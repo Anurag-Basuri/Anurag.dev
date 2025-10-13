@@ -31,3 +31,14 @@ dist-ssr
 /out
 /.expo
 /.expo-shared
+
+.env
+.env.local
+.env.*.local
+.env.test
+.env.production
+.env.production.local
+
+.prettierrc
+.prettierignore
+.eslintcache
