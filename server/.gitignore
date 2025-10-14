@@ -74,3 +74,7 @@ Thumbs.db
 .next
 .nuxt
 .sass-cache
+
+.prettierrc
+.prettierignore
+.prettier.cache
