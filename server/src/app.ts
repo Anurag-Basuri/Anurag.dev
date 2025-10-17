@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
 import { query } from './db.js';
 
@@ -85,6 +85,10 @@ app.post('/api/users', async (req: Request, res: Response) => {
 			[name, email],
 		);
 		const created = result.rows[0];
+		if (!created) {
+			// Safeguard in case the DB did not return a row
+			return res.status(500).json({ error: 'db_error', message: 'Insert returned no rows' });
+		}
 		res.status(201).location(`/api/users/${created.id}`).json(created);
 	} catch (err) {
 		// Map common PG errors
@@ -143,7 +147,10 @@ function sanitizeCreateUser(body: unknown): { name?: string; email?: string } {
 	const e = typeof email === 'string' ? email.trim().toLowerCase() : undefined;
 	if (n && n.length > 255) return {};
 	if (e && (!emailRegex.test(e) || e.length > 320)) return {};
-	return { name: n, email: e };
+	const out: { name?: string; email?: string } = {};
+	if (n !== undefined) out.name = n;
+	if (e !== undefined) out.email = e;
+	return out;
 }
 
 const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
