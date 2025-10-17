@@ -3,7 +3,7 @@ dotenv.config();
 
 // ESM-safe import: pg is CommonJS, so use default import and destructure.
 // Keep type-only imports as named (erased at runtime).
-import pg, { type PoolClient, type PoolConfig, type QueryResult } from 'pg';
+import pg, { type PoolClient, type PoolConfig, type QueryResult, type QueryResultRow } from 'pg';
 
 const { Pool } = pg;
 
@@ -95,7 +95,10 @@ function sleep(ms: number) {
 }
 
 // Parameterized query helper
-export async function query<T = unknown>(text: string, params?: any[]): Promise<QueryResult<T>> {
+export async function query<T extends QueryResultRow = QueryResultRow>(
+	text: string,
+	params?: any[],
+): Promise<QueryResult<T>> {
 	return pool.query<T>(text, params);
 }
 
@@ -108,7 +111,7 @@ export function sql(strings: TemplateStringsArray, ...values: any[]) {
 	return { text, values };
 }
 
-export async function querySql<T = unknown>(
+export async function querySql<T extends QueryResultRow = QueryResultRow>(
 	strings: TemplateStringsArray,
 	...values: any[]
 ): Promise<QueryResult<T>> {
