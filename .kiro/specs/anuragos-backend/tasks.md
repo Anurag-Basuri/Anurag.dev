@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [ ] 1. Set up project structure and core dependencies
+- [-] 1. Set up project structure and core dependencies
   - Replace Express with Fastify framework
   - Install and configure Prisma ORM with PostgreSQL
   - Install Zod for validation
