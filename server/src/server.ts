@@ -1,32 +1,16 @@
-import { validateEnv } from './config/env';
-import { buildApp } from './app';
+import { buildApp } from "./app";
+import { env } from "./config/env";
 
-async function start() {
+const app = buildApp();
+
+const start = async () => {
   try {
-    // Validate environment variables
-    const env = validateEnv();
-    
-    console.log('🔧 Environment validated successfully');
-    console.log(`📦 Environment: ${env.NODE_ENV}`);
-    
-    // Build and start the Fastify app
-    const app = await buildApp();
-    
-    await app.listen({
-      port: env.PORT,
-      host: '0.0.0.0',
-    });
-    
-    console.log(`🚀 Server running on http://localhost:${env.PORT}`);
-    
-    if (env.NODE_ENV === 'development') {
-      console.log(`📚 API Documentation: http://localhost:${env.PORT}/api-docs`);
-    }
-    
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    await app.listen({ port: env.PORT, host: "0.0.0.0" });
+    app.log.info(`Server listening on port ${env.PORT}`);
+  } catch (err) {
+    app.log.error(err);
     process.exit(1);
   }
-}
+};
 
 start();
