@@ -1,0 +1,166 @@
+// Prisma schema for AnuragOS Backend
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  username      String         @unique
+  passwordHash  String
+  email         String         @unique
+  isLocked      Boolean        @default(false)
+  lockedUntil   DateTime?
+  failedAttempts Int           @default(0)
+  lastFailedAt  DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isRevoked Boolean  @default(false)
+  
+  @@index([userId])
+  @@index([token])
+}
+
+model Project {
+  id          String    @id @default(uuid())
+  title       String
+  description String    @db.Text
+  techStack   String[]
+  githubUrl   String?
+  liveUrl     String?
+  status      String    @default("draft")
+  stars       Int?
+  forks       Int?
+  commits     Int?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  versions    Version[] @relation("ProjectVersions")
+  
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model JourneyEntry {
+  id          String   @id @default(uuid())
+  year        Int
+  title       String
+  description String   @db.Text
+  category    String
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([year, order])
+}
+
+model BlogPost {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  content     String    @db.Text
+  tags        String[]
+  status      String    @default("draft")
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  versions    Version[] @relation("BlogPostVersions")
+  
+  @@index([status])
+  @@index([slug])
+}
+
+model Media {
+  id           String   @id @default(uuid())
+  filename     String
+  fileKey      String   @unique
+  size         Int
+  mimeType     String
+  storageUrl   String
+  thumbnailUrl String?
+  createdAt    DateTime @default(now())
+  
+  @@index([fileKey])
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  ipAddress String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  @@index([createdAt])
+  @@index([isRead])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  action       String
+  resourceType String
+  resourceId   String
+  changes      Json
+  timestamp    DateTime @default(now())
+  
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([timestamp])
+}
+
+model Version {
+  id            String   @id @default(uuid())
+  resourceType  String
+  resourceId    String
+  versionNumber Int
+  data          Json
+  changeSummary String
+  createdBy     String
+  createdAt     DateTime @default(now())
+  
+  project       Project?  @relation("ProjectVersions", fields: [projectId], references: [id])
+  projectId     String?
+  blogPost      BlogPost? @relation("BlogPostVersions", fields: [blogPostId], references: [id])
+  blogPostId    String?
+  
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  type        String
+  payload     Json
+  status      String    @default("pending")
+  attempts    Int       @default(0)
+  error       String?   @db.Text
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([status])
+  @@index([type])
+}
