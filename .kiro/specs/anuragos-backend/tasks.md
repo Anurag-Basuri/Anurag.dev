@@ -15,24 +15,24 @@
   - Create proper directory structure (routes, services, repositories, middleware, utils, types)
   - _Requirements: 9.5_
 
-- [ ] 2. Set up database schema and migrations
+- [x] 2. Set up database schema and migrations
   - Define Prisma schema for all models (User, RefreshToken, Project, JourneyEntry, BlogPost, Media, ContactMessage, AuditLog, Version, Job)
   - Create initial migration
   - Set up database connection with connection pooling
   - Configure test database for testing
   - _Requirements: 2.1, 3.1, 4.2, 5.1, 6.1, 7.1, 8.1, 11.1_
 
-- [ ] 3. Implement authentication module
-  - [ ] 3.1 Create User model and repository
+- [-] 3. Implement authentication module
+  - [x] 3.1 Create User model and repository
     - Implement user repository with CRUD operations
     - Add account lockout tracking fields
     - _Requirements: 1.1, 1.5_
 
-  - [ ] 3.2 Implement password hashing utilities
+  - [x] 3.2 Implement password hashing utilities
     - Create bcrypt wrapper with salt rounds of 12
     - _Requirements: 1.1_
 
-  - [ ] 3.3 Implement JWT token generation and validation
+  - [x] 3.3 Implement JWT token generation and validation
     - Create access token generation (15 min expiry)
     - Create refresh token generation (7 day expiry)
     - Implement token validation middleware
@@ -42,7 +42,7 @@
     - **Property 1: Valid credentials generate token pair**
     - **Validates: Requirements 1.1**
 
-  - [ ] 3.5 Implement refresh token repository
+  - [x] 3.5 Implement refresh token repository
     - Create refresh token storage and retrieval
     - Implement token rotation logic
     - _Requirements: 1.2, 1.3_
@@ -51,14 +51,14 @@
     - **Property 3: Refresh token rotation invalidates previous token**
     - **Validates: Requirements 1.3**
 
-  - [ ] 3.7 Implement login service
+  - [x] 3.7 Implement login service
     - Validate credentials
     - Track failed login attempts
     - Implement account lockout logic (3 attempts in 15 min = 30 min lock)
     - Generate token pair on success
     - _Requirements: 1.1, 1.5_
 
-  - [ ] 3.8 Implement refresh token service
+  - [x] 3.8 Implement refresh token service
     - Validate refresh token
     - Generate new token pair
     - Rotate refresh token
@@ -68,7 +68,7 @@
     - **Property 2: Refresh token generates new access token**
     - **Validates: Requirements 1.2**
 
-  - [ ] 3.10 Implement logout service
+  - [x] 3.10 Implement logout service
     - Invalidate all user refresh tokens
     - _Requirements: 1.4_
 
@@ -76,7 +76,7 @@
     - **Property 4: Logout invalidates all refresh tokens**
     - **Validates: Requirements 1.4**
 
-  - [ ] 3.12 Create authentication routes
+  - [x] 3.12 Create authentication routes
     - POST /api/auth/login
     - POST /api/auth/refresh
     - POST /api/auth/logout
@@ -151,14 +151,14 @@
     - **Property 26: Rollback creates audit log**
     - **Validates: Requirements 6.4**
 
-- [ ] 6. Implement projects module
-  - [ ] 6.1 Create project repository
+- [-] 6. Implement projects module
+  - [x] 6.1 Create project repository
     - Implement CRUD operations
     - Implement soft delete
     - Implement published projects query with caching
     - _Requirements: 2.1, 2.4, 2.5_
 
-  - [ ] 6.2 Create project service
+  - [x] 6.2 Create project service
     - Implement create with all fields
     - Implement update with version snapshot
     - Implement publish with status change
@@ -181,7 +181,7 @@
     - **Property 8: Deletion soft-deletes projects**
     - **Validates: Requirements 2.4**
 
-  - [ ] 6.7 Create project routes
+  - [x] 6.7 Create project routes
     - POST /api/admin/projects
     - PUT /api/admin/projects/:id
     - POST /api/admin/projects/:id/publish
