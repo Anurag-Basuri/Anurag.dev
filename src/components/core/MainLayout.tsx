@@ -6,6 +6,9 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { FolderTree } from "@/components/core/FolderTree";
+import { CLI } from "@/components/core/CLI";
+import { initialFileSystem } from "@/lib/data";
 
 export function MainLayout() {
   return (
@@ -23,10 +26,7 @@ export function MainLayout() {
       <ResizablePanelGroup direction="horizontal" className="flex-1">
         <ResizablePanel defaultSize={35} minSize={20} maxSize={50} className="flex flex-col border-r">
            <div className="p-2 text-xs font-bold border-b bg-muted/20 uppercase tracking-wider text-muted-foreground">Explorer</div>
-import { FolderTree } from "@/components/core/FolderTree";
-import { initialFileSystem } from "@/lib/data";
 
-// ... inside component
            <ScrollArea className="flex-1">
              <div className="p-2">
                <FolderTree items={initialFileSystem} />
@@ -38,19 +38,7 @@ import { initialFileSystem } from "@/lib/data";
         
         <ResizablePanel defaultSize={65}>
             <div className="h-full flex flex-col">
-                {/* CLI / Terminal Area */}
-                <div className="flex-1 bg-zinc-950 text-green-500 p-4 font-mono text-sm overflow-auto">
-                    <div className="mb-4">
-                        <p>AnuragOS [Version 1.0.0]</p>
-                        <p>(c) 2025 Anurag Basuri. All rights reserved.</p>
-                        <br/>
-                        <p>Type 'help' to view available commands.</p>
-                    </div>
-                    <div className="flex">
-                        <span className="mr-2 text-blue-400">user@anurag:~$</span>
-                        <span className="animate-pulse block w-2 h-4 bg-green-500"></span>
-                    </div>
-                </div>
+                <CLI />
             </div>
         </ResizablePanel>
       </ResizablePanelGroup>
