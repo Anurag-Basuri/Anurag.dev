@@ -6,11 +6,25 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAtom } from "jotai";
 import { windowsAtom } from "@/store/atoms";
+import { AboutModule } from "@/components/modules/AboutModule";
+import { ProjectsModule } from "@/components/modules/ProjectsModule";
+import { JourneyModule } from "@/components/modules/JourneyModule";
+import { BlogModule } from "@/components/modules/BlogModule";
+import { ContactModule } from "@/components/modules/ContactModule";
 
 type HistoryItem = {
   id: string;
   command: string;
   response: CommandResponse;
+};
+
+const moduleComponents: Record<string, React.ReactNode> = {
+  about: <AboutModule />,
+  projects: <ProjectsModule />,
+  journey: <JourneyModule />,
+  blog: <BlogModule />,
+  contact: <ContactModule />,
+  "ai-lab": <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
 };
 
 export function CLI() {
@@ -45,7 +59,7 @@ export function CLI() {
             return [...prev, {
                 id: moduleId,
                 title: moduleId.toUpperCase(),
-                component: <div className="p-4">Placeholder for {moduleId}</div>,
+                component: moduleComponents[moduleId] || <div className="p-4">Module not found</div>,
                 isOpen: true,
                 isMinimized: false,
                 position: { x: 100 + prev.length * 20, y: 100 + prev.length * 20 },
