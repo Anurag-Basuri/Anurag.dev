@@ -1,63 +1,22 @@
-import { z } from 'zod';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().transform(Number).default('4000'),
-  
-  // Database
-  DATABASE_URL: z.string().url(),
-  
-  // Redis
-  REDIS_HOST: z.string().default('localhost'),
-  REDIS_PORT: z.string().transform(Number).default('6379'),
-  REDIS_PASSWORD: z.string().optional(),
-  
-  // JWT
-  JWT_SECRET: z.string().min(32),
-  JWT_REFRESH_SECRET: z.string().min(32),
-  JWT_ACCESS_EXPIRY: z.string().default('15m'),
-  JWT_REFRESH_EXPIRY: z.string().default('7d'),
-  
-  // AWS S3
-  AWS_REGION: z.string().default('us-east-1'),
-  AWS_ACCESS_KEY_ID: z.string(),
-  AWS_SECRET_ACCESS_KEY: z.string(),
-  AWS_S3_BUCKET: z.string(),
-  
-  // Email (optional for now)
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
+  PORT: z.coerce.number().default(4000),
+  DATABASE_URL: z.string().optional(),
+  REDIS_URL: z.string().optional(),
+  JWT_ACCESS_SECRET: z.string().min(8),
+  JWT_REFRESH_SECRET: z.string().min(8),
+  ACCESS_TOKEN_EXP: z.string().default("15m"),
+  REFRESH_TOKEN_EXP: z.string().default("7d"),
+  AWS_S3_BUCKET: z.string().optional(),
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.string().transform(Number).optional(),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASSWORD: z.string().optional(),
-  ADMIN_EMAIL: z.string().email().optional(),
 });
 
-export type Env = z.infer<typeof envSchema>;
-
-let env: Env;
-
-export function validateEnv(): Env {
-  try {
-    env = envSchema.parse(process.env);
-    return env;
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error('❌ Environment validation failed:');
-      error.errors.forEach((err) => {
-        console.error(`  - ${err.path.join('.')}: ${err.message}`);
-      });
-      process.exit(1);
-    }
-    throw error;
-  }
+const parsed = envSchema.safeParse(process.env);
+if (!parsed.success) {
+  console.error("Invalid environment variables:", parsed.error.format());
+  throw new Error("Invalid environment");
 }
 
-export function getEnv(): Env {
-  if (!env) {
-    env = validateEnv();
-  }
-  return env;
-}
+export const env = parsed.data;
