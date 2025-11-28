@@ -10,6 +10,7 @@ import { env } from "./config/env";
 import publicRoutes from "./routes/public.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import contactRoutes from "./modules/contact/contact.routes";
+import projectRoutes from "./modules/projects/project.routes";
 
 export function buildApp() {
   const app = Fastify({ logger: { level: process.env.LOG_LEVEL || "info" } });
@@ -18,7 +19,7 @@ export function buildApp() {
   app.register(sensible);
 
   app.register(fastifyJwt, {
-    secret: env.JWT_ACCESS_SECRET,
+    secret: env.JWT_SECRET,
   });
 
   if (env.NODE_ENV === "development") {
@@ -37,6 +38,7 @@ export function buildApp() {
   app.register(publicRoutes);
   app.register(authRoutes);
   app.register(contactRoutes);
+  app.register(projectRoutes);
 
   // global error handler
   app.setErrorHandler((err, _request, reply) => {
