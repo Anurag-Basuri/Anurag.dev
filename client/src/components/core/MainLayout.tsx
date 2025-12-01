@@ -19,6 +19,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 import { Menu } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Taskbar } from "@/components/core/Taskbar";
 
 export function MainLayout() {
   const [windows, setWindows] = useAtom(windowsAtom);
@@ -137,6 +138,22 @@ export function MainLayout() {
                 </div>
             )}
         </div>
+      </div>
+import { Taskbar } from "@/components/core/Taskbar";
+
+export function MainLayout() {
+  // ... existing code ...
+
+  return (
+    <>
+      <div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+        {/* ... existing code ... */}
+        
+        <div className="flex-1 z-10 relative overflow-hidden flex">
+            {/* ... existing code ... */}
+        </div>
+
+        <Taskbar />
       </div>
       <WindowManager />
     </>
