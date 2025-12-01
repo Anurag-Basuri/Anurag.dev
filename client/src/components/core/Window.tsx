@@ -36,8 +36,8 @@ export function Window({ windowState }: WindowProps) {
   return (
     <Rnd
       default={{
-        x: windowState.position.x,
-        y: windowState.position.y,
+        x: windowState.position?.x || 100,
+        y: windowState.position?.y || 100,
         width: 600,
         height: 400,
       }}
