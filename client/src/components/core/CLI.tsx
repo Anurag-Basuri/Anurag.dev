@@ -11,6 +11,12 @@ import { getModuleComponent } from "@/lib/moduleRegistry";
 // Removed local moduleComponents definition in favor of registry
 
 
+type HistoryItem = {
+  id: string;
+  command: string;
+  response: CommandResponse;
+};
+
 export function CLI() {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -43,7 +49,7 @@ export function CLI() {
             return [...prev, {
                 id: moduleId,
                 title: moduleId.toUpperCase(),
-                component: moduleComponents[moduleId] || <div className="p-4">Module not found</div>,
+                component: getModuleComponent(moduleId),
                 isOpen: true,
                 isMinimized: false,
                 position: { x: 100 + prev.length * 20, y: 100 + prev.length * 20 },
