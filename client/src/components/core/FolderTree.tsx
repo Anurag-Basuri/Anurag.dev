@@ -60,7 +60,7 @@ function FolderTreeItem({
     <div>
       <div
         className={cn(
-          "flex items-center py-1 px-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer select-none text-sm transition-colors",
+          "flex items-center py-1 px-2 hover:bg-white/10 cursor-pointer select-none text-sm transition-colors rounded-sm",
           level > 0 && "ml-4"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
