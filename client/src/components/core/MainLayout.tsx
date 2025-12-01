@@ -15,8 +15,15 @@ import { useAtom } from "jotai";
 import { windowsAtom } from "@/store/atoms";
 import { getModuleComponent } from "@/lib/moduleRegistry";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { Menu } from "lucide-react";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
 export function MainLayout() {
   const [windows, setWindows] = useAtom(windowsAtom);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
   const handleFileSelect = (item: any) => {
     if (item.type === "file") {
@@ -26,12 +33,6 @@ export function MainLayout() {
       setWindows((prev: any[]) => {
         if (prev.find((w: any) => w.id === moduleId)) return prev;
 
-        // Import dynamically to avoid circular deps if needed, but for now use registry
-        // We need to ensure we have a way to get component by ID.
-        // Since we can't easily import getModuleComponent inside this function without it being available in scope,
-        // we'll assume the registry logic is handled or we import it at top level.
-        // Let's rely on the fact we can import it.
-
         return [
           ...prev,
           {
@@ -40,10 +41,14 @@ export function MainLayout() {
             component: getModuleComponent(moduleId),
             isOpen: true,
             isMinimized: false,
-            position: { x: 150 + prev.length * 20, y: 150 + prev.length * 20 },
+            position: isMobile ? { x: 0, y: 0 } : { x: 150 + prev.length * 20, y: 150 + prev.length * 20 },
           },
         ];
       });
+      
+      if (isMobile) {
+          setIsExplorerOpen(false);
+      }
     }
   };
 
@@ -60,49 +65,78 @@ export function MainLayout() {
         />
 
         {/* Top Bar */}
-        <div className="h-8 border-b flex items-center px-4 text-xs select-none bg-background/60 backdrop-blur-md z-10 relative border-white/10">
-          <span className="font-bold mr-4">AnuragOS</span>
-          <span className="flex-1 text-center text-muted-foreground">
-            SYSTEM READY
-          </span>
+        <div className="h-8 border-b flex items-center px-4 text-xs select-none bg-background/60 backdrop-blur-md z-10 relative border-white/10 justify-between">
+          <div className="flex items-center">
+              {isMobile && (
+                  <Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
+                      <SheetTrigger asChild>
+                          <button className="mr-3 p-1 hover:bg-white/10 rounded">
+                              <Menu className="w-4 h-4" />
+                          </button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="w-[250px] p-0 bg-background/95 backdrop-blur-md border-r border-white/10">
+                          <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
+                              Explorer
+                          </div>
+                          <ScrollArea className="h-full">
+                              <div className="p-2">
+                                  <FolderTree
+                                      items={initialFileSystem}
+                                      onSelect={handleFileSelect}
+                                  />
+                              </div>
+                          </ScrollArea>
+                      </SheetContent>
+                  </Sheet>
+              )}
+              <span className="font-bold mr-4">AnuragOS</span>
+          </div>
+          
+          {!isMobile && <span className="flex-1 text-center text-muted-foreground">SYSTEM READY</span>}
+          
           <div className="flex gap-2 items-center">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
             <span className="text-[10px] text-muted-foreground">ONLINE</span>
           </div>
         </div>
 
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="flex-1 z-10 relative"
-        >
-          <ResizablePanel
-            defaultSize={25}
-            minSize={15}
-            maxSize={40}
-            className="flex flex-col border-r border-white/10 bg-background/40 backdrop-blur-sm"
-          >
-            <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
-              Explorer
-            </div>
+        <div className="flex-1 z-10 relative overflow-hidden flex">
+            {!isMobile ? (
+                <ResizablePanelGroup direction="horizontal" className="h-full">
+                    <ResizablePanel
+                        defaultSize={25}
+                        minSize={15}
+                        maxSize={40}
+                        className="flex flex-col border-r border-white/10 bg-background/40 backdrop-blur-sm"
+                    >
+                        <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
+                            Explorer
+                        </div>
 
-            <ScrollArea className="flex-1">
-              <div className="p-2">
-                <FolderTree
-                  items={initialFileSystem}
-                  onSelect={handleFileSelect}
-                />
-              </div>
-            </ScrollArea>
-          </ResizablePanel>
+                        <ScrollArea className="flex-1">
+                            <div className="p-2">
+                                <FolderTree
+                                    items={initialFileSystem}
+                                    onSelect={handleFileSelect}
+                                />
+                            </div>
+                        </ScrollArea>
+                    </ResizablePanel>
 
-          <ResizableHandle withHandle className="bg-white/10" />
+                    <ResizableHandle withHandle className="bg-white/10" />
 
-          <ResizablePanel defaultSize={75}>
-            <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
-              <CLI />
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+                    <ResizablePanel defaultSize={75}>
+                        <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
+                            <CLI />
+                        </div>
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            ) : (
+                <div className="flex-1 flex flex-col bg-black/20 backdrop-blur-sm w-full">
+                    <CLI />
+                </div>
+            )}
+        </div>
       </div>
       <WindowManager />
     </>
