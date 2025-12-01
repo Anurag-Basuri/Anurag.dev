@@ -6,26 +6,10 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAtom } from "jotai";
 import { windowsAtom } from "@/store/atoms";
-import { AboutModule } from "@/components/modules/AboutModule";
-import { ProjectsModule } from "@/components/modules/ProjectsModule";
-import { JourneyModule } from "@/components/modules/JourneyModule";
-import { BlogModule } from "@/components/modules/BlogModule";
-import { ContactModule } from "@/components/modules/ContactModule";
+import { getModuleComponent } from "@/lib/moduleRegistry";
 
-type HistoryItem = {
-  id: string;
-  command: string;
-  response: CommandResponse;
-};
+// Removed local moduleComponents definition in favor of registry
 
-const moduleComponents: Record<string, React.ReactNode> = {
-  about: <AboutModule />,
-  projects: <ProjectsModule />,
-  journey: <JourneyModule />,
-  blog: <BlogModule />,
-  contact: <ContactModule />,
-  "ai-lab": <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
-};
 
 export function CLI() {
   const [input, setInput] = useState("");
