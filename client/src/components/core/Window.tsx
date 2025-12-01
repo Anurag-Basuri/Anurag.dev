@@ -9,9 +9,12 @@ interface WindowProps {
   windowState: WindowState;
 }
 
+import { useMediaQuery } from "@/hooks/use-media-query";
+
 export function Window({ windowState }: WindowProps) {
   const [activeId, setActiveId] = useAtom(activeWindowIdAtom);
   const [windows, setWindows] = useAtom(windowsAtom);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const isActive = activeId === windowState.id;
 
@@ -41,6 +44,10 @@ export function Window({ windowState }: WindowProps) {
         width: 600,
         height: 400,
       }}
+      position={isMobile ? { x: 0, y: 0 } : undefined}
+      size={isMobile ? { width: "100%", height: "100%" } : undefined}
+      disableDragging={isMobile}
+      enableResizing={!isMobile}
       minWidth={300}
       minHeight={200}
       bounds="window"
