@@ -23,8 +23,8 @@ export function MainLayout() {
           // Map file names to module IDs (simple mapping for now)
           const moduleId = item.name.split('.')[0].toLowerCase();
           
-          setWindows((prev) => {
-            if (prev.find(w => w.id === moduleId)) return prev;
+          setWindows((prev: any[]) => {
+            if (prev.find((w: any) => w.id === moduleId)) return prev;
             
             // Import dynamically to avoid circular deps if needed, but for now use registry
             // We need to ensure we have a way to get component by ID.
