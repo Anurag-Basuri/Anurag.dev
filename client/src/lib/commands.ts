@@ -1,4 +1,8 @@
 import { ReactNode } from "react";
+import { Setter } from "jotai";
+
+import { Tab, tabsAtom, activeTabIdAtom } from "@/store/atoms";
+import { moduleRegistry } from "./moduleRegistry";
 
 export type CommandResponse = {
   type: "text" | "error" | "success" | "component" | "clear" | "open_module";
@@ -50,15 +54,55 @@ export function processCommand(input: string): CommandResponse {
       return { type: "clear", content: "" };
     case "ls":
       // TODO: Implement actual directory listing based on current path
-      return { type: "text", content: "about  projects  journey  ai-lab  blog  contact  tools  secret" };
+      return {
+        type: "text",
+        content:
+          "about  projects  journey  ai-lab  blog  contact  tools  secret",
+      };
     case "about":
     case "projects":
     case "journey":
     case "ai-lab":
     case "blog":
     case "contact":
-      return { type: "open_module", content: `Opening ${command}...`, moduleId: command };
+      return {
+        type: "open_module",
+        content: `Opening ${command}...`,
+        moduleId: command,
+      };
     default:
-      return { type: "error", content: `Command not found: ${command}. Type 'help' for available commands.` };
+      return {
+        type: "error",
+        content: `Command not found: ${command}. Type 'help' for available commands.`,
+      };
   }
 }
+
+const open = (args: string[], set: Setter): string => {
+  if (args.length === 0) {
+    return "Usage: open [module_name]";
+  }
+  const moduleId = args[0].toLowerCase();
+
+  if (!moduleRegistry[moduleId]) {
+    return `Error: Module '${moduleId}' not found.`;
+  }
+
+  set(tabsAtom, (prevTabs) => {
+    // If tab already exists, don't add it again
+    if (prevTabs.some((tab) => tab.id === moduleId)) {
+      return prevTabs;
+    }
+    const newTab: Tab = {
+      id: moduleId,
+      title: moduleId.charAt(0).toUpperCase() + moduleId.slice(1),
+      type: "module",
+    };
+    return [...prevTabs, newTab];
+  });
+
+  // Switch to the newly opened or existing tab
+  set(activeTabIdAtom, moduleId);
+
+  return `Opening ${moduleId}...`;
+};
