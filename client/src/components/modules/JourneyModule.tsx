@@ -42,46 +42,48 @@ export function JourneyModule() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="p-6 space-y-6 font-mono">
+      <div className="p-6 space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-green-500 mb-2">$ cat journey/timeline.md</h1>
-          <p className="text-muted-foreground">My professional journey</p>
+          <h1 className="text-2xl font-bold text-green-500 mb-2 flex items-center gap-2">
+            <span className="text-blue-400">$</span> cat journey/timeline.md
+          </h1>
+          <p className="text-white/60">My professional journey</p>
         </div>
 
         <div className="relative space-y-6 pl-8">
-          {/* Timeline line */}
-          <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-muted"></div>
+          {/* Timeline line - gradient */}
+          <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-green-500 via-blue-500 to-purple-500"></div>
 
           {journey.map((entry, index) => (
             <div key={entry.id} className="relative">
-              {/* Timeline dot */}
-              <div className="absolute -left-[26px] top-2 w-3 h-3 rounded-full bg-green-500 border-2 border-background"></div>
+              {/* Timeline dot with glow */}
+              <div className="absolute -left-[26px] top-2 w-3 h-3 rounded-full bg-green-500 border-2 border-black shadow-[0_0_8px_rgba(34,197,94,0.8)] z-10"></div>
 
-              <div className="border border-muted rounded-lg p-4 hover:border-green-500/50 transition-colors">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-2xl font-bold text-green-400">{entry.year}</span>
+              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-5 hover:border-green-500/50 hover:shadow-lg transition-all">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-3xl font-bold text-green-400">{entry.year}</span>
                       <span
-                        className={`px-2 py-0.5 border rounded text-xs uppercase ${
-                          categoryColors[entry.category] || "text-muted-foreground border-muted"
+                        className={`px-3 py-1 border rounded-full text-xs uppercase font-semibold ${
+                          categoryColors[entry.category] || "text-white/60 border-white/20"
                         }`}
                       >
                         {entry.category}
                       </span>
                     </div>
-                    <h2 className="text-lg font-bold text-foreground">{entry.title}</h2>
+                    <h2 className="text-xl font-bold text-white mb-2">{entry.title}</h2>
                   </div>
                 </div>
 
-                <p className="text-sm text-muted-foreground">{entry.description}</p>
+                <p className="text-sm text-white/70 leading-relaxed">{entry.description}</p>
               </div>
             </div>
           ))}
         </div>
 
         {journey.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
+          <div className="text-center py-12 text-white/60">
             <p>No journey entries found.</p>
           </div>
         )}
