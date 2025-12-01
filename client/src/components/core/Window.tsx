@@ -36,40 +36,44 @@ export function Window({ windowState }: WindowProps) {
   return (
     <Rnd
       default={{
-        x: windowState.position?.x || 100,
-        y: windowState.position?.y || 100,
-        width: windowState.size?.width || 600,
-        height: windowState.size?.height || 400,
+        x: windowState.position.x,
+        y: windowState.position.y,
+        width: 600,
+        height: 400,
       }}
       minWidth={300}
       minHeight={200}
       bounds="window"
-      onDragStart={handleFocus}
-      onResizeStart={handleFocus}
-      className={cn(
-        "bg-background border border-border shadow-2xl flex flex-col overflow-hidden rounded-md",
-        isActive ? "z-50 ring-1 ring-ring" : "z-40 opacity-95"
-      )}
-      dragHandleClassName="window-header"
-      onClick={handleFocus}
+      dragHandleClassName="window-handle"
+      className="z-50"
+      onDragStop={(e, d) => {
+        // Update position in atom if needed, for now local state handled by Rnd
+      }}
     >
-      <div
-        className={cn(
-            "window-header h-9 bg-muted/80 backdrop-blur-sm border-b flex items-center justify-between px-3 cursor-move select-none transition-colors",
-            isActive ? "bg-muted" : "bg-muted/50"
-        )}
-      >
-        <div className="flex items-center gap-2 group">
-            <div className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 cursor-pointer transition-colors" onClick={handleClose} />
-            <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 cursor-pointer transition-colors" onClick={handleMinimize} />
-            <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 cursor-pointer transition-colors" />
+      <div className="h-full flex flex-col rounded-lg overflow-hidden border border-white/20 shadow-2xl bg-black/80 backdrop-blur-md text-white">
+        {/* Title Bar */}
+        <div className="window-handle h-9 bg-white/5 border-b border-white/10 flex items-center px-3 select-none cursor-default justify-between">
+           <div className="flex items-center gap-2">
+             <div className="flex gap-1.5 group">
+                <button 
+                    onClick={handleClose}
+                    className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center"
+                >
+                </button>
+                <button 
+                    onClick={handleMinimize}
+                    className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
+                ></button>
+                <button className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 transition-colors"></button>
+             </div>
+             <span className="ml-3 text-xs font-medium text-white/70">{windowState.title}</span>
+           </div>
         </div>
-        <span className="text-xs font-medium text-muted-foreground absolute left-1/2 -translate-x-1/2 pointer-events-none">
-            {windowState.title}
-        </span>
-      </div>
-      <div className="flex-1 overflow-auto bg-background text-foreground relative">
-        {windowState.component}
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto bg-black/40 relative">
+           {windowState.component}
+        </div>
       </div>
     </Rnd>
   );
