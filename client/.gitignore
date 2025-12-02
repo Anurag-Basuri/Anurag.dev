@@ -71,3 +71,7 @@ Thumbs.db
 .stylelintrc.json
 .stylelintrc.yml
 .stylelintrc.yaml
+
+/.next
+/out
+/build
