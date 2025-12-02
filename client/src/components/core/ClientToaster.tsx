@@ -9,12 +9,14 @@ export default function ClientToaster() {
 			position="bottom-center"
 			toastOptions={{
 				style: {
-					background: '#0b0b0b',
-					color: '#eaeaea',
-					border: '1px solid rgba(255,255,255,0.08)',
+					background: 'var(--popover)',
+					color: 'var(--popover-foreground)',
+					border: '1px solid var(--border)',
+					boxShadow: '0 8px 32px -8px rgba(0,0,0,0.35)',
+					backdropFilter: 'blur(10px)',
 				},
-				success: { iconTheme: { primary: '#10b981', secondary: '#0b0b0b' } },
-				error: { iconTheme: { primary: '#f59e0b', secondary: '#0b0b0b' } },
+				success: { iconTheme: { primary: '#10b981', secondary: 'var(--popover)' } },
+				error: { iconTheme: { primary: '#f59e0b', secondary: 'var(--popover)' } },
 			}}
 		/>
 	);
