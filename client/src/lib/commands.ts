@@ -1,8 +1,4 @@
 import { ReactNode } from "react";
-import { Setter } from "jotai";
-
-import { Tab, tabsAtom, activeTabIdAtom } from "@/store/atoms";
-import { moduleRegistry } from "./moduleRegistry";
 
 export type CommandResponse = {
   type: "text" | "error" | "success" | "component" | "clear" | "open_module";
@@ -70,6 +66,23 @@ export function processCommand(input: string): CommandResponse {
         content: `Opening ${command}...`,
         moduleId: command,
       };
+    case "open": {
+      if (args.length === 0) {
+        return { type: "error", content: "Usage: open [module_name]" };
+      }
+      const moduleId = args[0].toLowerCase();
+      if (!moduleRegistry[moduleId]) {
+        return {
+          type: "error",
+          content: `Error: Module '${moduleId}' not found.`,
+        };
+      }
+      return {
+        type: "open_module",
+        content: `Opening ${moduleId}...`,
+        moduleId: moduleId,
+      };
+    }
     default:
       return {
         type: "error",
@@ -77,32 +90,3 @@ export function processCommand(input: string): CommandResponse {
       };
   }
 }
-
-const open = (args: string[], set: Setter): string => {
-  if (args.length === 0) {
-    return "Usage: open [module_name]";
-  }
-  const moduleId = args[0].toLowerCase();
-
-  if (!moduleRegistry[moduleId]) {
-    return `Error: Module '${moduleId}' not found.`;
-  }
-
-  set(tabsAtom, (prevTabs) => {
-    // If tab already exists, don't add it again
-    if (prevTabs.some((tab) => tab.id === moduleId)) {
-      return prevTabs;
-    }
-    const newTab: Tab = {
-      id: moduleId,
-      title: moduleId.charAt(0).toUpperCase() + moduleId.slice(1),
-      type: "module",
-    };
-    return [...prevTabs, newTab];
-  });
-
-  // Switch to the newly opened or existing tab
-  set(activeTabIdAtom, moduleId);
-
-  return `Opening ${moduleId}...`;
-};

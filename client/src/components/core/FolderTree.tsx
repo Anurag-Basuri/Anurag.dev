@@ -13,9 +13,6 @@ import {
   FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSetAtom } from "jotai";
-import { activeTabIdAtom, tabsAtom, Tab } from "@/store/atoms";
-import { ScrollArea } from "../ui/scroll-area";
 
 interface FolderTreeProps {
   items: FileSystemItem[];
@@ -116,33 +113,3 @@ function FolderTreeItem({
     </div>
   );
 }
-
-const FileItem = ({ name, id }: { name: string; id: string }) => {
-  const setTabs = useSetAtom(tabsAtom);
-  const setActiveTabId = useSetAtom(activeTabIdAtom);
-
-  const handleClick = () => {
-    setTabs((prevTabs) => {
-      if (prevTabs.some((tab) => tab.id === id)) {
-        return prevTabs;
-      }
-      const newTab: Tab = {
-        id,
-        title: name,
-        type: "module",
-      };
-      return [...prevTabs, newTab];
-    });
-    setActiveTabId(id);
-  };
-
-  return (
-    <div
-      className="flex items-center space-x-2 cursor-pointer hover:bg-muted p-1 rounded"
-      onClick={handleClick}
-    >
-      <File className="h-4 w-4 text-muted-foreground" />
-      <span>{name}</span>
-    </div>
-  );
-};
