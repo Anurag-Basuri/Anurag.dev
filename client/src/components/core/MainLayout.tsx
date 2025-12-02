@@ -9,14 +9,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FolderTree } from "@/components/core/FolderTree";
 import { CLI } from "@/components/core/CLI";
 import { initialFileSystem, FileSystemItem } from "@/lib/data";
-
 import { useAtom } from "jotai";
 import { windowsAtom, activeWindowIdAtom } from "@/store/atoms";
 import { getModuleComponent } from "@/lib/moduleRegistry";
 import { EditorArea } from "@/components/core/EditorArea";
 import { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
-
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -32,16 +30,12 @@ export function MainLayout() {
 
   const handleFileSelect = (item: FileSystemItem) => {
     if (item.type === "file") {
-      const moduleId = item.id; // Use ID for uniqueness
-
+      const moduleId = item.id;
       setWindows((prev) => {
-        // If already open, just focus it
         if (prev.find((w) => w.id === moduleId)) {
           setActiveWindowId(moduleId);
           return prev;
         }
-
-        // Add new window
         setActiveWindowId(moduleId);
         return [
           ...prev,
@@ -54,7 +48,6 @@ export function MainLayout() {
           },
         ];
       });
-
       if (isMobile) {
         setIsExplorerOpen(false);
       }
@@ -76,27 +69,29 @@ export function MainLayout() {
         }}
       />
       <div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
-        {/* Wallpaper Background */}
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-20 pointer-events-none"
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-25 pointer-events-none"
           style={{
             backgroundImage:
               'url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")',
           }}
         />
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.12),transparent_55%)]" />
+          <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        </div>
 
-        {/* Top Bar */}
         <motion.div
           initial={{ y: -40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="h-8 border-b flex items-center px-4 text-xs select-none bg-background/60 backdrop-blur-md z-20 relative border-white/10 justify-between"
+          className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/75 backdrop-blur-md z-20 relative border-white/10 justify-between shadow-[0_5px_30px_rgba(0,0,0,0.4)]"
         >
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             {isMobile && (
               <Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
                 <SheetTrigger asChild>
-                  <button className="mr-3 p-1 hover:bg-white/10 rounded">
+                  <button className="p-1.5 hover:bg-white/10 rounded">
                     <Menu className="w-4 h-4" />
                   </button>
                 </SheetTrigger>
@@ -104,7 +99,7 @@ export function MainLayout() {
                   side="left"
                   className="w-[250px] p-0 bg-background/95 backdrop-blur-md border-r border-white/10"
                 >
-                  <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
+                  <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-[0.3em] text-muted-foreground">
                     Explorer
                   </div>
                   <ScrollArea className="h-full">
@@ -118,18 +113,18 @@ export function MainLayout() {
                 </SheetContent>
               </Sheet>
             )}
-            <span className="font-bold mr-4 tracking-widest">AnuragOS</span>
+            <span className="font-bold tracking-[0.4em] text-sm">ANURAGOS</span>
           </div>
 
           {!isMobile && (
-            <span className="flex-1 text-center text-muted-foreground">
+            <span className="flex-1 text-center text-muted-foreground tracking-[0.3em]">
               SYSTEM READY
             </span>
           )}
 
           <div className="flex gap-2 items-center">
-            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-            <span className="text-[10px] text-muted-foreground uppercase">
+            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]" />
+            <span className="text-[10px] text-muted-foreground uppercase tracking-[0.4em]">
               ONLINE
             </span>
           </div>
@@ -140,19 +135,23 @@ export function MainLayout() {
             <ResizablePanelGroup direction="horizontal" className="h-full">
               <ResizablePanel
                 defaultSize={20}
-                minSize={15}
-                maxSize={30}
-                className="flex flex-col border-r border-white/10 bg-background/40 backdrop-blur-sm"
+                minSize={13}
+                maxSize={28}
+                collapsible
+                collapsedSize={3}
+                className="flex flex-col border-r border-white/10 bg-background/60 backdrop-blur-md"
               >
-                <ResizablePanelGroup direction="vertical">
+                <ResizablePanelGroup direction="vertical" className="h-full">
                   <ResizablePanel
-                    defaultSize={30}
-                    minSize={10}
-                    collapsible={true}
+                    defaultSize={35}
+                    minSize={12}
+                    collapsible
+                    collapsedSize={8}
+                    className="border-b border-white/10"
                   >
                     <div className="h-full flex flex-col">
-                      <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground flex justify-between items-center group">
-                        <span>Open Editors</span>
+                      <div className="p-2 text-[11px] font-semibold border-b border-white/10 bg-white/5 uppercase tracking-[0.25em] text-muted-foreground">
+                        Open Editors
                       </div>
                       <ScrollArea className="flex-1">
                         <motion.div layout className="flex flex-col">
@@ -168,7 +167,7 @@ export function MainLayout() {
                                 className={cn(
                                   "flex items-center justify-between px-3 py-1.5 text-sm hover:bg-white/5 cursor-pointer group/item",
                                   activeWindowId === win.id &&
-                                    "bg-blue-500/20 text-blue-300"
+                                    "bg-blue-500/20 text-blue-300 shadow-[inset_0_0_0_1px_rgba(96,165,250,0.4)]"
                                 )}
                                 onClick={() => setActiveWindowId(win.id)}
                               >
@@ -185,11 +184,13 @@ export function MainLayout() {
                                     );
                                     setWindows(newWindows);
                                     if (activeWindowId === win.id) {
-                                      if (newWindows.length > 0)
+                                      if (newWindows.length > 0) {
                                         setActiveWindowId(
                                           newWindows[newWindows.length - 1].id
                                         );
-                                      else setActiveWindowId(null);
+                                      } else {
+                                        setActiveWindowId(null);
+                                      }
                                     }
                                   }}
                                   className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
@@ -211,9 +212,9 @@ export function MainLayout() {
 
                   <ResizableHandle className="bg-white/10" />
 
-                  <ResizablePanel defaultSize={70} minSize={20}>
+                  <ResizablePanel defaultSize={65} minSize={25}>
                     <div className="h-full flex flex-col">
-                      <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
+                      <div className="p-2 text-[11px] font-semibold border-b border-white/10 bg-white/5 uppercase tracking-[0.25em] text-muted-foreground">
                         Explorer
                       </div>
                       <ScrollArea className="flex-1">
@@ -231,28 +232,44 @@ export function MainLayout() {
 
               <ResizableHandle withHandle className="bg-white/10" />
 
-              <ResizablePanel defaultSize={80} minSize={30}>
-                <ResizablePanelGroup direction="vertical">
-                  <ResizablePanel defaultSize={70} minSize={20}>
-                    <EditorArea />
-                  </ResizablePanel>
-                  <ResizableHandle withHandle className="bg-white/10" />
-                  <ResizablePanel
-                    defaultSize={30}
-                    minSize={10}
-                    collapsible={true}
-                  >
-                    <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
-                      <CLI onOpenFile={handleFileSelect} />
-                    </div>
-                  </ResizablePanel>
-                </ResizablePanelGroup>
+              <ResizablePanel
+                defaultSize={55}
+                minSize={32}
+                className="relative overflow-hidden bg-gradient-to-br from-[#05070d]/70 via-[#050a13]/80 to-[#04050a]/70"
+              >
+                <div className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.18),transparent_55%)]" />
+                <div className="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:60px_60px]" />
+                <div className="relative z-10 h-full flex flex-col">
+                  <EditorArea />
+                </div>
+              </ResizablePanel>
+
+              <ResizableHandle withHandle className="bg-white/10" />
+
+              <ResizablePanel
+                defaultSize={25}
+                minSize={15}
+                maxSize={40}
+                collapsible
+                collapsedSize={3}
+                className="border-l border-white/10 bg-[#05060a]/90 backdrop-blur-xl"
+              >
+                <div className="h-full flex flex-col">
+                  <div className="p-3 border-b border-white/10 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between">
+                    <span>Terminal</span>
+                    <span className="text-[9px] text-emerald-300">
+                      ƒ-motion
+                    </span>
+                  </div>
+                  <div className="flex-1 overflow-hidden">
+                    <CLI />
+                  </div>
+                </div>
               </ResizablePanel>
             </ResizablePanelGroup>
           ) : (
-            <div className="flex-1 flex flex-col bg-black/20 backdrop-blur-sm w-full">
-              {/* Mobile View - Just CLI for now, maybe tabs later */}
-              <CLI onOpenFile={handleFileSelect} />
+            <div className="flex-1 flex flex-col bg-black/40 backdrop-blur-sm w-full">
+              <CLI />
             </div>
           )}
         </div>
