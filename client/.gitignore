@@ -58,3 +58,16 @@ logs
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+.prettierignore
+.prettierrc
+.prettierrc.json
+.prettierrc.yml
+.prettierrc.yaml
+.prettierrc.js
+.prettierrc.cjs
+.prettierrc.toml
+.stylelintrc
+.stylelintrc.json
+.stylelintrc.yml
+.stylelintrc.yaml
