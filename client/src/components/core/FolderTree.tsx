@@ -7,12 +7,12 @@ import {
   FolderOpen,
   File,
   ChevronRight,
-  ChevronDown,
   FileCode,
   FileJson,
   FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FolderTreeProps {
   items: FileSystemItem[];
@@ -54,14 +54,16 @@ function FolderTreeItem({
   level: number;
   onSelect?: (item: FileSystemItem) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const isFolder = item.type === "folder";
+  const [isOpen, setIsOpen] = useState(isFolder && level < 1);
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (item.type === "folder") {
-      setIsOpen(!isOpen);
+    if (isFolder) {
+      setIsOpen((prev) => !prev);
+    } else {
+      onSelect?.(item);
     }
-    onSelect?.(item);
   };
 
   return (
@@ -69,27 +71,29 @@ function FolderTreeItem({
       <div
         className={cn(
           "flex items-center py-1 px-2 hover:bg-white/10 cursor-pointer select-none text-sm transition-colors rounded-sm",
-          level > 0 && "ml-4"
+          level > 0 && "ml-2"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
         onClick={handleToggle}
       >
-        <span className="mr-1 opacity-70">
-          {item.type === "folder" &&
-            (isOpen ? (
-              <ChevronDown className="w-3 h-3" />
-            ) : (
-              <ChevronRight className="w-3 h-3" />
-            ))}
-          {item.type === "file" && <span className="w-3 h-3 inline-block" />}
-        </span>
+        <motion.span
+          animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
+          transition={{ duration: 0.15 }}
+          className="mr-1 opacity-70 flex items-center justify-center"
+        >
+          {isFolder ? (
+            <ChevronRight className="w-3 h-3" />
+          ) : (
+            <span className="w-3 h-3 inline-block" />
+          )}
+        </motion.span>
 
         <span className="mr-2">
-          {item.type === "folder" ? (
+          {isFolder ? (
             isOpen ? (
-              <FolderOpen className="w-4 h-4 text-blue-500" />
+              <FolderOpen className="w-4 h-4 text-blue-400" />
             ) : (
-              <Folder className="w-4 h-4 text-blue-500" />
+              <Folder className="w-4 h-4 text-blue-400" />
             )
           ) : (
             <FileIcon name={item.name} />
@@ -97,19 +101,32 @@ function FolderTreeItem({
         </span>
 
         <span
-          className={cn("truncate", item.name === "secret" && "text-zinc-500")}
+          className={cn(
+            "truncate transition-colors",
+            item.name === "secret" && "text-zinc-500"
+          )}
         >
           {item.name}
         </span>
       </div>
 
-      {item.type === "folder" && isOpen && item.children && (
-        <FolderTree
-          items={item.children}
-          level={level + 1}
-          onSelect={onSelect}
-        />
-      )}
+      <AnimatePresence initial={false}>
+        {isFolder && isOpen && item.children && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: "easeInOut" }}
+            style={{ overflow: "hidden" }}
+          >
+            <FolderTree
+              items={item.children}
+              level={level + 1}
+              onSelect={onSelect}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
