@@ -41,3 +41,5 @@ prisma/migrations/
 # Misc
 Thumbs.db
 .cache
+
+/.vscode
