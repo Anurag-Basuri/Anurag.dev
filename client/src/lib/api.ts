@@ -1,5 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
+export type BackendStatus = 'unknown' | 'online' | 'offline';
+
 export interface Project {
 	id: string;
 	title: string;
@@ -59,12 +61,43 @@ export interface AboutData {
 import { toast } from 'react-hot-toast';
 import { mockProjects, mockAbout, mockJourney, mockBlogPosts } from './mockData';
 
+type StatusListener = (status: BackendStatus, info?: { error?: unknown }) => void;
+
 class ApiClient {
 	private baseUrl: string;
 	private hasShownError: boolean = false;
 
+	// New: observable backend connectivity
+	private status: BackendStatus = 'unknown';
+	private lastErrorAt?: number;
+	private listeners = new Set<StatusListener>();
+
 	constructor(baseUrl: string) {
 		this.baseUrl = baseUrl;
+
+		if (typeof window !== 'undefined') {
+			window.addEventListener('online', () => this.setStatus('online'));
+			window.addEventListener('offline', () => this.setStatus('offline'));
+		}
+	}
+
+	// New: status helpers
+	getStatus() {
+		return this.status;
+	}
+	getLastErrorAt() {
+		return this.lastErrorAt;
+	}
+	onStatusChange(listener: StatusListener) {
+		this.listeners.add(listener);
+		return () => this.listeners.delete(listener);
+	}
+	private setStatus(next: BackendStatus, info?: { error?: unknown }) {
+		if (this.status !== next) {
+			this.status = next;
+			if (next === 'offline') this.lastErrorAt = Date.now();
+			for (const l of this.listeners) l(next, info);
+		}
 	}
 
 	private getMockData(
@@ -92,9 +125,17 @@ class ApiClient {
 	private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 		const url = `${this.baseUrl}${endpoint}`;
 
+		// Add timeout to avoid hanging requests
+		const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+		const timeout =
+			typeof window !== 'undefined'
+				? window.setTimeout(() => controller?.abort(), 8000)
+				: undefined;
+
 		try {
 			const response = await fetch(url, {
 				...options,
+				signal: controller?.signal,
 				headers: {
 					'Content-Type': 'application/json',
 					...options?.headers,
@@ -102,34 +143,54 @@ class ApiClient {
 			});
 
 			if (!response.ok) {
-				const error = await response.json().catch(() => ({}));
-				throw new Error(error.error?.message || `HTTP ${response.status}`);
+				// Try to parse error; fall back to status text/code
+				let errorMessage = `HTTP ${response.status}`;
+				try {
+					const error = await response.json();
+					errorMessage = error?.error?.message || errorMessage;
+				} catch {
+					// ignore
+				}
+				throw new Error(errorMessage);
 			}
 
+			// Mark online if we got a good response
+			this.setStatus('online');
 			return response.json();
 		} catch (error) {
 			console.error(`API Error (${endpoint}):`, error);
+			this.setStatus('offline', { error });
+
+			// Friendly one-time toast
+			if (!this.hasShownError) {
+				const isLocal =
+					this.baseUrl.includes('localhost') || this.baseUrl.includes('127.0.0.1');
+				toast.error(
+					isLocal
+						? 'Backend is not running. Showing live demo content.'
+						: 'Backend unreachable. Showing live demo content.',
+					{ id: 'backend-error', duration: 5000 },
+				);
+				this.hasShownError = true;
+			}
 
 			// Fallback to mock data
 			const mockData = this.getMockData(endpoint);
 			if (mockData) {
-				if (!this.hasShownError) {
-					toast.error('Backend unreachable. Showing demo data.', {
-						id: 'backend-error', // Prevent duplicates
-						duration: 5000,
-					});
-					this.hasShownError = true;
-				}
 				return mockData as T;
 			}
 
 			throw error;
+		} finally {
+			if (timeout !== undefined) clearTimeout(timeout);
 		}
 	}
 
 	// Health check
 	async healthCheck(): Promise<{ status: string; timestamp: string; environment: string }> {
-		return this.request('/api/health');
+		const res = await this.request<{ status: string; timestamp: string; environment: string }>('/api/health');
+		// If request succeeds, status already set to 'online'
+		return res;
 	}
 
 	// About
@@ -143,12 +204,11 @@ class ApiClient {
 	}
 
 	async getProject(id: string): Promise<Project> {
-		// For individual project, we filter from mock data if request fails
 		try {
 			return await this.request(`/api/projects/${id}`);
 		} catch (error) {
 			const project = mockProjects.find(p => p.id === id);
-			if (project) return project;
+			if (project) return project as Project;
 			throw error;
 		}
 	}
@@ -171,7 +231,7 @@ class ApiClient {
 				body: JSON.stringify(data),
 			});
 		} catch {
-			toast.success('Offline mode: Message logged to console.');
+			toast.success('Demo mode: Message saved locally.');
 			console.log('Offline Contact Submission:', data);
 			return { ok: true, id: 'offline-' + Date.now() };
 		}
@@ -179,3 +239,8 @@ class ApiClient {
 }
 
 export const api = new ApiClient(API_URL);
+
+// Optional convenience exports for hooks/components
+export const getBackendStatus = () => api.getStatus();
+export const getBackendLastErrorAt = () => api.getLastErrorAt();
+export const onBackendStatusChange = (listener: StatusListener) => api.onStatusChange(listener);
