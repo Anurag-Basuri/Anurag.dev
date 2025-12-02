@@ -22,6 +22,7 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Taskbar } from "@/components/core/Taskbar";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function MainLayout() {
   const [windows, setWindows] = useAtom(windowsAtom);
@@ -77,7 +78,7 @@ export function MainLayout() {
       <div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
         {/* Wallpaper Background */}
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-40 pointer-events-none"
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-20 pointer-events-none"
           style={{
             backgroundImage:
               'url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")',
@@ -85,7 +86,12 @@ export function MainLayout() {
         />
 
         {/* Top Bar */}
-        <div className="h-8 border-b flex items-center px-4 text-xs select-none bg-background/60 backdrop-blur-md z-10 relative border-white/10 justify-between">
+        <motion.div
+          initial={{ y: -40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="h-8 border-b flex items-center px-4 text-xs select-none bg-background/60 backdrop-blur-md z-20 relative border-white/10 justify-between"
+        >
           <div className="flex items-center">
             {isMobile && (
               <Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
@@ -112,7 +118,7 @@ export function MainLayout() {
                 </SheetContent>
               </Sheet>
             )}
-            <span className="font-bold mr-4">AnuragOS</span>
+            <span className="font-bold mr-4 tracking-widest">AnuragOS</span>
           </div>
 
           {!isMobile && (
@@ -123,9 +129,11 @@ export function MainLayout() {
 
           <div className="flex gap-2 items-center">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-            <span className="text-[10px] text-muted-foreground">ONLINE</span>
+            <span className="text-[10px] text-muted-foreground uppercase">
+              ONLINE
+            </span>
           </div>
-        </div>
+        </motion.div>
 
         <div className="flex-1 z-10 relative overflow-hidden flex">
           {!isMobile ? (
@@ -147,49 +155,56 @@ export function MainLayout() {
                         <span>Open Editors</span>
                       </div>
                       <ScrollArea className="flex-1">
-                        <div className="flex flex-col">
-                          {windows.map((win) => (
-                            <div
-                              key={win.id}
-                              className={cn(
-                                "flex items-center justify-between px-3 py-1 text-sm hover:bg-white/5 cursor-pointer group/item",
-                                activeWindowId === win.id &&
-                                  "bg-white/10 text-blue-400"
-                              )}
-                              onClick={() => setActiveWindowId(win.id)}
-                            >
-                              <div className="flex items-center gap-2 overflow-hidden">
-                                <span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
-                                  {win.title}
-                                </span>
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const newWindows = windows.filter(
-                                    (w) => w.id !== win.id
-                                  );
-                                  setWindows(newWindows);
-                                  if (activeWindowId === win.id) {
-                                    if (newWindows.length > 0)
-                                      setActiveWindowId(
-                                        newWindows[newWindows.length - 1].id
-                                      );
-                                    else setActiveWindowId(null);
-                                  }
-                                }}
-                                className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
+                        <motion.div layout className="flex flex-col">
+                          <AnimatePresence>
+                            {windows.map((win) => (
+                              <motion.div
+                                layout
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.2 }}
+                                key={win.id}
+                                className={cn(
+                                  "flex items-center justify-between px-3 py-1.5 text-sm hover:bg-white/5 cursor-pointer group/item",
+                                  activeWindowId === win.id &&
+                                    "bg-blue-500/20 text-blue-300"
+                                )}
+                                onClick={() => setActiveWindowId(win.id)}
                               >
-                                <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-                              </button>
-                            </div>
-                          ))}
+                                <div className="flex items-center gap-2 overflow-hidden">
+                                  <span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
+                                    {win.title}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const newWindows = windows.filter(
+                                      (w) => w.id !== win.id
+                                    );
+                                    setWindows(newWindows);
+                                    if (activeWindowId === win.id) {
+                                      if (newWindows.length > 0)
+                                        setActiveWindowId(
+                                          newWindows[newWindows.length - 1].id
+                                        );
+                                      else setActiveWindowId(null);
+                                    }
+                                  }}
+                                  className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
+                                >
+                                  <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+                                </button>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
                           {windows.length === 0 && (
                             <div className="p-4 text-xs text-muted-foreground text-center italic">
                               No open editors
                             </div>
                           )}
-                        </div>
+                        </motion.div>
                       </ScrollArea>
                     </div>
                   </ResizablePanel>
