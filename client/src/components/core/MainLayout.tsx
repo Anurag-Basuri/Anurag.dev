@@ -12,8 +12,11 @@ import { initialFileSystem } from "@/lib/data";
 
 import { WindowManager } from "@/components/core/WindowManager";
 import { useAtom } from "jotai";
-import { windowsAtom } from "@/store/atoms";
+import { windowsAtom, activeWindowIdAtom } from "@/store/atoms";
 import { getModuleComponent } from "@/lib/moduleRegistry";
+import { EditorArea } from "@/components/core/EditorArea";
+import { Toaster } from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
@@ -23,26 +26,31 @@ import { Taskbar } from "@/components/core/Taskbar";
 
 export function MainLayout() {
   const [windows, setWindows] = useAtom(windowsAtom);
+  const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
   const handleFileSelect = (item: any) => {
     if (item.type === "file") {
-      // Map file names to module IDs (simple mapping for now)
-      const moduleId = item.name.split(".")[0].toLowerCase();
+      const moduleId = item.id; // Use ID for uniqueness
 
       setWindows((prev: any[]) => {
-        if (prev.find((w: any) => w.id === moduleId)) return prev;
+        // If already open, just focus it
+        if (prev.find((w: any) => w.id === moduleId)) {
+            setActiveWindowId(moduleId);
+            return prev;
+        }
 
+        // Add new window
+        setActiveWindowId(moduleId);
         return [
           ...prev,
           {
             id: moduleId,
-            title: moduleId.toUpperCase(),
+            title: item.name.toUpperCase(),
             component: getModuleComponent(moduleId),
             isOpen: true,
             isMinimized: false,
-            position: isMobile ? { x: 0, y: 0 } : { x: 150 + prev.length * 20, y: 150 + prev.length * 20 },
           },
         ];
       });
@@ -55,6 +63,15 @@ export function MainLayout() {
 
   return (
     <>
+      <Toaster position="bottom-right" toastOptions={{
+          style: {
+              background: '#333',
+              color: '#fff',
+              fontSize: '12px',
+              borderRadius: '4px',
+              border: '1px solid rgba(255,255,255,0.1)',
+          }
+      }} />
       <div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
         {/* Wallpaper Background */}
         <div
@@ -121,14 +138,11 @@ export function MainLayout() {
                                             {windows.map((win: any) => (
                                                 <div
                                                     key={win.id}
-                                                    className="flex items-center justify-between px-3 py-1 text-sm hover:bg-white/5 cursor-pointer group/item"
-                                                    onClick={() => {
-                                                        // Focus window logic could go here if we had a focus mechanism
-                                                        // For now just ensure it's not minimized?
-                                                        setWindows((prev: any[]) => 
-                                                            prev.map((w: any) => w.id === win.id ? { ...w, isMinimized: false } : w)
-                                                        );
-                                                    }}
+                                                    className={cn(
+                                                        "flex items-center justify-between px-3 py-1 text-sm hover:bg-white/5 cursor-pointer group/item",
+                                                        activeWindowId === win.id && "bg-white/10 text-blue-400"
+                                                    )}
+                                                    onClick={() => setActiveWindowId(win.id)}
                                                 >
                                                     <div className="flex items-center gap-2 overflow-hidden">
                                                         <span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
@@ -138,7 +152,12 @@ export function MainLayout() {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setWindows((prev: any[]) => prev.filter((w: any) => w.id !== win.id));
+                                                            const newWindows = windows.filter((w: any) => w.id !== win.id);
+                                                            setWindows(newWindows);
+                                                            if (activeWindowId === win.id) {
+                                                                if (newWindows.length > 0) setActiveWindowId(newWindows[newWindows.length - 1].id);
+                                                                else setActiveWindowId(null);
+                                                            }
                                                         }}
                                                         className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
                                                     >
@@ -178,7 +197,13 @@ export function MainLayout() {
 
                     <ResizableHandle withHandle className="bg-white/10" />
 
-                    <ResizablePanel defaultSize={80} collapsible={true} minSize={10}>
+                    <ResizablePanel defaultSize={50} minSize={30}>
+                        <EditorArea />
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle className="bg-white/10" />
+
+                    <ResizablePanel defaultSize={30} collapsible={true} minSize={10}>
                         <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
                             <CLI />
                         </div>
@@ -186,13 +211,13 @@ export function MainLayout() {
                 </ResizablePanelGroup>
             ) : (
                 <div className="flex-1 flex flex-col bg-black/20 backdrop-blur-sm w-full">
+                    {/* Mobile View - Just CLI for now, maybe tabs later */}
                     <CLI />
                 </div>
             )}
         </div>
         <Taskbar />
       </div>
-      <WindowManager />
     </>
   );
 }
