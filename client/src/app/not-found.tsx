@@ -3,31 +3,16 @@ import Link from 'next/link';
 
 export default function NotFound() {
 	return (
-		<div
-			style={{
-				padding: 24,
-				maxWidth: 720,
-				margin: '40px auto',
-				fontFamily: 'system-ui, sans-serif',
-			}}
-		>
-			<h1 style={{ fontSize: 24, marginBottom: 8 }}>Page not found</h1>
-			<p style={{ opacity: 0.8, marginBottom: 16 }}>
+		<div className="max-w-xl mx-auto mt-16 px-6 py-8 rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+			<h1 className="text-xl font-semibold mb-2">Page not found</h1>
+			<p className="text-muted-foreground mb-6">
 				The page you’re looking for doesn’t exist or was moved.
 			</p>
-			<Link href="/" passHref legacyBehavior>
-				<a
-					style={{
-						padding: '8px 12px',
-						borderRadius: 8,
-						border: '1px solid #333',
-						background: '#111',
-						color: '#fff',
-						textDecoration: 'none',
-					}}
-				>
-					Go home
-				</a>
+			<Link
+				href="/"
+				className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-muted/40 hover:bg-muted/60 transition-colors"
+			>
+				Go home
 			</Link>
 		</div>
 	);

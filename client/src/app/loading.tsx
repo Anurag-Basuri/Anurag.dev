@@ -2,18 +2,11 @@ import React from 'react';
 
 export default function Loading() {
 	return (
-		<div style={{ display: 'grid', placeItems: 'center', minHeight: '50vh' }}>
+		<div className="grid place-items-center min-h-[50vh]">
 			<div
-				style={{
-					width: 28,
-					height: 28,
-					border: '3px solid #333',
-					borderTopColor: '#999',
-					borderRadius: '50%',
-					animation: 'spin 1s linear infinite',
-				}}
+				className="w-7 h-7 rounded-full border-2 border-border border-t-primary animate-spin"
+				aria-label="Loading"
 			/>
-			<style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 		</div>
 	);
 }
