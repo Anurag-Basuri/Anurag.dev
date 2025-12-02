@@ -22,7 +22,7 @@ export const windowsAtom = atom<WindowState[]>([
     component: getModuleComponent("about/whoami.md"), // We need to ensure this works, otherwise we might need to lazy load or handle differently
     isOpen: true,
     isMinimized: false,
-  }
+  },
 ]);
 export const activeWindowIdAtom = atom<string | null>("about/whoami.md");
 
