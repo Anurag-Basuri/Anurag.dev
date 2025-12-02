@@ -20,14 +20,14 @@ const promptLabel = 'user@anurag:~$';
 const responseTone = (type: CommandResponse['type']) => {
 	switch (type) {
 		case 'error':
-			return 'text-rose-300';
+			return 'text-destructive';
 		case 'success':
 		case 'open_module':
-			return 'text-emerald-300';
+			return 'text-emerald-500 dark:text-emerald-400';
 		case 'component':
-			return 'text-sky-300';
+			return 'text-primary';
 		default:
-			return 'text-slate-200';
+			return 'text-foreground';
 	}
 };
 
@@ -121,14 +121,14 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-gradient-to-b from-[#05060a] via-[#050a15] to-[#03040a] text-slate-100 font-mono text-sm p-4 overflow-hidden border-l border-white/5 shadow-[inset_0_0_30px_rgba(15,23,42,0.6)]"
+			className="h-full flex flex-col bg-background text-foreground font-mono text-sm p-4 overflow-hidden border-l border-border shadow-inner transition-colors duration-300"
 			onClick={handleContainerClick}
 		>
-			<div className="mb-4 select-none text-xs space-y-1 text-slate-400">
-				<p className="tracking-[0.3em] uppercase text-slate-500">Terminal</p>
+			<div className="mb-4 select-none text-xs space-y-1 text-muted-foreground">
+				<p className="tracking-[0.3em] uppercase text-muted-foreground/70">Terminal</p>
 				<p>AnuragOS [Version 1.0.0]</p>
 				<p>(c) 2025 Anurag Basuri. All rights reserved.</p>
-				<p className="pt-2 text-slate-500">Type &apos;help&apos; to begin.</p>
+				<p className="pt-2 text-muted-foreground/70">Type &apos;help&apos; to begin.</p>
 			</div>
 
 			<ScrollArea className="flex-1 pr-2">
@@ -145,8 +145,8 @@ export function CLI() {
 								className="rounded-md"
 							>
 								<div className="flex gap-2 text-sm">
-									<span className="text-sky-300">{promptLabel}</span>
-									<span className="text-slate-100">{item.command}</span>
+									<span className="text-primary">{promptLabel}</span>
+									<span className="text-foreground">{item.command}</span>
 								</div>
 								<div
 									className={cn(
@@ -161,14 +161,14 @@ export function CLI() {
 					</AnimatePresence>
 
 					<div className="flex items-center gap-2 text-sm">
-						<span className="text-sky-300">{promptLabel}</span>
+						<span className="text-primary">{promptLabel}</span>
 						<motion.input
 							ref={inputRef}
 							type="text"
 							value={input}
 							onChange={e => setInput(e.target.value)}
 							onKeyDown={handleKeyDown}
-							className="flex-1 bg-transparent border-none outline-none text-green-400 placeholder-green-500/30"
+							className="flex-1 bg-transparent border-none outline-none text-emerald-500 dark:text-emerald-400 placeholder-emerald-500/30"
 							autoFocus
 							spellCheck={false}
 							autoComplete="off"
