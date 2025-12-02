@@ -13,8 +13,18 @@ export type WindowState = {
   size?: { width: number; height: number };
 };
 
-export const windowsAtom = atom<WindowState[]>([]);
-export const activeWindowIdAtom = atom<string | null>(null);
+import { getModuleComponent } from "@/lib/moduleRegistry";
+
+export const windowsAtom = atom<WindowState[]>([
+  {
+    id: "about/whoami.md",
+    title: "WHOAMI.MD",
+    component: getModuleComponent("about/whoami.md"), // We need to ensure this works, otherwise we might need to lazy load or handle differently
+    isOpen: true,
+    isMinimized: false,
+  }
+]);
+export const activeWindowIdAtom = atom<string | null>("about/whoami.md");
 
 export interface Tab {
   id: string;
