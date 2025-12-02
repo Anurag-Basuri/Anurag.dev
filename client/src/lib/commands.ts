@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { getModuleComponent } from '@/lib/moduleRegistry';
 
 export type CommandResponse = {
 	type: 'text' | 'error' | 'success' | 'component' | 'clear' | 'open_module';
@@ -70,16 +71,27 @@ export function processCommand(input: string): CommandResponse {
 				return { type: 'error', content: 'Usage: open [module_name]' };
 			}
 			const moduleId = args[0].toLowerCase();
-			if (!moduleRegistry[moduleId]) {
+
+			// Validate by attempting to resolve the component.
+			try {
+				const component = getModuleComponent(moduleId);
+				if (!component) {
+					return {
+						type: 'error',
+						content: `Error: Module '${moduleId}' not found.`,
+					};
+				}
+			} catch {
 				return {
 					type: 'error',
 					content: `Error: Module '${moduleId}' not found.`,
 				};
 			}
+
 			return {
 				type: 'open_module',
 				content: `Opening ${moduleId}...`,
-				moduleId: moduleId,
+				moduleId,
 			};
 		}
 		default:
