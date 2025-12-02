@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 export function useMediaQuery(query: string): boolean {
 	const getMatches = () => {
 		if (typeof window === 'undefined' || typeof window.matchMedia === 'undefined') {
-			// Server or unsupported environment
 			return false;
 		}
 		return window.matchMedia(query).matches;
@@ -22,18 +21,18 @@ export function useMediaQuery(query: string): boolean {
 		if (typeof window === 'undefined' || typeof window.matchMedia === 'undefined') return;
 
 		const mql = window.matchMedia(query);
-		const handler = (e: MediaQueryListEvent) => {
-			setMatches(e.matches);
+		const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+			// Normalize for legacy API
+			const next = 'matches' in e ? e.matches : (e as MediaQueryList).matches;
+			setMatches(next);
 		};
 
-		// Support older Safari
+		// Subscribe to media query changes
 		if (typeof mql.addEventListener === 'function') {
 			mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void);
 		} else {
 			mql.addListener(handler);
 		}
-
-		// No need to setMatches here; initial state is set via getMatches
 
 		return () => {
 			if (typeof mql.removeEventListener === 'function') {
