@@ -18,14 +18,13 @@ export function TabManager() {
 		const newTabs = tabs.filter(tab => tab.id !== tabId);
 		setTabs(newTabs);
 
-		// If the closed tab was active, switch to a different tab
+		// If the closed tab was active, switch to a different tab deterministically
 		if (activeTabId === tabId) {
 			if (newTabs.length > 0) {
-				// Switch to the previous tab or the first one
-				const newActiveIndex = Math.max(0, tabIndex - 1);
+				const newActiveIndex = Math.max(0, Math.min(tabIndex - 1, newTabs.length - 1));
 				setActiveTabId(newTabs[newActiveIndex].id);
 			} else {
-				// This case should ideally not happen if we prevent closing the last tab
+				// Fallback safety — shouldn't happen because CLI tab is non-closable
 				setActiveTabId('');
 			}
 		}
@@ -38,18 +37,23 @@ export function TabManager() {
 					<div
 						key={tab.id}
 						onClick={() => setActiveTabId(tab.id)}
+						role="tab"
+						aria-selected={activeTabId === tab.id}
+						title={tab.title}
 						className={`flex items-center gap-2 px-4 py-2 text-sm cursor-pointer border-r border-black ${
 							activeTabId === tab.id
 								? 'bg-[#1e1e1e] text-white'
 								: 'bg-[#2d2d2d] text-gray-400 hover:bg-[#3e3e3e]'
 						}`}
 					>
-						<span>{tab.title}</span>
+						<span className="truncate max-w-[200px]">{tab.title}</span>
 						{/* Prevent closing the CLI tab */}
 						{tab.type !== 'cli' && (
 							<button
 								className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-gray-600 transition-colors"
 								onClick={e => handleCloseTab(e, tab.id)}
+								aria-label={`Close ${tab.title}`}
+								title="Close"
 							>
 								<X size={14} />
 							</button>

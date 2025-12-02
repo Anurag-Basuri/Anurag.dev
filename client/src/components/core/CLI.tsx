@@ -47,7 +47,10 @@ export function CLI() {
 				setHistory([]);
 			} else {
 				const newItem: HistoryItem = {
-					id: Math.random().toString(36).substr(2, 9),
+					id:
+						typeof crypto !== 'undefined' && 'randomUUID' in crypto
+							? crypto.randomUUID()
+							: Math.random().toString(36).slice(2),
 					command: input,
 					response,
 				};
