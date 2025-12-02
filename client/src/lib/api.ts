@@ -1,5 +1,3 @@
-// API client for backend communication
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export interface Project {
@@ -58,12 +56,25 @@ export interface AboutData {
 	};
 }
 
+import { toast } from 'react-hot-toast';
+import { mockProjects, mockAbout, mockJourney, mockBlogPosts } from './mockData';
+
 class ApiClient {
 	private baseUrl: string;
+    private hasShownError: boolean = false;
 
 	constructor(baseUrl: string) {
 		this.baseUrl = baseUrl;
 	}
+
+    private getMockData(endpoint: string): any {
+        if (endpoint.includes('/projects')) return { projects: mockProjects };
+        if (endpoint.includes('/about')) return mockAbout;
+        if (endpoint.includes('/journey')) return { items: mockJourney };
+        if (endpoint.includes('/blog')) return { posts: mockBlogPosts };
+        if (endpoint.includes('/health')) return { status: 'offline', timestamp: new Date().toISOString(), environment: 'development' };
+        return null;
+    }
 
 	private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 		const url = `${this.baseUrl}${endpoint}`;
@@ -85,6 +96,20 @@ class ApiClient {
 			return response.json();
 		} catch (error) {
 			console.error(`API Error (${endpoint}):`, error);
+            
+            // Fallback to mock data
+            const mockData = this.getMockData(endpoint);
+            if (mockData) {
+                if (!this.hasShownError) {
+                    toast.error('Backend unreachable. Showing demo data.', {
+                        id: 'backend-error', // Prevent duplicates
+                        duration: 5000,
+                    });
+                    this.hasShownError = true;
+                }
+                return mockData as T;
+            }
+
 			throw error;
 		}
 	}
@@ -105,7 +130,14 @@ class ApiClient {
 	}
 
 	async getProject(id: string): Promise<Project> {
-		return this.request(`/api/projects/${id}`);
+        // For individual project, we filter from mock data if request fails
+        try {
+		    return await this.request(`/api/projects/${id}`);
+        } catch (error) {
+            const project = mockProjects.find(p => p.id === id);
+            if (project) return project;
+            throw error;
+        }
 	}
 
 	// Journey
@@ -120,10 +152,16 @@ class ApiClient {
 
 	// Contact
 	async submitContact(data: ContactFormData): Promise<{ ok: boolean; id: string }> {
-		return this.request('/api/contact', {
-			method: 'POST',
-			body: JSON.stringify(data),
-		});
+        try {
+            return await this.request('/api/contact', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            toast.success('Offline mode: Message logged to console.');
+            console.log('Offline Contact Submission:', data);
+            return { ok: true, id: 'offline-' + Date.now() };
+        }
 	}
 }
 
