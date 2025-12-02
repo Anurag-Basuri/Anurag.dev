@@ -8,9 +8,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FolderTree } from "@/components/core/FolderTree";
 import { CLI } from "@/components/core/CLI";
-import { initialFileSystem } from "@/lib/data";
+import { initialFileSystem, FileSystemItem } from "@/lib/data";
 
-import { WindowManager } from "@/components/core/WindowManager";
 import { useAtom } from "jotai";
 import { windowsAtom, activeWindowIdAtom } from "@/store/atoms";
 import { getModuleComponent } from "@/lib/moduleRegistry";
@@ -30,13 +29,13 @@ export function MainLayout() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
-  const handleFileSelect = (item: any) => {
+  const handleFileSelect = (item: FileSystemItem) => {
     if (item.type === "file") {
       const moduleId = item.id; // Use ID for uniqueness
 
-      setWindows((prev: any[]) => {
+      setWindows((prev) => {
         // If already open, just focus it
-        if (prev.find((w: any) => w.id === moduleId)) {
+        if (prev.find((w) => w.id === moduleId)) {
             setActiveWindowId(moduleId);
             return prev;
         }
@@ -135,7 +134,7 @@ export function MainLayout() {
                                     </div>
                                     <ScrollArea className="flex-1">
                                         <div className="flex flex-col">
-                                            {windows.map((win: any) => (
+                                            {windows.map((win) => (
                                                 <div
                                                     key={win.id}
                                                     className={cn(
@@ -152,7 +151,7 @@ export function MainLayout() {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            const newWindows = windows.filter((w: any) => w.id !== win.id);
+                                                            const newWindows = windows.filter((w) => w.id !== win.id);
                                                             setWindows(newWindows);
                                                             if (activeWindowId === win.id) {
                                                                 if (newWindows.length > 0) setActiveWindowId(newWindows[newWindows.length - 1].id);
