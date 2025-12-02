@@ -118,27 +118,27 @@ export function MainLayout() {
                                     </div>
                                     <ScrollArea className="flex-1">
                                         <div className="flex flex-col">
-                                            {windows.map((window: any) => (
+                                            {windows.map((win: any) => (
                                                 <div
-                                                    key={window.id}
+                                                    key={win.id}
                                                     className="flex items-center justify-between px-3 py-1 text-sm hover:bg-white/5 cursor-pointer group/item"
                                                     onClick={() => {
                                                         // Focus window logic could go here if we had a focus mechanism
                                                         // For now just ensure it's not minimized?
                                                         setWindows((prev: any[]) => 
-                                                            prev.map((w: any) => w.id === window.id ? { ...w, isMinimized: false } : w)
+                                                            prev.map((w: any) => w.id === win.id ? { ...w, isMinimized: false } : w)
                                                         );
                                                     }}
                                                 >
                                                     <div className="flex items-center gap-2 overflow-hidden">
                                                         <span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
-                                                            {window.title}
+                                                            {win.title}
                                                         </span>
                                                     </div>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setWindows((prev: any[]) => prev.filter((w: any) => w.id !== window.id));
+                                                            setWindows((prev: any[]) => prev.filter((w: any) => w.id !== win.id));
                                                         }}
                                                         className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
                                                     >
