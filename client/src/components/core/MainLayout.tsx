@@ -16,7 +16,7 @@ import { windowsAtom } from "@/store/atoms";
 import { getModuleComponent } from "@/lib/moduleRegistry";
 
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Taskbar } from "@/components/core/Taskbar";
@@ -105,28 +105,80 @@ export function MainLayout() {
             {!isMobile ? (
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                     <ResizablePanel
-                        defaultSize={25}
+                        defaultSize={20}
                         minSize={15}
-                        maxSize={40}
+                        maxSize={30}
                         className="flex flex-col border-r border-white/10 bg-background/40 backdrop-blur-sm"
                     >
-                        <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
-                            Explorer
-                        </div>
+                        <ResizablePanelGroup direction="vertical">
+                            <ResizablePanel defaultSize={30} minSize={10} collapsible={true}>
+                                <div className="h-full flex flex-col">
+                                    <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground flex justify-between items-center group">
+                                        <span>Open Editors</span>
+                                    </div>
+                                    <ScrollArea className="flex-1">
+                                        <div className="flex flex-col">
+                                            {windows.map((window: any) => (
+                                                <div
+                                                    key={window.id}
+                                                    className="flex items-center justify-between px-3 py-1 text-sm hover:bg-white/5 cursor-pointer group/item"
+                                                    onClick={() => {
+                                                        // Focus window logic could go here if we had a focus mechanism
+                                                        // For now just ensure it's not minimized?
+                                                        setWindows((prev: any[]) => 
+                                                            prev.map((w: any) => w.id === window.id ? { ...w, isMinimized: false } : w)
+                                                        );
+                                                    }}
+                                                >
+                                                    <div className="flex items-center gap-2 overflow-hidden">
+                                                        <span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
+                                                            {window.title}
+                                                        </span>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setWindows((prev: any[]) => prev.filter((w: any) => w.id !== window.id));
+                                                        }}
+                                                        className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
+                                                    >
+                                                        <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            {windows.length === 0 && (
+                                                <div className="p-4 text-xs text-muted-foreground text-center italic">
+                                                    No open editors
+                                                </div>
+                                            )}
+                                        </div>
+                                    </ScrollArea>
+                                </div>
+                            </ResizablePanel>
+                            
+                            <ResizableHandle className="bg-white/10" />
 
-                        <ScrollArea className="flex-1">
-                            <div className="p-2">
-                                <FolderTree
-                                    items={initialFileSystem}
-                                    onSelect={handleFileSelect}
-                                />
-                            </div>
-                        </ScrollArea>
+                            <ResizablePanel defaultSize={70} minSize={20}>
+                                <div className="h-full flex flex-col">
+                                    <div className="p-2 text-xs font-bold border-b border-white/10 bg-white/5 uppercase tracking-wider text-muted-foreground">
+                                        Explorer
+                                    </div>
+                                    <ScrollArea className="flex-1">
+                                        <div className="p-2">
+                                            <FolderTree
+                                                items={initialFileSystem}
+                                                onSelect={handleFileSelect}
+                                            />
+                                        </div>
+                                    </ScrollArea>
+                                </div>
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     </ResizablePanel>
 
                     <ResizableHandle withHandle className="bg-white/10" />
 
-                    <ResizablePanel defaultSize={75}>
+                    <ResizablePanel defaultSize={80} collapsible={true} minSize={10}>
                         <div className="h-full flex flex-col bg-black/20 backdrop-blur-sm">
                             <CLI />
                         </div>
