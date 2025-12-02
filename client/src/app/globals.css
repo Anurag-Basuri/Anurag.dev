@@ -153,3 +153,43 @@
 	height: 8px;
 	margin-top: -4px;
 }
+
+/* Enhanced scrollbars (WebKit) */
+::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+	border-radius: 20px;
+	border: 2px solid transparent;
+	background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.1));
+}
+
+/* Selection */
+::selection {
+	background: rgba(56, 189, 248, 0.35);
+	color: #fff;
+}
+
+/* Glass utility */
+.glass-panel {
+	background: rgba(12, 16, 24, 0.55);
+	backdrop-filter: blur(14px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 8px 28px -6px rgba(0, 0, 0, 0.55);
+}
+
+/* Panel handle hover highlight (extra safety) */
+[data-resize-handle] {
+	transition: background-color 140ms;
+}
+[data-resize-handle]:hover {
+	background-color: rgba(255, 255, 255, 0.18) !important;
+}
