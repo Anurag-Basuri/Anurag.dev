@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/core/ErrorBoundary';
+import ConnectivityBanner from '@/components/core/ConnectivityBanner';
+import ClientToaster from '@/components/core/ClientToaster';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -42,9 +44,11 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<ErrorBoundary>
+					<ConnectivityBanner />
 					<Suspense fallback={<div style={{ padding: 16 }}>Loading…</div>}>
 						{children}
 					</Suspense>
+					<ClientToaster />
 				</ErrorBoundary>
 			</body>
 		</html>
