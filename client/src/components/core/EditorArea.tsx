@@ -30,9 +30,9 @@ export function EditorArea() {
 	};
 
 	return (
-		<div className="h-full flex flex-col bg-gradient-to-br from-background/40 via-background/50 to-background/60 backdrop-blur-sm">
+		<div className="h-full flex flex-col bg-background/50 backdrop-blur-sm transition-colors duration-300">
 			{/* Tab Bar */}
-			<div className="h-10 flex bg-background/70 border-b border-white/10 overflow-hidden shadow-sm">
+			<div className="h-10 flex bg-background/80 border-b border-border overflow-hidden shadow-sm">
 				<ScrollAreaPrimitive.Root className="w-full relative overflow-hidden">
 					<ScrollAreaPrimitive.Viewport className="w-full h-full rounded-[inherit]">
 						<div className="flex h-10">
@@ -47,19 +47,19 @@ export function EditorArea() {
 										transition={{ duration: 0.2 }}
 										onClick={() => setActiveWindowId(window.id)}
 										className={cn(
-											'h-10 px-4 flex items-center gap-2.5 text-xs border-r border-white/10 cursor-pointer select-none min-w-[140px] max-w-[220px] group relative transition-colors',
+											'h-10 px-4 flex items-center gap-2.5 text-xs border-r border-border cursor-pointer select-none min-w-[140px] max-w-[220px] group relative transition-all duration-200',
 											activeWindowId === window.id
-												? 'bg-gradient-to-b from-cyan-500/15 to-blue-500/10 text-cyan-300 border-t-2 border-t-cyan-500 shadow-inner'
-												: 'bg-transparent text-muted-foreground hover:bg-white/5 hover:text-foreground'
+												? 'bg-muted text-primary border-t-2 border-t-primary shadow-inner font-medium'
+												: 'bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
 										)}
 									>
-										<span className="truncate flex-1 font-medium">{window.title}</span>
+										<span className="truncate flex-1">{window.title}</span>
 										<motion.button
 											whileHover={{ scale: 1.1 }}
 											whileTap={{ scale: 0.9 }}
 											onClick={e => handleClose(window.id, e)}
 											className={cn(
-												'p-1 rounded hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity',
+												'p-1 rounded hover:bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity',
 												activeWindowId === window.id && 'opacity-100'
 											)}
 											aria-label={`Close ${window.title}`}
@@ -108,16 +108,16 @@ export function EditorArea() {
 								}}
 								className="relative mb-6"
 							>
-								<Terminal className="w-24 h-24 text-cyan-500/30" />
-								<Sparkles className="w-6 h-6 text-cyan-400 absolute -top-2 -right-2 animate-pulse" />
+								<Terminal className="w-24 h-24 text-primary/20" />
+								<Sparkles className="w-6 h-6 text-primary absolute -top-2 -right-2 animate-pulse" />
 							</motion.div>
-							<p className="text-lg font-medium text-white/40 mb-2">No file open</p>
-							<p className="text-sm text-white/30">Select a file from the Explorer to get started</p>
-							<div className="mt-8 flex flex-col gap-2 text-xs text-white/20">
+							<p className="text-lg font-medium text-muted-foreground mb-2">No file open</p>
+							<p className="text-sm text-muted-foreground/60">Select a file from the Explorer to get started</p>
+							<div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground/40">
 								<p className="flex items-center gap-2">
-									<kbd className="px-2 py-1 bg-white/5 rounded border border-white/10">Ctrl</kbd>
+									<kbd className="px-2 py-1 bg-muted rounded border border-border">Ctrl</kbd>
 									+
-									<kbd className="px-2 py-1 bg-white/5 rounded border border-white/10">P</kbd>
+									<kbd className="px-2 py-1 bg-muted rounded border border-border">P</kbd>
 									<span>Quick Open</span>
 								</p>
 							</div>
