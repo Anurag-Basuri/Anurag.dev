@@ -21,12 +21,41 @@ import {
 	EyeOff,
 	Eye,
 	ChevronDown,
+	Sparkles,
 } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Taskbar } from '@/components/core/Taskbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
+
+// Persistent size helper (simple localStorage)
+function usePersistentSizes(key: string, initial: number[]) {
+	const [sizes, setSizes] = useState<number[]>(() => {
+		try {
+			const raw = localStorage.getItem(key);
+			if (raw) {
+				const parsed = JSON.parse(raw);
+				if (Array.isArray(parsed) && parsed.every(n => typeof n === 'number')) {
+					return parsed;
+				}
+			}
+		} catch {}
+		return initial;
+	});
+
+	const onLayout = useCallback(
+		(next: number[]) => {
+			setSizes(next);
+			try {
+				localStorage.setItem(key, JSON.stringify(next));
+			} catch {}
+		},
+		[key],
+	);
+
+	return { sizes, onLayout };
+}
 
 export function MainLayout() {
 	const [windows, setWindows] = useAtom(windowsAtom);
@@ -34,13 +63,21 @@ export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
-	// New: refs to control panels programmatically
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
 	const terminalRef = useRef<ImperativePanelHandle>(null);
 
-	// Track our own collapsed/hide toggles (kept simple)
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const [terminalCollapsed, setTerminalCollapsed] = useState(false);
+
+	// Persistent layout (vertical: main/terminal), (horizontal: sidebar/editor)
+	const { sizes: verticalSizes, onLayout: onVerticalLayout } = usePersistentSizes(
+		'layout:v',
+		[75, 25],
+	);
+	const { sizes: horizontalSizes, onLayout: onHorizontalLayout } = usePersistentSizes(
+		'layout:h',
+		[20, 80],
+	);
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
@@ -62,9 +99,7 @@ export function MainLayout() {
 					},
 				];
 			});
-			if (isMobile) {
-				setIsExplorerOpen(false);
-			}
+			if (isMobile) setIsExplorerOpen(false);
 		}
 	};
 
@@ -102,17 +137,19 @@ export function MainLayout() {
 				position="bottom-right"
 				toastOptions={{
 					style: {
-						background: '#333',
+						background: '#1b1f23',
 						color: '#fff',
 						fontSize: '12px',
-						borderRadius: '4px',
-						border: '1px solid rgba(255,255,255,0.1)',
+						borderRadius: '6px',
+						border: '1px solid rgba(255,255,255,0.08)',
+						backdropFilter: 'blur(10px)',
 					},
 				}}
 			/>
 			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+				{/* Background layers */}
 				<div
-					className="absolute inset-0 z-0 bg-cover bg-center opacity-25 pointer-events-none"
+					className="absolute inset-0 z-0 bg-cover bg-center opacity-20 pointer-events-none"
 					style={{
 						backgroundImage:
 							'url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")',
@@ -120,20 +157,24 @@ export function MainLayout() {
 				/>
 				<div className="absolute inset-0 z-0 pointer-events-none">
 					<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.12),transparent_55%)]" />
-					<div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:40px_40px]" />
+					<div className="absolute inset-0 opacity-25 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:46px_46px]" />
 				</div>
 
+				{/* Top bar */}
 				<motion.div
-					initial={{ y: -40, opacity: 0 }}
+					initial={{ y: -30, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
-					transition={{ duration: 0.5, ease: 'easeOut' }}
-					className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/75 backdrop-blur-md z-20 relative border-white/10 justify-between shadow-[0_5px_30px_rgba(0,0,0,0.4)]"
+					transition={{ duration: 0.4, ease: 'easeOut' }}
+					className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/70 backdrop-blur-md z-20 relative border-white/10 justify-between shadow-[0_5px_22px_-4px_rgba(0,0,0,0.5)]"
 				>
 					<div className="flex items-center gap-3">
 						{isMobile && (
 							<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 								<SheetTrigger asChild>
-									<button className="p-1.5 hover:bg-white/10 rounded">
+									<button
+										className="p-1.5 hover:bg-white/10 rounded transition-colors"
+										aria-label="Toggle explorer"
+									>
 										<Menu className="w-4 h-4" />
 									</button>
 								</SheetTrigger>
@@ -155,11 +196,14 @@ export function MainLayout() {
 								</SheetContent>
 							</Sheet>
 						)}
-						<span className="font-bold tracking-[0.4em] text-sm">ANURAGOS</span>
+						<span className="font-bold tracking-[0.4em] text-sm flex items-center gap-2">
+							ANURAGOS
+							<Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+						</span>
 					</div>
 
 					{!isMobile && (
-						<span className="flex-1 text-center text-muted-foreground tracking-[0.3em]">
+						<span className="flex-1 text-center text-muted-foreground tracking-[0.35em]">
 							SYSTEM READY
 						</span>
 					)}
@@ -167,14 +211,14 @@ export function MainLayout() {
 					<div className="flex items-center gap-2">
 						{/* Status */}
 						<div className="flex gap-2 items-center pr-2 border-r border-white/10">
-							<div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.8)]" />
+							<div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_2px_rgba(34,197,94,0.7)] animate-pulse" />
 							<span className="text-[10px] text-muted-foreground uppercase tracking-[0.4em]">
 								ONLINE
 							</span>
 						</div>
 
 						{/* Sidebar controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-white/5 border border-white/10">
+						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-white/5 border border-white/10 backdrop-blur-sm">
 							{sidebarCollapsed ? (
 								<button
 									className="p-1 hover:bg-white/10 rounded"
@@ -207,7 +251,7 @@ export function MainLayout() {
 						</div>
 
 						{/* Terminal controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-white/5 border border-white/10">
+						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-white/5 border border-white/10 backdrop-blur-sm">
 							{terminalCollapsed ? (
 								<button
 									className="p-1 hover:bg-white/10 rounded"
@@ -241,28 +285,38 @@ export function MainLayout() {
 					</div>
 				</motion.div>
 
+				{/* Main area */}
 				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth">
 					{!isMobile ? (
-						// Reworked: vertical group so Terminal sits at the bottom
-						<ResizablePanelGroup direction="vertical" className="h-full w-full">
-							{/* Top section: sidebar + editor */}
-							<ResizablePanel defaultSize={75} minSize={40}>
-								<ResizablePanelGroup direction="horizontal" className="h-full">
+						<ResizablePanelGroup
+							direction="vertical"
+							className="h-full w-full"
+							onLayout={onVerticalLayout}
+							id="layout-vertical"
+						>
+							<ResizablePanel defaultSize={verticalSizes[0]} minSize={40}>
+								<ResizablePanelGroup
+									direction="horizontal"
+									className="h-full"
+									onLayout={onHorizontalLayout}
+									id="layout-horizontal"
+								>
 									<ResizablePanel
 										ref={sidebarRef}
-										defaultSize={20}
+										defaultSize={horizontalSizes[0]}
 										minSize={0}
-										maxSize={28}
+										maxSize={30}
 										collapsible
 										collapsedSize={3}
-										className="flex flex-col border-r border-white/10 bg-background/60 backdrop-blur-md"
+										className="flex flex-col border-r border-white/10 bg-background/60 backdrop-blur-md relative"
 									>
+										<div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/5 to-transparent" />
 										<ResizablePanelGroup
 											direction="vertical"
 											className="h-full"
 										>
 											<ResizablePanel
-												defaultSize={35}
+												defaultSize={38}
 												minSize={12}
 												collapsible
 												collapsedSize={8}
@@ -283,7 +337,7 @@ export function MainLayout() {
 																		layout
 																		initial={{
 																			opacity: 0,
-																			x: -20,
+																			x: -18,
 																		}}
 																		animate={{
 																			opacity: 1,
@@ -291,17 +345,18 @@ export function MainLayout() {
 																		}}
 																		exit={{
 																			opacity: 0,
-																			x: -20,
+																			x: -18,
 																		}}
 																		transition={{
-																			duration: 0.2,
+																			duration: 0.18,
 																		}}
 																		key={win.id}
 																		className={cn(
-																			'flex items-center justify-between px-3 py-1.5 text-sm hover:bg-white/5 cursor-pointer group/item',
+																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item relative',
+																			'hover:bg-white/5',
 																			activeWindowId ===
 																				win.id &&
-																				'bg-blue-500/20 text-blue-300 shadow-[inset_0_0_0_1px_rgba(96,165,250,0.4)]',
+																				'bg-gradient-to-r from-cyan-600/25 to-blue-600/20 text-cyan-200 shadow-[inset_0_0_0_1px_rgba(56,189,248,0.35)]',
 																		)}
 																		onClick={() =>
 																			setActiveWindowId(
@@ -310,7 +365,7 @@ export function MainLayout() {
 																		}
 																	>
 																		<div className="flex items-center gap-2 overflow-hidden">
-																			<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors">
+																			<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
 																				{win.title}
 																			</span>
 																		</div>
@@ -330,24 +385,18 @@ export function MainLayout() {
 																					activeWindowId ===
 																					win.id
 																				) {
-																					if (
-																						newWindows.length >
-																						0
-																					) {
-																						setActiveWindowId(
-																							newWindows[
-																								newWindows.length -
-																									1
-																							].id,
-																						);
-																					} else {
-																						setActiveWindowId(
-																							null,
-																						);
-																					}
+																					setActiveWindowId(
+																						newWindows.length
+																							? newWindows[
+																									newWindows.length -
+																										1
+																							  ].id
+																							: null,
+																					);
 																				}
 																			}}
 																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-white/10 rounded transition-opacity"
+																			aria-label={`Close ${win.title}`}
 																		>
 																			<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
 																		</button>
@@ -364,9 +413,9 @@ export function MainLayout() {
 												</div>
 											</ResizablePanel>
 
-											<ResizableHandle className="bg-white/10" />
+											<ResizableHandle className="bg-white/10 hover:bg-white/20 transition-colors" />
 
-											<ResizablePanel defaultSize={65} minSize={25}>
+											<ResizablePanel defaultSize={62} minSize={26}>
 												<div className="h-full flex flex-col">
 													<div className="p-2 text-[11px] font-semibold border-b border-white/10 bg-white/5 uppercase tracking-[0.25em] text-muted-foreground">
 														Explorer
@@ -384,15 +433,19 @@ export function MainLayout() {
 										</ResizablePanelGroup>
 									</ResizablePanel>
 
-									<ResizableHandle withHandle className="bg-white/10" />
+									<ResizableHandle
+										withHandle
+										className="bg-white/10 hover:bg-white/20 transition-colors"
+									/>
 
 									<ResizablePanel
-										defaultSize={80}
-										minSize={32}
-										className="relative overflow-hidden bg-gradient-to-br from-[#05070d]/70 via-[#050a13]/80 to-[#04050a]/70"
+										defaultSize={horizontalSizes[1]}
+										minSize={35}
+										className="relative overflow-hidden bg-gradient-to-br from-[#05070d]/70 via-[#06101c]/75 to-[#04050a]/70"
 									>
-										<div className="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.18),transparent_55%)]" />
-										<div className="absolute inset-0 pointer-events-none opacity-15 bg-[linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-[size:60px_60px]" />
+										<div className="absolute inset-0 pointer-events-none opacity-35 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.22),transparent_60%)]" />
+										<div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(rgba(255,255,255,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.10)_1px,transparent_1px)] bg-[size:70px_70px]" />
+										<div className="absolute inset-0 pointer-events-none mix-blend-overlay animate-pulse bg-[conic-gradient(at_50%_50%,transparent_0deg,rgba(56,189,248,0.08)_90deg,transparent_180deg)]" />
 										<div className="relative z-10 h-full flex flex-col">
 											<EditorArea />
 										</div>
@@ -400,21 +453,28 @@ export function MainLayout() {
 								</ResizablePanelGroup>
 							</ResizablePanel>
 
-							<ResizableHandle withHandle className="bg-white/10" />
+							<ResizableHandle
+								withHandle
+								className="bg-white/10 hover:bg-white/20 transition-colors"
+							/>
 
 							{/* Bottom terminal */}
 							<ResizablePanel
 								ref={terminalRef}
-								defaultSize={25}
+								defaultSize={verticalSizes[1]}
 								minSize={0}
 								maxSize={45}
 								collapsible
 								collapsedSize={4}
-								className="border-t border-white/10 bg-[#05060a]/90 backdrop-blur-xl"
+								className="border-t border-white/10 bg-[#05060a]/85 backdrop-blur-xl relative"
 							>
+								<div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/40 to-transparent" />
 								<div className="h-full flex flex-col">
 									<div className="p-3 border-b border-white/10 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between">
-										<span>Terminal</span>
+										<span className="flex items-center gap-2">
+											Terminal
+											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_2px_rgba(16,185,129,0.7)]" />
+										</span>
 										<span className="text-[9px] text-emerald-300">
 											ƒ-motion
 										</span>
@@ -426,7 +486,7 @@ export function MainLayout() {
 							</ResizablePanel>
 						</ResizablePanelGroup>
 					) : (
-						<div className="flex-1 flex flex-col bg-black/40 backdrop-blur-sm w-full">
+						<div className="flex-1 flex flex-col bg-black/50 backdrop-blur-sm w-full">
 							<CLI />
 						</div>
 					)}
