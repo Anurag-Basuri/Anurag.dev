@@ -30,20 +30,23 @@ A terminal-style portfolio interface built with Next.js, featuring a unique OS-l
 ### Installation
 
 1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+
+    ```bash
+    npm install
+    ```
 
 2. **Configure environment**:
-   ```bash
-   cp .env.local.example .env.local
-   # Edit .env.local if backend is on different port
-   ```
+
+    ```bash
+    cp .env.local.example .env.local
+    # Edit .env.local if backend is on different port
+    ```
 
 3. **Start development server**:
-   ```bash
-   npm run dev
-   ```
+
+    ```bash
+    npm run dev
+    ```
 
 4. **Open browser**:
    Navigate to http://localhost:3000
@@ -100,29 +103,38 @@ Type these commands in the CLI:
 ## Modules
 
 ### About Module
+
 Displays personal information, tagline, and skills fetched from the backend.
 
 ### Projects Module
+
 Shows all published projects with:
+
 - Project descriptions
 - Tech stack tags
 - GitHub and live links
 - Star/fork counts
 
 ### Journey Module
+
 Timeline view of professional journey with:
+
 - Year-based entries
 - Category badges (education, work, project, achievement)
 - Chronological ordering
 
 ### Blog Module
+
 Lists published blog posts with:
+
 - Title and publication date
 - Content preview
 - Tags
 
 ### Contact Module
+
 Contact form with:
+
 - Name, email, subject, message fields
 - Form validation
 - Success/error feedback
@@ -149,10 +161,10 @@ Edit `src/app/globals.css` to customize the color scheme:
 
 ```css
 :root {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --primary: 142 76% 36%;  /* Green accent */
-  /* ... more colors */
+	--background: 0 0% 3.9%;
+	--foreground: 0 0% 98%;
+	--primary: 142 76% 36%; /* Green accent */
+	/* ... more colors */
 }
 ```
 
@@ -178,10 +190,10 @@ Add new commands in `src/lib/commands.ts`:
 
 ```typescript
 case "your-command":
-  return { 
-    type: "open_module", 
-    content: "Opening...", 
-    moduleId: "your-module" 
+  return {
+    type: "open_module",
+    content: "Opening...",
+    moduleId: "your-module"
   };
 ```
 
