@@ -5,6 +5,7 @@ import './globals.css';
 import { ErrorBoundary } from '@/components/core/ErrorBoundary';
 import ConnectivityBanner from '@/components/core/ConnectivityBanner';
 import ClientToaster from '@/components/core/ClientToaster';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -42,14 +43,27 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<ErrorBoundary>
-					<ConnectivityBanner />
-					<Suspense fallback={<div style={{ padding: 16 }}>Loading…</div>}>
+			<head>
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+				/>
+			</head>
+			<body
+				className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen overflow-hidden bg-background text-foreground`}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<ErrorBoundary>
+						<ConnectivityBanner />
+						<ClientToaster />
 						{children}
-					</Suspense>
-					<ClientToaster />
-				</ErrorBoundary>
+					</ErrorBoundary>
+				</ThemeProvider>
 			</body>
 		</html>
 	);
