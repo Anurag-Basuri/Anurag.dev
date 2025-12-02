@@ -3,7 +3,28 @@
 import { useEffect, useState } from 'react';
 import { api, Project } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ExternalLink, Github, Star, GitFork } from 'lucide-react';
+import { ExternalLink, Github, Star, GitFork, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+// Skeleton Loading Component
+function ProjectCardSkeleton() {
+	return (
+		<div className="bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
+			<div className="relative h-48 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 animate-pulse" />
+			<div className="p-5 space-y-3">
+				<div className="h-6 bg-white/10 rounded animate-pulse w-3/4" />
+				<div className="h-4 bg-white/5 rounded animate-pulse w-full" />
+				<div className="h-4 bg-white/5 rounded animate-pulse w-5/6" />
+				<div className="flex gap-2 mt-4">
+					<div className="h-6 bg-blue-500/20 rounded animate-pulse w-16" />
+					<div className="h-6 bg-blue-500/20 rounded animate-pulse w-20" />
+					<div className="h-6 bg-blue-500/20 rounded animate-pulse w-14" />
+				</div>
+			</div>
+		</div>
+	);
+}
 
 export function ProjectsModule() {
 	const [projects, setProjects] = useState<Project[]>([]);
@@ -19,129 +40,194 @@ export function ProjectsModule() {
 
 	if (loading) {
 		return (
-			<div className="p-6 flex items-center justify-center h-full">
-				<div className="text-muted-foreground">Loading projects...</div>
-			</div>
+			<ScrollArea className="h-full">
+				<div className="p-6 md:p-8 space-y-6">
+					<div className="space-y-2">
+						<h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
+							<span className="text-cyan-400">$</span> ls projects/
+							<Sparkles className="w-5 h-5 text-cyan-400 animate-pulse" />
+						</h1>
+						<p className="text-white/60 text-sm">Loading projects...</p>
+					</div>
+
+					<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+						{[1, 2, 3].map(i => (
+							<ProjectCardSkeleton key={i} />
+						))}
+					</div>
+				</div>
+			</ScrollArea>
 		);
 	}
 
 	if (error) {
 		return (
-			<div className="p-6 flex items-center justify-center h-full">
-				<div className="text-red-500">Error: {error}</div>
+			<div className="p-8 flex items-center justify-center h-full">
+				<div className="text-center space-y-3">
+					<div className="text-5xl">⚠️</div>
+					<div className="text-red-400 font-medium">Error loading projects</div>
+					<div className="text-white/50 text-sm">{error}</div>
+				</div>
 			</div>
 		);
 	}
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="p-6 space-y-6">
-				<div>
-					<h1 className="text-2xl font-bold text-green-500 mb-2 flex items-center gap-2">
-						<span className="text-blue-400">$</span> ls projects/
+			<div className="p-6 md:p-8 space-y-8">
+				{/* Header */}
+				<motion.div
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5 }}
+					className="space-y-3"
+				>
+					<h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
+						<span className="text-cyan-400">$</span> ls projects/
 					</h1>
-					<p className="text-white/60">
+					<p className="text-white/70 text-sm md:text-base">
 						{projects.length} project{projects.length !== 1 ? 's' : ''} found
 					</p>
-				</div>
+				</motion.div>
 
-				<div className="grid gap-6 md:grid-cols-2">
-					{projects.map(project => (
-						<div
+				{/* Projects Grid */}
+				<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+					{projects.map((project, index) => (
+						<motion.div
 							key={project.id}
-							className="bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:border-green-500/50 hover:shadow-lg transition-all group"
+							initial={{ opacity: 0, y: 30 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.4, delay: index * 0.1 }}
+							whileHover={{ y: -8, scale: 1.02 }}
+							className="group relative"
 						>
-							{/* Project Thumbnail */}
-							<div className="relative h-40 bg-gradient-to-br from-green-500/20 to-blue-500/20 overflow-hidden">
-								<img
-									src={`https://placehold.co/600x400/1a1a1a/22c55e?text=${encodeURIComponent(project.title)}`}
-									alt={project.title}
-									className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all"
-								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+							<div className="glass-panel rounded-xl overflow-hidden border border-white/10 hover:border-cyan-500/40 transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(6,182,212,0.3)]">
+								{/* Gradient Overlay on Hover */}
+								<div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:via-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none z-10" />
 
-								{/* Links Overlay */}
-								<div className="absolute top-3 right-3 flex gap-2">
-									{project.githubUrl && (
-										<a
-											href={project.githubUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2 bg-black/60 backdrop-blur-sm rounded-full text-white hover:bg-green-500/80 transition-colors"
-											title="View on GitHub"
-											onClick={e => e.stopPropagation()}
-										>
-											<Github className="w-4 h-4" />
-										</a>
-									)}
-									{project.liveUrl && (
-										<a
-											href={project.liveUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2 bg-black/60 backdrop-blur-sm rounded-full text-white hover:bg-blue-500/80 transition-colors"
-											title="View Live"
-											onClick={e => e.stopPropagation()}
-										>
-											<ExternalLink className="w-4 h-4" />
-										</a>
-									)}
-								</div>
-							</div>
+								{/* Project Thumbnail */}
+								<div className="relative h-48 bg-gradient-to-br from-cyan-500/10 via-blue-500/15 to-purple-500/10 overflow-hidden">
+									<img
+										src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(project.title)}`}
+										alt={project.title}
+										className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-110 transition-all duration-500"
+									/>
+									<div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
-							{/* Project Info */}
-							<div className="p-4 space-y-3">
-								<div>
-									<h2 className="text-xl font-bold text-green-400 mb-1 group-hover:text-green-300 transition-colors">
-										{project.title}
-									</h2>
-									<p className="text-sm text-white/70 line-clamp-2">
-										{project.description}
-									</p>
-								</div>
-
-								<div className="flex flex-wrap gap-2">
-									{project.techStack.slice(0, 4).map(tech => (
-										<span
-											key={tech}
-											className="px-2 py-1 bg-blue-500/20 border border-blue-500/30 rounded text-xs text-blue-300 font-medium"
-										>
-											{tech}
-										</span>
-									))}
-									{project.techStack.length > 4 && (
-										<span className="px-2 py-1 text-xs text-white/50">
-											+{project.techStack.length - 4}
-										</span>
-									)}
-								</div>
-
-								{(project.stars !== undefined || project.forks !== undefined) && (
-									<div className="flex gap-4 text-xs text-white/50 pt-2 border-t border-white/10">
-										{project.stars !== undefined && (
-											<div className="flex items-center gap-1">
-												<Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-												<span>{project.stars}</span>
-											</div>
+									{/* Action Buttons */}
+									<div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+										{project.githubUrl && (
+											<motion.a
+												href={project.githubUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												whileHover={{ scale: 1.1, rotate: 5 }}
+												whileTap={{ scale: 0.95 }}
+												className="p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white hover:bg-emerald-500/80 transition-colors shadow-lg"
+												title="View on GitHub"
+												onClick={e => e.stopPropagation()}
+											>
+												<Github className="w-4 h-4" />
+											</motion.a>
 										)}
-										{project.forks !== undefined && (
-											<div className="flex items-center gap-1">
-												<GitFork className="w-3 h-3" />
-												<span>{project.forks}</span>
-											</div>
+										{project.liveUrl && (
+											<motion.a
+												href={project.liveUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												whileHover={{ scale: 1.1, rotate: -5 }}
+												whileTap={{ scale: 0.95 }}
+												className="p-2.5 bg-black/70 backdrop-blur-md rounded-full text-white hover:bg-cyan-500/80 transition-colors shadow-lg"
+												title="View Live"
+												onClick={e => e.stopPropagation()}
+											>
+												<ExternalLink className="w-4 h-4" />
+											</motion.a>
 										)}
 									</div>
-								)}
+
+									{/* Status Badge */}
+									{project.status && (
+										<div className="absolute bottom-3 left-3">
+											<span className={cn(
+												"px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border",
+												project.status.toLowerCase() === 'completed' 
+													? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+													: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300"
+											)}>
+												{project.status}
+											</span>
+										</div>
+									)}
+								</div>
+
+								{/* Project Info */}
+								<div className="p-5 space-y-4 relative z-20">
+									<div className="space-y-2">
+										<h2 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-blue-400 transition-all duration-300">
+											{project.title}
+										</h2>
+										<p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
+											{project.description}
+										</p>
+									</div>
+
+									{/* Tech Stack */}
+									<div className="flex flex-wrap gap-2">
+										{project.techStack.slice(0, 4).map((tech, i) => (
+											<motion.span
+												key={tech}
+												initial={{ opacity: 0, scale: 0.8 }}
+												animate={{ opacity: 1, scale: 1 }}
+												transition={{ delay: index * 0.1 + i * 0.05 }}
+												className="px-2.5 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-md text-xs text-cyan-300 font-medium hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all duration-200"
+											>
+												{tech}
+											</motion.span>
+										))}
+										{project.techStack.length > 4 && (
+											<span className="px-2.5 py-1 text-xs text-white/50 flex items-center">
+												+{project.techStack.length - 4} more
+											</span>
+										)}
+									</div>
+
+									{/* Stats */}
+									{(project.stars !== undefined || project.forks !== undefined) && (
+										<div className="flex gap-4 text-xs text-white/60 pt-3 border-t border-white/10">
+											{project.stars !== undefined && (
+												<div className="flex items-center gap-1.5 hover:text-yellow-400 transition-colors">
+													<Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
+													<span className="font-medium">{project.stars}</span>
+												</div>
+											)}
+											{project.forks !== undefined && (
+												<div className="flex items-center gap-1.5 hover:text-cyan-400 transition-colors">
+													<GitFork className="w-3.5 h-3.5" />
+													<span className="font-medium">{project.forks}</span>
+												</div>
+											)}
+										</div>
+									)}
+								</div>
 							</div>
-						</div>
+						</motion.div>
 					))}
 				</div>
 
+				{/* Empty State */}
 				{projects.length === 0 && (
-					<div className="text-center py-12 text-white/60">
-						<p>No projects found.</p>
-						<p className="text-sm mt-2">Check back soon for updates!</p>
-					</div>
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						className="text-center py-20 space-y-4"
+					>
+						<div className="text-6xl opacity-30">📁</div>
+						<div className="space-y-2">
+							<p className="text-white/70 font-medium">No projects found</p>
+							<p className="text-sm text-white/40">Check back soon for updates!</p>
+						</div>
+					</motion.div>
 				)}
 			</div>
 		</ScrollArea>
