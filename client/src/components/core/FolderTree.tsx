@@ -13,12 +13,12 @@ interface FolderTreeProps {
 }
 
 const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-yellow-500" />;
+	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-amber-500 dark:text-amber-400" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 text-blue-400" />;
+		return <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" />;
 	if (name.endsWith('.py') || name.endsWith('.js') || name.endsWith('.tsx'))
-		return <FileCode className="w-4 h-4 text-green-500" />;
-	return <File className="w-4 h-4 text-zinc-500" />;
+		return <FileCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />;
+	return <File className="w-4 h-4 text-muted-foreground" />;
 };
 
 export function FolderTree({ items, level = 0, onSelect }: FolderTreeProps) {
@@ -56,7 +56,7 @@ function FolderTreeItem({
 		<div>
 			<div
 				className={cn(
-					'flex items-center py-1 px-2 hover:bg-white/10 cursor-pointer select-none text-sm transition-colors rounded-sm',
+					'flex items-center py-1 px-2 hover:bg-muted/70 cursor-pointer select-none text-sm transition-colors rounded-sm group',
 					level > 0 && 'ml-2',
 				)}
 				style={{ paddingLeft: `${level * 12 + 8}px` }}
@@ -65,7 +65,7 @@ function FolderTreeItem({
 				<motion.span
 					animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
 					transition={{ duration: 0.15 }}
-					className="mr-1 opacity-70 flex items-center justify-center"
+					className="mr-1 text-muted-foreground group-hover:text-foreground flex items-center justify-center transition-colors"
 				>
 					{isFolder ? (
 						<ChevronRight className="w-3 h-3" />
@@ -77,9 +77,9 @@ function FolderTreeItem({
 				<span className="mr-2">
 					{isFolder ? (
 						isOpen ? (
-							<FolderOpen className="w-4 h-4 text-blue-400" />
+							<FolderOpen className="w-4 h-4 text-sky-600 dark:text-sky-400" />
 						) : (
-							<Folder className="w-4 h-4 text-blue-400" />
+							<Folder className="w-4 h-4 text-sky-600 dark:text-sky-400" />
 						)
 					) : (
 						<FileIcon name={item.name} />
@@ -88,8 +88,8 @@ function FolderTreeItem({
 
 				<span
 					className={cn(
-						'truncate transition-colors',
-						item.name === 'secret' && 'text-zinc-500',
+						'truncate transition-colors text-foreground group-hover:text-primary',
+						item.name === 'secret' && 'text-muted-foreground opacity-50',
 					)}
 				>
 					{item.name}
