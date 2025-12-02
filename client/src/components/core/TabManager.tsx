@@ -1,6 +1,5 @@
 import { useAtom } from 'jotai';
 import { activeTabIdAtom, tabsAtom } from '@/store/atoms';
-import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { CLI } from './CLI';
 import { getModuleComponent } from '@/lib/moduleRegistry';
@@ -48,14 +47,12 @@ export function TabManager() {
 						<span>{tab.title}</span>
 						{/* Prevent closing the CLI tab */}
 						{tab.type !== 'cli' && (
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-5 w-5 rounded-full hover:bg-gray-600"
+							<button
+								className="h-5 w-5 flex items-center justify-center rounded-full hover:bg-gray-600 transition-colors"
 								onClick={e => handleCloseTab(e, tab.id)}
 							>
 								<X size={14} />
-							</Button>
+							</button>
 						)}
 					</div>
 				))}
