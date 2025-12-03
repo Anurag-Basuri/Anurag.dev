@@ -67,13 +67,13 @@ function HexGrid({ opacity }: { opacity: number }) {
 				className="w-full h-full"
 				style={{
 					backgroundImage: `
-						linear-gradient(30deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
-						linear-gradient(150deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
-						linear-gradient(30deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
-						linear-gradient(150deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
-						linear-gradient(60deg, #00332255 25%, transparent 25.5%, transparent 75%, #00332255 75%, #00332255),
-						linear-gradient(60deg, #00332255 25%, transparent 25.5%, transparent 75%, #00332255 75%, #00332255)
-					`,
+							linear-gradient(30deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
+							linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
+							linear-gradient(30deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
+							linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
+							linear-gradient(60deg, #00332270 25%, transparent 25.5%, transparent 75%, #00332270 75%, #00332270),
+							linear-gradient(60deg, #00332270 25%, transparent 25.5%, transparent 75%, #00332270 75%, #00332270)
+						`,
 					backgroundSize: '80px 140px',
 					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
 				}}
@@ -326,10 +326,11 @@ export function BootAnimation() {
 					<div
 						className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest relative"
 						style={{
+							color: '#00ff41',
 							textShadow:
-								'0 0 15px #00ff4180, 0 0 30px #00ff4160, 2px 2px 0 #003311, 4px 4px 0 #002211',
+								'0 1px 0 #003a0e, 0 2px 0 #002a08, 0 3px 0 #001a04, 0 4px 0 #000a02, 0 5px 0 #000501, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,255,65,.3), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)',
 							transform: `perspective(500px) rotateX(${
-								Math.sin(phase * 0.5) * 5
+								Math.sin(phase * 0.5) * 3
 							}deg)`,
 							transition: 'transform 0.5s ease-out',
 						}}
@@ -337,7 +338,10 @@ export function BootAnimation() {
 						ANURAG
 						<span
 							className="text-[#0088ff]"
-							style={{ textShadow: '0 0 15px #0088ff60' }}
+							style={{
+								textShadow:
+									'0 1px 0 #001a33, 0 2px 0 #001028, 0 3px 0 #000a1a, 0 4px 0 #00050d, 0 5px 0 #000306, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,136,255,.3), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)',
+							}}
 						>
 							OS
 						</span>
@@ -354,12 +358,15 @@ export function BootAnimation() {
 					</div>
 
 					{/* Progress Bar */}
-					<div className="w-full max-w-md h-2.5 md:h-3 bg-[#001a0d] overflow-hidden mx-auto border-2 border-[#00ff41] shadow-[0_0_15px_rgba(0,255,65,0.3)]">
-						<div
-							className="h-full bg-linear-to-r from-[#00ff41] via-[#00cc66] to-[#0088ff] transition-all duration-300 ease-out relative"
-							style={{ width: `${progress}%` }}
-						>
-							<div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+					<div className="w-full max-w-md mx-auto">
+						<div className="h-3 md:h-4 bg-gradient-to-r from-[#001a0d] to-[#000a05] overflow-hidden border-2 border-[#00ff41] shadow-[0_0_20px_rgba(0,255,65,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+							<div
+								className="h-full bg-gradient-to-r from-[#00ff41] via-[#00cc33] to-[#00aa22] transition-all duration-300 ease-out relative shadow-[0_0_10px_rgba(0,255,65,0.6)]"
+								style={{ width: `${progress}%` }}
+							>
+								<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
+								<div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+							</div>
 						</div>
 					</div>
 
