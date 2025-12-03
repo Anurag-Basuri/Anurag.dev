@@ -3,6 +3,7 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/core/FolderTree';
+import { SidebarProfile } from '@/components/core/SidebarProfile';
 import ConnectivityBanner from '@/components/core/ConnectivityBanner';
 import { CLI } from '@/components/core/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
@@ -128,7 +129,6 @@ export function MainLayout() {
 		terminalRef.current?.expand();
 		setTerminalCollapsed(false);
 	};
-
 
 	return (
 		<>
@@ -308,6 +308,7 @@ export function MainLayout() {
 								onExpand={() => setSidebarCollapsed(false)}
 								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
 							>
+								<SidebarProfile />
 								<ResizablePanelGroup direction="vertical" className="h-full">
 									<ResizablePanel
 										defaultSize={38}

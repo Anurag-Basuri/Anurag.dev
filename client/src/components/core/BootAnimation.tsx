@@ -251,7 +251,7 @@ export function BootAnimation() {
 				{
 					duration: 1.6,
 					onStart: () => {
-						setStatus('NEXT.JS + MERN → CLEAN, SCALABLE, HUMAN-CENTERED UX');
+						setStatus('MODERN STACK + MERN → CLEAN, SCALABLE, HUMAN-CENTERED UX');
 						setPhase(1);
 						setHexOpacity(0.6);
 					},
@@ -423,7 +423,7 @@ export function BootAnimation() {
 						>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 sm:gap-x-10 gap-y-2 sm:gap-y-3 text-center text-[#bdfccf]/85">
 								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
-									<div>Clean, scalable UX with Next.js & MERN</div>
+									<div>Clean, scalable UX with Modern Tech Stack</div>
 									<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
 								</div>
 								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
