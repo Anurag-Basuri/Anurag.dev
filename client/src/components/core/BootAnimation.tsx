@@ -313,12 +313,11 @@ export function BootAnimation() {
 			{/* Content (clean, centered, responsive) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
 				<div className="w-full max-w-5xl px-4 sm:px-6 md:px-8">
-					{/* use consistent vertical spacing with fluid scales */}
+					{/* Consistent vertical rhythm; tighter on mobile */}
 					<div className="py-8 sm:py-12 md:py-16 space-y-6 sm:space-y-8 md:space-y-10">
 						{/* Title */}
 						<div
 							className="text-center select-none"
-							// keep subtle motion but reduce extremes for readability
 							style={{
 								transform: `perspective(600px) rotateX(${
 									Math.sin(phase * 0.5) * 2.2
@@ -327,7 +326,6 @@ export function BootAnimation() {
 							}}
 						>
 							<h1
-								// fluid typography via clamp ensures consistent scale
 								className="font-extrabold tracking-[0.14em] md:tracking-[0.18em]"
 								style={{
 									fontSize: 'clamp(2rem, 4vw + 1rem, 4.5rem)',
@@ -391,28 +389,25 @@ export function BootAnimation() {
 							</div>
 						</div>
 
-						{/* Phases (clean dots, no progress line) */}
+						{/* Phases (clean dots, evenly spaced, centered labels) */}
 						<div className="mx-auto w-full max-w-xl">
-							<div className="flex justify-center gap-6 sm:gap-8 md:gap-10">
+							<div className="flex flex-wrap justify-center gap-5 sm:gap-7 md:gap-9">
 								{['HELLO', 'FULL‑STACK UX', 'AI/ML + LLMs', 'REAL IMPACT'].map(
 									(label, idx) => (
-										<div
-											key={label}
-											className="flex flex-col items-center gap-2"
-										>
+										<div key={label} className="flex flex-col items-center">
 											<div
-												className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${
+												className={`w-3.5 h-3.5 rounded-full transition-transform duration-300 ${
 													phase >= idx
-														? 'bg-[#00ff41] shadow-[0_0_10px_#00ff41]'
+														? 'bg-[#00ff41]'
 														: 'bg-[#00ff41]/30'
 												}`}
-												aria-label={`Phase ${idx + 1}: ${label}`}
 												style={{
 													transform:
 														phase === idx ? 'scale(1.15)' : 'scale(1)',
 												}}
+												aria-label={`Phase ${idx + 1}: ${label}`}
 											/>
-											<span className="text-[10px] sm:text-xs opacity-80 text-center">
+											<span className="mt-2 text-[10px] sm:text-xs opacity-80 text-center">
 												{label}
 											</span>
 										</div>
@@ -421,16 +416,16 @@ export function BootAnimation() {
 							</div>
 						</div>
 
-						{/* Bio lines (centered, balanced, responsive) */}
+						{/* Bio lines (centered, balanced, responsive, better alignment) */}
 						<div
 							className="grid sm:grid-cols-2 gap-x-8 gap-y-3 justify-items-center text-center text-[#bdfccf]/85"
 							style={{ fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 0.95rem)' }}
 						>
-							<div className="space-y-1 leading-relaxed max-w-[28ch] sm:max-w-[30ch]">
+							<div className="space-y-1 leading-relaxed max-w-[30ch]">
 								<div>Clean, scalable UX with Next.js & MERN</div>
 								<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
 							</div>
-							<div className="space-y-1 leading-relaxed max-w-[28ch] sm:max-w-[30ch]">
+							<div className="space-y-1 leading-relaxed max-w-[30ch]">
 								<div>LeetCode 450+ • consistency that compounds</div>
 								<div>Exploring internships & freelancing • real impact</div>
 							</div>
