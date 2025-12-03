@@ -220,68 +220,40 @@ export function MainLayout() {
 
 						{/* Sidebar controls */}
 						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
-							{sidebarCollapsed ? (
-								<button
-									className="p-1 hover:bg-muted/60 rounded"
-									title="Show sidebar"
-									aria-label="Show sidebar"
-									onClick={showSidebar}
-								>
+							<button
+								className={cn(
+									'p-1 hover:bg-muted/60 rounded transition-all duration-200',
+									sidebarCollapsed && 'text-muted-foreground',
+								)}
+								title={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
+								aria-label={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
+								onClick={sidebarCollapsed ? showSidebar : hideSidebar}
+							>
+								{sidebarCollapsed ? (
 									<PanelLeftOpen className="w-4 h-4" />
-								</button>
-							) : (
-								<>
-									<button
-										className="p-1 hover:bg-muted/60 rounded"
-										title="Cut sidebar"
-										aria-label="Cut sidebar"
-										onClick={cutSidebar}
-									>
-										<PanelLeftClose className="w-4 h-4" />
-									</button>
-									<button
-										className="p-1 hover:bg-muted/60 rounded"
-										title="Hide sidebar"
-										aria-label="Hide sidebar"
-										onClick={hideSidebar}
-									>
-										<EyeOff className="w-4 h-4" />
-									</button>
-								</>
-							)}
+								) : (
+									<PanelLeftClose className="w-4 h-4" />
+								)}
+							</button>
 						</div>
 
 						{/* Terminal controls */}
 						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
-							{terminalCollapsed ? (
-								<button
-									className="p-1 hover:bg-muted/60 rounded"
-									title="Show terminal"
-									aria-label="Show terminal"
-									onClick={showTerminal}
-								>
+							<button
+								className={cn(
+									'p-1 hover:bg-muted/60 rounded transition-all duration-200',
+									terminalCollapsed && 'text-muted-foreground',
+								)}
+								title={terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'}
+								aria-label={terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'}
+								onClick={terminalCollapsed ? showTerminal : hideTerminal}
+							>
+								{terminalCollapsed ? (
 									<TerminalIcon className="w-4 h-4" />
-								</button>
-							) : (
-								<>
-									<button
-										className="p-1 hover:bg-muted/60 rounded"
-										title="Cut terminal"
-										aria-label="Cut terminal"
-										onClick={cutTerminal}
-									>
-										<ChevronDown className="w-4 h-4" />
-									</button>
-									<button
-										className="p-1 hover:bg-muted/60 rounded"
-										title="Hide terminal"
-										aria-label="Hide terminal"
-										onClick={hideTerminal}
-									>
-										<Eye className="w-4 h-4 rotate-180" />
-									</button>
-								</>
-							)}
+								) : (
+									<ChevronDown className="w-4 h-4" />
+								)}
+							</button>
 						</div>
 					</div>
 				</motion.div>
@@ -290,154 +262,119 @@ export function MainLayout() {
 				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth">
 					{!isMobile ? (
 						<ResizablePanelGroup
-							direction="vertical"
+							direction="horizontal"
 							className="h-full w-full"
-							onLayout={onVerticalLayout}
-							id="layout-vertical"
+							onLayout={onHorizontalLayout}
+							id="layout-main"
 						>
-							<ResizablePanel defaultSize={verticalSizes[0]} minSize={40}>
-								<ResizablePanelGroup
-									direction="horizontal"
-									className="h-full"
-									onLayout={onHorizontalLayout}
-									id="layout-horizontal"
-								>
+							{/* Sidebar (Left) */}
+							<ResizablePanel
+								ref={sidebarRef}
+								defaultSize={horizontalSizes[0]}
+								minSize={0}
+								maxSize={30}
+								collapsible
+								collapsedSize={0}
+								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
+							>
+								<ResizablePanelGroup direction="vertical" className="h-full">
 									<ResizablePanel
-										ref={sidebarRef}
-										defaultSize={horizontalSizes[0]}
-										minSize={0}
-										maxSize={30}
+										defaultSize={38}
+										minSize={12}
 										collapsible
-										collapsedSize={3}
-										className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
+										collapsedSize={8}
+										className="border-b border-border/60"
 									>
-										<ResizablePanelGroup
-											direction="vertical"
-											className="h-full"
-										>
-											<ResizablePanel
-												defaultSize={38}
-												minSize={12}
-												collapsible
-												collapsedSize={8}
-												className="border-b border-border/60"
-											>
-												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
-														Open Editors
-													</div>
-													<ScrollArea className="flex-1">
-														<motion.div
-															layout
-															className="flex flex-col"
-														>
-															<AnimatePresence>
-																{windows.map(win => (
-																	<motion.div
-																		layout
-																		initial={{
-																			opacity: 0,
-																			x: -16,
-																		}}
-																		animate={{
-																			opacity: 1,
-																			x: 0,
-																		}}
-																		exit={{
-																			opacity: 0,
-																			x: -16,
-																		}}
-																		transition={{
-																			duration: 0.16,
-																		}}
-																		key={win.id}
-																		className={cn(
-																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
-																			'hover:bg-muted/40',
-																			activeWindowId ===
-																				win.id &&
-																				'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
-																		)}
-																		onClick={() =>
-																			setActiveWindowId(
-																				win.id,
-																			)
-																		}
-																	>
-																		<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
-																			{win.title}
-																		</span>
-																		<button
-																			onClick={e => {
-																				e.stopPropagation();
-																				const newWindows =
-																					windows.filter(
-																						w =>
-																							w.id !==
-																							win.id,
-																					);
-																				setWindows(
-																					newWindows,
-																				);
-																				setActiveWindowId(
-																					newWindows.length
-																						? newWindows[
-																								newWindows.length -
-																									1
-																						  ].id
-																						: null,
-																				);
-																			}}
-																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
-																			aria-label={`Close ${win.title}`}
-																		>
-																			<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-																		</button>
-																	</motion.div>
-																))}
-															</AnimatePresence>
-															{windows.length === 0 && (
-																<div className="p-4 text-xs text-muted-foreground text-center italic">
-																	No open editors
-																</div>
-															)}
-														</motion.div>
-													</ScrollArea>
-												</div>
-											</ResizablePanel>
-
-											<ResizableHandle className="bg-border/60 hover:bg-border transition-colors" />
-
-											<ResizablePanel defaultSize={62} minSize={26}>
-												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
-														Explorer
-													</div>
-													<ScrollArea className="flex-1">
-														<div className="p-2">
-															<FolderTree
-																items={initialFileSystem}
-																onSelect={handleFileSelect}
-															/>
+										<div className="h-full flex flex-col">
+											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
+												Open Editors
+											</div>
+											<ScrollArea className="flex-1">
+												<motion.div layout className="flex flex-col">
+													<AnimatePresence>
+														{windows.map(win => (
+															<motion.div
+																layout
+																initial={{
+																	opacity: 0,
+																	x: -16,
+																}}
+																animate={{
+																	opacity: 1,
+																	x: 0,
+																}}
+																exit={{
+																	opacity: 0,
+																	x: -16,
+																}}
+																transition={{
+																	duration: 0.16,
+																}}
+																key={win.id}
+																className={cn(
+																	'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
+																	'hover:bg-muted/40',
+																	activeWindowId === win.id &&
+																		'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
+																)}
+																onClick={() =>
+																	setActiveWindowId(win.id)
+																}
+															>
+																<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																	{win.title}
+																</span>
+																<button
+																	onClick={e => {
+																		e.stopPropagation();
+																		const newWindows =
+																			windows.filter(
+																				w =>
+																					w.id !== win.id,
+																			);
+																		setWindows(newWindows);
+																		setActiveWindowId(
+																			newWindows.length
+																				? newWindows[
+																						newWindows.length -
+																							1
+																				  ].id
+																				: null,
+																		);
+																	}}
+																	className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
+																	aria-label={`Close ${win.title}`}
+																>
+																	<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+																</button>
+															</motion.div>
+														))}
+													</AnimatePresence>
+													{windows.length === 0 && (
+														<div className="p-4 text-xs text-muted-foreground text-center italic">
+															No open editors
 														</div>
-													</ScrollArea>
-												</div>
-											</ResizablePanel>
-										</ResizablePanelGroup>
+													)}
+												</motion.div>
+											</ScrollArea>
+										</div>
 									</ResizablePanel>
 
-									<ResizableHandle
-										withHandle
-										className="bg-border/60 hover:bg-border transition-colors"
-									/>
+									<ResizableHandle className="bg-border/60 hover:bg-border transition-colors" />
 
-									<ResizablePanel
-										defaultSize={horizontalSizes[1]}
-										minSize={35}
-										className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85"
-									>
-										<div className="relative z-10 h-full flex flex-col">
-											<EditorArea />
+									<ResizablePanel defaultSize={62} minSize={26}>
+										<div className="h-full flex flex-col">
+											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
+												Explorer
+											</div>
+											<ScrollArea className="flex-1">
+												<div className="p-2">
+													<FolderTree
+														items={initialFileSystem}
+														onSelect={handleFileSelect}
+													/>
+												</div>
+											</ScrollArea>
 										</div>
 									</ResizablePanel>
 								</ResizablePanelGroup>
@@ -448,27 +385,53 @@ export function MainLayout() {
 								className="bg-border/60 hover:bg-border transition-colors"
 							/>
 
-							{/* Bottom terminal */}
-							<ResizablePanel
-								ref={terminalRef}
-								defaultSize={verticalSizes[1]}
-								minSize={0}
-								maxSize={45}
-								collapsible
-								collapsedSize={4}
-								className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)]"
-							>
-								<div className="h-full flex flex-col">
-									<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm">
-										<span className="flex items-center gap-2">
-											Terminal{' '}
-											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-										</span>
-									</div>
-									<div className="flex-1 overflow-hidden">
-										<CLI />
-									</div>
-								</div>
+							{/* Right Side (Editor + Terminal) */}
+							<ResizablePanel defaultSize={horizontalSizes[1]}>
+								<ResizablePanelGroup
+									direction="vertical"
+									className="h-full w-full"
+									onLayout={onVerticalLayout}
+									id="layout-content"
+								>
+									{/* Editor Area */}
+									<ResizablePanel
+										defaultSize={verticalSizes[0]}
+										minSize={30}
+										className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85"
+									>
+										<div className="relative z-10 h-full flex flex-col">
+											<EditorArea />
+										</div>
+									</ResizablePanel>
+
+									<ResizableHandle
+										withHandle
+										className="bg-border/60 hover:bg-border transition-colors"
+									/>
+
+									{/* Terminal */}
+									<ResizablePanel
+										ref={terminalRef}
+										defaultSize={verticalSizes[1]}
+										minSize={0}
+										maxSize={45}
+										collapsible
+										collapsedSize={0}
+										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)]"
+									>
+										<div className="h-full flex flex-col">
+											<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm">
+												<span className="flex items-center gap-2">
+													Terminal{' '}
+													<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+												</span>
+											</div>
+											<div className="flex-1 overflow-hidden">
+												<CLI />
+											</div>
+										</div>
+									</ResizablePanel>
+								</ResizablePanelGroup>
 							</ResizablePanel>
 						</ResizablePanelGroup>
 					) : (
