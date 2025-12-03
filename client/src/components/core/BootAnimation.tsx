@@ -98,7 +98,7 @@ export function BootAnimation() {
 	if (bootComplete) return null;
 
 	return (
-		<div className="fixed inset-0 z-[9999] bg-black text-[#cccccc] font-mono p-8 text-lg leading-relaxed overflow-hidden cursor-none select-none">
+		<div className="fixed inset-0 z-9999 bg-black text-[#cccccc] font-mono p-8 text-lg leading-relaxed overflow-hidden cursor-none select-none">
 			{/* CRT Effect Overlay */}
 			<div className="scanlines pointer-events-none absolute inset-0 z-20"></div>
 
@@ -128,7 +128,7 @@ export function BootAnimation() {
 
 						<div className="mt-4">
 							{logs.map((log, i) => (
-								<p key={i} className="whitespace-pre-wrap break-words">
+								<p key={i} className="whitespace-pre-wrap wrap-break-word">
 									{log}
 								</p>
 							))}
