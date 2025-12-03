@@ -28,6 +28,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Taskbar } from '@/components/core/Taskbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 // Persistent size helper (no change to API)
 function usePersistentSizes(key: string, initial: number[]) {
@@ -142,18 +143,22 @@ export function MainLayout() {
 				}}
 			/>
 			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
-				{/* Background polish, respects themes */}
+				{/* Enhanced Background with Premium Gradients */}
 				<div className="absolute inset-0 z-0 pointer-events-none">
-					<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_color-mix(in_oklch,var(--ring)_18%,transparent),transparent_55%)] opacity-25" />
-					<div className="absolute inset-0 opacity-15 bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_10%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_10%,transparent)_1px,transparent_1px)] bg-[size:46px_46px]" />
+					{/* Radial gradient from top */}
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--primary)_0%,transparent_50%)] opacity-[0.15] dark:opacity-[0.12]" />
+					{/* Radial gradient from bottom right */}
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.08] dark:opacity-[0.10]" />
+					{/* Grid pattern */}
+					<div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_15%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_15%,transparent)_1px,transparent_1px)] bg-size-[48px_48px]" />
 				</div>
 
-				{/* Top bar */}
+				{/* Premium Top Bar with Glassmorphism */}
 				<motion.div
 					initial={{ y: -28, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ duration: 0.35, ease: 'easeOut' }}
-					className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/70 backdrop-blur-md z-20 relative border-border justify-between shadow-[0_5px_22px_-4px_rgba(0,0,0,0.45)]"
+					className="h-10 border-b flex items-center px-4 text-xs select-none bg-linear-to-r from-background/85 via-background/90 to-background/85 backdrop-blur-xl z-20 relative border-border/70 justify-between shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6)]"
 				>
 					<div className="flex items-center gap-3">
 						{isMobile && (
@@ -206,6 +211,11 @@ export function MainLayout() {
 							<span className="text-[10px] text-muted-foreground uppercase tracking-[0.4em]">
 								ONLINE
 							</span>
+						</div>
+
+						{/* Theme Toggle */}
+						<div className="pr-2 border-r border-border">
+							<ThemeToggle />
 						</div>
 
 						{/* Sidebar controls */}
@@ -299,7 +309,7 @@ export function MainLayout() {
 										maxSize={30}
 										collapsible
 										collapsedSize={3}
-										className="flex flex-col border-r border-border bg-background/60 backdrop-blur-md"
+										className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
 									>
 										<ResizablePanelGroup
 											direction="vertical"
@@ -310,10 +320,10 @@ export function MainLayout() {
 												minSize={12}
 												collapsible
 												collapsedSize={8}
-												className="border-b border-border"
+												className="border-b border-border/60"
 											>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.25em] text-muted-foreground">
+													<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
 														Open Editors
 													</div>
 													<ScrollArea className="flex-1">
@@ -400,7 +410,7 @@ export function MainLayout() {
 
 											<ResizablePanel defaultSize={62} minSize={26}>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.25em] text-muted-foreground">
+													<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
 														Explorer
 													</div>
 													<ScrollArea className="flex-1">
@@ -424,7 +434,7 @@ export function MainLayout() {
 									<ResizablePanel
 										defaultSize={horizontalSizes[1]}
 										minSize={35}
-										className="relative overflow-hidden bg-gradient-to-br from-background/70 via-background/80 to-background/70"
+										className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85"
 									>
 										<div className="relative z-10 h-full flex flex-col">
 											<EditorArea />
@@ -446,10 +456,10 @@ export function MainLayout() {
 								maxSize={45}
 								collapsible
 								collapsedSize={4}
-								className="border-t border-border bg-background/85 backdrop-blur-xl"
+								className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)]"
 							>
 								<div className="h-full flex flex-col">
-									<div className="p-3 border-b border-border text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between">
+									<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm">
 										<span className="flex items-center gap-2">
 											Terminal{' '}
 											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
