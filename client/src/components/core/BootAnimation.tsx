@@ -299,196 +299,119 @@ export function BootAnimation() {
 			<HexGrid opacity={hexOpacity} />
 			<ParticleBurst active={showBurst} />
 
-			{/* Content */}
+			{/* Content (no box/container) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
 				<div className="w-full max-w-4xl px-4 sm:px-6">
-					{/* Card container for better focus and readability */}
-					<div className="mx-auto rounded-lg border border-[#00ff4114] bg-black/40 backdrop-blur-sm shadow-[0_0_30px_rgba(0,255,65,0.12)]">
-						<div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-7">
-							{/* Title */}
-							<div
-								className="text-center select-none"
+					<div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-7">
+						{/* Title */}
+						<div
+							className="text-center select-none"
+							style={{
+								transform: `perspective(500px) rotateX(${
+									Math.sin(phase * 0.5) * 3
+								}deg)`,
+								transition: 'transform 0.5s ease-out',
+							}}
+						>
+							<h1
+								className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[0.2em] md:tracking-[0.25em]"
 								style={{
-									transform: `perspective(500px) rotateX(${
-										Math.sin(phase * 0.5) * 3
-									}deg)`,
-									transition: 'transform 0.5s ease-out',
+									color: '#00ff41',
+									textShadow:
+										'0 1px 0 #003a0e, 0 2px 0 #002a08, 0 3px 0 #001a04, 0 4px 0 #000a02, 0 6px 1px rgba(0,0,0,.12), 0 0 6px rgba(0,255,65,.28), 0 3px 6px rgba(0,0,0,.25)',
 								}}
 							>
-								<h1
-									className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[0.2em] md:tracking-[0.25em]"
-									style={{
-										color: '#00ff41',
-										textShadow:
-											'0 1px 0 #003a0e, 0 2px 0 #002a08, 0 3px 0 #001a04, 0 4px 0 #000a02, 0 6px 1px rgba(0,0,0,.12), 0 0 6px rgba(0,255,65,.28), 0 3px 6px rgba(0,0,0,.25)',
-									}}
-								>
-									ANURAG BASURI
-									<span
-										className="text-[#66c3ff] align-top ml-2 text-base sm:text-lg md:text-xl tracking-normal"
-										style={{
-											textShadow:
-												'0 1px 0 #001a33, 0 2px 0 #001028, 0 0 4px rgba(0,136,255,.25)',
-										}}
-									>
-										• PORTFOLIO
-									</span>
-								</h1>
+								ANURAG BASURI
+							</h1>
+							<p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-[#bdfccf]/80">
+								Building at the intersection of full‑stack engineering and machine
+								intelligence.
+							</p>
+						</div>
 
-								{/* Subtitle */}
-								<p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-[#bdfccf]/80">
-									Building at the intersection of full‑stack engineering and
-									machine intelligence.
-								</p>
-							</div>
-
-							{/* Status */}
-							<div className="text-center">
-								<div
-									className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#00ff41]/30 bg-[#001a0d]/50 text-xs sm:text-sm md:text-base uppercase tracking-wider"
-									style={{ textShadow: '0 0 8px #00ff4150' }}
-									aria-live="polite"
-								>
-									<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41] shadow-[0_0_10px_#00ff41]" />
-									{status}
-								</div>
-							</div>
-
-							{/* Badges (bio highlights) */}
-							<div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-								<span className="pointer-events-none px-3 py-1 rounded-sm border border-[#00ff41]/40 bg-[#00ff41]/10 text-[#bdfccf] text-[11px] sm:text-xs">
-									CSE UNDERGRAD
-								</span>
-								<span className="pointer-events-none px-3 py-1 rounded-sm border border-[#00ff41]/40 bg-[#00ff41]/10 text-[#bdfccf] text-[11px] sm:text-xs">
-									NEXT.JS • MERN
-								</span>
-								<span className="pointer-events-none px-3 py-1 rounded-sm border border-[#00ff41]/40 bg-[#00ff41]/10 text-[#bdfccf] text-[11px] sm:text-xs">
-									AI/ML • LLMs • NLP
-								</span>
-								<span className="pointer-events-none px-3 py-1 rounded-sm border border-[#00ff41]/40 bg-[#00ff41]/10 text-[#bdfccf] text-[11px] sm:text-xs">
-									LeetCode 450+
-								</span>
-								<span className="pointer-events-none px-3 py-1 rounded-sm border border-[#00ff41]/40 bg-[#00ff41]/10 text-[#bdfccf] text-[11px] sm:text-xs">
-									Impact over code
-								</span>
-							</div>
-
-							{/* Progress */}
-							<div className="space-y-2">
-								<div className="w-full max-w-lg mx-auto">
-									<div className="h-3 md:h-4 bg-linear-to-r from-[#001a0d] to-[#000a05] overflow-hidden border border-[#00ff41] shadow-[0_0_20px_rgba(0,255,65,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] rounded-sm">
-										<div
-											className="h-full bg-linear-to-r from-[#00ff41] via-[#00cc33] to-[#00aa22] transition-all duration-300 ease-out relative shadow-[0_0_10px_rgba(0,255,65,0.6)]"
-											style={{ width: `${progress}%` }}
-											aria-valuenow={progress}
-											aria-valuemin={0}
-											aria-valuemax={100}
-											role="progressbar"
-										>
-											<div className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
-											<div className="absolute inset-0 bg-linear-to-b from-white/15 to-transparent" />
-										</div>
-									</div>
-								</div>
-
-								<div className="text-center text-[11px] sm:text-xs md:text-sm opacity-75 font-mono tabular-nums tracking-wider">
-									<span className="text-[#00ff41]">[</span>
-									{progress.toString().padStart(3, '0')}%
-									<span className="text-[#00ff41]">]</span>
-									<span className="ml-2 hidden sm:inline">BOOTING SYSTEM</span>
-									<span className="ml-2 inline sm:hidden animate-pulse">
-										BOOT...
-									</span>
-								</div>
-							</div>
-
-							{/* Phase indicator */}
-							<div className="flex items-center justify-center gap-3">
-								{['HELLO', 'UX', 'AI', 'IMPACT'].map((label, idx) => (
-									<div key={label} className="flex items-center gap-2">
-										<div
-											className={`w-3.5 h-3.5 rounded-full border-2 transition-all duration-500 ${
-												phase >= idx
-													? 'border-[#00ff41] bg-[#00ff41] shadow-[0_0_10px_#00ff41]'
-													: 'border-[#003311] bg-transparent'
-											}`}
-											style={{
-												transform:
-													phase >= idx ? 'scale(1.15)' : 'scale(1)',
-											}}
-											aria-label={`Phase ${idx + 1}: ${label}`}
-										/>
-										<span className="text-[10px] sm:text-xs opacity-70">
-											{label}
-										</span>
-									</div>
-								))}
-							</div>
-
-							{/* Bio lines (compact, readable) */}
-							<div className="hidden md:grid md:grid-cols-2 gap-3 text-xs text-[#bdfccf]/80">
-								<div className="space-y-1">
-									<div>Designing clean, scalable UX with Next.js & MERN</div>
-									<div>
-										Diving into AI/ML, LLMs, and NLP—how machines learn and
-										adapt
-									</div>
-									<div>LeetCode 450+ • Consistency that compounds</div>
-								</div>
-								<div className="space-y-1">
-									<div>Building intelligence + user experience</div>
-									<div>Exploring internships & freelancing with real impact</div>
-									<div>
-										STATUS:{' '}
-										<span className="text-[#00ff41]">
-											{phase === 3
-												? 'READY TO COLLABORATE'
-												: 'PREPARING MEANINGFUL WORK'}
-										</span>
-									</div>
-								</div>
-							</div>
-
-							{/* CTAs */}
+						{/* Status */}
+						<div className="text-center">
 							<div
-								className={`flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-2 pointer-events-auto transition-opacity duration-500 ${
-									progress >= 50 ? 'opacity-100' : 'opacity-0'
-								}`}
+								className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-[#00ff41]/30 bg-black/30 text-xs sm:text-sm md:text-base uppercase tracking-wider"
+								style={{ textShadow: '0 0 8px #00ff4150' }}
+								aria-live="polite"
 							>
-								<a
-									href="https://www.linkedin.com/in/anurag-basuri"
-									target="_blank"
-									rel="noopener noreferrer"
-									className="inline-flex items-center gap-2 px-4 py-2 border border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all duration-200 text-xs md:text-sm font-bold uppercase tracking-wider rounded-sm shadow-[0_0_12px_rgba(0,255,65,0.25)]"
-									aria-label="Connect on LinkedIn"
-									title="Connect on LinkedIn"
-								>
-									<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41]" />
-									CONNECT
-								</a>
-								<a
-									href="/projects"
-									className="inline-flex items-center gap-2 px-4 py-2 border border-[#66c3ff] text-[#66c3ff] hover:bg-[#66c3ff] hover:text-black transition-all duration-200 text-xs md:text-sm font-bold uppercase tracking-wider rounded-sm shadow-[0_0_12px_rgba(102,195,255,0.25)]"
-									aria-label="View Projects"
-									title="View Projects"
-								>
-									<span className="inline-block w-2 h-2 rounded-full bg-[#66c3ff]" />
-									VIEW PROJECTS
-								</a>
+								<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41] shadow-[0_0_10px_#00ff41]" />
+								{status}
+							</div>
+						</div>
+
+						{/* Progress */}
+						<div className="space-y-2">
+							<div className="w-full max-w-lg mx-auto">
+								<div className="h-3 md:h-4 overflow-hidden border border-[#00ff41] rounded-sm shadow-[0_0_16px_rgba(0,255,65,0.2)]">
+									<div
+										className="h-full bg-linear-to-r from-[#00ff41] via-[#00cc33] to-[#00aa22] transition-all duration-300 ease-out relative"
+										style={{ width: `${progress}%` }}
+										aria-valuenow={progress}
+										aria-valuemin={0}
+										aria-valuemax={100}
+										role="progressbar"
+									>
+										<div className="absolute inset-0 bg-linear-to-r from-transparent via-white/25 to-transparent" />
+									</div>
+								</div>
+							</div>
+
+							<div className="text-center text-[11px] sm:text-xs md:text-sm opacity-75 font-mono tabular-nums tracking-wider">
+								<span className="text-[#00ff41]">[</span>
+								{progress.toString().padStart(3, '0')}%
+								<span className="text-[#00ff41]">]</span>
+								<span className="ml-2 hidden sm:inline">BOOTING SYSTEM</span>
+								<span className="ml-2 inline sm:hidden animate-pulse">BOOT...</span>
+							</div>
+						</div>
+
+						{/* Phase indicator */}
+						<div className="flex items-center justify-center gap-4">
+							{['HELLO', 'UX', 'AI', 'IMPACT'].map((label, idx) => (
+								<div key={label} className="flex items-center gap-2">
+									<div
+										className={`w-3.5 h-3.5 rounded-full border-2 transition-all duration-500 ${
+											phase >= idx
+												? 'border-[#00ff41] bg-[#00ff41] shadow-[0_0_10px_#00ff41]'
+												: 'border-[#003311] bg-transparent'
+										}`}
+										style={{
+											transform: phase >= idx ? 'scale(1.15)' : 'scale(1)',
+										}}
+										aria-label={`Phase ${idx + 1}: ${label}`}
+									/>
+									<span className="text-[10px] sm:text-xs opacity-70">
+										{label}
+									</span>
+								</div>
+							))}
+						</div>
+
+						{/* Bio lines */}
+						<div className="grid md:grid-cols-2 gap-3 text-xs sm:text-sm text-[#bdfccf]/80">
+							<div className="space-y-1">
+								<div>Clean, scalable UX with Next.js & MERN</div>
+								<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
+							</div>
+							<div className="space-y-1">
+								<div>LeetCode 450+ • consistency that compounds</div>
+								<div>Real impact over just code</div>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					{/* Skip button */}
-					<div className="pointer-events-auto">
-						<button
-							onClick={handleSkip}
-							className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/50 border border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black hover:scale-[1.03] transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm shadow-[0_0_20px_rgba(0,255,65,0.25)]"
-							aria-label="Skip boot animation"
-						>
-							SKIP BOOT <span className="ml-1">›</span>
-						</button>
-					</div>
+				{/* Skip button */}
+				<div className="pointer-events-auto">
+					<button
+						onClick={handleSkip}
+						className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/50 border border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black hover:scale-[1.03] transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm shadow-[0_0_20px_rgba(0,255,65,0.25)]"
+						aria-label="Skip boot animation"
+					>
+						SKIP BOOT <span className="ml-1">›</span>
+					</button>
 				</div>
 			</div>
 
