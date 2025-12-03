@@ -20,14 +20,14 @@ const promptLabel = 'root@anuragos:~#';
 const responseTone = (type: CommandResponse['type']) => {
 	switch (type) {
 		case 'error':
-			return 'text-[#ff0033]';
+			return 'text-destructive';
 		case 'success':
 		case 'open_module':
-			return 'text-[#00ff41]';
+			return 'text-primary';
 		case 'component':
-			return 'text-[#ccc]';
+			return 'text-muted-foreground';
 		default:
-			return 'text-[#ccc]';
+			return 'text-muted-foreground';
 	}
 };
 
@@ -121,16 +121,18 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-[#0a0a0a] text-[#ccc] font-mono text-sm p-4 overflow-hidden border-l border-[#333] shadow-inner transition-colors duration-300"
+			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm p-4 overflow-hidden border-l border-border/50 shadow-inner transition-colors duration-300"
 			onClick={handleContainerClick}
 		>
-			<div className="mb-4 select-none text-xs space-y-1 text-[#666]">
-				<p className="tracking-[0.3em] uppercase text-[#00ff41] opacity-70">
+			<div className="mb-4 select-none text-xs space-y-1 text-muted-foreground/80">
+				<p className="tracking-[0.3em] uppercase text-primary opacity-90 drop-shadow-[0_0_5px_rgba(var(--primary),0.5)]">
 					AnuragOS Terminal
 				</p>
 				<p>Kernel v2.0.0-alpha [Secure Shell]</p>
 				<p>(c) 2025 Anurag Basuri. All rights reserved.</p>
-				<p className="pt-2 text-[#666]">Type &apos;help&apos; for available commands.</p>
+				<p className="pt-2 text-muted-foreground/60">
+					Type &apos;help&apos; for available commands.
+				</p>
 			</div>
 
 			<ScrollArea className="flex-1 pr-2">
@@ -147,8 +149,10 @@ export function CLI() {
 								className="rounded-md"
 							>
 								<div className="flex gap-2 text-sm">
-									<span className="text-[#00ff41] font-bold">{promptLabel}</span>
-									<span className="text-[#ccc]">{item.command}</span>
+									<span className="text-primary font-bold drop-shadow-[0_0_5px_rgba(var(--primary),0.3)]">
+										{promptLabel}
+									</span>
+									<span className="text-foreground/90">{item.command}</span>
 								</div>
 								<div
 									className={cn(
@@ -163,7 +167,9 @@ export function CLI() {
 					</AnimatePresence>
 
 					<div className="flex items-center gap-2 text-sm">
-						<span className="text-[#00ff41] font-bold">{promptLabel}</span>
+						<span className="text-primary font-bold drop-shadow-[0_0_5px_rgba(var(--primary),0.3)]">
+							{promptLabel}
+						</span>
 						<div className="relative flex-1">
 							<input
 								ref={inputRef}
@@ -171,13 +177,13 @@ export function CLI() {
 								value={input}
 								onChange={e => setInput(e.target.value)}
 								onKeyDown={handleKeyDown}
-								className="w-full bg-transparent border-none outline-none text-[#ccc] caret-transparent"
+								className="w-full bg-transparent border-none outline-none text-foreground/90 caret-transparent"
 								autoFocus
 								spellCheck={false}
 								autoComplete="off"
 							/>
 							{/* Custom Block Cursor */}
-							<span className="absolute top-0 pointer-events-none text-[#ccc]">
+							<span className="absolute top-0 pointer-events-none text-foreground/90">
 								{input}
 								<motion.span
 									animate={{ opacity: [1, 0] }}
@@ -186,7 +192,7 @@ export function CLI() {
 										repeat: Infinity,
 										ease: 'linear',
 									}}
-									className="inline-block w-2.5 h-4 bg-[#00ff41] align-middle ml-0.5"
+									className="inline-block w-2.5 h-4 bg-primary align-middle ml-0.5 shadow-[0_0_8px_rgba(var(--primary),0.6)]"
 								/>
 							</span>
 						</div>
