@@ -41,7 +41,7 @@ export function Taskbar() {
 						isStartOpen && 'bg-muted',
 					)}
 				>
-					<div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 rounded-sm flex items-center justify-center shadow-lg shadow-emerald-500/20">
+					<div className="w-6 h-6 bg-linear-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 rounded-sm flex items-center justify-center shadow-lg shadow-emerald-500/20">
 						<Terminal className="w-4 h-4 text-white" />
 					</div>
 					<span className="font-bold text-foreground text-sm hidden md:block">Start</span>
@@ -57,7 +57,7 @@ export function Taskbar() {
 							className="absolute bottom-14 left-0 w-64 bg-popover/95 backdrop-blur-xl border border-border rounded-lg shadow-2xl p-4 overflow-hidden"
 						>
 							<div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
-								<div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 flex items-center justify-center">
+								<div className="w-10 h-10 rounded-full bg-linear-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 flex items-center justify-center">
 									<span className="text-white font-bold text-lg">A</span>
 								</div>
 								<div>
@@ -112,7 +112,7 @@ export function Taskbar() {
 
 			{/* System Tray */}
 			<div className="flex items-center gap-4 px-2 pl-4 border-l border-border ml-2">
-				<div className="flex items-center gap-2 text-muted-foreground hidden md:flex">
+				<div className="items-center gap-2 text-muted-foreground hidden md:flex">
 					<Wifi className="w-4 h-4" />
 					<Volume2 className="w-4 h-4" />
 					<Battery className="w-4 h-4" />

@@ -69,7 +69,7 @@ export function AboutModule() {
 					className="flex flex-col md:flex-row gap-6 items-start"
 				>
 					{/* Profile Photo */}
-					<div className="flex-shrink-0">
+					<div className="shrink-0">
 						<div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg ring-2 ring-primary/10">
 							<img
 								src="/profile.png"
@@ -112,7 +112,7 @@ export function AboutModule() {
 							initial={{ opacity: 0, scale: 0.95 }}
 							animate={{ opacity: 1, scale: 1 }}
 							transition={{ delay: 0.2 }}
-							className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/15 dark:to-emerald-500/5 backdrop-blur-sm border border-emerald-500/20 rounded-lg p-4 hover:border-emerald-500/40 transition-colors"
+							className="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/15 dark:to-emerald-500/5 backdrop-blur-sm border border-emerald-500/20 rounded-lg p-4 hover:border-emerald-500/40 transition-colors"
 						>
 							<h3 className="text-emerald-600 dark:text-emerald-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -135,7 +135,7 @@ export function AboutModule() {
 							initial={{ opacity: 0, scale: 0.95 }}
 							animate={{ opacity: 1, scale: 1 }}
 							transition={{ delay: 0.3 }}
-							className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 dark:from-blue-500/15 dark:to-blue-500/5 backdrop-blur-sm border border-blue-500/20 rounded-lg p-4 hover:border-blue-500/40 transition-colors"
+							className="bg-linear-to-br from-blue-500/10 to-blue-500/5 dark:from-blue-500/15 dark:to-blue-500/5 backdrop-blur-sm border border-blue-500/20 rounded-lg p-4 hover:border-blue-500/40 transition-colors"
 						>
 							<h3 className="text-blue-600 dark:text-blue-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
@@ -158,7 +158,7 @@ export function AboutModule() {
 							initial={{ opacity: 0, scale: 0.95 }}
 							animate={{ opacity: 1, scale: 1 }}
 							transition={{ delay: 0.4 }}
-							className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 dark:from-purple-500/15 dark:to-purple-500/5 backdrop-blur-sm border border-purple-500/20 rounded-lg p-4 hover:border-purple-500/40 transition-colors"
+							className="bg-linear-to-br from-purple-500/10 to-purple-500/5 dark:from-purple-500/15 dark:to-purple-500/5 backdrop-blur-sm border border-purple-500/20 rounded-lg p-4 hover:border-purple-500/40 transition-colors"
 						>
 							<h3 className="text-purple-600 dark:text-purple-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
