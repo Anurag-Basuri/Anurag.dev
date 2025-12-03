@@ -5,39 +5,41 @@
 	CSS Variables for Theming
 	========================= */
 :root {
-	/* Light Mode - "Day Mode" Terminal (High Contrast) */
-	--background: oklch(0.98 0 0);
-	--foreground: oklch(0.15 0 0);
+	/* Light Mode - Premium Day Mode with Vibrant Accents */
+	--background: oklch(0.995 0.005 270); /* Subtle cool tint */
+	--foreground: oklch(0.18 0.02 270);
 
-	--card: oklch(0.95 0 0);
+	--card: oklch(0.98 0.008 260);
 	--card-foreground: var(--foreground);
 
-	--popover: var(--card);
+	--popover: oklch(0.99 0.006 260);
 	--popover-foreground: var(--foreground);
 
-	--primary: oklch(0.15 0 0);
-	--primary-foreground: oklch(0.98 0 0);
+	/* Primary - Vibrant Blue/Purple */
+	--primary: oklch(0.52 0.18 265);
+	--primary-foreground: oklch(0.99 0 0);
 
-	--secondary: oklch(0.92 0 0);
-	--secondary-foreground: var(--primary);
+	--secondary: oklch(0.94 0.01 260);
+	--secondary-foreground: oklch(0.25 0.02 265);
 
-	--muted: oklch(0.92 0 0);
-	--muted-foreground: oklch(0.4 0 0);
+	--muted: oklch(0.96 0.008 260);
+	--muted-foreground: oklch(0.48 0.015 260);
 
-	--accent: oklch(0.92 0 0);
-	--accent-foreground: var(--primary);
+	/* Accent - Cyan/Teal */
+	--accent: oklch(0.92 0.025 200);
+	--accent-foreground: oklch(0.35 0.1 200);
 
-	--destructive: oklch(0.6 0.2 20);
-	--destructive-foreground: oklch(0.98 0 0);
+	--destructive: oklch(0.58 0.22 25);
+	--destructive-foreground: oklch(0.99 0 0);
 
-	--border: oklch(0.85 0 0 / 0.35);
-	--input: var(--border);
-	--ring: oklch(0.7 0.1 260);
+	--border: oklch(0.88 0.008 260 / 0.4);
+	--input: oklch(0.9 0.01 260 / 0.5);
+	--ring: oklch(0.6 0.16 265);
 
-	--radius: 0rem; /* Sharp corners for retro feel */
+	--radius: 0.5rem;
 
 	/* Sidebar specific */
-	--sidebar: oklch(0.95 0 0);
+	--sidebar: oklch(0.97 0.008 260);
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
@@ -47,44 +49,45 @@
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors */
-	--terminal-bg: #0c0c0c;
-	--terminal-text: #cccccc;
-	--terminal-cursor: #33ff00;
+	--terminal-bg: oklch(0.96 0.008 260);
+	--terminal-text: oklch(0.25 0.02 265);
+	--terminal-cursor: oklch(0.52 0.18 265);
 }
 
 .dark {
-	/* Dark Mode - "Night Mode" Hacker Terminal (Neon Green/Amber) */
-	--background: #050505; /* Deepest Black */
-	--foreground: #e0e0e0; /* Off-white for readability */
+	/* Dark Mode - Premium Hacker Terminal with Vibrant Neon Accents */
+	--background: oklch(0.12 0.01 270); /* Rich deep black with subtle hue */
+	--foreground: oklch(0.92 0.01 180); /* Crisp off-white */
 
-	--card: #0a0a0a;
+	--card: oklch(0.16 0.012 270);
 	--card-foreground: var(--foreground);
 
-	--popover: #0a0a0a;
+	--popover: oklch(0.15 0.012 270);
 	--popover-foreground: var(--foreground);
 
-	/* Primary Brand Color - Neon Green */
-	--primary: #00ff41;
-	--primary-foreground: #000000;
+	/* Primary - Electric Neon Green/Cyan */
+	--primary: oklch(0.82 0.22 155);
+	--primary-foreground: oklch(0.1 0.01 270);
 
-	--secondary: #111111;
-	--secondary-foreground: #00ff41;
+	--secondary: oklch(0.2 0.015 270);
+	--secondary-foreground: oklch(0.85 0.2 155);
 
-	--muted: #1a1a1a;
-	--muted-foreground: #666666;
+	--muted: oklch(0.25 0.015 270);
+	--muted-foreground: oklch(0.55 0.02 180);
 
-	--accent: #111111;
-	--accent-foreground: #00ff41;
+	/* Accent - Vibrant Cyan/Purple */
+	--accent: oklch(0.22 0.018 270);
+	--accent-foreground: oklch(0.75 0.18 190);
 
-	--destructive: #ff0033;
-	--destructive-foreground: #ffffff;
+	--destructive: oklch(0.6 0.25 15);
+	--destructive-foreground: oklch(0.98 0 0);
 
-	--border: #333333;
-	--input: #222222;
-	--ring: #00ff41;
+	--border: oklch(0.32 0.02 270 / 0.5);
+	--input: oklch(0.25 0.015 270 / 0.6);
+	--ring: oklch(0.8 0.22 155);
 
 	/* Sidebar specific */
-	--sidebar: #080808;
+	--sidebar: oklch(0.14 0.012 270);
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
@@ -112,11 +115,22 @@
 	* {
 		border-color: var(--border);
 	}
+
+	/* Smooth theme transitions */
+	*,
+	*::before,
+	*::after {
+		transition-property: background-color, border-color, color, fill, stroke;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 200ms;
+	}
+
 	body {
 		background-color: var(--background);
 		color: var(--foreground);
-		font-family: var(--font-geist-mono), monospace; /* Default to Mono for Hacker feel */
+		font-family: var(--font-geist-mono), monospace;
 	}
+
 	html,
 	body,
 	:root {
@@ -290,6 +304,66 @@
 	backdrop-filter: blur(12px);
 	border: 1px solid var(--border);
 	box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Premium Glassmorphism Effect */
+.glass-premium {
+	background: linear-gradient(
+		135deg,
+		color-mix(in oklch, var(--background) 85%, white 15%),
+		color-mix(in oklch, var(--background) 75%, white 25%)
+	);
+	backdrop-filter: blur(16px) saturate(180%);
+	border: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+	box-shadow: 0 8px 32px -8px color-mix(in oklch, var(--primary) 20%, transparent),
+		inset 0 1px 0 0 color-mix(in oklch, white 10%, transparent);
+}
+
+/* Glow effect for interactive elements */
+.glow-primary {
+	box-shadow: 0 0 20px color-mix(in oklch, var(--primary) 30%, transparent);
+}
+
+.glow-primary-hover:hover {
+	box-shadow: 0 0 30px color-mix(in oklch, var(--primary) 50%, transparent);
+	transition: box-shadow 0.3s ease;
+}
+
+/* Shimmer animation for loading/accent */
+@keyframes shimmer {
+	0% {
+		background-position: -200% center;
+	}
+	100% {
+		background-position: 200% center;
+	}
+}
+
+.shimmer {
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		color-mix(in oklch, var(--primary) 20%, transparent) 50%,
+		transparent 100%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 3s infinite linear;
+}
+
+/* Animated gradient backgrounds */
+@keyframes gradient-shift {
+	0%,
+	100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+.gradient-animated {
+	background-size: 200% 200%;
+	animation: gradient-shift 8s ease infinite;
 }
 
 /* Code Syntax Highlighting (Neon) */
