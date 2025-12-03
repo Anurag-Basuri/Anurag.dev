@@ -66,31 +66,51 @@ export function AboutModule() {
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.4, ease: 'easeOut' }}
 					className="flex flex-col md:flex-row gap-6 items-start"
 				>
-					{/* Profile Photo */}
-					<div className="shrink-0">
-						<div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg ring-2 ring-primary/10">
+					{/* Profile Photo with Premium Styling */}
+					<motion.div
+						whileHover={{ scale: 1.05, rotate: 2 }}
+						transition={{ duration: 0.3 }}
+						className="shrink-0"
+					>
+						<div className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/40 dark:border-primary/30 shadow-[0_0_30px_rgba(var(--primary),0.3)] ring-4 ring-primary/10 dark:ring-primary/20">
 							<img
 								src="/profile.png"
 								alt="Profile"
 								className="w-full h-full object-cover"
 							/>
 						</div>
-					</div>
+					</motion.div>
 
 					{/* Name and Tagline */}
 					<div className="flex-1">
-						<h1 className="text-3xl font-bold text-foreground mb-2 font-mono">
+						<motion.h1
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.1, duration: 0.4 }}
+							className="text-3xl font-bold text-foreground mb-2 font-mono"
+						>
 							{about.name}
-						</h1>
-						<p className="text-xl text-primary mb-3 flex items-center gap-2">
+						</motion.h1>
+						<motion.p
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.2, duration: 0.4 }}
+							className="text-xl text-primary mb-3 flex items-center gap-2"
+						>
 							<Code2 className="w-5 h-5" />
 							{about.tagline}
-						</p>
-						<div className="border-l-4 border-primary pl-4 bg-muted/50 backdrop-blur-sm rounded-r p-3">
+						</motion.p>
+						<motion.div
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.3, duration: 0.4 }}
+							className="border-l-4 border-primary pl-4 glass-premium rounded-r p-3"
+						>
 							<p className="text-foreground/90 leading-relaxed">{about.short}</p>
-						</div>
+						</motion.div>
 					</div>
 				</motion.div>
 
@@ -109,10 +129,11 @@ export function AboutModule() {
 					<div className="grid gap-4 md:grid-cols-3">
 						{/* Frontend Skills */}
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: 0.2 }}
-							className="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 dark:from-emerald-500/15 dark:to-emerald-500/5 backdrop-blur-sm border border-emerald-500/20 rounded-lg p-4 hover:border-emerald-500/40 transition-colors"
+							initial={{ opacity: 0, scale: 0.95, y: 20 }}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							whileHover={{ scale: 1.02, y: -4 }}
+							transition={{ delay: 0.2, duration: 0.3 }}
+							className="glass-premium bg-linear-to-br from-emerald-500/15 via-emerald-500/8 to-emerald-500/5 dark:from-emerald-500/20 dark:via-emerald-500/10 dark:to-emerald-500/5 border-emerald-500/30 dark:border-emerald-500/25 rounded-xl p-5 hover:border-emerald-500/50 dark:hover:border-emerald-500/40 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.24)] hover:shadow-[0_12px_40px_rgb(16,185,129,0.25)] dark:hover:shadow-[0_12px_40px_rgb(16,185,129,0.35)] glow-primary-hover"
 						>
 							<h3 className="text-emerald-600 dark:text-emerald-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -132,10 +153,11 @@ export function AboutModule() {
 
 						{/* Backend Skills */}
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: 0.3 }}
-							className="bg-linear-to-br from-blue-500/10 to-blue-500/5 dark:from-blue-500/15 dark:to-blue-500/5 backdrop-blur-sm border border-blue-500/20 rounded-lg p-4 hover:border-blue-500/40 transition-colors"
+							initial={{ opacity: 0, scale: 0.95, y: 20 }}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							whileHover={{ scale: 1.02, y: -4 }}
+							transition={{ delay: 0.3, duration: 0.3 }}
+							className="glass-premium bg-linear-to-br from-blue-500/15 via-blue-500/8 to-blue-500/5 dark:from-blue-500/20 dark:via-blue-500/10 dark:to-blue-500/5 border-blue-500/30 dark:border-blue-500/25 rounded-xl p-5 hover:border-blue-500/50 dark:hover:border-blue-500/40 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.24)] hover:shadow-[0_12px_40px_rgb(59,130,246,0.25)] dark:hover:shadow-[0_12px_40px_rgb(59,130,246,0.35)] glow-primary-hover"
 						>
 							<h3 className="text-blue-600 dark:text-blue-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
@@ -155,10 +177,11 @@ export function AboutModule() {
 
 						{/* ML/AI Skills */}
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: 0.4 }}
-							className="bg-linear-to-br from-purple-500/10 to-purple-500/5 dark:from-purple-500/15 dark:to-purple-500/5 backdrop-blur-sm border border-purple-500/20 rounded-lg p-4 hover:border-purple-500/40 transition-colors"
+							initial={{ opacity: 0, scale: 0.95, y: 20 }}
+							animate={{ opacity: 1, scale: 1, y: 0 }}
+							whileHover={{ scale: 1.02, y: -4 }}
+							transition={{ delay: 0.4, duration: 0.3 }}
+							className="glass-premium bg-linear-to-br from-purple-500/15 via-purple-500/8 to-purple-500/5 dark:from-purple-500/20 dark:via-purple-500/10 dark:to-purple-500/5 border-purple-500/30 dark:border-purple-500/25 rounded-xl p-5 hover:border-purple-500/50 dark:hover:border-purple-500/40 transition-all duration-300 shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.24)] hover:shadow-[0_12px_40px_rgb(168,85,247,0.25)] dark:hover:shadow-[0_12px_40px_rgb(168,85,247,0.35)] glow-primary-hover"
 						>
 							<h3 className="text-purple-600 dark:text-purple-400 font-semibold mb-3 text-lg flex items-center gap-2">
 								<span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
@@ -186,9 +209,13 @@ export function AboutModule() {
 					className="pt-4 border-t border-border bg-muted/50 backdrop-blur-sm rounded p-3"
 				>
 					<p className="text-sm text-muted-foreground font-mono">
-						💡 Type <span className="text-emerald-600 dark:text-emerald-400 font-bold">contact</span> to get in
-						touch or <span className="text-blue-600 dark:text-blue-400 font-bold">projects</span> to see my
-						work.
+						💡 Type{' '}
+						<span className="text-emerald-600 dark:text-emerald-400 font-bold">
+							contact
+						</span>{' '}
+						to get in touch or{' '}
+						<span className="text-blue-600 dark:text-blue-400 font-bold">projects</span>{' '}
+						to see my work.
 					</p>
 				</motion.div>
 			</div>
