@@ -321,45 +321,54 @@ export function BootAnimation() {
 
 			{/* UI Overlay */}
 			<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-				<div className="text-center space-y-8 px-4">
+				<div className="text-center space-y-6 md:space-y-8 px-4 max-w-3xl mx-auto">
 					{/* Logo/Title with 3D effect */}
 					<div
-						className="text-6xl md:text-8xl font-bold tracking-widest relative"
+						className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest relative"
 						style={{
 							textShadow:
-								'0 0 20px #00ff41, 0 0 40px #00ff41, 2px 2px 0 #003311, 4px 4px 0 #002211',
+								'0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 60px #00ff4140, 2px 2px 0 #003311, 4px 4px 0 #002211',
 							transform: `perspective(500px) rotateX(${
 								Math.sin(phase * 0.5) * 5
 							}deg)`,
 							transition: 'transform 0.5s ease-out',
 						}}
 					>
-						ANURAG<span className="text-[#0088ff]">OS</span>
+						ANURAG
+						<span
+							className="text-[#0088ff]"
+							style={{ textShadow: '0 0 20px #0088ff, 0 0 40px #0088ff' }}
+						>
+							OS
+						</span>
 					</div>
 
 					{/* Status with glow */}
 					<div
-						className="text-xl md:text-2xl tracking-wider opacity-90"
+						className="text-lg sm:text-xl md:text-2xl tracking-wider opacity-90 uppercase"
 						style={{
-							textShadow: '0 0 10px #00ff41',
+							textShadow: '0 0 10px #00ff41, 0 0 20px #00ff4180',
 						}}
 					>
 						{status}
 					</div>
 
 					{/* Progress Bar */}
-					<div className="w-full max-w-md h-3 bg-[#003311] rounded-none overflow-hidden mx-auto border border-[#00ff41]">
+					<div className="w-full max-w-md h-2.5 md:h-3 bg-[#001a0d] overflow-hidden mx-auto border-2 border-[#00ff41] shadow-[0_0_15px_rgba(0,255,65,0.3)]">
 						<div
-							className="h-full bg-linear-to-r from-[#00ff41] to-[#0088ff] transition-all duration-300 ease-out relative"
+							className="h-full bg-linear-to-r from-[#00ff41] via-[#00cc66] to-[#0088ff] transition-all duration-300 ease-out relative"
 							style={{ width: `${progress}%` }}
 						>
-							<div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent)] animate-shimmer" />
+							<div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
 						</div>
 					</div>
 
 					{/* Progress Percentage */}
-					<div className="text-base md:text-lg opacity-70 font-mono tabular-nums">
-						[{progress.toString().padStart(3, '0')}%] LOADING...
+					<div className="text-sm md:text-base opacity-70 font-mono tabular-nums tracking-wider">
+						<span className="text-[#00ff41]">[</span>
+						{progress.toString().padStart(3, '0')}%
+						<span className="text-[#00ff41]">]</span>{' '}
+						<span className="animate-pulse">LOADING...</span>
 					</div>
 
 					{/* Phase indicator dots */}
@@ -394,12 +403,12 @@ export function BootAnimation() {
 			{/* Skip button */}
 			<button
 				onClick={handleSkip}
-				className="absolute bottom-8 right-8 px-6 py-3 bg-transparent border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all duration-300 uppercase tracking-wider text-sm pointer-events-auto z-20 font-bold"
+				className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/50 border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black hover:scale-105 transition-all duration-300 uppercase tracking-wider text-xs md:text-sm pointer-events-auto z-20 font-bold backdrop-blur-sm"
 				style={{
 					boxShadow: '0 0 20px rgba(0, 255, 65, 0.3)',
 				}}
 			>
-				SKIP BOOT ›
+				SKIP BOOT <span className="ml-1">›</span>
 			</button>
 
 			{/* Scanline effect */}
