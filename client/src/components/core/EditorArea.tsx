@@ -32,7 +32,7 @@ export function EditorArea() {
 	return (
 		<div className="h-full flex flex-col bg-background/50 backdrop-blur-sm transition-colors duration-300">
 			{/* Tab Bar */}
-			<div className="h-10 flex bg-background/80 border-b border-border overflow-hidden shadow-sm">
+			<div className="h-10 flex bg-background/80 border-b border-border/60 overflow-hidden shadow-sm backdrop-blur-md">
 				<ScrollAreaPrimitive.Root className="w-full relative overflow-hidden">
 					<ScrollAreaPrimitive.Viewport className="w-full h-full rounded-[inherit]">
 						<div className="flex h-10">
@@ -47,10 +47,10 @@ export function EditorArea() {
 										transition={{ duration: 0.2 }}
 										onClick={() => setActiveWindowId(window.id)}
 										className={cn(
-											'h-10 px-4 flex items-center gap-2.5 text-xs border-r border-border cursor-pointer select-none min-w-[140px] max-w-[220px] group relative transition-all duration-200',
+											'h-10 px-4 flex items-center gap-2.5 text-xs border-r border-border/50 cursor-pointer select-none min-w-[140px] max-w-[220px] group relative transition-all duration-200',
 											activeWindowId === window.id
-												? 'bg-muted text-primary border-t-2 border-t-primary shadow-inner font-medium'
-												: 'bg-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+												? 'bg-background text-primary font-medium shadow-[inset_0_-2px_0_0_rgba(var(--primary),1)]'
+												: 'bg-transparent text-muted-foreground hover:bg-muted/30 hover:text-foreground',
 										)}
 									>
 										<span className="truncate flex-1">{window.title}</span>
@@ -59,8 +59,8 @@ export function EditorArea() {
 											whileTap={{ scale: 0.9 }}
 											onClick={e => handleClose(window.id, e)}
 											className={cn(
-												'p-1 rounded hover:bg-background/50 opacity-0 group-hover:opacity-100 transition-opacity',
-												activeWindowId === window.id && 'opacity-100'
+												'p-1 rounded-sm hover:bg-muted/50 opacity-0 group-hover:opacity-100 transition-opacity',
+												activeWindowId === window.id && 'opacity-100',
 											)}
 											aria-label={`Close ${window.title}`}
 										>
@@ -97,27 +97,35 @@ export function EditorArea() {
 							className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none p-8"
 						>
 							<motion.div
-								animate={{ 
+								animate={{
 									rotate: [0, 5, -5, 0],
-									scale: [1, 1.05, 1]
+									scale: [1, 1.05, 1],
 								}}
-								transition={{ 
+								transition={{
 									duration: 4,
 									repeat: Infinity,
-									ease: "easeInOut"
+									ease: 'easeInOut',
 								}}
 								className="relative mb-6"
 							>
-								<Terminal className="w-24 h-24 text-primary/20" />
-								<Sparkles className="w-6 h-6 text-primary absolute -top-2 -right-2 animate-pulse" />
+								<Terminal className="w-24 h-24 text-primary/10 dark:text-primary/20 drop-shadow-[0_0_15px_rgba(var(--primary),0.2)]" />
+								<Sparkles className="w-6 h-6 text-primary absolute -top-2 -right-2 animate-pulse drop-shadow-[0_0_8px_rgba(var(--primary),0.6)]" />
 							</motion.div>
-							<p className="text-lg font-medium text-muted-foreground mb-2">No file open</p>
-							<p className="text-sm text-muted-foreground/60">Select a file from the Explorer to get started</p>
+							<p className="text-lg font-medium text-muted-foreground mb-2">
+								No file open
+							</p>
+							<p className="text-sm text-muted-foreground/60">
+								Select a file from the Explorer to get started
+							</p>
 							<div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground/40">
 								<p className="flex items-center gap-2">
-									<kbd className="px-2 py-1 bg-muted rounded border border-border">Ctrl</kbd>
+									<kbd className="px-2 py-1 bg-muted/50 rounded border border-border/50 shadow-sm text-xs font-mono">
+										Ctrl
+									</kbd>
 									+
-									<kbd className="px-2 py-1 bg-muted rounded border border-border">P</kbd>
+									<kbd className="px-2 py-1 bg-muted/50 rounded border border-border/50 shadow-sm text-xs font-mono">
+										P
+									</kbd>
 									<span>Quick Open</span>
 								</p>
 							</div>
