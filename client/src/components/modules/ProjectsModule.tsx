@@ -6,12 +6,13 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ExternalLink, Github, Star, GitFork, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { ModuleError } from '@/components/ui/module-error';
 
 // Skeleton Loading Component
 function ProjectCardSkeleton() {
 	return (
-		<div className="bg-gradient-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
-			<div className="relative h-48 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 animate-pulse" />
+		<div className="bg-linear-to-br from-white/5 to-white/0 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
+			<div className="relative h-48 bg-linear-to-br from-cyan-500/10 to-blue-500/10 animate-pulse" />
 			<div className="p-5 space-y-3">
 				<div className="h-6 bg-white/10 rounded animate-pulse w-3/4" />
 				<div className="h-4 bg-white/5 rounded animate-pulse w-full" />
@@ -43,7 +44,7 @@ export function ProjectsModule() {
 			<ScrollArea className="h-full">
 				<div className="p-6 md:p-8 space-y-6">
 					<div className="space-y-2">
-						<h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
+						<h1 className="text-3xl font-bold bg-linear-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
 							<span className="text-cyan-400">$</span> ls projects/
 							<Sparkles className="w-5 h-5 text-cyan-400 animate-pulse" />
 						</h1>
@@ -62,13 +63,17 @@ export function ProjectsModule() {
 
 	if (error) {
 		return (
-			<div className="p-8 flex items-center justify-center h-full">
-				<div className="text-center space-y-3">
-					<div className="text-5xl">⚠️</div>
-					<div className="text-red-400 font-medium">Error loading projects</div>
-					<div className="text-white/50 text-sm">{error}</div>
-				</div>
-			</div>
+			<ModuleError
+				message={error}
+				onRetry={() => {
+					setLoading(true);
+					setError(null);
+					api.getProjects()
+						.then(data => setProjects(data.projects))
+						.catch(err => setError(err.message))
+						.finally(() => setLoading(false));
+				}}
+			/>
 		);
 	}
 
@@ -82,7 +87,7 @@ export function ProjectsModule() {
 					transition={{ duration: 0.5 }}
 					className="space-y-3"
 				>
-					<h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
+					<h1 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
 						<span className="text-cyan-400">$</span> ls projects/
 					</h1>
 					<p className="text-white/70 text-sm md:text-base">
@@ -108,7 +113,9 @@ export function ProjectsModule() {
 								{/* Project Thumbnail */}
 								<div className="relative h-48 bg-gradient-to-br from-cyan-500/10 via-blue-500/15 to-purple-500/10 overflow-hidden">
 									<img
-										src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(project.title)}`}
+										src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
+											project.title,
+										)}`}
 										alt={project.title}
 										className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-110 transition-all duration-500"
 									/>
@@ -149,12 +156,14 @@ export function ProjectsModule() {
 									{/* Status Badge */}
 									{project.status && (
 										<div className="absolute bottom-3 left-3">
-											<span className={cn(
-												"px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border",
-												project.status.toLowerCase() === 'completed' 
-													? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
-													: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300"
-											)}>
+											<span
+												className={cn(
+													'px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md border',
+													project.status.toLowerCase() === 'completed'
+														? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+														: 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300',
+												)}
+											>
 												{project.status}
 											</span>
 										</div>
@@ -164,7 +173,7 @@ export function ProjectsModule() {
 								{/* Project Info */}
 								<div className="p-5 space-y-4 relative z-20">
 									<div className="space-y-2">
-										<h2 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-blue-400 transition-all duration-300">
+										<h2 className="text-xl font-bold bg-linear-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent group-hover:from-cyan-400 group-hover:to-blue-400 transition-all duration-300">
 											{project.title}
 										</h2>
 										<p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
@@ -180,7 +189,7 @@ export function ProjectsModule() {
 												initial={{ opacity: 0, scale: 0.8 }}
 												animate={{ opacity: 1, scale: 1 }}
 												transition={{ delay: index * 0.1 + i * 0.05 }}
-												className="px-2.5 py-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-md text-xs text-cyan-300 font-medium hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all duration-200"
+												className="px-2.5 py-1 bg-linear-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-md text-xs text-cyan-300 font-medium hover:border-cyan-400/50 hover:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all duration-200"
 											>
 												{tech}
 											</motion.span>
@@ -193,18 +202,23 @@ export function ProjectsModule() {
 									</div>
 
 									{/* Stats */}
-									{(project.stars !== undefined || project.forks !== undefined) && (
+									{(project.stars !== undefined ||
+										project.forks !== undefined) && (
 										<div className="flex gap-4 text-xs text-white/60 pt-3 border-t border-white/10">
 											{project.stars !== undefined && (
 												<div className="flex items-center gap-1.5 hover:text-yellow-400 transition-colors">
 													<Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
-													<span className="font-medium">{project.stars}</span>
+													<span className="font-medium">
+														{project.stars}
+													</span>
 												</div>
 											)}
 											{project.forks !== undefined && (
 												<div className="flex items-center gap-1.5 hover:text-cyan-400 transition-colors">
 													<GitFork className="w-3.5 h-3.5" />
-													<span className="font-medium">{project.forks}</span>
+													<span className="font-medium">
+														{project.forks}
+													</span>
 												</div>
 											)}
 										</div>
