@@ -416,18 +416,20 @@ export function BootAnimation() {
 							</div>
 						</div>
 
-						{/* Bio lines (centered, balanced, responsive, better alignment) */}
+						{/* Bio lines (clean, centered, responsive) */}
 						<div
-							className="grid sm:grid-cols-2 gap-x-8 gap-y-3 justify-items-center text-center text-[#bdfccf]/85"
-							style={{ fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 0.95rem)' }}
+							className="mx-auto w-full max-w-3xl px-2 sm:px-0"
+							style={{ fontSize: 'clamp(0.8rem, 1vw + 0.25rem, 1rem)' }}
 						>
-							<div className="space-y-1 leading-relaxed max-w-[30ch]">
-								<div>Clean, scalable UX with Next.js & MERN</div>
-								<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
-							</div>
-							<div className="space-y-1 leading-relaxed max-w-[30ch]">
-								<div>LeetCode 450+ • consistency that compounds</div>
-								<div>Exploring internships & freelancing • real impact</div>
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 text-center text-[#bdfccf]/85">
+								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[32ch]">
+									<div>Clean, scalable UX with Next.js & MERN</div>
+									<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
+								</div>
+								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[32ch]">
+									<div>LeetCode 450+ • consistency that compounds</div>
+									<div>Exploring internships & freelancing • real impact</div>
+								</div>
 							</div>
 						</div>
 					</div>
