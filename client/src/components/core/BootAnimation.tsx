@@ -299,67 +299,79 @@ export function BootAnimation() {
 			<HexGrid opacity={hexOpacity} />
 			<ParticleBurst active={showBurst} />
 
-			{/* Content (minimal, no boxy containers) */}
+			{/* Content (clean, centered, responsive) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-				<div className="w-full max-w-4xl px-4 sm:px-6">
-					<div className="p-6 sm:p-8 md:p-10 space-y-6 sm:space-y-7">
+				<div className="w-full max-w-5xl px-4 sm:px-6 md:px-8">
+					{/* use consistent vertical spacing with fluid scales */}
+					<div className="py-8 sm:py-12 md:py-16 space-y-6 sm:space-y-8 md:space-y-10">
 						{/* Title */}
 						<div
 							className="text-center select-none"
+							// keep subtle motion but reduce extremes for readability
 							style={{
-								transform: `perspective(500px) rotateX(${
-									Math.sin(phase * 0.5) * 3
+								transform: `perspective(600px) rotateX(${
+									Math.sin(phase * 0.5) * 2.2
 								}deg)`,
-								transition: 'transform 0.5s ease-out',
+								transition: 'transform 400ms ease-out',
 							}}
 						>
 							<h1
-								className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[0.18em] md:tracking-[0.22em]"
+								// fluid typography via clamp ensures consistent scale
+								className="font-extrabold tracking-[0.14em] md:tracking-[0.18em]"
 								style={{
+									fontSize: 'clamp(2rem, 4vw + 1rem, 4.5rem)',
 									color: '#00ff41',
-									textShadow:
-										'0 0 6px rgba(0,255,65,.25), 0 3px 6px rgba(0,0,0,.25)',
+									textShadow: '0 0 6px rgba(0,255,65,.22)',
+									lineHeight: 1.1,
 								}}
 							>
 								ANURAG BASURI
 							</h1>
-							<p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-[#bdfccf]/85">
+							<p
+								className="mt-3 sm:mt-4 text-[#bdfccf]/85"
+								style={{ fontSize: 'clamp(0.85rem, 1.2vw + 0.35rem, 1.1rem)' }}
+							>
 								Building at the intersection of full‑stack engineering and machine
 								intelligence.
 							</p>
 						</div>
 
-						{/* Status (no box; subtle underline accent) */}
+						{/* Status (minimal accent) */}
 						<div className="text-center">
 							<div
-								className="inline-flex items-center gap-2 text-xs sm:text-sm md:text-base uppercase tracking-wider"
-								style={{ textShadow: '0 0 8px #00ff4135' }}
+								className="inline-flex items-center gap-2 uppercase tracking-wider"
+								style={{
+									fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 1rem)',
+									textShadow: '0 0 6px #00ff4128',
+								}}
 								aria-live="polite"
 							>
-								<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41] shadow-[0_0_8px_#00ff41]" />
+								<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41]" />
 								{status}
 							</div>
-							<div className="mx-auto mt-2 h-px w-48 sm:w-56 md:w-64 bg-[#00ff41]/40" />
+							<div className="mx-auto mt-2 h-px w-40 sm:w-56 md:w-64 bg-[#00ff41]/35" />
 						</div>
 
-						{/* Progress (sleek line instead of boxed bar) */}
+						{/* Progress (thin neon track) */}
 						<div className="space-y-2">
-							<div className="w-full max-w-lg mx-auto">
-								<div className="relative h-1.5 md:h-2 bg-[#00ff41]/15 rounded-full overflow-hidden">
+							<div className="w-full max-w-xl mx-auto">
+								<div className="relative h-1.5 md:h-2 bg-[#00ff41]/18 rounded-full overflow-hidden">
 									<div
-										className="absolute left-0 top-0 h-full rounded-full bg-[#00ff41] shadow-[0_0_12px_rgba(0,255,65,0.5)] transition-all duration-300 ease-out"
+										className="absolute left-0 top-0 h-full rounded-full bg-[#00ff41] shadow-[0_0_10px_rgba(0,255,65,0.45)] transition-[width] duration-300 ease-out"
 										style={{ width: `${progress}%` }}
 										aria-valuenow={progress}
 										aria-valuemin={0}
 										aria-valuemax={100}
 										role="progressbar"
 									/>
-									{/* glossy highlight */}
 									<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
 								</div>
 							</div>
 
-							<div className="text-center text-[11px] sm:text-xs md:text-sm opacity-80 font-mono tabular-nums tracking-wider">
+							<div
+								className="text-center font-mono tabular-nums opacity-80"
+								style={{ fontSize: 'clamp(0.7rem, 0.9vw + 0.25rem, 0.95rem)' }}
+							>
 								<span className="text-[#00ff41]">[</span>
 								{progress.toString().padStart(3, '0')}%
 								<span className="text-[#00ff41]">]</span>
@@ -368,33 +380,37 @@ export function BootAnimation() {
 							</div>
 						</div>
 
-						{/* Phase indicator (thin timeline with markers) */}
-						<div className="mx-auto w-full max-w-lg">
-							<div className="relative h-0.5 bg-[#00ff41]/20">
+						{/* Phase timeline (compact, evenly spaced) */}
+						<div className="mx-auto w-full max-w-xl">
+							<div className="relative h-0.5 bg-[#00ff41]/22">
 								<div
-									className="absolute left-0 top-0 h-0.5 bg-[#00ff41] shadow-[0_0_8px_#00ff41] transition-all duration-500"
+									className="absolute left-0 top-0 h-0.5 bg-[#00ff41] shadow-[0_0_6px_#00ff41] transition-[width] duration-400 ease-out"
 									style={{ width: `${(phase + 1) * 25}%` }}
 								/>
 							</div>
-							<div className="mt-3 flex justify-between text-[10px] sm:text-xs opacity-75">
+							<div
+								className="mt-3 grid grid-cols-4 items-center"
+								style={{ fontSize: 'clamp(0.65rem, 0.8vw + 0.25rem, 0.85rem)' }}
+							>
 								{['HELLO', 'UX', 'AI', 'IMPACT'].map((label, idx) => (
 									<div key={label} className="flex flex-col items-center gap-1">
 										<div
-											className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${
-												phase >= idx
-													? 'bg-[#00ff41] shadow-[0_0_8px_#00ff41]'
-													: 'bg-[#00ff41]/25'
+											className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+												phase >= idx ? 'bg-[#00ff41]' : 'bg-[#00ff41]/25'
 											}`}
 											aria-label={`Phase ${idx + 1}: ${label}`}
 										/>
-										<span>{label}</span>
+										<span className="opacity-75">{label}</span>
 									</div>
 								))}
 							</div>
 						</div>
 
-						{/* Bio lines (minimal, no borders) */}
-						<div className="grid md:grid-cols-2 gap-3 text-xs sm:text-sm text-[#bdfccf]/85">
+						{/* Bio lines (fluid, balanced columns) */}
+						<div
+							className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-[#bdfccf]/85"
+							style={{ fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 0.95rem)' }}
+						>
 							<div className="space-y-1">
 								<div>Clean, scalable UX with Next.js & MERN</div>
 								<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
@@ -407,11 +423,11 @@ export function BootAnimation() {
 					</div>
 				</div>
 
-				{/* Skip button (subtle, floating) */}
+				{/* Skip button (subtle) */}
 				<div className="pointer-events-auto">
 					<button
 						onClick={handleSkip}
-						className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/30 text-[#00ff41] hover:bg-black/50 hover:text-[#00ff41] hover:scale-[1.03] transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm"
+						className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm"
 						aria-label="Skip boot animation"
 					>
 						SKIP BOOT <span className="ml-1">›</span>
