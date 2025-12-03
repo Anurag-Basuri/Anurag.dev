@@ -1,164 +1,406 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store/atoms';
-import { AnimatePresence, motion } from 'framer-motion';
+import gsap from 'gsap';
 
-export function BootAnimation() {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
-	const [memory, setMemory] = useState(0);
-	const [logs, setLogs] = useState<string[]>([]);
-	const [showCursor, setShowCursor] = useState(true);
-	const scrollRef = useRef<HTMLDivElement>(null);
+// Matrix Rain Effect Component
+function MatrixRain() {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-	// Cursor blink effect
 	useEffect(() => {
-		const interval = setInterval(() => setShowCursor(prev => !prev), 500);
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		const chars =
+			'01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+		const fontSize = 14;
+		const columns = canvas.width / fontSize;
+		const drops: number[] = [];
+
+		for (let i = 0; i < columns; i++) {
+			drops[i] = Math.random() * -100;
+		}
+
+		function draw() {
+			if (!ctx || !canvas) return;
+
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			ctx.fillStyle = '#00ff41';
+			ctx.font = `${fontSize}px monospace`;
+
+			for (let i = 0; i < drops.length; i++) {
+				const text = chars[Math.floor(Math.random() * chars.length)];
+				ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+				if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+					drops[i] = 0;
+				}
+				drops[i]++;
+			}
+		}
+
+		const interval = setInterval(draw, 33);
+
 		return () => clearInterval(interval);
 	}, []);
 
-	// Auto-scroll to bottom
-	useEffect(() => {
-		if (scrollRef.current) {
-			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-		}
-	}, [logs]);
+	return <canvas ref={canvasRef} className="absolute inset-0 opacity-30" />;
+}
 
-	// Boot sequence
-	useEffect(() => {
-		if (bootComplete) return;
+// Hexagon Grid Component
+function HexGrid({ opacity }: { opacity: number }) {
+	return (
+		<div
+			className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
+			style={{
+				opacity,
+				backgroundImage: `
+					linear-gradient(30deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
+					linear-gradient(150deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
+					linear-gradient(30deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
+					linear-gradient(150deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
+					linear-gradient(60deg, #00332277 25%, transparent 25.5%, transparent 75%, #00332277 75%, #00332277),
+					linear-gradient(60deg, #00332277 25%, transparent 25.5%, transparent 75%, #00332277 75%, #00332277)
+				`,
+				backgroundSize: '80px 140px',
+				backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
+			}}
+		/>
+	);
+}
 
-		const totalMemory = 65536; // 64KB base memory + extended
-		const memoryInterval = setInterval(() => {
-			setMemory(prev => {
-				const next = prev + 1024;
-				if (next >= totalMemory) {
-					clearInterval(memoryInterval);
-					return totalMemory;
-				}
-				return next;
+// Particle Burst Component
+function ParticleBurst({ active }: { active: boolean }) {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+
+	useEffect(() => {
+		if (!active) return;
+
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		const particles: Array<{
+			x: number;
+			y: number;
+			vx: number;
+			vy: number;
+			life: number;
+			maxLife: number;
+		}> = [];
+
+		const centerX = canvas.width / 2;
+		const centerY = canvas.height / 2;
+
+		for (let i = 0; i < 100; i++) {
+			const angle = (Math.PI * 2 * i) / 100;
+			const velocity = 2 + Math.random() * 3;
+			particles.push({
+				x: centerX,
+				y: centerY,
+				vx: Math.cos(angle) * velocity,
+				vy: Math.sin(angle) * velocity,
+				life: 0,
+				maxLife: 60 + Math.random() * 40,
 			});
-		}, 10);
+		}
 
-		const bootSequence = [
-			{ text: 'Award Modular BIOS v4.51PG, An Energy Star Ally', delay: 100 },
-			{ text: 'Copyright (C) 1984-2025, AnuragOS Inc.', delay: 200 },
-			{ text: 'ASUS P5A ACPI BIOS Revision 1007', delay: 400 },
-			{ text: 'Pentium III 500MHz Processor', delay: 600 },
-			{ text: '', delay: 800 }, // Spacer
-			{ text: 'Memory Test: ', delay: 1000, keepLine: true },
-			{ text: 'OK', delay: 2000, appendToLast: true },
-			{ text: '', delay: 2100 },
-			{ text: 'Award Plug and Play BIOS Extension v1.0A', delay: 2200 },
-			{ text: 'Initialize Plug and Play Cards...', delay: 2400 },
-			{ text: 'PNP Init Completed', delay: 2800 },
-			{ text: '', delay: 2900 },
-			{ text: 'Detecting Primary Master ... ANURAG-OS-DRIVE-01', delay: 3000 },
-			{ text: 'Detecting Primary Slave  ... None', delay: 3200 },
-			{ text: 'Detecting Secondary Master ... CD-ROM 52X', delay: 3400 },
-			{ text: 'Detecting Secondary Slave  ... None', delay: 3600 },
-			{ text: '', delay: 3700 },
-			{ text: 'Verifying DMI Pool Data .........', delay: 4000 },
-			{ text: 'Update Success', delay: 4500, appendToLast: true },
-			{ text: 'Booting from Hard Disk...', delay: 5000 },
-			{ text: 'Starting ANURAG-OS Kernel v2.0...', delay: 5500 },
-			{ text: 'Loading UI Modules...', delay: 6000 },
-			{ text: 'SYSTEM READY.', delay: 6500 },
-		];
+		function draw() {
+			if (!ctx || !canvas) return;
 
-		let timeouts: NodeJS.Timeout[] = [];
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		bootSequence.forEach(({ text, delay, keepLine, appendToLast }) => {
-			const timeout = setTimeout(() => {
-				setLogs(prev => {
-					if (appendToLast) {
-						const newLogs = [...prev];
-						newLogs[newLogs.length - 1] += text;
-						return newLogs;
-					}
-					return [...prev, text];
-				});
-			}, delay);
-			timeouts.push(timeout);
+			particles.forEach(p => {
+				p.x += p.vx;
+				p.y += p.vy;
+				p.life++;
+
+				const alpha = 1 - p.life / p.maxLife;
+				ctx.fillStyle = `rgba(0, 255, 65, ${alpha})`;
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+				ctx.fill();
+			});
+
+			if (particles.every(p => p.life >= p.maxLife)) {
+				cancelAnimationFrame(animId);
+			} else {
+				animId = requestAnimationFrame(draw);
+			}
+		}
+
+		let animId = requestAnimationFrame(draw);
+
+		return () => cancelAnimationFrame(animId);
+	}, [active]);
+
+	if (!active) return null;
+	return <canvas ref={canvasRef} className="absolute inset-0" />;
+}
+
+// Network Nodes Component
+function NetworkNodes({ phase }: { phase: number }) {
+	const nodeCount = 12;
+	const nodes = Array.from({ length: nodeCount }, (_, i) => ({
+		id: i,
+		x: 20 + (i % 4) * 26,
+		y: 30 + Math.floor(i / 4) * 30,
+	}));
+
+	if (phase < 2) return null;
+
+	return (
+		<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+			<svg width="100%" height="100%" className="max-w-4xl">
+				{/* Connection Lines */}
+				{nodes.map((node, i) =>
+					nodes
+						.slice(i + 1)
+						.map(target => (
+							<line
+								key={`${node.id}-${target.id}`}
+								x1={`${node.x}%`}
+								y1={`${node.y}%`}
+								x2={`${target.x}%`}
+								y2={`${target.y}%`}
+								stroke="#00ff41"
+								strokeWidth="1"
+								opacity="0.2"
+								className="animate-pulse"
+							/>
+						)),
+				)}
+
+				{/* Nodes */}
+				{nodes.map((node, i) => (
+					<g key={node.id}>
+						<circle
+							cx={`${node.x}%`}
+							cy={`${node.y}%`}
+							r="8"
+							fill="#000"
+							stroke="#00ff41"
+							strokeWidth="2"
+							opacity="1"
+							style={{
+								animation: `pulse 2s ease-in-out ${i * 0.1}s infinite`,
+							}}
+						/>
+						<circle
+							cx={`${node.x}%`}
+							cy={`${node.y}%`}
+							r="4"
+							fill="#00ff41"
+							opacity="0.8"
+						/>
+					</g>
+				))}
+			</svg>
+		</div>
+	);
+}
+
+export function BootAnimation() {
+	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
+	const [phase, setPhase] = useState(0);
+	const [status, setStatus] = useState('INITIALIZING SYSTEM');
+	const [progress, setProgress] = useState(0);
+	const [showBurst, setShowBurst] = useState(false);
+	const [hexOpacity, setHexOpacity] = useState(0);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		// GSAP Timeline for orchestrating the boot sequence
+		const tl = gsap.timeline({
+			onComplete: () => {
+				setShowBurst(true);
+				setTimeout(() => setBootComplete(true), 1500);
+			},
 		});
 
-		// Finish boot
-		const finishTimeout = setTimeout(() => {
-			setBootComplete(true);
-		}, 7000);
-		timeouts.push(finishTimeout);
+		tl.to(
+			{},
+			{
+				duration: 1.5,
+				onStart: () => {
+					setStatus('INITIALIZING QUANTUM CORE');
+					setPhase(0);
+				},
+				onUpdate: function () {
+					setProgress(Math.floor(this.progress() * 25));
+				},
+			},
+		)
+			.to(
+				{},
+				{
+					duration: 1.5,
+					onStart: () => {
+						setStatus('ESTABLISHING NEURAL PATHWAYS');
+						setPhase(1);
+						setHexOpacity(0.5);
+					},
+					onUpdate: function () {
+						setProgress(25 + Math.floor(this.progress() * 25));
+					},
+				},
+			)
+			.to(
+				{},
+				{
+					duration: 1.5,
+					onStart: () => {
+						setStatus('SYNCHRONIZING NETWORK NODES');
+						setPhase(2);
+						setHexOpacity(1);
+					},
+					onUpdate: function () {
+						setProgress(50 + Math.floor(this.progress() * 25));
+					},
+				},
+			)
+			.to(
+				{},
+				{
+					duration: 1.5,
+					onStart: () => {
+						setStatus('SYSTEM READY');
+						setPhase(3);
+					},
+					onUpdate: function () {
+						setProgress(75 + Math.floor(this.progress() * 25));
+					},
+				},
+			);
 
 		return () => {
-			clearInterval(memoryInterval);
-			timeouts.forEach(clearTimeout);
+			tl.kill();
 		};
-	}, [bootComplete, setBootComplete]);
+	}, [setBootComplete]);
+
+	const handleSkip = () => {
+		setBootComplete(true);
+	};
 
 	if (bootComplete) return null;
 
 	return (
-		<div className="fixed inset-0 z-9999 bg-black text-[#cccccc] font-mono p-8 text-lg leading-relaxed overflow-hidden cursor-none select-none">
-			{/* CRT Effect Overlay */}
-			<div className="scanlines pointer-events-none absolute inset-0 z-20"></div>
+		<div
+			ref={containerRef}
+			className="fixed inset-0 z-9999 bg-black text-[#00ff41] font-mono overflow-hidden"
+		>
+			{/* Matrix Rain Background */}
+			<MatrixRain />
 
-			<div className="relative z-10 flex flex-col h-full max-w-4xl mx-auto">
-				{/* Header */}
-				<div className="flex justify-between mb-8">
-					<div>
-						<p>Award Modular BIOS v4.51PG, An Energy Star Ally</p>
-						<p>Copyright (C) 1984-2025, AnuragOS Inc.</p>
+			{/* Hex Grid */}
+			<HexGrid opacity={hexOpacity} />
+
+			{/* Network Nodes */}
+			<NetworkNodes phase={phase} />
+
+			{/* Particle Burst */}
+			<ParticleBurst active={showBurst} />
+
+			{/* UI Overlay */}
+			<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
+				<div className="text-center space-y-8 px-4">
+					{/* Logo/Title with 3D effect */}
+					<div
+						className="text-6xl md:text-8xl font-bold tracking-widest relative"
+						style={{
+							textShadow:
+								'0 0 20px #00ff41, 0 0 40px #00ff41, 2px 2px 0 #003311, 4px 4px 0 #002211',
+							transform: `perspective(500px) rotateX(${
+								Math.sin(phase * 0.5) * 5
+							}deg)`,
+							transition: 'transform 0.5s ease-out',
+						}}
+					>
+						ANURAG<span className="text-[#0088ff]">OS</span>
 					</div>
-					<div className="text-right hidden sm:block">
-						<pre className="text-[10px] leading-[10px] text-[#00ff41]">
-							{`   _   
-  ( )  
-   H   
-  ( )  
- ENERGY`}
-						</pre>
+
+					{/* Status with glow */}
+					<div
+						className="text-xl md:text-2xl tracking-wider opacity-90"
+						style={{
+							textShadow: '0 0 10px #00ff41',
+						}}
+					>
+						{status}
 					</div>
-				</div>
 
-				{/* Main Content */}
-				<div className="flex-1 overflow-hidden relative" ref={scrollRef}>
-					<div className="space-y-1">
-						<p>PENTIUM-III 500MHz Processor</p>
-						<p>Memory Test: {memory}K OK</p>
-
-						<div className="mt-4">
-							{logs.map((log, i) => (
-								<p key={i} className="whitespace-pre-wrap wrap-break-word">
-									{log}
-								</p>
-							))}
-							<p className="inline-block">
-								_
-								<span className={`${showCursor ? 'opacity-100' : 'opacity-0'}`}>
-									_
-								</span>
-							</p>
+					{/* Progress Bar */}
+					<div className="w-full max-w-md h-3 bg-[#003311] rounded-none overflow-hidden mx-auto border border-[#00ff41]">
+						<div
+							className="h-full bg-linear-to-r from-[#00ff41] to-[#0088ff] transition-all duration-300 ease-out relative"
+							style={{ width: `${progress}%` }}
+						>
+							<div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent)] animate-shimmer" />
 						</div>
 					</div>
-				</div>
 
-				{/* Footer */}
-				<div className="mt-8 border-t-2 border-[#cccccc] pt-2 flex justify-between text-sm">
-					<div>
-						<span className="mr-4">Press DEL to enter SETUP</span>
-						<span>Press ESC to skip memory test</span>
+					{/* Progress Percentage */}
+					<div className="text-base md:text-lg opacity-70 font-mono tabular-nums">
+						[{progress.toString().padStart(3, '0')}%] LOADING...
 					</div>
-					<div>12/03/2025-i440BX-8671-2A69KD4FC-00</div>
+
+					{/* Phase indicator dots */}
+					<div className="flex gap-4 justify-center">
+						{[0, 1, 2, 3].map(p => (
+							<div key={p} className="relative">
+								<div
+									className={`w-4 h-4 border-2 transition-all duration-500 ${
+										phase >= p
+											? 'border-[#00ff41] bg-[#00ff41] shadow-[0_0_12px_#00ff41]'
+											: 'border-[#003311] bg-transparent'
+									}`}
+									style={{
+										transform: phase >= p ? 'scale(1.2)' : 'scale(1)',
+									}}
+								/>
+								{phase === p && (
+									<div className="absolute inset-0 border-2 border-[#00ff41] animate-ping opacity-75" />
+								)}
+							</div>
+						))}
+					</div>
+
+					{/* System info */}
+					<div className="text-xs opacity-50 space-y-1 hidden md:block">
+						<div>KERNEL v2.0.0-alpha | QUANTUM ENGINE ONLINE</div>
+						<div>NEURAL CORE: {phase * 25}% | MEMORY: OPTIMAL</div>
+					</div>
 				</div>
 			</div>
 
-			{/* Skip Button (Hidden but clickable area or subtle) */}
+			{/* Skip button */}
 			<button
-				onClick={() => setBootComplete(true)}
-				className="absolute bottom-4 right-4 text-xs text-zinc-800 hover:text-zinc-600 z-50 uppercase tracking-widest"
+				onClick={handleSkip}
+				className="absolute bottom-8 right-8 px-6 py-3 bg-transparent border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all duration-300 uppercase tracking-wider text-sm pointer-events-auto z-20 font-bold"
+				style={{
+					boxShadow: '0 0 20px rgba(0, 255, 65, 0.3)',
+				}}
 			>
-				[ SKIP BOOT ]
+				SKIP BOOT ›
 			</button>
+
+			{/* Scanline effect */}
+			<div className="scanlines pointer-events-none absolute inset-0 z-30" />
 		</div>
 	);
 }
