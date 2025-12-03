@@ -179,7 +179,7 @@ export function BootAnimation() {
 			{
 				duration: 1.5,
 				onStart: () => {
-					setStatus('WELCOME TO MY PORTFOLIO');
+					setStatus('HELLO, WORLD → BUILDING INTELLIGENT SYSTEMS');
 					setPhase(0);
 				},
 				onUpdate: function () {
@@ -192,7 +192,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('LOADING EXPERIENCE & PROJECTS');
+						setStatus('NEXT.JS + UX: SCALABLE, CLEAN, HUMAN-CENTERED');
 						setPhase(1);
 						setHexOpacity(0.5);
 					},
@@ -206,7 +206,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('INITIALIZING SKILLS & EXPERTISE');
+						setStatus('AI/ML + LLMs/NLP: LEARNING, REASONING, ADAPTATION');
 						setPhase(2);
 						setHexOpacity(1);
 					},
@@ -220,7 +220,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('PORTFOLIO READY');
+						setStatus('PORTFOLIO READY: REAL IMPACT OVER JUST CODE');
 						setPhase(3);
 					},
 					onUpdate: function () {
@@ -251,9 +251,6 @@ export function BootAnimation() {
 			{/* Hex Grid */}
 			<HexGrid opacity={hexOpacity} />
 
-			{/* Network Nodes - Removed for cleaner look */}
-			{/* <NetworkNodes phase={phase} /> */}
-
 			{/* Particle Burst */}
 			<ParticleBurst active={showBurst} />
 
@@ -273,7 +270,7 @@ export function BootAnimation() {
 							transition: 'transform 0.5s ease-out',
 						}}
 					>
-						ANURAG
+						ANURAG BASURI
 						<span
 							className="text-[#0088ff]"
 							style={{
@@ -281,7 +278,7 @@ export function BootAnimation() {
 									'0 1px 0 #001a33, 0 2px 0 #001028, 0 3px 0 #000a1a, 0 4px 0 #00050d, 0 5px 0 #000306, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,136,255,.3), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15)',
 							}}
 						>
-							OS
+							• PORTFOLIO
 						</span>
 					</div>
 
@@ -313,7 +310,7 @@ export function BootAnimation() {
 						<span className="text-[#00ff41]">[</span>
 						{progress.toString().padStart(3, '0')}%
 						<span className="text-[#00ff41]">]</span>{' '}
-						<span className="animate-pulse">LOADING...</span>
+						<span className="animate-pulse">BOOTING...</span>
 					</div>
 
 					{/* Phase indicator dots */}
@@ -339,9 +336,13 @@ export function BootAnimation() {
 
 					{/* System info */}
 					<div className="text-xs opacity-40 space-y-1 hidden md:block">
-						<div>FULL-STACK DEVELOPER | DESIGNER | CREATOR</div>
+						<div>CSE UNDERGRAD • FULL-STACK + MACHINE INTELLIGENCE</div>
+						<div>NEXT.JS • MERN • AI/ML • LLMs • NLP</div>
+						<div>LeetCode: 450+ • Consistency over time</div>
+						<div>Exploring internships & freelancing with real impact</div>
 						<div>
-							STATUS: {phase === 3 ? 'READY FOR COLLABORATION' : 'PREPARING SHOWCASE'}
+							STATUS:{' '}
+							{phase === 3 ? 'READY TO COLLABORATE' : 'PREPARING MEANINGFUL WORK'}
 						</div>
 					</div>
 				</div>
