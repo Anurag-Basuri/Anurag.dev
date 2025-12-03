@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Taskbar } from '@/components/core/Taskbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -196,9 +195,24 @@ export function MainLayout() {
 					</div>
 
 					{!isMobile && (
-						<span className="flex-1 text-center text-muted-foreground tracking-[0.35em]">
-							SYSTEM READY
-						</span>
+						<div className="flex-1 flex justify-center items-center gap-6">
+							<span className="text-muted-foreground tracking-[0.35em]">
+								SYSTEM READY
+							</span>
+							<button
+								onClick={() => {
+									const contactItem = {
+										id: 'contact',
+										name: 'contact',
+										type: 'file',
+									} as FileSystemItem;
+									handleFileSelect(contactItem);
+								}}
+								className="text-muted-foreground hover:text-primary transition-colors tracking-[0.2em] hover:tracking-[0.25em] duration-300 text-[10px] uppercase border border-transparent hover:border-primary/20 px-2 py-0.5 rounded-sm"
+							>
+								Contact
+							</button>
+						</div>
 					)}
 
 					<div className="flex items-center gap-2">
@@ -227,7 +241,13 @@ export function MainLayout() {
 								)}
 								title={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
 								aria-label={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
-								onClick={sidebarCollapsed ? showSidebar : hideSidebar}
+								onClick={() => {
+									const panel = sidebarRef.current;
+									if (panel) {
+										if (sidebarCollapsed) panel.expand();
+										else panel.collapse();
+									}
+								}}
 							>
 								{sidebarCollapsed ? (
 									<PanelLeftOpen className="w-4 h-4" />
@@ -246,7 +266,13 @@ export function MainLayout() {
 								)}
 								title={terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'}
 								aria-label={terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'}
-								onClick={terminalCollapsed ? showTerminal : hideTerminal}
+								onClick={() => {
+									const panel = terminalRef.current;
+									if (panel) {
+										if (terminalCollapsed) panel.expand();
+										else panel.collapse();
+									}
+								}}
 							>
 								{terminalCollapsed ? (
 									<TerminalIcon className="w-4 h-4" />
@@ -275,6 +301,8 @@ export function MainLayout() {
 								maxSize={30}
 								collapsible
 								collapsedSize={0}
+								onCollapse={() => setSidebarCollapsed(true)}
+								onExpand={() => setSidebarCollapsed(false)}
 								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
 							>
 								<ResizablePanelGroup direction="vertical" className="h-full">
@@ -417,6 +445,8 @@ export function MainLayout() {
 										maxSize={45}
 										collapsible
 										collapsedSize={0}
+										onCollapse={() => setTerminalCollapsed(true)}
+										onExpand={() => setTerminalCollapsed(false)}
 										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)]"
 									>
 										<div className="h-full flex flex-col">
@@ -440,7 +470,6 @@ export function MainLayout() {
 						</div>
 					)}
 				</div>
-				<Taskbar />
 			</div>
 		</>
 	);
