@@ -51,6 +51,9 @@ export interface AboutData {
 	name: string;
 	tagline: string;
 	short: string;
+	currentStatus: string[];
+	philosophy: string;
+	callToAction: string;
 	skills: {
 		frontend: string[];
 		backend: string[];
@@ -188,7 +191,9 @@ class ApiClient {
 
 	// Health check
 	async healthCheck(): Promise<{ status: string; timestamp: string; environment: string }> {
-		const res = await this.request<{ status: string; timestamp: string; environment: string }>('/api/health');
+		const res = await this.request<{ status: string; timestamp: string; environment: string }>(
+			'/api/health',
+		);
 		// If request succeeds, status already set to 'online'
 		return res;
 	}
