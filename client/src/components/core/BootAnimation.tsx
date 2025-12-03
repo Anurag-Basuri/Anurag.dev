@@ -48,12 +48,12 @@ function MatrixRain() {
 			}
 		}
 
-		const interval = setInterval(draw, 33);
+		const interval = setInterval(draw, 50);
 
 		return () => clearInterval(interval);
 	}, []);
 
-	return <canvas ref={canvasRef} className="absolute inset-0 opacity-30" />;
+	return <canvas ref={canvasRef} className="absolute inset-0 opacity-20" />;
 }
 
 // Hexagon Grid Component
@@ -241,7 +241,7 @@ export function BootAnimation() {
 			{
 				duration: 1.5,
 				onStart: () => {
-					setStatus('INITIALIZING CORE SYSTEMS');
+					setStatus('WELCOME TO MY PORTFOLIO');
 					setPhase(0);
 				},
 				onUpdate: function () {
@@ -254,7 +254,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('LOADING SYSTEM ARCHITECTURE');
+						setStatus('LOADING EXPERIENCE & PROJECTS');
 						setPhase(1);
 						setHexOpacity(0.5);
 					},
@@ -268,7 +268,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('CONNECTING NETWORK PROTOCOLS');
+						setStatus('INITIALIZING SKILLS & EXPERTISE');
 						setPhase(2);
 						setHexOpacity(1);
 					},
@@ -282,7 +282,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('BOOT SEQUENCE COMPLETE');
+						setStatus('PORTFOLIO READY');
 						setPhase(3);
 					},
 					onUpdate: function () {
@@ -327,7 +327,7 @@ export function BootAnimation() {
 						className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-widest relative"
 						style={{
 							textShadow:
-								'0 0 20px #00ff41, 0 0 40px #00ff41, 0 0 60px #00ff4140, 2px 2px 0 #003311, 4px 4px 0 #002211',
+								'0 0 15px #00ff4180, 0 0 30px #00ff4160, 2px 2px 0 #003311, 4px 4px 0 #002211',
 							transform: `perspective(500px) rotateX(${
 								Math.sin(phase * 0.5) * 5
 							}deg)`,
@@ -337,7 +337,7 @@ export function BootAnimation() {
 						ANURAG
 						<span
 							className="text-[#0088ff]"
-							style={{ textShadow: '0 0 20px #0088ff, 0 0 40px #0088ff' }}
+							style={{ textShadow: '0 0 15px #0088ff60' }}
 						>
 							OS
 						</span>
@@ -345,9 +345,9 @@ export function BootAnimation() {
 
 					{/* Status with glow */}
 					<div
-						className="text-lg sm:text-xl md:text-2xl tracking-wider opacity-90 uppercase"
+						className="text-lg sm:text-xl md:text-2xl tracking-wider opacity-75 uppercase"
 						style={{
-							textShadow: '0 0 10px #00ff41, 0 0 20px #00ff4180',
+							textShadow: '0 0 8px #00ff4150',
 						}}
 					>
 						{status}
@@ -393,9 +393,11 @@ export function BootAnimation() {
 					</div>
 
 					{/* System info */}
-					<div className="text-xs opacity-50 space-y-1 hidden md:block">
-						<div>KERNEL: v2.0.0-stable | ARCHITECTURE: x64</div>
-						<div>STATUS: {phase === 3 ? 'READY' : 'LOADING'} | SECURITY: ENABLED</div>
+					<div className="text-xs opacity-40 space-y-1 hidden md:block">
+						<div>FULL-STACK DEVELOPER | DESIGNER | CREATOR</div>
+						<div>
+							STATUS: {phase === 3 ? 'READY FOR COLLABORATION' : 'PREPARING SHOWCASE'}
+						</div>
 					</div>
 				</div>
 			</div>
