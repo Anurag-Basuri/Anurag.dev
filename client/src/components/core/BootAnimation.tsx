@@ -156,68 +156,6 @@ function ParticleBurst({ active }: { active: boolean }) {
 	return <canvas ref={canvasRef} className="absolute inset-0" />;
 }
 
-// Network Nodes Component
-function NetworkNodes({ phase }: { phase: number }) {
-	const nodeCount = 12;
-	const nodes = Array.from({ length: nodeCount }, (_, i) => ({
-		id: i,
-		x: 20 + (i % 4) * 26,
-		y: 30 + Math.floor(i / 4) * 30,
-	}));
-
-	if (phase < 2) return null;
-
-	return (
-		<div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-			<svg width="100%" height="100%" className="max-w-4xl">
-				{/* Connection Lines */}
-				{nodes.map((node, i) =>
-					nodes
-						.slice(i + 1)
-						.map(target => (
-							<line
-								key={`${node.id}-${target.id}`}
-								x1={`${node.x}%`}
-								y1={`${node.y}%`}
-								x2={`${target.x}%`}
-								y2={`${target.y}%`}
-								stroke="#00ff41"
-								strokeWidth="1"
-								opacity="0.2"
-								className="animate-pulse"
-							/>
-						)),
-				)}
-
-				{/* Nodes */}
-				{nodes.map((node, i) => (
-					<g key={node.id}>
-						<circle
-							cx={`${node.x}%`}
-							cy={`${node.y}%`}
-							r="8"
-							fill="#000"
-							stroke="#00ff41"
-							strokeWidth="2"
-							opacity="1"
-							style={{
-								animation: `pulse 2s ease-in-out ${i * 0.1}s infinite`,
-							}}
-						/>
-						<circle
-							cx={`${node.x}%`}
-							cy={`${node.y}%`}
-							r="4"
-							fill="#00ff41"
-							opacity="0.8"
-						/>
-					</g>
-				))}
-			</svg>
-		</div>
-	);
-}
-
 export function BootAnimation() {
 	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
 	const [phase, setPhase] = useState(0);

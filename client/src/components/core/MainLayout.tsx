@@ -23,7 +23,7 @@ import {
 	ChevronDown,
 	Sparkles,
 } from 'lucide-react';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Taskbar } from '@/components/core/Taskbar';
 import { motion, AnimatePresence } from 'framer-motion';
