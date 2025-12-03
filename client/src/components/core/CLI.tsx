@@ -15,19 +15,19 @@ type HistoryItem = {
 	response: CommandResponse;
 };
 
-const promptLabel = 'user@anurag:~$';
+const promptLabel = 'root@anuragos:~#';
 
 const responseTone = (type: CommandResponse['type']) => {
 	switch (type) {
 		case 'error':
-			return 'text-destructive';
+			return 'text-[#ff0033]';
 		case 'success':
 		case 'open_module':
-			return 'text-emerald-500 dark:text-emerald-400';
+			return 'text-[#00ff41]';
 		case 'component':
-			return 'text-primary';
+			return 'text-[#ccc]';
 		default:
-			return 'text-foreground';
+			return 'text-[#ccc]';
 	}
 };
 
@@ -121,14 +121,16 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-background text-foreground font-mono text-sm p-4 overflow-hidden border-l border-border shadow-inner transition-colors duration-300"
+			className="h-full flex flex-col bg-[#0a0a0a] text-[#ccc] font-mono text-sm p-4 overflow-hidden border-l border-[#333] shadow-inner transition-colors duration-300"
 			onClick={handleContainerClick}
 		>
-			<div className="mb-4 select-none text-xs space-y-1 text-muted-foreground">
-				<p className="tracking-[0.3em] uppercase text-muted-foreground/70">Terminal</p>
-				<p>AnuragOS [Version 1.0.0]</p>
+			<div className="mb-4 select-none text-xs space-y-1 text-[#666]">
+				<p className="tracking-[0.3em] uppercase text-[#00ff41] opacity-70">
+					AnuragOS Terminal
+				</p>
+				<p>Kernel v2.0.0-alpha [Secure Shell]</p>
 				<p>(c) 2025 Anurag Basuri. All rights reserved.</p>
-				<p className="pt-2 text-muted-foreground/70">Type &apos;help&apos; to begin.</p>
+				<p className="pt-2 text-[#666]">Type &apos;help&apos; for available commands.</p>
 			</div>
 
 			<ScrollArea className="flex-1 pr-2">
@@ -145,8 +147,8 @@ export function CLI() {
 								className="rounded-md"
 							>
 								<div className="flex gap-2 text-sm">
-									<span className="text-primary">{promptLabel}</span>
-									<span className="text-foreground">{item.command}</span>
+									<span className="text-[#00ff41] font-bold">{promptLabel}</span>
+									<span className="text-[#ccc]">{item.command}</span>
 								</div>
 								<div
 									className={cn(
@@ -161,19 +163,33 @@ export function CLI() {
 					</AnimatePresence>
 
 					<div className="flex items-center gap-2 text-sm">
-						<span className="text-primary">{promptLabel}</span>
-						<motion.input
-							ref={inputRef}
-							type="text"
-							value={input}
-							onChange={e => setInput(e.target.value)}
-							onKeyDown={handleKeyDown}
-							className="flex-1 bg-transparent border-none outline-none text-emerald-500 dark:text-emerald-400 placeholder-emerald-500/30"
-							autoFocus
-							spellCheck={false}
-							autoComplete="off"
-							whileFocus={{ opacity: 1 }}
-						/>
+						<span className="text-[#00ff41] font-bold">{promptLabel}</span>
+						<div className="relative flex-1">
+							<input
+								ref={inputRef}
+								type="text"
+								value={input}
+								onChange={e => setInput(e.target.value)}
+								onKeyDown={handleKeyDown}
+								className="w-full bg-transparent border-none outline-none text-[#ccc] caret-transparent"
+								autoFocus
+								spellCheck={false}
+								autoComplete="off"
+							/>
+							{/* Custom Block Cursor */}
+							<span className="absolute top-0 pointer-events-none text-[#ccc]">
+								{input}
+								<motion.span
+									animate={{ opacity: [1, 0] }}
+									transition={{
+										duration: 0.8,
+										repeat: Infinity,
+										ease: 'linear',
+									}}
+									className="inline-block w-2.5 h-4 bg-[#00ff41] align-middle ml-0.5"
+								/>
+							</span>
+						</div>
 					</div>
 					<div ref={scrollRef} />
 				</div>
