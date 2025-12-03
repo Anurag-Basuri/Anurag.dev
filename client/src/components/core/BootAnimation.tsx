@@ -79,7 +79,7 @@ function MatrixRain() {
 		};
 	}, []);
 
-	return <canvas ref={canvasRef} className="absolute inset-0 opacity-20" />;
+	return <canvas ref={canvasRef} className="absolute inset-0 opacity-12" />;
 }
 
 // Hexagon Grid Component
@@ -87,7 +87,8 @@ function HexGrid({ opacity }: { opacity: number }) {
 	return (
 		<div
 			className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-			style={{ opacity }}
+			// decrease overall presence of the grid
+			style={{ opacity: Math.max(0, Math.min(1, opacity * 0.6)) }}
 			aria-hidden="true"
 		>
 			<div
@@ -103,8 +104,18 @@ function HexGrid({ opacity }: { opacity: number }) {
                     `,
 					backgroundSize: '80px 140px',
 					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
-					maskImage:
-						'radial-gradient(ellipse at center, rgba(0,0,0,0.9), rgba(0,0,0,0.2))',
+					// darker at top, slightly brighter toward bottom
+					maskImage: `
+                        linear-gradient(
+                            to bottom,
+                            rgba(0,0,0,0.92) 0%,
+                            rgba(0,0,0,0.75) 35%,
+                            rgba(0,0,0,0.45) 70%,
+                            rgba(0,0,0,0.25) 100%
+                        )
+                    `,
+					// subtle luminance lift near bottom without adding boxy feel
+					filter: 'brightness(0.95)',
 				}}
 			/>
 		</div>
