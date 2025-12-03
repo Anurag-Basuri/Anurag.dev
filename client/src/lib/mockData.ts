@@ -44,6 +44,9 @@ export const mockAbout: AboutData = {
 	name: 'Anurag Basuri',
 	tagline: 'Full-Stack Engineer & Machine Intelligence Explorer',
 	short: 'It started with "Hello, World!" and grew into a passion for building intelligent systems that make an impact. I\'m a CSE undergrad who loves building at the intersection of full-stack engineering and machine intelligence — designing clean, scalable user experiences with MERN & Next.js, while diving deep into AI/ML, LLMs, and NLP to understand how machines learn, reason, and adapt.',
+	currentStatus: ['Building AnuragOS', 'Learning Rust', 'Exploring Agentic AI'],
+	philosophy: 'Build things that matter, and make them look good while doing it.',
+	callToAction: 'Check out my projects or say hello!',
 	skills: {
 		frontend: ['React', 'Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion', 'MERN Stack'],
 		backend: ['Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'RESTful APIs'],
