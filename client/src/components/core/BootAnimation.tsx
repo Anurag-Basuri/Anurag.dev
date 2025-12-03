@@ -61,21 +61,25 @@ function MatrixRain() {
 function HexGrid({ opacity }: { opacity: number }) {
 	return (
 		<div
-			className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
-			style={{
-				opacity,
-				backgroundImage: `
-					linear-gradient(30deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
-					linear-gradient(150deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
-					linear-gradient(30deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
-					linear-gradient(150deg, #00ff4120 12%, transparent 12.5%, transparent 87%, #00ff4120 87.5%, #00ff4120),
-					linear-gradient(60deg, #00332277 25%, transparent 25.5%, transparent 75%, #00332277 75%, #00332277),
-					linear-gradient(60deg, #00332277 25%, transparent 25.5%, transparent 75%, #00332277 75%, #00332277)
-				`,
-				backgroundSize: '80px 140px',
-				backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
-			}}
-		/>
+			className="absolute inset-0 pointer-events-none transition-opacity duration-1000 flex items-center justify-center"
+			style={{ opacity }}
+		>
+			<div
+				className="w-full h-full"
+				style={{
+					backgroundImage: `
+						linear-gradient(30deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
+						linear-gradient(150deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
+						linear-gradient(30deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
+						linear-gradient(150deg, #00ff4115 12%, transparent 12.5%, transparent 87%, #00ff4115 87.5%, #00ff4115),
+						linear-gradient(60deg, #00332255 25%, transparent 25.5%, transparent 75%, #00332255 75%, #00332255),
+						linear-gradient(60deg, #00332255 25%, transparent 25.5%, transparent 75%, #00332255 75%, #00332255)
+					`,
+					backgroundSize: '80px 140px',
+					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
+				}}
+			/>
+		</div>
 	);
 }
 
@@ -238,7 +242,7 @@ export function BootAnimation() {
 			{
 				duration: 1.5,
 				onStart: () => {
-					setStatus('INITIALIZING QUANTUM CORE');
+					setStatus('INITIALIZING CORE SYSTEMS');
 					setPhase(0);
 				},
 				onUpdate: function () {
@@ -251,7 +255,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('ESTABLISHING NEURAL PATHWAYS');
+						setStatus('LOADING SYSTEM ARCHITECTURE');
 						setPhase(1);
 						setHexOpacity(0.5);
 					},
@@ -265,7 +269,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('SYNCHRONIZING NETWORK NODES');
+						setStatus('CONNECTING NETWORK PROTOCOLS');
 						setPhase(2);
 						setHexOpacity(1);
 					},
@@ -279,7 +283,7 @@ export function BootAnimation() {
 				{
 					duration: 1.5,
 					onStart: () => {
-						setStatus('SYSTEM READY');
+						setStatus('BOOT SEQUENCE COMPLETE');
 						setPhase(3);
 					},
 					onUpdate: function () {
@@ -382,8 +386,8 @@ export function BootAnimation() {
 
 					{/* System info */}
 					<div className="text-xs opacity-50 space-y-1 hidden md:block">
-						<div>KERNEL v2.0.0-alpha | QUANTUM ENGINE ONLINE</div>
-						<div>NEURAL CORE: {phase * 25}% | MEMORY: OPTIMAL</div>
+						<div>KERNEL: v2.0.0-stable | ARCHITECTURE: x64</div>
+						<div>STATUS: {phase === 3 ? 'READY' : 'LOADING'} | SECURITY: ENABLED</div>
 					</div>
 				</div>
 			</div>
