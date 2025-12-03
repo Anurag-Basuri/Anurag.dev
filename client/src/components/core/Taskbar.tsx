@@ -4,7 +4,17 @@ import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, AppWindow, Wifi, Battery, Volume2 } from 'lucide-react';
+import {
+	Terminal,
+	AppWindow,
+	Wifi,
+	Battery,
+	Volume2,
+	Power,
+	Settings,
+	User,
+	ChevronRight,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Taskbar() {
@@ -31,59 +41,64 @@ export function Taskbar() {
 	};
 
 	return (
-		<div className="h-12 bg-background/90 backdrop-blur-md border-t border-border flex items-center px-2 z-50 relative select-none shadow-lg transition-colors duration-300">
+		<div className="h-10 bg-[#050505] border-t border-[#333] flex items-center px-2 z-50 relative select-none font-mono text-sm">
 			{/* Start Button */}
 			<div className="relative">
 				<button
 					onClick={() => setIsStartOpen(!isStartOpen)}
 					className={cn(
-						'p-2 rounded hover:bg-muted transition-colors flex items-center gap-2 mr-2',
-						isStartOpen && 'bg-muted',
+						'px-3 py-1 hover:bg-[#111] hover:text-[#00ff41] transition-colors flex items-center gap-2 border border-transparent hover:border-[#333]',
+						isStartOpen && 'bg-[#111] text-[#00ff41] border-[#333]',
 					)}
 				>
-					<div className="w-6 h-6 bg-linear-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 rounded-sm flex items-center justify-center shadow-lg shadow-emerald-500/20">
-						<Terminal className="w-4 h-4 text-white" />
-					</div>
-					<span className="font-bold text-foreground text-sm hidden md:block">Start</span>
+					<Terminal className="w-4 h-4" />
+					<span className="font-bold hidden md:block">SYSTEM</span>
 				</button>
 
 				{/* Start Menu */}
 				<AnimatePresence>
 					{isStartOpen && (
 						<motion.div
-							initial={{ opacity: 0, y: 10, scale: 0.95 }}
-							animate={{ opacity: 1, y: 0, scale: 1 }}
-							exit={{ opacity: 0, y: 10, scale: 0.95 }}
-							className="absolute bottom-14 left-0 w-64 bg-popover/95 backdrop-blur-xl border border-border rounded-lg shadow-2xl p-4 overflow-hidden"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 10 }}
+							className="absolute bottom-12 left-0 w-64 bg-[#050505] border border-[#333] shadow-[0_0_20px_rgba(0,255,65,0.1)] p-1"
 						>
-							<div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
-								<div className="w-10 h-10 rounded-full bg-linear-to-br from-emerald-500 to-blue-600 dark:from-emerald-400 dark:to-blue-500 flex items-center justify-center">
-									<span className="text-white font-bold text-lg">A</span>
-								</div>
-								<div>
-									<div className="font-bold text-foreground">Anurag User</div>
-									<div className="text-xs text-muted-foreground">Developer</div>
+							<div className="bg-[#111] p-3 border-b border-[#333] mb-1">
+								<div className="flex items-center gap-3">
+									<div className="w-8 h-8 bg-[#00ff41] text-black flex items-center justify-center font-bold">
+										A
+									</div>
+									<div>
+										<div className="font-bold text-[#00ff41]">ANURAG.USR</div>
+										<div className="text-[10px] text-[#666]">LEVEL 99 DEV</div>
+									</div>
 								</div>
 							</div>
 
-							<div className="space-y-1">
-								{['Projects', 'About', 'Contact', 'Journey'].map(item => (
+							<div className="space-y-0.5">
+								{['PROJECTS', 'ABOUT', 'CONTACT', 'JOURNEY'].map(item => (
 									<button
 										key={item}
-										className="w-full text-left px-3 py-2 rounded hover:bg-muted text-foreground hover:text-primary transition-colors text-sm flex items-center gap-2"
+										className="w-full text-left px-3 py-2 hover:bg-[#00ff41] hover:text-black text-[#ccc] transition-colors text-xs flex items-center justify-between group"
 									>
-										<AppWindow className="w-4 h-4" />
-										{item}
+										<span className="flex items-center gap-2">
+											<ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100" />
+											{item}
+										</span>
+										<span className="text-[10px] opacity-50">EXE</span>
 									</button>
 								))}
 							</div>
 
-							<div className="mt-4 pt-4 border-t border-border flex justify-between">
-								<button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-									Settings
+							<div className="mt-1 pt-1 border-t border-[#333] grid grid-cols-2 gap-0.5">
+								<button className="px-3 py-2 hover:bg-[#111] text-[#666] hover:text-[#ccc] text-xs flex items-center gap-2 transition-colors">
+									<Settings className="w-3 h-3" />
+									CONFIG
 								</button>
-								<button className="text-xs text-destructive hover:text-destructive/80 transition-colors">
-									Shut Down
+								<button className="px-3 py-2 hover:bg-[#ff0033] hover:text-white text-[#ff0033] text-xs flex items-center gap-2 transition-colors">
+									<Power className="w-3 h-3" />
+									HALT
 								</button>
 							</div>
 						</motion.div>
@@ -92,37 +107,38 @@ export function Taskbar() {
 			</div>
 
 			{/* Window Tabs */}
-			<div className="flex-1 flex items-center gap-1 overflow-x-auto px-2">
+			<div className="flex-1 flex items-center gap-1 overflow-x-auto px-4">
 				{windows.map(window => (
 					<button
 						key={window.id}
 						onClick={() => handleWindowClick(window.id)}
 						className={cn(
-							'px-3 py-1.5 rounded flex items-center gap-2 min-w-[120px] max-w-[200px] transition-all border',
+							'px-3 py-1 flex items-center gap-2 min-w-[100px] max-w-[180px] transition-all border text-xs',
 							activeId === window.id && !window.isMinimized
-								? 'bg-muted border-primary/30 shadow-inner'
-								: 'hover:bg-muted/50 text-muted-foreground border-transparent',
+								? 'bg-[#111] border-[#333] text-[#00ff41] shadow-[inset_0_0_10px_rgba(0,255,65,0.05)]'
+								: 'hover:bg-[#111] text-[#666] border-transparent hover:border-[#333]',
 						)}
 					>
-						<AppWindow className="w-4 h-4 text-primary" />
-						<span className="text-xs truncate text-foreground">{window.title}</span>
+						<span className="truncate">{window.title}</span>
 					</button>
 				))}
 			</div>
 
 			{/* System Tray */}
-			<div className="flex items-center gap-4 px-2 pl-4 border-l border-border ml-2">
-				<div className="items-center gap-2 text-muted-foreground hidden md:flex">
-					<Wifi className="w-4 h-4" />
-					<Volume2 className="w-4 h-4" />
-					<Battery className="w-4 h-4" />
+			<div className="flex items-center gap-4 px-4 border-l border-[#333] ml-2 text-[#666]">
+				<div className="items-center gap-3 hidden md:flex">
+					<div className="flex items-center gap-1 text-[10px]">
+						<span className="text-[#00ff41]">CPU</span>
+						<span>12%</span>
+					</div>
+					<div className="flex items-center gap-1 text-[10px]">
+						<span className="text-[#00ff41]">MEM</span>
+						<span>4.2GB</span>
+					</div>
 				</div>
 				<div className="text-right">
-					<div className="text-xs font-medium text-foreground">
+					<div className="text-xs font-medium text-[#00ff41]">
 						{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-					</div>
-					<div className="text-[10px] text-muted-foreground hidden md:block">
-						{time.toLocaleDateString()}
 					</div>
 				</div>
 			</div>
