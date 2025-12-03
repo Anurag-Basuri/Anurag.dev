@@ -6,7 +6,7 @@ export const mockProjects: Project[] = [
 		title: 'AnuragOS',
 		description:
 			'A personal portfolio website designed like a terminal-based operating system.',
-		techStack: ['Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion'],
+		techStack: ['TypeScript', 'TailwindCSS', 'Framer Motion'],
 		githubUrl: 'https://github.com/Anurag-Basuri/personal_portfolio',
 		liveUrl: 'https://anuragos.vercel.app',
 		status: 'In Progress',
@@ -43,12 +43,12 @@ export const mockProjects: Project[] = [
 export const mockAbout: AboutData = {
 	name: 'Anurag Basuri',
 	tagline: 'Full-Stack Engineer & Machine Intelligence Explorer',
-	short: 'It started with "Hello, World!" and grew into a passion for building intelligent systems that make an impact. I\'m a CSE undergrad who loves building at the intersection of full-stack engineering and machine intelligence — designing clean, scalable user experiences with MERN & Next.js, while diving deep into AI/ML, LLMs, and NLP to understand how machines learn, reason, and adapt.',
+	short: 'It started with "Hello, World!" and grew into a passion for building intelligent systems that make an impact. I\'m a CSE undergrad who loves building at the intersection of full-stack engineering and machine intelligence — designing clean, scalable user experiences with MERN & Modern Tech, while diving deep into AI/ML, LLMs, and NLP to understand how machines learn, reason, and adapt.',
 	currentStatus: ['Building AnuragOS', 'Learning Rust', 'Exploring Agentic AI'],
 	philosophy: 'Build things that matter, and make them look good while doing it.',
 	callToAction: 'Check out my projects or say hello!',
 	skills: {
-		frontend: ['React', 'Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion', 'MERN Stack'],
+		frontend: ['React', 'TypeScript', 'TailwindCSS', 'Framer Motion', 'MERN Stack'],
 		backend: ['Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'RESTful APIs'],
 		ml: ['Machine Learning', 'NLP', 'LLMs', 'Deep Learning', 'AI Systems'],
 	},
@@ -83,7 +83,7 @@ export const mockBlogPosts: BlogPost[] = [
 		title: 'Building a Terminal Portfolio',
 		slug: 'building-terminal-portfolio',
 		content: 'How I built AnuragOS using Next.js and TailwindCSS...',
-		tags: ['Next.js', 'Portfolio', 'Design'],
+		tags: ['Portfolio', 'Design'],
 		status: 'published',
 		publishedAt: new Date().toISOString(),
 		createdAt: new Date().toISOString(),
