@@ -30,9 +30,9 @@
 	--destructive: oklch(0.6 0.2 20);
 	--destructive-foreground: oklch(0.98 0 0);
 
-	--border: oklch(0.85 0 0);
+	--border: oklch(0.85 0 0 / 0.35);
 	--input: var(--border);
-	--ring: oklch(0.15 0 0);
+	--ring: oklch(0.7 0.1 260);
 
 	--radius: 0rem; /* Sharp corners for retro feel */
 
@@ -238,19 +238,58 @@
 	border-left: 1px solid var(--border);
 }
 ::-webkit-scrollbar-thumb {
-	background: var(--border);
+	background: linear-gradient(
+		180deg,
+		color-mix(in oklch, var(--foreground) 14%, transparent),
+		color-mix(in oklch, var(--foreground) 7%, transparent)
+	);
 	border: 2px solid var(--background);
 }
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--primary);
 }
 
-/* Glass Panel (Updated for Darker Theme) */
+/* Theme token harmonization + softer borders */
+:root {
+	--border: oklch(0.85 0 0 / 0.35);
+	--ring: oklch(0.7 0.1 260);
+}
+
+.dark {
+	/* soften whites, avoid stark lines in dark */
+	--border: oklch(0.35 0 0 / 0.45);
+	--ring: oklch(0.8 0.12 240);
+}
+
+/* Default element border uses our token (removes harsh white lines) */
+@layer base {
+	* {
+		border-color: var(--border);
+	}
+	/* Accessible, subtle focus */
+	*:where(:focus-visible) {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+	}
+	*:where(:focus) {
+		outline: none;
+	}
+}
+
+/* Resizable handles feel smoother and less bright */
+[data-resize-handle] {
+	transition: background-color 160ms ease;
+}
+[data-resize-handle]:hover {
+	background-color: color-mix(in oklch, var(--ring) 18%, transparent);
+}
+
+/* Muted panels instead of white-bordered panes */
 .glass-panel {
-	background: rgba(10, 10, 10, 0.7);
+	background: color-mix(in oklch, var(--background) 80%, black 20%);
 	backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+	border: 1px solid var(--border);
+	box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.5);
 }
 
 /* Code Syntax Highlighting (Neon) */
