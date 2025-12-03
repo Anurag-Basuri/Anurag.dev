@@ -3,6 +3,7 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/core/FolderTree';
+import ConnectivityBanner from '@/components/core/ConnectivityBanner';
 import { CLI } from '@/components/core/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { useAtom } from 'jotai';
@@ -128,6 +129,7 @@ export function MainLayout() {
 		setTerminalCollapsed(false);
 	};
 
+
 	return (
 		<>
 			<Toaster
@@ -141,6 +143,7 @@ export function MainLayout() {
 					},
 				}}
 			/>
+			<ConnectivityBanner />
 			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
 				{/* Enhanced Background with Premium Gradients */}
 				<div className="absolute inset-0 z-0 pointer-events-none">

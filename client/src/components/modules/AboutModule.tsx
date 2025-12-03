@@ -5,6 +5,7 @@ import { api, AboutData } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Code2, Terminal } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ModuleError } from '@/components/ui/module-error';
 
 // Skeleton loader component
 function AboutSkeleton() {
@@ -48,12 +49,17 @@ export function AboutModule() {
 
 	if (error) {
 		return (
-			<div className="p-6 flex items-center justify-center h-full">
-				<div className="text-center space-y-2">
-					<div className="text-destructive text-lg font-mono">ERROR</div>
-					<div className="text-muted-foreground">{error}</div>
-				</div>
-			</div>
+			<ModuleError
+				message={error}
+				onRetry={() => {
+					setLoading(true);
+					setError(null);
+					api.getAbout()
+						.then(setAbout)
+						.catch(err => setError(err.message))
+						.finally(() => setLoading(false));
+				}}
+			/>
 		);
 	}
 
