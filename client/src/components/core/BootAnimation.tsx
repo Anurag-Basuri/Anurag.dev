@@ -359,13 +359,13 @@ export function BootAnimation() {
 
 					{/* Progress Bar */}
 					<div className="w-full max-w-md mx-auto">
-						<div className="h-3 md:h-4 bg-gradient-to-r from-[#001a0d] to-[#000a05] overflow-hidden border-2 border-[#00ff41] shadow-[0_0_20px_rgba(0,255,65,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
+						<div className="h-3 md:h-4 bg-linear-to-r from-[#001a0d] to-[#000a05] overflow-hidden border-2 border-[#00ff41] shadow-[0_0_20px_rgba(0,255,65,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]">
 							<div
-								className="h-full bg-gradient-to-r from-[#00ff41] via-[#00cc33] to-[#00aa22] transition-all duration-300 ease-out relative shadow-[0_0_10px_rgba(0,255,65,0.6)]"
+								className="h-full bg-linear-to-r from-[#00ff41] via-[#00cc33] to-[#00aa22] transition-all duration-300 ease-out relative shadow-[0_0_10px_rgba(0,255,65,0.6)]"
 								style={{ width: `${progress}%` }}
 							>
-								<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
-								<div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent" />
+								<div className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
+								<div className="absolute inset-0 bg-linear-to-b from-white/20 to-transparent" />
 							</div>
 						</div>
 					</div>
