@@ -22,6 +22,8 @@ import {
 	Eye,
 	ChevronDown,
 	Sparkles,
+	Cpu,
+	Activity,
 } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -138,27 +140,29 @@ export function MainLayout() {
 				position="bottom-right"
 				toastOptions={{
 					style: {
-						background: 'var(--popover)',
-						color: 'var(--popover-foreground)',
+						background: '#111',
+						color: '#ccc',
 						fontSize: '12px',
-						borderRadius: 'var(--radius)',
-						border: '1px solid var(--border)',
-						backdropFilter: 'blur(10px)',
+						borderRadius: '0px',
+						border: '1px solid #333',
+						fontFamily: 'monospace',
 					},
 				}}
 			/>
-			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative transition-colors duration-300">
-				{/* Background layers */}
-				<div
-					className="absolute inset-0 z-0 bg-cover bg-center opacity-[0.03] dark:opacity-20 pointer-events-none transition-opacity duration-500"
-					style={{
-						backgroundImage:
-							'url("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop")',
-					}}
-				/>
+			<div className="h-full w-full bg-[#050505] text-[#ccc] font-mono overflow-hidden flex flex-col relative transition-colors duration-300">
+				{/* Background layers - Pure CSS Grid */}
 				<div className="absolute inset-0 z-0 pointer-events-none">
-					<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--primary)_0%,transparent_40%)] opacity-10" />
-					<div className="absolute inset-0 opacity-10 bg-[linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-[size:46px_46px]" />
+					<div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-[1] bg-[length:100%_2px,3px_100%] opacity-10" />
+					<div
+						className="absolute inset-0 opacity-20"
+						style={{
+							backgroundImage: `
+								linear-gradient(to right, #111 1px, transparent 1px),
+								linear-gradient(to bottom, #111 1px, transparent 1px)
+							`,
+							backgroundSize: '40px 40px',
+						}}
+					/>
 				</div>
 
 				{/* Top bar */}
@@ -166,14 +170,14 @@ export function MainLayout() {
 					initial={{ y: -30, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
 					transition={{ duration: 0.4, ease: 'easeOut' }}
-					className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/80 backdrop-blur-md z-20 relative border-border justify-between shadow-sm"
+					className="h-8 border-b border-[#333] flex items-center px-4 text-xs select-none bg-[#0a0a0a] z-20 relative justify-between"
 				>
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-4">
 						{isMobile && (
 							<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 								<SheetTrigger asChild>
 									<button
-										className="p-1.5 hover:bg-muted rounded transition-colors"
+										className="p-1 hover:bg-[#111] hover:text-[#00ff41] transition-colors"
 										aria-label="Toggle explorer"
 									>
 										<Menu className="w-4 h-4" />
@@ -181,9 +185,9 @@ export function MainLayout() {
 								</SheetTrigger>
 								<SheetContent
 									side="left"
-									className="w-[250px] p-0 bg-sidebar border-r border-border"
+									className="w-[250px] p-0 bg-[#0a0a0a] border-r border-[#333]"
 								>
-									<div className="p-2 text-xs font-bold border-b border-border bg-muted/50 uppercase tracking-[0.3em] text-muted-foreground">
+									<div className="p-2 text-xs font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#00ff41]">
 										Explorer
 									</div>
 									<ScrollArea className="h-full">
@@ -197,91 +201,73 @@ export function MainLayout() {
 								</SheetContent>
 							</Sheet>
 						)}
-						<span className="font-bold tracking-[0.4em] text-sm flex items-center gap-2 text-foreground">
+						<span className="font-bold tracking-[0.2em] text-sm flex items-center gap-2 text-[#00ff41]">
 							ANURAGOS
-							<Sparkles className="w-3.5 h-3.5 text-primary animate-pulse" />
+							<span className="text-[10px] opacity-50">KERNEL v2.0</span>
 						</span>
 					</div>
 
 					{!isMobile && (
-						<span className="flex-1 text-center text-muted-foreground tracking-[0.35em] opacity-50">
-							SYSTEM READY
-						</span>
+						<div className="flex items-center gap-8 opacity-50 text-[10px] tracking-widest">
+							<span className="flex items-center gap-1">
+								<Cpu className="w-3 h-3" /> SYSTEM OPTIMAL
+							</span>
+							<span className="flex items-center gap-1">
+								<Activity className="w-3 h-3" /> NETWORK SECURE
+							</span>
+						</div>
 					)}
 
 					<div className="flex items-center gap-3">
-						{/* Theme Toggle */}
-						<ThemeToggle />
-
-						{/* Status */}
-						<div className="flex gap-2 items-center pr-2 border-r border-border hidden sm:flex">
-							<div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
-							<span className="text-[10px] text-muted-foreground uppercase tracking-[0.4em]">
-								ONLINE
-							</span>
-						</div>
-
 						{/* Sidebar controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/50 border border-border backdrop-blur-sm">
+						<div className="flex items-center gap-1 pl-2 pr-1 border-l border-[#333]">
 							{sidebarCollapsed ? (
 								<button
-									className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-									title="Show sidebar"
-									aria-label="Show sidebar"
+									className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 									onClick={showSidebar}
 								>
-									<PanelLeftOpen className="w-4 h-4" />
+									<PanelLeftOpen className="w-3 h-3" />
 								</button>
 							) : (
 								<>
 									<button
-										className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-										title="Cut sidebar"
-										aria-label="Cut sidebar"
+										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 										onClick={cutSidebar}
 									>
-										<PanelLeftClose className="w-4 h-4" />
+										<PanelLeftClose className="w-3 h-3" />
 									</button>
 									<button
-										className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-										title="Hide sidebar"
-										aria-label="Hide sidebar"
+										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 										onClick={hideSidebar}
 									>
-										<EyeOff className="w-4 h-4" />
+										<EyeOff className="w-3 h-3" />
 									</button>
 								</>
 							)}
 						</div>
 
 						{/* Terminal controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/50 border border-border backdrop-blur-sm">
+						<div className="flex items-center gap-1 pl-2 pr-1 border-l border-[#333]">
 							{terminalCollapsed ? (
 								<button
-									className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-									title="Show terminal"
-									aria-label="Show terminal"
+									className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 									onClick={showTerminal}
 								>
-									<TerminalIcon className="w-4 h-4" />
+									<TerminalIcon className="w-3 h-3" />
 								</button>
 							) : (
 								<>
 									<button
-										className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-										title="Cut terminal"
-										aria-label="Cut terminal"
+										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 										onClick={cutTerminal}
 									>
-										<ChevronDown className="w-4 h-4" />
+										<ChevronDown className="w-3 h-3" />
 									</button>
 									<button
-										className="p-1 hover:bg-background rounded text-muted-foreground hover:text-foreground transition-colors"
-										title="Hide terminal"
-										aria-label="Hide terminal"
+										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
 										onClick={hideTerminal}
 									>
-										<Eye className="w-4 h-4 rotate-180" />
+										<Eye className="w-3 h-3 rotate-180" />
 									</button>
 								</>
 							)}
@@ -312,7 +298,7 @@ export function MainLayout() {
 										maxSize={30}
 										collapsible
 										collapsedSize={3}
-										className="flex flex-col border-r border-border bg-sidebar/95 backdrop-blur-md relative transition-colors duration-300"
+										className="flex flex-col border-r border-[#333] bg-[#0a0a0a] relative transition-colors duration-300"
 									>
 										<ResizablePanelGroup
 											direction="vertical"
@@ -323,10 +309,10 @@ export function MainLayout() {
 												minSize={12}
 												collapsible
 												collapsedSize={8}
-												className="border-b border-border"
+												className="border-b border-[#333]"
 											>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/30 uppercase tracking-[0.25em] text-muted-foreground">
+													<div className="p-2 text-[10px] font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#666]">
 														Open Editors
 													</div>
 													<ScrollArea className="flex-1">
@@ -355,11 +341,11 @@ export function MainLayout() {
 																		}}
 																		key={win.id}
 																		className={cn(
-																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item relative transition-colors',
-																			'hover:bg-muted/50',
+																			'flex items-center justify-between px-3 py-1.5 text-xs cursor-pointer group/item relative transition-colors border-l-2 border-transparent',
+																			'hover:bg-[#111]',
 																			activeWindowId ===
 																				win.id &&
-																				'bg-muted text-primary font-medium border-l-2 border-primary pl-[10px]',
+																				'bg-[#111] text-[#00ff41] border-[#00ff41]',
 																		)}
 																		onClick={() =>
 																			setActiveWindowId(
@@ -368,7 +354,7 @@ export function MainLayout() {
 																		}
 																	>
 																		<div className="flex items-center gap-2 overflow-hidden">
-																			<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																			<span className="truncate group-hover/item:text-[#ccc] transition-colors">
 																				{win.title}
 																			</span>
 																		</div>
@@ -398,17 +384,17 @@ export function MainLayout() {
 																					);
 																				}
 																			}}
-																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-background/50 rounded transition-opacity"
+																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-[#222] hover:text-red-500 transition-all"
 																			aria-label={`Close ${win.title}`}
 																		>
-																			<X className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+																			<X className="w-3 h-3" />
 																		</button>
 																	</motion.div>
 																))}
 															</AnimatePresence>
 															{windows.length === 0 && (
-																<div className="p-4 text-xs text-muted-foreground text-center italic opacity-50">
-																	No open editors
+																<div className="p-4 text-xs text-[#444] text-center italic">
+																	[NO ACTIVE PROCESSES]
 																</div>
 															)}
 														</motion.div>
@@ -416,12 +402,12 @@ export function MainLayout() {
 												</div>
 											</ResizablePanel>
 
-											<ResizableHandle className="bg-border hover:bg-primary/50 transition-colors w-[1px]" />
+											<ResizableHandle className="bg-[#333] hover:bg-[#00ff41] transition-colors w-[1px]" />
 
 											<ResizablePanel defaultSize={62} minSize={26}>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/30 uppercase tracking-[0.25em] text-muted-foreground">
-														Explorer
+													<div className="p-2 text-[10px] font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#666]">
+														File System
 													</div>
 													<ScrollArea className="flex-1">
 														<div className="p-2">
@@ -438,15 +424,14 @@ export function MainLayout() {
 
 									<ResizableHandle
 										withHandle
-										className="bg-border hover:bg-primary/50 transition-colors w-[1px]"
+										className="bg-[#333] hover:bg-[#00ff41] transition-colors w-[1px]"
 									/>
 
 									<ResizablePanel
 										defaultSize={horizontalSizes[1]}
 										minSize={35}
-										className="relative overflow-hidden bg-background"
+										className="relative overflow-hidden bg-[#050505]"
 									>
-										<div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(circle_at_top,_var(--primary),transparent_60%)]" />
 										<div className="relative z-10 h-full flex flex-col">
 											<EditorArea />
 										</div>
@@ -456,7 +441,7 @@ export function MainLayout() {
 
 							<ResizableHandle
 								withHandle
-								className="bg-border hover:bg-primary/50 transition-colors h-[1px]"
+								className="bg-[#333] hover:bg-[#00ff41] transition-colors h-[1px]"
 							/>
 
 							{/* Bottom terminal */}
@@ -467,16 +452,16 @@ export function MainLayout() {
 								maxSize={45}
 								collapsible
 								collapsedSize={4}
-								className="border-t border-border bg-background/95 backdrop-blur-xl relative"
+								className="border-t border-[#333] bg-[#0a0a0a] relative"
 							>
 								<div className="h-full flex flex-col">
-									<div className="p-3 border-b border-border text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between bg-muted/20">
+									<div className="p-2 border-b border-[#333] text-[10px] uppercase tracking-[0.2em] text-[#666] flex items-center justify-between bg-[#111]">
 										<span className="flex items-center gap-2">
-											Terminal
-											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_2px_rgba(16,185,129,0.4)]" />
+											TERMINAL
+											<span className="w-1.5 h-1.5 bg-[#00ff41] animate-pulse" />
 										</span>
-										<span className="text-[9px] text-primary opacity-70">
-											ƒ-motion
+										<span className="text-[9px] text-[#00ff41] opacity-70">
+											BASH
 										</span>
 									</div>
 									<div className="flex-1 overflow-hidden">
@@ -486,7 +471,7 @@ export function MainLayout() {
 							</ResizablePanel>
 						</ResizablePanelGroup>
 					) : (
-						<div className="flex-1 flex flex-col bg-background w-full">
+						<div className="flex-1 flex flex-col bg-[#050505] w-full">
 							<CLI />
 						</div>
 					)}
