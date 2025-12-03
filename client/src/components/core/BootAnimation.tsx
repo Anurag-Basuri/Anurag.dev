@@ -19,8 +19,7 @@ function MatrixRain() {
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
-		const chars =
-			'01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+		const chars = '01अआइईउऊएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसहक्षज्ञ';
 		const fontSize = 14;
 		const columns = canvas.width / fontSize;
 		const drops: number[] = [];
@@ -314,8 +313,8 @@ export function BootAnimation() {
 			{/* Hex Grid */}
 			<HexGrid opacity={hexOpacity} />
 
-			{/* Network Nodes */}
-			<NetworkNodes phase={phase} />
+			{/* Network Nodes - Removed for cleaner look */}
+			{/* <NetworkNodes phase={phase} /> */}
 
 			{/* Particle Burst */}
 			<ParticleBurst active={showBurst} />
