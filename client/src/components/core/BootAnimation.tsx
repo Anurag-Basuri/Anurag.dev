@@ -312,33 +312,33 @@ export function BootAnimation() {
 
 			{/* Content (clean, centered, responsive) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-				<div className="w-full max-w-5xl px-4 sm:px-6 md:px-8">
+				<div className="w-full max-w-[72rem] px-3 sm:px-5 md:px-8">
 					{/* Consistent vertical rhythm; tighter on mobile */}
-					<div className="py-8 sm:py-12 md:py-16 space-y-6 sm:space-y-8 md:space-y-10">
+					<div className="py-6 sm:py-10 md:py-16 space-y-5 sm:space-y-7 md:space-y-10">
 						{/* Title */}
 						<div
 							className="text-center select-none"
 							style={{
 								transform: `perspective(600px) rotateX(${
-									Math.sin(phase * 0.5) * 2.2
+									Math.sin(phase * 0.5) * 2.0
 								}deg)`,
-								transition: 'transform 400ms ease-out',
+								transition: 'transform 350ms ease-out',
 							}}
 						>
 							<h1
-								className="font-extrabold tracking-[0.14em] md:tracking-[0.18em]"
+								className="font-extrabold tracking-[0.12em] md:tracking-[0.18em]"
 								style={{
-									fontSize: 'clamp(2rem, 4vw + 1rem, 4.5rem)',
+									fontSize: 'clamp(1.8rem, 4.2vw + 0.5rem, 4.5rem)',
 									color: '#00ff41',
-									textShadow: '0 0 6px rgba(0,255,65,.22)',
-									lineHeight: 1.1,
+									textShadow: '0 0 6px rgba(0,255,65,.2)',
+									lineHeight: 1.08,
 								}}
 							>
 								ANURAG BASURI
 							</h1>
 							<p
-								className="mt-3 sm:mt-4 text-[#bdfccf]/85"
-								style={{ fontSize: 'clamp(0.85rem, 1.2vw + 0.35rem, 1.1rem)' }}
+								className="mt-2 sm:mt-3 text-[#bdfccf]/85"
+								style={{ fontSize: 'clamp(0.85rem, 1.1vw + 0.35rem, 1.1rem)' }}
 							>
 								Building at the intersection of full‑stack engineering and machine
 								intelligence.
@@ -350,15 +350,15 @@ export function BootAnimation() {
 							<div
 								className="inline-flex items-center gap-2 uppercase tracking-wider"
 								style={{
-									fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 1rem)',
+									fontSize: 'clamp(0.75rem, 0.9vw + 0.25rem, 1rem)',
 									textShadow: '0 0 6px #00ff4128',
 								}}
 								aria-live="polite"
 							>
-								<span className="inline-block w-2 h-2 rounded-full bg-[#00ff41]" />
+								<span className="inline-block w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#00ff41]" />
 								{status}
 							</div>
-							<div className="mx-auto mt-2 h-px w-40 sm:w-56 md:w-64 bg-[#00ff41]/35" />
+							<div className="mx-auto mt-2 h-px w-36 sm:w-56 md:w-64 bg-[#00ff41]/35" />
 						</div>
 
 						{/* Progress (thin neon track) */}
@@ -379,7 +379,7 @@ export function BootAnimation() {
 
 							<div
 								className="text-center font-mono tabular-nums opacity-80"
-								style={{ fontSize: 'clamp(0.7rem, 0.9vw + 0.25rem, 0.95rem)' }}
+								style={{ fontSize: 'clamp(0.7rem, 0.85vw + 0.25rem, 0.95rem)' }}
 							>
 								<span className="text-[#00ff41]">[</span>
 								{progress.toString().padStart(3, '0')}%
@@ -391,12 +391,12 @@ export function BootAnimation() {
 
 						{/* Phases (clean dots, evenly spaced, centered labels) */}
 						<div className="mx-auto w-full max-w-xl">
-							<div className="flex flex-wrap justify-center gap-5 sm:gap-7 md:gap-9">
+							<div className="flex flex-wrap justify-center gap-4 xs:gap-5 sm:gap-7 md:gap-9">
 								{['HELLO', 'FULL‑STACK UX', 'AI/ML + LLMs', 'REAL IMPACT'].map(
 									(label, idx) => (
 										<div key={label} className="flex flex-col items-center">
 											<div
-												className={`w-3.5 h-3.5 rounded-full transition-transform duration-300 ${
+												className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-transform duration-300 ${
 													phase >= idx
 														? 'bg-[#00ff41]'
 														: 'bg-[#00ff41]/30'
@@ -421,12 +421,12 @@ export function BootAnimation() {
 							className="mx-auto w-full max-w-3xl px-2 sm:px-0"
 							style={{ fontSize: 'clamp(0.8rem, 1vw + 0.25rem, 1rem)' }}
 						>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 text-center text-[#bdfccf]/85">
-								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[32ch]">
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 sm:gap-x-10 gap-y-2 sm:gap-y-3 text-center text-[#bdfccf]/85">
+								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
 									<div>Clean, scalable UX with Next.js & MERN</div>
 									<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
 								</div>
-								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[32ch]">
+								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
 									<div>LeetCode 450+ • consistency that compounds</div>
 									<div>Exploring internships & freelancing • real impact</div>
 								</div>
@@ -439,7 +439,7 @@ export function BootAnimation() {
 				<div className="pointer-events-auto">
 					<button
 						onClick={handleSkip}
-						className="absolute bottom-6 right-6 md:bottom-8 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm"
+						className="absolute bottom-5 sm:bottom-6 md:bottom-8 right-5 sm:right-6 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm"
 						aria-label="Skip boot animation"
 					>
 						SKIP BOOT <span className="ml-1">›</span>
