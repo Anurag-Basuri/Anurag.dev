@@ -380,44 +380,48 @@ export function BootAnimation() {
 							</div>
 						</div>
 
-						{/* Phase timeline (compact, evenly spaced) */}
+						{/* Phases (clean dots, no progress line) */}
 						<div className="mx-auto w-full max-w-xl">
-							<div className="relative h-0.5 bg-[#00ff41]/22">
-								<div
-									className="absolute left-0 top-0 h-0.5 bg-[#00ff41] shadow-[0_0_6px_#00ff41] transition-[width] duration-400 ease-out"
-									style={{ width: `${(phase + 1) * 25}%` }}
-								/>
-							</div>
-							<div
-								className="mt-3 grid grid-cols-4 items-center"
-								style={{ fontSize: 'clamp(0.65rem, 0.8vw + 0.25rem, 0.85rem)' }}
-							>
-								{['HELLO', 'UX', 'AI', 'IMPACT'].map((label, idx) => (
-									<div key={label} className="flex flex-col items-center gap-1">
+							<div className="flex justify-center gap-6 sm:gap-8 md:gap-10">
+								{['HELLO', 'FULL‑STACK UX', 'AI/ML + LLMs', 'REAL IMPACT'].map(
+									(label, idx) => (
 										<div
-											className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-												phase >= idx ? 'bg-[#00ff41]' : 'bg-[#00ff41]/25'
-											}`}
-											aria-label={`Phase ${idx + 1}: ${label}`}
-										/>
-										<span className="opacity-75">{label}</span>
-									</div>
-								))}
+											key={label}
+											className="flex flex-col items-center gap-2"
+										>
+											<div
+												className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${
+													phase >= idx
+														? 'bg-[#00ff41] shadow-[0_0_10px_#00ff41]'
+														: 'bg-[#00ff41]/30'
+												}`}
+												aria-label={`Phase ${idx + 1}: ${label}`}
+												style={{
+													transform:
+														phase === idx ? 'scale(1.15)' : 'scale(1)',
+												}}
+											/>
+											<span className="text-[10px] sm:text-xs opacity-80 text-center">
+												{label}
+											</span>
+										</div>
+									),
+								)}
 							</div>
 						</div>
 
-						{/* Bio lines (fluid, balanced columns) */}
+						{/* Bio lines (centered, balanced, responsive) */}
 						<div
-							className="grid sm:grid-cols-2 gap-x-6 gap-y-2 text-[#bdfccf]/85"
+							className="grid sm:grid-cols-2 gap-x-8 gap-y-3 justify-items-center text-center text-[#bdfccf]/85"
 							style={{ fontSize: 'clamp(0.75rem, 1vw + 0.25rem, 0.95rem)' }}
 						>
-							<div className="space-y-1">
+							<div className="space-y-1 leading-relaxed max-w-[28ch] sm:max-w-[30ch]">
 								<div>Clean, scalable UX with Next.js & MERN</div>
 								<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
 							</div>
-							<div className="space-y-1">
+							<div className="space-y-1 leading-relaxed max-w-[28ch] sm:max-w-[30ch]">
 								<div>LeetCode 450+ • consistency that compounds</div>
-								<div>Real impact over just code</div>
+								<div>Exploring internships & freelancing • real impact</div>
 							</div>
 						</div>
 					</div>
