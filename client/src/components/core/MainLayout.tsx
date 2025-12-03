@@ -22,17 +22,14 @@ import {
 	Eye,
 	ChevronDown,
 	Sparkles,
-	Cpu,
-	Activity,
 } from 'lucide-react';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Taskbar } from '@/components/core/Taskbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 
-// Persistent size helper (simple localStorage)
+// Persistent size helper (no change to API)
 function usePersistentSizes(key: string, initial: number[]) {
 	const [sizes, setSizes] = useState<number[]>(() => {
 		try {
@@ -72,7 +69,6 @@ export function MainLayout() {
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const [terminalCollapsed, setTerminalCollapsed] = useState(false);
 
-	// Persistent layout (vertical: main/terminal), (horizontal: sidebar/editor)
 	const { sizes: verticalSizes, onLayout: onVerticalLayout } = usePersistentSizes(
 		'layout:v',
 		[75, 25],
@@ -106,7 +102,7 @@ export function MainLayout() {
 		}
 	};
 
-	// Sidebar controls
+	// Controls (unchanged behavior)
 	const cutSidebar = () => {
 		sidebarRef.current?.collapse();
 		setSidebarCollapsed(true);
@@ -119,8 +115,6 @@ export function MainLayout() {
 		sidebarRef.current?.expand();
 		setSidebarCollapsed(false);
 	};
-
-	// Terminal controls
 	const cutTerminal = () => {
 		terminalRef.current?.collapse();
 		setTerminalCollapsed(true);
@@ -140,44 +134,33 @@ export function MainLayout() {
 				position="bottom-right"
 				toastOptions={{
 					style: {
-						background: '#111',
-						color: '#ccc',
-						fontSize: '12px',
-						borderRadius: '0px',
-						border: '1px solid #333',
-						fontFamily: 'monospace',
+						background: 'var(--popover)',
+						color: 'var(--popover-foreground)',
+						border: '1px solid var(--border)',
+						backdropFilter: 'blur(10px)',
 					},
 				}}
 			/>
-			<div className="h-full w-full bg-[#050505] text-[#ccc] font-mono overflow-hidden flex flex-col relative transition-colors duration-300">
-				{/* Background layers - Pure CSS Grid */}
+			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+				{/* Background polish, respects themes */}
 				<div className="absolute inset-0 z-0 pointer-events-none">
-					<div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] z-1 bg-size-[100%_2px,3px_100%] opacity-10" />
-					<div
-						className="absolute inset-0 opacity-20"
-						style={{
-							backgroundImage: `
-								linear-gradient(to right, #111 1px, transparent 1px),
-								linear-gradient(to bottom, #111 1px, transparent 1px)
-							`,
-							backgroundSize: '40px 40px',
-						}}
-					/>
+					<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_color-mix(in_oklch,var(--ring)_18%,transparent),transparent_55%)] opacity-25" />
+					<div className="absolute inset-0 opacity-15 bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_10%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_10%,transparent)_1px,transparent_1px)] bg-[size:46px_46px]" />
 				</div>
 
 				{/* Top bar */}
 				<motion.div
-					initial={{ y: -30, opacity: 0 }}
+					initial={{ y: -28, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
-					transition={{ duration: 0.4, ease: 'easeOut' }}
-					className="h-8 border-b border-[#333] flex items-center px-4 text-xs select-none bg-[#0a0a0a] z-20 relative justify-between"
+					transition={{ duration: 0.35, ease: 'easeOut' }}
+					className="h-10 border-b flex items-center px-4 text-xs select-none bg-background/70 backdrop-blur-md z-20 relative border-border justify-between shadow-[0_5px_22px_-4px_rgba(0,0,0,0.45)]"
 				>
-					<div className="flex items-center gap-4">
+					<div className="flex items-center gap-3">
 						{isMobile && (
 							<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 								<SheetTrigger asChild>
 									<button
-										className="p-1 hover:bg-[#111] hover:text-[#00ff41] transition-colors"
+										className="p-1.5 hover:bg-muted/40 rounded transition-colors"
 										aria-label="Toggle explorer"
 									>
 										<Menu className="w-4 h-4" />
@@ -185,9 +168,9 @@ export function MainLayout() {
 								</SheetTrigger>
 								<SheetContent
 									side="left"
-									className="w-[250px] p-0 bg-[#0a0a0a] border-r border-[#333]"
+									className="w-[260px] p-0 bg-background/95 backdrop-blur-md border-r border-border"
 								>
-									<div className="p-2 text-xs font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#00ff41]">
+									<div className="p-2 text-xs font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.28em] text-muted-foreground">
 										Explorer
 									</div>
 									<ScrollArea className="h-full">
@@ -201,73 +184,91 @@ export function MainLayout() {
 								</SheetContent>
 							</Sheet>
 						)}
-						<span className="font-bold tracking-[0.2em] text-sm flex items-center gap-2 text-[#00ff41]">
+						<span className="font-bold tracking-[0.35em] text-sm flex items-center gap-2">
 							ANURAGOS
-							<span className="text-[10px] opacity-50">KERNEL v2.0</span>
+							<Sparkles className="w-3.5 h-3.5 text-primary/80" />
 						</span>
 					</div>
 
 					{!isMobile && (
-						<div className="flex items-center gap-8 opacity-50 text-[10px] tracking-widest">
-							<span className="flex items-center gap-1">
-								<Cpu className="w-3 h-3" /> SYSTEM OPTIMAL
-							</span>
-							<span className="flex items-center gap-1">
-								<Activity className="w-3 h-3" /> NETWORK SECURE
-							</span>
-						</div>
+						<span className="flex-1 text-center text-muted-foreground tracking-[0.35em]">
+							SYSTEM READY
+						</span>
 					)}
 
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2">
+						{/* Status */}
+						<div className="flex gap-2 items-center pr-2 border-r border-border">
+							<span
+								aria-hidden
+								className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_2px_rgba(34,197,94,0.5)]"
+							/>
+							<span className="text-[10px] text-muted-foreground uppercase tracking-[0.4em]">
+								ONLINE
+							</span>
+						</div>
+
 						{/* Sidebar controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 border-l border-[#333]">
+						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
 							{sidebarCollapsed ? (
 								<button
-									className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+									className="p-1 hover:bg-muted/60 rounded"
+									title="Show sidebar"
+									aria-label="Show sidebar"
 									onClick={showSidebar}
 								>
-									<PanelLeftOpen className="w-3 h-3" />
+									<PanelLeftOpen className="w-4 h-4" />
 								</button>
 							) : (
 								<>
 									<button
-										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+										className="p-1 hover:bg-muted/60 rounded"
+										title="Cut sidebar"
+										aria-label="Cut sidebar"
 										onClick={cutSidebar}
 									>
-										<PanelLeftClose className="w-3 h-3" />
+										<PanelLeftClose className="w-4 h-4" />
 									</button>
 									<button
-										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+										className="p-1 hover:bg-muted/60 rounded"
+										title="Hide sidebar"
+										aria-label="Hide sidebar"
 										onClick={hideSidebar}
 									>
-										<EyeOff className="w-3 h-3" />
+										<EyeOff className="w-4 h-4" />
 									</button>
 								</>
 							)}
 						</div>
 
 						{/* Terminal controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 border-l border-[#333]">
+						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
 							{terminalCollapsed ? (
 								<button
-									className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+									className="p-1 hover:bg-muted/60 rounded"
+									title="Show terminal"
+									aria-label="Show terminal"
 									onClick={showTerminal}
 								>
-									<TerminalIcon className="w-3 h-3" />
+									<TerminalIcon className="w-4 h-4" />
 								</button>
 							) : (
 								<>
 									<button
-										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+										className="p-1 hover:bg-muted/60 rounded"
+										title="Cut terminal"
+										aria-label="Cut terminal"
 										onClick={cutTerminal}
 									>
-										<ChevronDown className="w-3 h-3" />
+										<ChevronDown className="w-4 h-4" />
 									</button>
 									<button
-										className="p-1 hover:bg-[#111] text-[#666] hover:text-[#00ff41] transition-colors"
+										className="p-1 hover:bg-muted/60 rounded"
+										title="Hide terminal"
+										aria-label="Hide terminal"
 										onClick={hideTerminal}
 									>
-										<Eye className="w-3 h-3 rotate-180" />
+										<Eye className="w-4 h-4 rotate-180" />
 									</button>
 								</>
 							)}
@@ -298,7 +299,7 @@ export function MainLayout() {
 										maxSize={30}
 										collapsible
 										collapsedSize={3}
-										className="flex flex-col border-r border-[#333] bg-[#0a0a0a] relative transition-colors duration-300"
+										className="flex flex-col border-r border-border bg-background/60 backdrop-blur-md"
 									>
 										<ResizablePanelGroup
 											direction="vertical"
@@ -309,10 +310,10 @@ export function MainLayout() {
 												minSize={12}
 												collapsible
 												collapsedSize={8}
-												className="border-b border-[#333]"
+												className="border-b border-border"
 											>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[10px] font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#666]">
+													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.25em] text-muted-foreground">
 														Open Editors
 													</div>
 													<ScrollArea className="flex-1">
@@ -326,7 +327,7 @@ export function MainLayout() {
 																		layout
 																		initial={{
 																			opacity: 0,
-																			x: -18,
+																			x: -16,
 																		}}
 																		animate={{
 																			opacity: 1,
@@ -334,18 +335,18 @@ export function MainLayout() {
 																		}}
 																		exit={{
 																			opacity: 0,
-																			x: -18,
+																			x: -16,
 																		}}
 																		transition={{
-																			duration: 0.18,
+																			duration: 0.16,
 																		}}
 																		key={win.id}
 																		className={cn(
-																			'flex items-center justify-between px-3 py-1.5 text-xs cursor-pointer group/item relative transition-colors border-l-2 border-transparent',
-																			'hover:bg-[#111]',
+																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
+																			'hover:bg-muted/40',
 																			activeWindowId ===
 																				win.id &&
-																				'bg-[#111] text-[#00ff41] border-[#00ff41]',
+																				'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
 																		)}
 																		onClick={() =>
 																			setActiveWindowId(
@@ -353,11 +354,9 @@ export function MainLayout() {
 																			)
 																		}
 																	>
-																		<div className="flex items-center gap-2 overflow-hidden">
-																			<span className="truncate group-hover/item:text-[#ccc] transition-colors">
-																				{win.title}
-																			</span>
-																		</div>
+																		<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																			{win.title}
+																		</span>
 																		<button
 																			onClick={e => {
 																				e.stopPropagation();
@@ -370,31 +369,26 @@ export function MainLayout() {
 																				setWindows(
 																					newWindows,
 																				);
-																				if (
-																					activeWindowId ===
-																					win.id
-																				) {
-																					setActiveWindowId(
-																						newWindows.length
-																							? newWindows[
-																									newWindows.length -
-																										1
-																							  ].id
-																							: null,
-																					);
-																				}
+																				setActiveWindowId(
+																					newWindows.length
+																						? newWindows[
+																								newWindows.length -
+																									1
+																						  ].id
+																						: null,
+																				);
 																			}}
-																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-[#222] hover:text-red-500 transition-all"
+																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
 																			aria-label={`Close ${win.title}`}
 																		>
-																			<X className="w-3 h-3" />
+																			<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
 																		</button>
 																	</motion.div>
 																))}
 															</AnimatePresence>
 															{windows.length === 0 && (
-																<div className="p-4 text-xs text-[#444] text-center italic">
-																	[NO ACTIVE PROCESSES]
+																<div className="p-4 text-xs text-muted-foreground text-center italic">
+																	No open editors
 																</div>
 															)}
 														</motion.div>
@@ -402,12 +396,12 @@ export function MainLayout() {
 												</div>
 											</ResizablePanel>
 
-											<ResizableHandle className="bg-[#333] hover:bg-[#00ff41] transition-colors w-px" />
+											<ResizableHandle className="bg-border/60 hover:bg-border transition-colors" />
 
 											<ResizablePanel defaultSize={62} minSize={26}>
 												<div className="h-full flex flex-col">
-													<div className="p-2 text-[10px] font-bold border-b border-[#333] bg-[#111] uppercase tracking-[0.2em] text-[#666]">
-														File System
+													<div className="p-2 text-[11px] font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.25em] text-muted-foreground">
+														Explorer
 													</div>
 													<ScrollArea className="flex-1">
 														<div className="p-2">
@@ -424,13 +418,13 @@ export function MainLayout() {
 
 									<ResizableHandle
 										withHandle
-										className="bg-[#333] hover:bg-[#00ff41] transition-colors w-px"
+										className="bg-border/60 hover:bg-border transition-colors"
 									/>
 
 									<ResizablePanel
 										defaultSize={horizontalSizes[1]}
 										minSize={35}
-										className="relative overflow-hidden bg-[#050505]"
+										className="relative overflow-hidden bg-gradient-to-br from-background/70 via-background/80 to-background/70"
 									>
 										<div className="relative z-10 h-full flex flex-col">
 											<EditorArea />
@@ -441,7 +435,7 @@ export function MainLayout() {
 
 							<ResizableHandle
 								withHandle
-								className="bg-[#333] hover:bg-[#00ff41] transition-colors h-px"
+								className="bg-border/60 hover:bg-border transition-colors"
 							/>
 
 							{/* Bottom terminal */}
@@ -452,16 +446,13 @@ export function MainLayout() {
 								maxSize={45}
 								collapsible
 								collapsedSize={4}
-								className="border-t border-[#333] bg-[#0a0a0a] relative"
+								className="border-t border-border bg-background/85 backdrop-blur-xl"
 							>
 								<div className="h-full flex flex-col">
-									<div className="p-2 border-b border-[#333] text-[10px] uppercase tracking-[0.2em] text-[#666] flex items-center justify-between bg-[#111]">
+									<div className="p-3 border-b border-border text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between">
 										<span className="flex items-center gap-2">
-											TERMINAL
-											<span className="w-1.5 h-1.5 bg-[#00ff41] animate-pulse" />
-										</span>
-										<span className="text-[9px] text-[#00ff41] opacity-70">
-											BASH
+											Terminal{' '}
+											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
 										</span>
 									</div>
 									<div className="flex-1 overflow-hidden">
@@ -471,7 +462,7 @@ export function MainLayout() {
 							</ResizablePanel>
 						</ResizablePanelGroup>
 					) : (
-						<div className="flex-1 flex flex-col bg-[#050505] w-full">
+						<div className="flex-1 flex flex-col bg-muted/40 backdrop-blur-sm w-full">
 							<CLI />
 						</div>
 					)}
