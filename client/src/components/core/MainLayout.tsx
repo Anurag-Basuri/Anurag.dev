@@ -23,7 +23,6 @@ import {
 	EyeOff,
 	Eye,
 	ChevronDown,
-	Sparkles,
 } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -193,7 +192,6 @@ export function MainLayout() {
 						)}
 						<span className="font-bold tracking-[0.35em] text-sm flex items-center gap-2">
 							ANURAGOS
-							<Sparkles className="w-3.5 h-3.5 text-primary/80" />
 						</span>
 					</div>
 
