@@ -303,12 +303,20 @@ export function MainLayout() {
 
 				{/* Main area */}
 				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth">
-					{!isMobile ? (
+					{!isMobile && !isLayoutReady ? (
+						/* Loading skeleton during SSR/hydration */
+						<div className="h-full w-full flex animate-pulse">
+							<div className="w-[20%] bg-muted/30 border-r border-border/30" />
+							<div className="flex-1 flex flex-col">
+								<div className="flex-1 bg-muted/20" />
+								<div className="h-[25%] bg-muted/30 border-t border-border/30" />
+							</div>
+						</div>
+					) : !isMobile && isLayoutReady ? (
 						<ResizablePanelGroup
 							direction="horizontal"
 							className="h-full w-full"
 							onLayout={onHorizontalLayout}
-							id="layout-main"
 						>
 							{/* Sidebar (Left) */}
 							<ResizablePanel
@@ -437,7 +445,6 @@ export function MainLayout() {
 									direction="vertical"
 									className="h-full w-full"
 									onLayout={onVerticalLayout}
-									id="layout-content"
 								>
 									{/* Editor Area */}
 									<ResizablePanel

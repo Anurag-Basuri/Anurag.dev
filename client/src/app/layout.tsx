@@ -49,7 +49,10 @@ export default function RootLayout({
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
 				/>
 			</head>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+			<body
+				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				suppressHydrationWarning
+			>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
