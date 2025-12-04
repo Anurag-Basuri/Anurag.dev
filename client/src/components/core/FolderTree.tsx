@@ -43,6 +43,14 @@ function FolderTreeItem({
 	const isFolder = item.type === 'folder';
 	const [isOpen, setIsOpen] = useState(isFolder && level < 1);
 
+	React.useEffect(() => {
+		const handleCollapse = () => {
+			if (isFolder) setIsOpen(false);
+		};
+		window.addEventListener('collapse-all-folders', handleCollapse);
+		return () => window.removeEventListener('collapse-all-folders', handleCollapse);
+	}, [isFolder]);
+
 	const handleToggle = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		if (isFolder) {

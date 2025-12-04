@@ -108,10 +108,10 @@ export function ProjectsModule() {
 						>
 							<div className="glass-panel rounded-xl overflow-hidden border border-white/10 hover:border-cyan-500/40 transition-all duration-300 hover:shadow-[0_0_30px_-5px_rgba(6,182,212,0.3)]">
 								{/* Gradient Overlay on Hover */}
-								<div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:via-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none z-10" />
+								<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/5 group-hover:via-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none z-10" />
 
 								{/* Project Thumbnail */}
-								<div className="relative h-48 bg-gradient-to-br from-cyan-500/10 via-blue-500/15 to-purple-500/10 overflow-hidden">
+								<div className="relative h-48 bg-linear-to-br from-cyan-500/10 via-blue-500/15 to-purple-500/10 overflow-hidden">
 									<img
 										src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
 											project.title,
@@ -119,7 +119,7 @@ export function ProjectsModule() {
 										alt={project.title}
 										className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-110 transition-all duration-500"
 									/>
-									<div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+									<div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
 
 									{/* Action Buttons */}
 									<div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
