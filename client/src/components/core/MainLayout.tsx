@@ -160,22 +160,26 @@ export function MainLayout() {
 			/>
 			<ConnectivityBanner />
 			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
-				{/* Enhanced Background with Premium Gradients */}
-				<div className="absolute inset-0 z-0 pointer-events-none">
-					{/* Radial gradient from top */}
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--primary)_0%,transparent_50%)] opacity-[0.15] dark:opacity-[0.12]" />
-					{/* Radial gradient from bottom right */}
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.08] dark:opacity-[0.10]" />
-					{/* Grid pattern */}
-					<div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_15%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_15%,transparent)_1px,transparent_1px)] bg-size-[48px_48px]" />
+				{/* Enhanced Background with Premium Layered Gradients */}
+				<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+					{/* Primary radial gradient - top center */}
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,var(--primary)_0%,transparent_60%)] opacity-[0.12] dark:opacity-[0.08]" />
+					{/* Secondary gradient - bottom right corner */}
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_100%_100%,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.06] dark:opacity-[0.08]" />
+					{/* Tertiary gradient - left side accent */}
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_30%_60%_at_0%_50%,var(--primary)_0%,transparent_40%)] opacity-[0.05] dark:opacity-[0.04]" />
+					{/* Subtle grid pattern - more refined */}
+					<div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px)] bg-size-[56px_56px]" />
+					{/* Noise texture overlay for depth */}
+					<div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==')]" />
 				</div>
 
-				{/* Premium Top Bar with Glassmorphism */}
+				{/* Premium Top Bar with Enhanced Glassmorphism */}
 				<motion.div
 					initial={{ y: -28, opacity: 0 }}
 					animate={{ y: 0, opacity: 1 }}
-					transition={{ duration: 0.35, ease: 'easeOut' }}
-					className="h-10 border-b flex items-center px-4 text-xs select-none bg-linear-to-r from-background/85 via-background/90 to-background/85 backdrop-blur-xl z-20 relative border-border/70 justify-between shadow-[0_8px_32px_-8px_rgba(0,0,0,0.3)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6)]"
+					transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+					className="h-11 border-b flex items-center px-4 text-xs select-none backdrop-blur-2xl z-20 relative justify-between bg-linear-to-r from-card/80 via-card/90 to-card/80 border-border/50 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08),inset_0_-1px_0_0_rgba(255,255,255,0.05)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4),inset_0_-1px_0_0_rgba(255,255,255,0.03)]"
 				>
 					<div className="flex items-center gap-3">
 						{isMobile && (
@@ -304,12 +308,43 @@ export function MainLayout() {
 				{/* Main area */}
 				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth">
 					{!isMobile && !isLayoutReady ? (
-						/* Loading skeleton during SSR/hydration */
-						<div className="h-full w-full flex animate-pulse">
-							<div className="w-[20%] bg-muted/30 border-r border-border/30" />
+						/* Premium loading skeleton during SSR/hydration */
+						<div className="h-full w-full flex">
+							{/* Sidebar skeleton */}
+							<div className="w-[20%] min-w-[200px] bg-linear-to-b from-muted/25 via-muted/15 to-muted/20 border-r border-border/30 flex flex-col">
+								<div className="p-4 border-b border-border/25">
+									<div className="flex items-center gap-3">
+										<div className="w-10 h-10 rounded-full bg-muted/40 animate-pulse" />
+										<div className="flex-1 space-y-2">
+											<div className="h-3 w-24 bg-muted/40 rounded animate-pulse" />
+											<div className="h-2 w-16 bg-muted/30 rounded animate-pulse" />
+										</div>
+									</div>
+								</div>
+								<div className="flex-1 p-3 space-y-2">
+									{[...Array(5)].map((_, i) => (
+										<div
+											key={i}
+											className="h-6 bg-muted/20 rounded animate-pulse"
+											style={{
+												width: `${60 + Math.random() * 30}%`,
+												animationDelay: `${i * 100}ms`,
+											}}
+										/>
+									))}
+								</div>
+							</div>
+							{/* Content skeleton */}
 							<div className="flex-1 flex flex-col">
-								<div className="flex-1 bg-muted/20" />
-								<div className="h-[25%] bg-muted/30 border-t border-border/30" />
+								<div className="flex-1 bg-linear-to-br from-muted/10 via-muted/5 to-muted/15 flex items-center justify-center">
+									<div className="w-12 h-12 rounded-lg bg-muted/30 animate-pulse" />
+								</div>
+								<div className="h-[25%] bg-linear-to-t from-muted/25 to-muted/15 border-t border-border/25 p-4">
+									<div className="space-y-2">
+										<div className="h-3 w-32 bg-muted/30 rounded animate-pulse" />
+										<div className="h-4 w-full bg-muted/20 rounded animate-pulse" />
+									</div>
+								</div>
 							</div>
 						</div>
 					) : !isMobile && isLayoutReady ? (
