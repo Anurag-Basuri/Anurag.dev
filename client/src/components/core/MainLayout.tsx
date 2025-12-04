@@ -24,26 +24,31 @@ import {
 	Eye,
 	ChevronDown,
 } from 'lucide-react';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
-// Persistent size helper (no change to API)
+// Persistent size helper - defers localStorage read to avoid SSR hydration mismatch
 function usePersistentSizes(key: string, initial: number[]) {
-	const [sizes, setSizes] = useState<number[]>(() => {
+	// Always start with initial values for SSR consistency
+	const [sizes, setSizes] = useState<number[]>(initial);
+	const [isHydrated, setIsHydrated] = useState(false);
+
+	// Read from localStorage only after hydration
+	useEffect(() => {
 		try {
 			const raw = localStorage.getItem(key);
 			if (raw) {
 				const parsed = JSON.parse(raw);
 				if (Array.isArray(parsed) && parsed.every(n => typeof n === 'number')) {
-					return parsed;
+					setSizes(parsed);
 				}
 			}
 		} catch {}
-		return initial;
-	});
+		setIsHydrated(true);
+	}, [key]);
 
 	const onLayout = useCallback(
 		(next: number[]) => {
@@ -55,7 +60,7 @@ function usePersistentSizes(key: string, initial: number[]) {
 		[key],
 	);
 
-	return { sizes, onLayout };
+	return { sizes, onLayout, isHydrated };
 }
 
 export function MainLayout() {
@@ -64,20 +69,31 @@ export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const [isExplorerOpen, setIsExplorerOpen] = useState(false);
 
+	// Track client-side mount to prevent hydration mismatch
+	const [isMounted, setIsMounted] = useState(false);
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
 	const terminalRef = useRef<ImperativePanelHandle>(null);
 
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const [terminalCollapsed, setTerminalCollapsed] = useState(false);
 
-	const { sizes: verticalSizes, onLayout: onVerticalLayout } = usePersistentSizes(
-		'layout:v',
-		[75, 25],
-	);
-	const { sizes: horizontalSizes, onLayout: onHorizontalLayout } = usePersistentSizes(
-		'layout:h',
-		[20, 80],
-	);
+	const {
+		sizes: verticalSizes,
+		onLayout: onVerticalLayout,
+		isHydrated: vHydrated,
+	} = usePersistentSizes('layout:v', [75, 25]);
+	const {
+		sizes: horizontalSizes,
+		onLayout: onHorizontalLayout,
+		isHydrated: hHydrated,
+	} = usePersistentSizes('layout:h', [20, 80]);
+
+	// Only render panels after client-side hydration is complete
+	const isLayoutReady = isMounted && vHydrated && hHydrated;
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
