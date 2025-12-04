@@ -28,6 +28,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
+import Background3D from '@/components/core/Background3D';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 // Persistent size helper - defers localStorage read to avoid SSR hydration mismatch
@@ -145,6 +146,8 @@ export function MainLayout() {
 		setTerminalCollapsed(false);
 	};
 
+	// ... existing imports
+
 	return (
 		<>
 			<Toaster
@@ -160,6 +163,9 @@ export function MainLayout() {
 			/>
 			<ConnectivityBanner />
 			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+				{/* 3D Background Layer */}
+				<Background3D />
+
 				{/* Enhanced Background with Premium Layered Gradients */}
 				<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 					{/* Primary radial gradient - top center */}
@@ -453,8 +459,20 @@ export function MainLayout() {
 
 									<ResizablePanel defaultSize={62} minSize={26}>
 										<div className="h-full flex flex-col">
-											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
-												Explorer
+											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
+												<span>Explorer</span>
+												<button
+													onClick={() => {
+														// Dispatch a custom event that FolderTree listens to
+														window.dispatchEvent(
+															new CustomEvent('collapse-all-folders'),
+														);
+													}}
+													className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
+													title="Collapse All"
+												>
+													<PanelLeftClose className="w-3 h-3" />
+												</button>
 											</div>
 											<ScrollArea className="flex-1">
 												<div className="p-2">
