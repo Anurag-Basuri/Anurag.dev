@@ -75,7 +75,7 @@ function SocialButton({
 	colorClass,
 }: {
 	href: string;
-	icon: React.ElementType;
+	icon: React.ElementType<{ className?: string }>;
 	label: string;
 	colorClass: string;
 }) {
