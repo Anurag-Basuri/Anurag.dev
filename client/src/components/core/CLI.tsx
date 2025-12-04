@@ -121,21 +121,29 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm p-4 overflow-hidden border-l border-border/50 shadow-inner transition-colors duration-300"
+			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm overflow-hidden transition-colors duration-300 relative"
 			onClick={handleContainerClick}
 		>
-			<div className="mb-4 select-none text-xs space-y-1 text-muted-foreground/80">
-				<p className="tracking-[0.3em] uppercase text-primary opacity-90 drop-shadow-[0_0_5px_rgba(var(--primary),0.5)]">
+			{/* Subtle terminal gradient overlay */}
+			<div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
+
+			{/* Terminal Header */}
+			<div className="px-4 pt-4 pb-3 select-none space-y-1.5 relative z-10 border-b border-border/30">
+				<p className="tracking-[0.35em] uppercase text-primary font-semibold text-xs flex items-center gap-2">
+					<span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--primary)]" />
 					AnuragOS Terminal
 				</p>
-				<p>Kernel v2.0.0-alpha [Secure Shell]</p>
-				<p>(c) 2025 Anurag Basuri. All rights reserved.</p>
-				<p className="pt-2 text-muted-foreground/60">
+				<div className="text-[10px] text-muted-foreground/70 space-y-0.5 font-normal">
+					<p className="tracking-wide">Kernel v2.0.0-alpha [Secure Shell]</p>
+					<p className="tracking-wide">(c) 2025 Anurag Basuri. All rights reserved.</p>
+				</div>
+				<p className="pt-1.5 text-muted-foreground/50 text-[10px] tracking-wide">
 					Type &apos;help&apos; for available commands.
 				</p>
 			</div>
 
-			<ScrollArea className="flex-1 pr-2">
+			{/* Terminal Content */}
+			<ScrollArea className="flex-1 px-4 py-3">
 				<div className="space-y-3 pb-4">
 					<AnimatePresence initial={false} mode="popLayout">
 						{history.map(item => (
@@ -146,17 +154,17 @@ export function CLI() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ duration: 0.18, ease: 'easeOut' }}
-								className="rounded-md"
+								className="rounded"
 							>
-								<div className="flex gap-2 text-sm">
-									<span className="text-primary font-bold drop-shadow-[0_0_5px_rgba(var(--primary),0.3)]">
+								<div className="flex gap-2 text-sm items-baseline">
+									<span className="text-primary font-medium text-glow">
 										{promptLabel}
 									</span>
 									<span className="text-foreground/90">{item.command}</span>
 								</div>
 								<div
 									className={cn(
-										'mt-1 whitespace-pre-wrap leading-relaxed',
+										'mt-1.5 pl-2 border-l-2 border-border/40 whitespace-pre-wrap leading-relaxed text-[13px]',
 										responseTone(item.response.type),
 									)}
 								>
@@ -166,10 +174,9 @@ export function CLI() {
 						))}
 					</AnimatePresence>
 
+					{/* Input Line */}
 					<div className="flex items-center gap-2 text-sm">
-						<span className="text-primary font-bold drop-shadow-[0_0_5px_rgba(var(--primary),0.3)]">
-							{promptLabel}
-						</span>
+						<span className="text-primary font-medium text-glow">{promptLabel}</span>
 						<div className="relative flex-1">
 							<input
 								ref={inputRef}
@@ -186,13 +193,13 @@ export function CLI() {
 							<span className="absolute top-0 pointer-events-none text-foreground/90">
 								{input}
 								<motion.span
-									animate={{ opacity: [1, 0] }}
+									animate={{ opacity: [1, 0.3] }}
 									transition={{
-										duration: 0.8,
+										duration: 0.7,
 										repeat: Infinity,
-										ease: 'linear',
+										ease: 'easeInOut',
 									}}
-									className="inline-block w-2.5 h-4 bg-primary align-middle ml-0.5 shadow-[0_0_8px_rgba(var(--primary),0.6)]"
+									className="inline-block w-2 h-4 bg-primary align-middle ml-0.5 rounded-sm shadow-[0_0_12px_var(--primary)]"
 								/>
 							</span>
 						</div>
