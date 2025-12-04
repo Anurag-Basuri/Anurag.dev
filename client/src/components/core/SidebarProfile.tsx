@@ -7,56 +7,60 @@ import { cn } from '@/lib/utils';
 
 export function SidebarProfile() {
 	return (
-		<div className="p-4 border-b border-border/60 bg-muted/20 backdrop-blur-sm">
+		<div className="p-4 border-b border-border/40 bg-linear-to-b from-muted/30 via-muted/10 to-transparent backdrop-blur-sm">
+			{/* Profile Section */}
 			<div className="flex items-center gap-3 mb-4">
-				<div className="relative shrink-0">
-					<div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/50 shadow-[0_0_15px_rgba(var(--primary),0.3)]">
+				<div className="relative shrink-0 group">
+					<div className="w-11 h-11 rounded-full overflow-hidden border-2 border-primary/40 shadow-[0_0_20px_-4px_var(--primary)] group-hover:border-primary/60 transition-all duration-300">
 						<img
 							src="/profile.png"
 							alt="Profile"
-							className="w-full h-full object-cover"
+							className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
 						/>
 					</div>
-					<div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+					<div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
 				</div>
-				<div className="overflow-hidden">
-					<h3 className="font-bold text-sm truncate text-foreground tracking-wide">
+				<div className="overflow-hidden min-w-0">
+					<h3 className="font-semibold text-sm truncate text-foreground tracking-wide leading-tight">
 						Anurag Basuri
 					</h3>
-					<p className="text-[10px] text-muted-foreground truncate font-mono">
+					<p className="text-[10px] text-muted-foreground/80 truncate font-mono tracking-wide">
 						Full Stack Engineer
 					</p>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-2 gap-2">
+			{/* Action Buttons */}
+			<div className="grid gap-2">
+				{/* Resume Download */}
 				<a
 					href="/resume.pdf"
 					target="_blank"
-					className="col-span-2 flex items-center justify-center gap-2 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded text-xs font-medium text-primary transition-all duration-200 group"
+					className="flex items-center justify-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 border border-primary/25 hover:border-primary/40 rounded-md text-xs font-medium text-primary transition-all duration-200 group shadow-sm hover:shadow-[0_0_16px_-4px_var(--primary)]"
 				>
-					<Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
-					<span>Download Resume</span>
+					<Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform duration-200" />
+					<span className="tracking-wide">Download Resume</span>
 				</a>
 
-				<div className="col-span-2 flex gap-1 justify-between">
+				{/* Social Links */}
+				<div className="flex gap-1.5 justify-between mt-1">
 					<SocialButton
 						href="https://linkedin.com/in/anurag-basuri"
 						icon={Linkedin}
 						label="LinkedIn"
-						color="hover:text-blue-400 hover:bg-blue-400/10 hover:border-blue-400/20"
+						colorClass="hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/25"
 					/>
 					<SocialButton
 						href="https://github.com/Anurag-Basuri"
 						icon={Github}
 						label="GitHub"
-						color="hover:text-white hover:bg-white/10 hover:border-white/20"
+						colorClass="hover:text-foreground hover:bg-foreground/10 hover:border-foreground/20"
 					/>
 					<SocialButton
 						href="mailto:contact@anurag.dev"
 						icon={Mail}
 						label="Email"
-						color="hover:text-emerald-400 hover:bg-emerald-400/10 hover:border-emerald-400/20"
+						colorClass="hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/25"
 					/>
 				</div>
 			</div>
@@ -68,12 +72,12 @@ function SocialButton({
 	href,
 	icon: Icon,
 	label,
-	color,
+	colorClass,
 }: {
 	href: string;
 	icon: React.ElementType;
 	label: string;
-	color: string;
+	colorClass: string;
 }) {
 	return (
 		<a
@@ -81,8 +85,8 @@ function SocialButton({
 			target="_blank"
 			rel="noopener noreferrer"
 			className={cn(
-				'flex-1 flex items-center justify-center p-1.5 rounded border border-transparent transition-all duration-200 text-muted-foreground',
-				color,
+				'flex-1 flex items-center justify-center p-2 rounded-md border border-transparent transition-all duration-200 text-muted-foreground',
+				colorClass,
 			)}
 			title={label}
 		>
