@@ -43,6 +43,11 @@ export function CLI() {
 	const { setTheme, resolvedTheme } = useTheme();
 	const [isFocused, setIsFocused] = useState(false);
 
+	// Terminal hints
+	const hints = ['help', 'whoami', 'ls', 'open projects', 'open about'];
+	const [currentHint, setCurrentHint] = useState(0);
+	const [showHint, setShowHint] = useState(false);
+
 	const getPromptLabel = (path: string) => (
 		<span className="font-medium">
 			<span className="text-green-500">root@anuragos</span>
@@ -198,6 +203,24 @@ export function CLI() {
 		}
 	}, [history]);
 
+	// Rotate hints every 3 seconds
+	useEffect(() => {
+		const timer = setInterval(() => {
+			setCurrentHint(prev => (prev + 1) % hints.length);
+		}, 3000);
+		return () => clearInterval(timer);
+	}, [hints.length]);
+
+	// Show hint when input is empty and focused
+	useEffect(() => {
+		if (isFocused && input === '') {
+			const timer = setTimeout(() => setShowHint(true), 1000);
+			return () => clearTimeout(timer);
+		} else {
+			setShowHint(false);
+		}
+	}, [isFocused, input]);
+
 	const handleContainerClick = () => {
 		inputRef.current?.focus();
 	};
@@ -226,25 +249,51 @@ export function CLI() {
 /_/   \\_\\_| \\_|\\___/|_| \\_\\/_/   \\_\\____| \\___/|____/ 
 `}
 					</div>
-					<div className="space-y-1 mt-4 font-mono text-[11px] text-muted-foreground/80">
-						<p>
-							<span className="text-green-500">✔</span> Loaded kernel modules...
+					<div className="space-y-1 mt-4 font-mono text-[11px]">
+						<p className="text-green-500">
+							<span className="mr-2">✔</span>Loaded kernel modules...
 						</p>
-						<p>
-							<span className="text-green-500">✔</span> Initialized graphics engine...
+						<p className="text-green-500">
+							<span className="mr-2">✔</span>Initialized graphics engine...
 						</p>
-						<p>
-							<span className="text-green-500">✔</span> Mounted file system...
+						<p className="text-green-500">
+							<span className="mr-2">✔</span>Mounted file system...
 						</p>
-						<p>
-							<span className="text-green-500">✔</span> Started network services...
+						<p className="text-green-500">
+							<span className="mr-2">✔</span>Started network services...
 						</p>
-						<p className="text-primary mt-2">System Ready.</p>
+						<p className="text-primary mt-2 font-semibold">🚀 System Ready.</p>
 					</div>
-					<p className="pt-2 text-muted-foreground/50 text-[10px] tracking-wide">
-						Type &apos;help&apos; for available commands. Try &apos;whoami&apos; or
-						&apos;date&apos;.
-					</p>
+					{/* Quick Start Guide */}
+					<div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded text-[11px] space-y-2">
+						<div className="text-primary font-semibold mb-2">⚡ Quick Start:</div>
+						<div className="space-y-1 text-muted-foreground">
+							<p>
+								• Type{' '}
+								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
+									about
+								</code>{' '}
+								to learn about me
+							</p>
+							<p>
+								• Type{' '}
+								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
+									projects
+								</code>{' '}
+								to see my work
+							</p>
+							<p>
+								• Type{' '}
+								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
+									help
+								</code>{' '}
+								for all commands
+							</p>
+							<p className="text-[10px] mt-2 text-muted-foreground/70">
+								💡 Or click files in the Explorer →
+							</p>
+						</div>
+					</div>
 				</div>
 				<div className="space-y-3 pb-4">
 					<AnimatePresence initial={false} mode="popLayout">
@@ -330,6 +379,21 @@ export function CLI() {
 							</div>
 						</div>
 					</div>
+					{/* Typing Hint */}
+					<AnimatePresence>
+						{showHint && (
+							<motion.div
+								initial={{ opacity: 0, y: -5 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -5 }}
+								transition={{ duration: 0.2 }}
+								className="text-xs text-muted-foreground/50 mt-2 ml-2"
+							>
+								💡 Try:{' '}
+								<code className="text-primary/70">{hints[currentHint]}</code>
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 			</div>
 		</div>
