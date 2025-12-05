@@ -42,7 +42,14 @@ export function CLI() {
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const { setTheme, resolvedTheme } = useTheme();
 
-	const getPromptLabel = (path: string) => `root@anuragos:${path}#`;
+	const getPromptLabel = (path: string) => (
+		<span className="font-medium">
+			<span className="text-green-500">root@anuragos</span>
+			<span className="text-muted-foreground">:</span>
+			<span className="text-blue-500">{path}</span>
+			<span className="text-muted-foreground">#</span>
+		</span>
+	);
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
@@ -209,11 +216,13 @@ export function CLI() {
 								transition={{ duration: 0.18, ease: 'easeOut' }}
 								className="rounded"
 							>
-								<div className="flex gap-2 text-sm items-baseline">
-									<span className="text-primary font-medium text-glow">
+								<div className="flex gap-2 text-sm items-baseline flex-wrap">
+									<span className="text-glow shrink-0">
 										{getPromptLabel(item.path)}
 									</span>
-									<span className="text-foreground/90">{item.command}</span>
+									<span className="text-foreground/90 break-all">
+										{item.command}
+									</span>
 								</div>
 								<div
 									className={cn(
@@ -228,11 +237,9 @@ export function CLI() {
 					</AnimatePresence>
 
 					{/* Input Line */}
-					<div className="flex items-center gap-2 text-sm">
-						<span className="text-primary font-medium text-glow">
-							{getPromptLabel(currentPath)}
-						</span>
-						<div className="relative flex-1 group">
+					<div className="flex items-center gap-2 text-sm flex-wrap">
+						<span className="text-glow shrink-0">{getPromptLabel(currentPath)}</span>
+						<div className="relative flex-1 group min-w-[100px]">
 							<input
 								ref={inputRef}
 								type="text"
@@ -257,7 +264,7 @@ export function CLI() {
 								autoComplete="off"
 							/>
 							{/* Custom Rendered Input with Cursor */}
-							<div className="font-mono whitespace-pre relative z-0 pointer-events-none">
+							<div className="font-mono whitespace-pre-wrap break-all relative z-0 pointer-events-none">
 								<span className="text-foreground/90">
 									{input.slice(0, cursorPos)}
 								</span>
