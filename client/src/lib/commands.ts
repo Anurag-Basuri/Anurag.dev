@@ -3,10 +3,19 @@ import { getModuleComponent } from '@/lib/moduleRegistry';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 
 export type CommandResponse = {
-	type: 'text' | 'error' | 'success' | 'component' | 'clear' | 'open_module' | 'change_directory';
+	type:
+		| 'text'
+		| 'error'
+		| 'success'
+		| 'component'
+		| 'clear'
+		| 'open_module'
+		| 'change_directory'
+		| 'set_theme';
 	content: string | ReactNode;
 	moduleId?: string;
 	newPath?: string;
+	theme?: 'light' | 'dark' | 'toggle';
 };
 
 export const commandsList = [
@@ -25,7 +34,6 @@ export const commandsList = [
 	'echo',
 	'theme',
 	'clear',
-	'exit',
 ];
 
 // Helper to resolve a path string to a FileSystemItem or null
@@ -110,7 +118,6 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
   echo      - Display a line of text
   theme     - Toggle theme (light/dark)
   clear     - Clear terminal
-  exit      - End session
   
   Shortcuts:
   about, projects, journey, ai-lab, blog, contact`,
@@ -176,11 +183,16 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 				type: 'text',
 				content: args.join(' '),
 			};
-		case 'theme':
-			return {
-				type: 'text',
-				content: 'Use the theme toggle button in the top bar for now.',
-			};
+		case 'theme': {
+			const subCmd = args[0]?.toLowerCase();
+			if (subCmd === 'dark') {
+				return { type: 'set_theme', theme: 'dark', content: 'Setting theme to dark...' };
+			}
+			if (subCmd === 'light') {
+				return { type: 'set_theme', theme: 'light', content: 'Setting theme to light...' };
+			}
+			return { type: 'set_theme', theme: 'toggle', content: 'Toggling theme...' };
+		}
 		case 'about':
 		case 'projects':
 		case 'journey':
