@@ -4,6 +4,7 @@ import { ProjectsModule } from '@/components/modules/ProjectsModule';
 import { JourneyModule } from '@/components/modules/JourneyModule';
 import { BlogModule } from '@/components/modules/BlogModule';
 import { ContactModule } from '@/components/modules/ContactModule';
+import { SecretModule } from '@/components/modules/SecretModule';
 
 export const moduleRegistry: Record<string, React.ReactNode> = {
 	about: <AboutModule />,
@@ -12,6 +13,7 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	blog: <BlogModule />,
 	contact: <ContactModule />,
 	'ai-lab': <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
+	secret: <SecretModule />,
 };
 
 export const getModuleComponent = (id: string): React.ReactNode => {
