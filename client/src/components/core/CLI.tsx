@@ -30,6 +30,7 @@ const responseTone = (type: CommandResponse['type']) => {
 
 export function CLI() {
 	const [input, setInput] = useState('');
+	const [cursorPos, setCursorPos] = useState(0);
 	const [history, setHistory] = useState<HistoryItem[]>([]);
 	const [cmdHistory, setCmdHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
@@ -94,6 +95,7 @@ export function CLI() {
 				setCmdHistory(prev => [...prev, input]);
 			}
 			setInput('');
+			setCursorPos(0);
 			setHistoryIndex(-1);
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
@@ -101,7 +103,9 @@ export function CLI() {
 				const newIndex =
 					historyIndex === -1 ? cmdHistory.length - 1 : Math.max(0, historyIndex - 1);
 				setHistoryIndex(newIndex);
-				setInput(cmdHistory[newIndex]);
+				const newInput = cmdHistory[newIndex];
+				setInput(newInput);
+				setCursorPos(newInput.length);
 			}
 		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
@@ -109,16 +113,22 @@ export function CLI() {
 				if (historyIndex === cmdHistory.length - 1) {
 					setHistoryIndex(-1);
 					setInput('');
+					setCursorPos(0);
 				} else {
 					const newIndex = Math.min(cmdHistory.length - 1, historyIndex + 1);
 					setHistoryIndex(newIndex);
-					setInput(cmdHistory[newIndex]);
+					const newInput = cmdHistory[newIndex];
+					setInput(newInput);
+					setCursorPos(newInput.length);
 				}
 			}
 		} else if (e.key === 'Tab') {
 			e.preventDefault();
 			const match = commandsList.find(cmd => cmd.startsWith(input.toLowerCase()));
-			if (match) setInput(match);
+			if (match) {
+				setInput(match);
+				setCursorPos(match.length);
+			}
 		}
 	};
 
@@ -209,31 +219,51 @@ export function CLI() {
 					{/* Input Line */}
 					<div className="flex items-center gap-2 text-sm">
 						<span className="text-primary font-medium text-glow">{promptLabel}</span>
-						<div className="relative flex-1">
+						<div className="relative flex-1 group">
 							<input
 								ref={inputRef}
 								type="text"
 								value={input}
-								onChange={e => setInput(e.target.value)}
+								onChange={e => {
+									setInput(e.target.value);
+									setCursorPos(e.target.selectionStart || 0);
+								}}
 								onKeyDown={handleKeyDown}
-								className="w-full bg-transparent border-none outline-none text-foreground/90 caret-transparent"
+								onSelect={e => {
+									setCursorPos(e.currentTarget.selectionStart || 0);
+								}}
+								onClick={e => {
+									setCursorPos(e.currentTarget.selectionStart || 0);
+								}}
+								onKeyUp={e => {
+									setCursorPos(e.currentTarget.selectionStart || 0);
+								}}
+								className="w-full bg-transparent border-none outline-none text-transparent caret-transparent absolute inset-0 z-10 font-mono"
 								autoFocus
 								spellCheck={false}
 								autoComplete="off"
 							/>
-							{/* Custom Block Cursor */}
-							<span className="absolute top-0 pointer-events-none text-foreground/90">
-								{input}
+							{/* Custom Rendered Input with Cursor */}
+							<div className="font-mono whitespace-pre relative z-0 pointer-events-none">
+								<span className="text-foreground/90">
+									{input.slice(0, cursorPos)}
+								</span>
 								<motion.span
-									animate={{ opacity: [1, 0.3] }}
+									animate={{ opacity: [1, 1, 0, 0] }}
 									transition={{
-										duration: 0.7,
+										duration: 0.8,
 										repeat: Infinity,
-										ease: 'easeInOut',
+										times: [0, 0.5, 0.5, 1],
+										ease: 'linear',
 									}}
-									className="inline-block w-2 h-4 bg-primary align-middle ml-0.5 rounded-sm shadow-[0_0_12px_var(--primary)]"
-								/>
-							</span>
+									className="inline-block w-[0.6em] h-[1.2em] bg-primary/90 align-text-bottom -mb-[2px] rounded-[1px] shadow-[0_0_8px_var(--primary)]"
+								>
+									<span className="text-primary-foreground opacity-0">
+										{input[cursorPos] || ' '}
+									</span>
+								</motion.span>
+								<span className="text-foreground/90">{input.slice(cursorPos)}</span>
+							</div>
 						</div>
 					</div>
 				</div>
