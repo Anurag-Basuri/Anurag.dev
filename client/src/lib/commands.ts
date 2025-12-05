@@ -2,9 +2,10 @@ import { ReactNode } from 'react';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 
 export type CommandResponse = {
-	type: 'text' | 'error' | 'success' | 'component' | 'clear' | 'open_module';
+	type: 'text' | 'error' | 'success' | 'component' | 'clear' | 'open_module' | 'change_directory';
 	content: string | ReactNode;
 	moduleId?: string;
+	newPath?: string;
 };
 
 export const commandsList = [
@@ -62,6 +63,33 @@ export function processCommand(input: string): CommandResponse {
 				type: 'text',
 				content: 'about  projects  journey  ai-lab  blog  contact  tools  secret',
 			};
+		case 'cd': {
+			if (args.length === 0) {
+				return { type: 'change_directory', content: '', newPath: '~' };
+			}
+			const target = args[0].toLowerCase();
+			if (target === '..') {
+				// Simple implementation: always go back to root for now since we only have 1 level depth
+				return { type: 'change_directory', content: '', newPath: '~' };
+			}
+			if (target === '~') {
+				return { type: 'change_directory', content: '', newPath: '~' };
+			}
+			const validDirs = [
+				'about',
+				'projects',
+				'journey',
+				'ai-lab',
+				'blog',
+				'contact',
+				'tools',
+				'secret',
+			];
+			if (validDirs.includes(target)) {
+				return { type: 'change_directory', content: '', newPath: `~/${target}` };
+			}
+			return { type: 'error', content: `cd: no such file or directory: ${target}` };
+		}
 		case 'whoami':
 			return {
 				type: 'text',
