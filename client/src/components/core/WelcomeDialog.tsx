@@ -39,61 +39,81 @@ export function WelcomeDialog() {
 		{
 			title: 'Welcome to AnuragOS! 👋',
 			content:
-				"I'm Anurag, and this is my interactive portfolio. How familiar are you with command-line interfaces?",
+				"This is my interactive portfolio. Navigate using the terminal (CLI) or by clicking files. What's your style?",
 			actions: (
-				<div className="flex gap-3">
+				<div className="flex flex-col gap-3">
 					<button
 						onClick={handleKnowTerminals}
-						className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm"
+						className="px-4 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2"
 					>
-						<Terminal className="w-4 h-4 inline mr-2" />I know terminals 🖥️
+						<Terminal className="w-4 h-4" />I love terminals 🖥️
 					</button>
 					<button
 						onClick={handleShowAround}
-						className="flex-1 px-4 py-2.5 bg-muted hover:bg-muted/80 rounded-lg transition-colors font-medium text-sm"
+						className="px-4 py-2.5 bg-muted hover:bg-muted/80 rounded-lg transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2"
 					>
-						<Sparkles className="w-4 h-4 inline mr-2" />
-						Show me around 🎯
+						<Sparkles className="w-4 h-4" />
+						Show me how it works ✨
+					</button>
+					<button
+						onClick={handleDismiss}
+						className="text-xs text-muted-foreground hover:text-foreground transition-colors duration-200"
+					>
+						Maybe later →
 					</button>
 				</div>
 			),
 		},
 		{
-			title: 'The Terminal',
-			content:
-				"This is the terminal on the right. You can type commands here like 'help' to see what's available, or 'about' to learn about me.",
-			actions: (
-				<button
-					onClick={() => setStep(2)}
-					className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-				>
-					Next →
-				</button>
+			title: 'Two Ways to Explore',
+			content: (
+				<div className="space-y-4 text-sm">
+					<div className="flex items-start gap-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+						<Terminal className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+						<div>
+							<div className="font-semibold text-foreground mb-1">
+								Terminal Commands
+							</div>
+							<div className="text-muted-foreground text-xs space-y-1">
+								<div>
+									• Type{' '}
+									<code className="text-primary bg-primary/10 px-1 rounded">
+										about
+									</code>{' '}
+									or{' '}
+									<code className="text-primary bg-primary/10 px-1 rounded">
+										projects
+									</code>
+								</div>
+								<div>
+									• Use{' '}
+									<code className="text-primary bg-primary/10 px-1 rounded">
+										help
+									</code>{' '}
+									for all commands
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
+						<MousePointer className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
+						<div>
+							<div className="font-semibold text-foreground mb-1">
+								Click & Explore
+							</div>
+							<div className="text-muted-foreground text-xs">
+								Click any file in the Explorer (left side) to open it instantly
+							</div>
+						</div>
+					</div>
+				</div>
 			),
-		},
-		{
-			title: 'Or Just Click',
-			content:
-				"Not a fan of typing? No problem! Click any file in the Explorer on the left to open it. Try clicking 'about' or 'projects'.",
-			actions: (
-				<button
-					onClick={() => setStep(3)}
-					className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
-				>
-					Next →
-				</button>
-			),
-		},
-		{
-			title: "You're All Set! 🚀",
-			content:
-				"Explore at your own pace. If you need help, there's a help button in the bottom-right corner. Enjoy!",
 			actions: (
 				<button
 					onClick={handleDismiss}
-					className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+					className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 font-medium w-full"
 				>
-					Let's Go! ✨
+					Got it! Let's explore 🚀
 				</button>
 			),
 		},
@@ -147,14 +167,14 @@ export function WelcomeDialog() {
 								</div>
 
 								{/* Progress dots */}
-								{step > 0 && (
+								{step === 1 && (
 									<div className="flex justify-center gap-2 pb-4">
-										{tutorialSteps.slice(1).map((_, i) => (
+										{[0, 1].map(i => (
 											<div
 												key={i}
 												className={cn(
-													'w-2 h-2 rounded-full transition-all',
-													i + 1 === step ? 'bg-primary w-6' : 'bg-muted',
+													'w-2 h-2 rounded-full transition-all duration-200',
+													i === step ? 'bg-primary w-6' : 'bg-muted',
 												)}
 											/>
 										))}
