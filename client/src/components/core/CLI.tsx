@@ -14,8 +14,6 @@ type HistoryItem = {
 	response: CommandResponse;
 };
 
-const promptLabel = 'root@anuragos:~#';
-
 const responseTone = (type: CommandResponse['type']) => {
 	switch (type) {
 		case 'error':
@@ -35,15 +33,31 @@ export function CLI() {
 	const [history, setHistory] = useState<HistoryItem[]>([]);
 	const [cmdHistory, setCmdHistory] = useState<string[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
+	const [currentPath, setCurrentPath] = useState('~');
 	const inputRef = useRef<HTMLInputElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [windows, setWindows] = useAtom(windowsAtom);
+
+	const promptLabel = `root@anuragos:${currentPath}#`;
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
 			const response = processCommand(input);
 			if (response.type === 'clear') {
 				setHistory([]);
+			} else if (response.type === 'change_directory') {
+				if (response.newPath) {
+					setCurrentPath(response.newPath);
+				}
+				const newItem: HistoryItem = {
+					id:
+						typeof crypto !== 'undefined' && 'randomUUID' in crypto
+							? crypto.randomUUID()
+							: Math.random().toString(36).slice(2),
+					command: input,
+					response: { type: 'success', content: '' }, // Don't show output for successful cd
+				};
+				setHistory(prev => [...prev, newItem]);
 			} else {
 				const newItem: HistoryItem = {
 					id:
