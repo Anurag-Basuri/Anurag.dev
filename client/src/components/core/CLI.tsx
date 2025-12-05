@@ -7,6 +7,7 @@ import { useAtom } from 'jotai';
 import { windowsAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 
 type HistoryItem = {
 	id: string;
@@ -39,6 +40,7 @@ export function CLI() {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [windows, setWindows] = useAtom(windowsAtom);
+	const { setTheme, resolvedTheme } = useTheme();
 
 	const getPromptLabel = (path: string) => `root@anuragos:${path}#`;
 
@@ -92,6 +94,12 @@ export function CLI() {
 							},
 						];
 					});
+				} else if (response.type === 'set_theme' && response.theme) {
+					if (response.theme === 'toggle') {
+						setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+					} else {
+						setTheme(response.theme);
+					}
 				}
 			}
 			if (input.trim()) {
