@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { processCommand, commandsList, CommandResponse } from '@/lib/commands';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAtom } from 'jotai';
 import { windowsAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
@@ -111,7 +110,7 @@ export function CLI() {
 
 	useEffect(() => {
 		if (scrollRef.current) {
-			scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
 		}
 	}, [history]);
 
@@ -156,7 +155,7 @@ export function CLI() {
 			</div>
 
 			{/* Terminal Content */}
-			<ScrollArea className="flex-1 px-4 py-3">
+			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
 				<div className="space-y-3 pb-4">
 					<AnimatePresence initial={false} mode="popLayout">
 						{history.map(item => (
@@ -217,9 +216,8 @@ export function CLI() {
 							</span>
 						</div>
 					</div>
-					<div ref={scrollRef} />
 				</div>
-			</ScrollArea>
+			</div>
 		</div>
 	);
 }
