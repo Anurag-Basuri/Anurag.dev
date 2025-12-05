@@ -81,6 +81,7 @@ export function MainLayout() {
 
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const [terminalCollapsed, setTerminalCollapsed] = useState(false);
+	const [isEditorsCollapsed, setIsEditorsCollapsed] = useState(false);
 
 	const {
 		sizes: verticalSizes,
@@ -98,7 +99,12 @@ export function MainLayout() {
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
-			const moduleId = item.id;
+			// Extract root module ID from file path (e.g., "about/whoami.md" -> "about")
+			let moduleId = item.id;
+			if (moduleId.includes('/')) {
+				moduleId = moduleId.split('/')[0];
+			}
+
 			setWindows(prev => {
 				if (prev.find(w => w.id === moduleId)) {
 					setActiveWindowId(moduleId);
@@ -109,7 +115,7 @@ export function MainLayout() {
 					...prev,
 					{
 						id: moduleId,
-						title: item.name.toUpperCase(),
+						title: moduleId.toUpperCase(),
 						component: getModuleComponent(moduleId),
 						isOpen: true,
 						isMinimized: false,
@@ -384,77 +390,112 @@ export function MainLayout() {
 										className="border-b border-border/60"
 									>
 										<div className="h-full flex flex-col">
-											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm">
-												Open Editors
+											<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
+												<span>Open Editors</span>
+												<button
+													onClick={() =>
+														setIsEditorsCollapsed(!isEditorsCollapsed)
+													}
+													className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
+													title={
+														isEditorsCollapsed ? 'Expand' : 'Collapse'
+													}
+												>
+													<ChevronDown
+														className={cn(
+															'w-3 h-3 transition-transform',
+															isEditorsCollapsed && 'rotate-180',
+														)}
+													/>
+												</button>
 											</div>
-											<ScrollArea className="flex-1">
-												<motion.div layout className="flex flex-col">
-													<AnimatePresence>
-														{windows.map(win => (
-															<motion.div
-																layout
-																initial={{
-																	opacity: 0,
-																	x: -16,
-																}}
-																animate={{
-																	opacity: 1,
-																	x: 0,
-																}}
-																exit={{
-																	opacity: 0,
-																	x: -16,
-																}}
-																transition={{
-																	duration: 0.16,
-																}}
-																key={win.id}
-																className={cn(
-																	'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
-																	'hover:bg-muted/40',
-																	activeWindowId === win.id &&
-																		'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
-																)}
-																onClick={() =>
-																	setActiveWindowId(win.id)
-																}
-															>
-																<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
-																	{win.title}
-																</span>
-																<button
-																	onClick={e => {
-																		e.stopPropagation();
-																		const newWindows =
-																			windows.filter(
-																				w =>
-																					w.id !== win.id,
-																			);
-																		setWindows(newWindows);
-																		setActiveWindowId(
-																			newWindows.length
-																				? newWindows[
-																						newWindows.length -
-																							1
-																				  ].id
-																				: null,
-																		);
-																	}}
-																	className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
-																	aria-label={`Close ${win.title}`}
-																>
-																	<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-																</button>
-															</motion.div>
-														))}
-													</AnimatePresence>
-													{windows.length === 0 && (
-														<div className="p-4 text-xs text-muted-foreground text-center italic">
-															No open editors
-														</div>
-													)}
+											{!isEditorsCollapsed && (
+												<motion.div
+													initial={{ height: 0, opacity: 0 }}
+													animate={{ height: 'auto', opacity: 1 }}
+													exit={{ height: 0, opacity: 0 }}
+													transition={{ duration: 0.2 }}
+													className="flex-1 overflow-hidden"
+												>
+													<ScrollArea className="h-full">
+														<motion.div
+															layout
+															className="flex flex-col"
+														>
+															<AnimatePresence>
+																{windows.map(win => (
+																	<motion.div
+																		layout
+																		initial={{
+																			opacity: 0,
+																			x: -16,
+																		}}
+																		animate={{
+																			opacity: 1,
+																			x: 0,
+																		}}
+																		exit={{
+																			opacity: 0,
+																			x: -16,
+																		}}
+																		transition={{
+																			duration: 0.16,
+																		}}
+																		key={win.id}
+																		className={cn(
+																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
+																			'hover:bg-muted/40',
+																			activeWindowId ===
+																				win.id &&
+																				'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
+																		)}
+																		onClick={() =>
+																			setActiveWindowId(
+																				win.id,
+																			)
+																		}
+																	>
+																		<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																			{win.title}
+																		</span>
+																		<button
+																			onClick={e => {
+																				e.stopPropagation();
+																				const newWindows =
+																					windows.filter(
+																						w =>
+																							w.id !==
+																							win.id,
+																					);
+																				setWindows(
+																					newWindows,
+																				);
+																				setActiveWindowId(
+																					newWindows.length
+																						? newWindows[
+																								newWindows.length -
+																									1
+																						  ].id
+																						: null,
+																				);
+																			}}
+																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
+																			aria-label={`Close ${win.title}`}
+																		>
+																			<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+																		</button>
+																	</motion.div>
+																))}
+															</AnimatePresence>
+															{windows.length === 0 && (
+																<div className="p-4 text-xs text-muted-foreground text-center italic">
+																	No open editors
+																</div>
+															)}
+														</motion.div>
+													</ScrollArea>
 												</motion.div>
-											</ScrollArea>
+											)}
 										</div>
 									</ResizablePanel>
 
