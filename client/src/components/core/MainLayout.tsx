@@ -86,7 +86,7 @@ export function MainLayout() {
 		sizes: verticalSizes,
 		onLayout: onVerticalLayout,
 		isHydrated: vHydrated,
-	} = usePersistentSizes('layout:v', [75, 25]);
+	} = usePersistentSizes('layout:v', [60, 40]);
 	const {
 		sizes: horizontalSizes,
 		onLayout: onHorizontalLayout,

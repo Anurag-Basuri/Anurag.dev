@@ -128,8 +128,20 @@ export function CLI() {
 			<div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
 
 			{/* Terminal Header */}
-			<div className="px-4 pt-4 pb-3 select-none space-y-1.5 relative z-10 border-b border-border/30">
-				<p className="tracking-[0.35em] uppercase text-primary font-semibold text-xs flex items-center gap-2">
+			<div className="px-4 pt-4 pb-3 select-none space-y-2 relative z-10 border-b border-border/30">
+				<div className="text-[10px] text-muted-foreground/50 font-mono mb-2">
+					Last login: {new Date().toLocaleString()} on ttys001
+				</div>
+				<div className="text-primary font-bold text-xs whitespace-pre leading-none opacity-80 hidden sm:block">
+					{`
+    _    _   _ _   _ ____      _    ____   ___  ____  
+   / \\  | \\ | | | | |  _ \\    / \\  / ___| / _ \\/ ___| 
+  / _ \\ |  \\| | | | | |_) |  / _ \\| |  _ | | | \\___ \\ 
+ / ___ \\| |\\  | |_| |  _ <  / ___ \\ |_| || |_| |___) |
+/_/   \\_\\_| \\_|\\___/|_| \\_\\/_/   \\_\\____| \\___/|____/ 
+`}
+				</div>
+				<p className="tracking-[0.35em] uppercase text-primary font-semibold text-xs flex items-center gap-2 mt-2">
 					<span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--primary)]" />
 					AnuragOS Terminal
 				</p>
@@ -138,7 +150,8 @@ export function CLI() {
 					<p className="tracking-wide">(c) 2025 Anurag Basuri. All rights reserved.</p>
 				</div>
 				<p className="pt-1.5 text-muted-foreground/50 text-[10px] tracking-wide">
-					Type &apos;help&apos; for available commands.
+					Type &apos;help&apos; for available commands. Try &apos;whoami&apos; or
+					&apos;date&apos;.
 				</p>
 			</div>
 
