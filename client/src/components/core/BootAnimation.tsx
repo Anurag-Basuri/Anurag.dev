@@ -213,12 +213,21 @@ export function BootAnimation() {
 	const [hexOpacity, setHexOpacity] = useState(0);
 	const containerRef = useRef<HTMLDivElement>(null);
 
-	// Keyboard accessibility: press Enter or Space to skip
+	// Check if user has visited before
+	useEffect(() => {
+		const hasVisited = localStorage.getItem('anuragos-visited');
+		if (hasVisited) {
+			setBootComplete(true);
+		} else {
+			localStorage.setItem('anuragos-visited', 'true');
+		}
+	}, [setBootComplete]);
+
+	// Keyboard accessibility: press any key to skip
 	useEffect(() => {
 		function onKey(e: KeyboardEvent) {
-			if (e.key === 'Enter' || e.key === ' ') {
-				setBootComplete(true);
-			}
+			// Skip on any key press
+			setBootComplete(true);
 		}
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
@@ -300,7 +309,7 @@ export function BootAnimation() {
 	return (
 		<div
 			ref={containerRef}
-			className="fixed inset-0 z-[9999] bg-black text-[#00ff41] font-mono overflow-hidden"
+			className="fixed inset-0 z-9999 bg-black text-[#00ff41] font-mono overflow-hidden"
 			aria-label="Boot animation loading screen"
 			role="dialog"
 			aria-live="polite"
@@ -312,7 +321,7 @@ export function BootAnimation() {
 
 			{/* Content (clean, centered, responsive) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-				<div className="w-full max-w-[72rem] px-3 sm:px-5 md:px-8">
+				<div className="w-full max-w-6xl px-3 sm:px-5 md:px-8">
 					{/* Consistent vertical rhythm; tighter on mobile */}
 					<div className="py-6 sm:py-10 md:py-16 space-y-5 sm:space-y-7 md:space-y-10">
 						{/* Title */}
@@ -373,7 +382,7 @@ export function BootAnimation() {
 										aria-valuemax={100}
 										role="progressbar"
 									/>
-									<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
+									<div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 to-transparent" />
 								</div>
 							</div>
 
