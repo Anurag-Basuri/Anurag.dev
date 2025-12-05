@@ -20,20 +20,24 @@ export type CommandResponse = {
 
 export const commandsList = [
 	'help',
-	'ls',
-	'cd',
-	'open',
 	'about',
 	'projects',
 	'journey',
 	'ai-lab',
 	'blog',
 	'contact',
+	'ls',
+	'cd',
+	'pwd',
 	'whoami',
 	'date',
-	'echo',
-	'theme',
+	'open',
 	'clear',
+	'theme',
+	// Easter eggs
+	'matrix',
+	'coffee',
+	'konami',
 ];
 
 // Helper to resolve a path string to a FileSystemItem or null
@@ -277,6 +281,52 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 					content: `Opened ${item.name} (Preview not implemented for this file type)`,
 				};
 			}
+
+			// Easter Eggs
+			case 'matrix':
+				return {
+					type: 'success',
+					content: `Following the white rabbit...
+
+01100100 01101111 01110111 01101110
+01110100 01101000 01100101
+01110010 01100001 01100010 01100010
+01101001 01110100 01101000 01101111
+01101100 01100101
+
+Wake up, Neo... The Matrix has you.
+Try exploring 'projects' to see the real world! 💊`,
+				};
+
+			case 'coffee':
+				return {
+					type: 'success',
+					content: `      ( (
+       ) )
+    ........
+    |      |]
+    \\      /
+     \`----'
+
+☕ Brewing a fresh cup...
+
+Take a break! You've been exploring for a while.
+When you're ready, check out 'about' or 'projects'! 🚀`,
+				};
+
+			case 'konami':
+				return {
+					type: 'success',
+					content: `⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ B A START
+
+🎮 ACHIEVEMENT UNLOCKED! 🎮
+
+✨ Secret Discovered: You found the Konami Code! ✨
+
+You've unlocked 30 extra lives... in your career!
+Now go check out my 'projects' and 'journey'! 🚀`,
+				};
+
 			default: {
 				// Simple suggestion logic
 				const suggestion = commandsList.find(c => {
