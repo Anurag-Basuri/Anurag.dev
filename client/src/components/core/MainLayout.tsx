@@ -311,8 +311,8 @@ export function MainLayout() {
 					</div>
 				</motion.div>
 
-				{/* Main area */}
-				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth">
+				{/* Main area with 3D Perspective */}
+				<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth perspective-[2000px]">
 					{!isMobile && !isLayoutReady ? (
 						/* Premium loading skeleton during SSR/hydration */
 						<div className="h-full w-full flex">
@@ -356,7 +356,7 @@ export function MainLayout() {
 					) : !isMobile && isLayoutReady ? (
 						<ResizablePanelGroup
 							direction="horizontal"
-							className="h-full w-full"
+							className="h-full w-full transform-style-3d"
 							onLayout={onHorizontalLayout}
 						>
 							{/* Sidebar (Left) */}
@@ -369,7 +369,8 @@ export function MainLayout() {
 								collapsedSize={0}
 								onCollapse={() => setSidebarCollapsed(true)}
 								onExpand={() => setSidebarCollapsed(false)}
-								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)]"
+								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] transition-transform duration-500 ease-out origin-left hover:rotate-y-0 rotate-y-[2deg] hover:translate-z-0 translate-z-[-10px]"
+								style={{ transformStyle: 'preserve-3d' }}
 							>
 								<SidebarProfile />
 								<ResizablePanelGroup direction="vertical" className="h-full">
@@ -493,7 +494,10 @@ export function MainLayout() {
 							/>
 
 							{/* Right Side (Editor + Terminal) */}
-							<ResizablePanel defaultSize={horizontalSizes[1]}>
+							<ResizablePanel
+								defaultSize={horizontalSizes[1]}
+								className="transform-style-3d"
+							>
 								<ResizablePanelGroup
 									direction="vertical"
 									className="h-full w-full"
@@ -503,7 +507,7 @@ export function MainLayout() {
 									<ResizablePanel
 										defaultSize={verticalSizes[0]}
 										minSize={30}
-										className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85"
+										className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85 transition-transform duration-500 ease-out origin-center hover:scale-[1.002] shadow-2xl"
 									>
 										<div className="relative z-10 h-full flex flex-col">
 											<EditorArea />
@@ -525,7 +529,8 @@ export function MainLayout() {
 										collapsedSize={0}
 										onCollapse={() => setTerminalCollapsed(true)}
 										onExpand={() => setTerminalCollapsed(false)}
-										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)]"
+										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-out origin-bottom hover:rotate-x-0 rotate-x-[2deg] hover:translate-z-0 translate-z-[-10px]"
+										style={{ transformStyle: 'preserve-3d' }}
 									>
 										<div className="h-full flex flex-col">
 											<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm">
