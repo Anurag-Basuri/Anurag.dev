@@ -42,7 +42,7 @@ export function CLI() {
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
-			const response = processCommand(input);
+			const response = processCommand(input, currentPath);
 			if (response.type === 'clear') {
 				setHistory([]);
 			} else if (response.type === 'change_directory') {

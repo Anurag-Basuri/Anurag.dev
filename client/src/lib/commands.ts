@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { getModuleComponent } from '@/lib/moduleRegistry';
+import { initialFileSystem, FileSystemItem } from '@/lib/data';
 
 export type CommandResponse = {
 	type: 'text' | 'error' | 'success' | 'component' | 'clear' | 'open_module' | 'change_directory';
@@ -27,7 +28,68 @@ export const commandsList = [
 	'exit',
 ];
 
-export function processCommand(input: string): CommandResponse {
+// Helper to resolve a path string to a FileSystemItem or null
+function resolvePath(currentPath: string, targetPath: string): FileSystemItem | null {
+	// Normalize paths
+	if (targetPath === '~' || targetPath === '/')
+		return { type: 'folder', name: 'root', id: 'root', children: initialFileSystem };
+
+	let pathParts: string[] = [];
+
+	// Handle absolute path (starting with / or ~)
+	if (targetPath.startsWith('/') || targetPath.startsWith('~')) {
+		pathParts = targetPath
+			.replace(/^~?\/?/, '')
+			.split('/')
+			.filter(Boolean);
+	} else {
+		// Relative path
+		const currentParts =
+			currentPath === '~'
+				? []
+				: currentPath
+						.replace(/^~?\/?/, '')
+						.split('/')
+						.filter(Boolean);
+		pathParts = [...currentParts, ...targetPath.split('/')].filter(Boolean);
+	}
+
+	// Resolve parts
+	let currentItems = initialFileSystem;
+	let currentItem: FileSystemItem | null = {
+		type: 'folder',
+		name: 'root',
+		id: 'root',
+		children: initialFileSystem,
+	};
+
+	// Handle ".." and "."
+	const resolvedParts: string[] = [];
+	for (const part of pathParts) {
+		if (part === '.') continue;
+		if (part === '..') {
+			resolvedParts.pop();
+		} else {
+			resolvedParts.push(part);
+		}
+	}
+
+	// Traverse
+	for (const part of resolvedParts) {
+		if (!currentItem || currentItem.type !== 'folder' || !currentItem.children) return null;
+
+		const found: FileSystemItem | undefined = currentItem.children.find(
+			item => item.name.toLowerCase() === part.toLowerCase(),
+		);
+		if (!found) return null;
+
+		currentItem = found;
+	}
+
+	return currentItem;
+}
+
+export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
 	const trimmed = input.trim();
 	if (!trimmed) return { type: 'text', content: '' };
 
@@ -43,52 +105,61 @@ export function processCommand(input: string): CommandResponse {
   ls        - List directory contents
   cd        - Change directory
   open      - Open a file or module
-  about     - Open About module
-  projects  - Open Projects Hub
-  journey   - Open Journey Mode
-  ai-lab    - Open AI Lab
-  blog      - List blog posts
-  contact   - Open Contact form
   whoami    - Display current user
   date      - Display current date and time
   echo      - Display a line of text
   theme     - Toggle theme (light/dark)
   clear     - Clear terminal
-  exit      - End session`,
+  exit      - End session
+  
+  Shortcuts:
+  about, projects, journey, ai-lab, blog, contact`,
 			};
 		case 'clear':
 			return { type: 'clear', content: '' };
-		case 'ls':
-			return {
-				type: 'text',
-				content: 'about  projects  journey  ai-lab  blog  contact  tools  secret',
-			};
+		case 'ls': {
+			const target = args.length > 0 ? args[0] : '.';
+			const item = resolvePath(currentPath, target);
+
+			if (!item) {
+				return {
+					type: 'error',
+					content: `ls: cannot access '${target}': No such file or directory`,
+				};
+			}
+
+			if (item.type === 'file') {
+				return { type: 'text', content: item.name };
+			}
+
+			if (item.children) {
+				const names = item.children.map(child => {
+					return child.type === 'folder' ? `${child.name}/` : child.name;
+				});
+				return { type: 'text', content: names.join('  ') };
+			}
+			return { type: 'text', content: '' };
+		}
 		case 'cd': {
 			if (args.length === 0) {
 				return { type: 'change_directory', content: '', newPath: '~' };
 			}
-			const target = args[0].toLowerCase();
-			if (target === '..') {
-				// Simple implementation: always go back to root for now since we only have 1 level depth
-				return { type: 'change_directory', content: '', newPath: '~' };
+			const target = args[0];
+			const item = resolvePath(currentPath, target);
+
+			if (!item) {
+				return { type: 'error', content: `cd: no such file or directory: ${target}` };
 			}
-			if (target === '~') {
-				return { type: 'change_directory', content: '', newPath: '~' };
+			if (item.type !== 'folder') {
+				return { type: 'error', content: `cd: not a directory: ${target}` };
 			}
-			const validDirs = [
-				'about',
-				'projects',
-				'journey',
-				'ai-lab',
-				'blog',
-				'contact',
-				'tools',
-				'secret',
-			];
-			if (validDirs.includes(target)) {
-				return { type: 'change_directory', content: '', newPath: `~/${target}` };
-			}
-			return { type: 'error', content: `cd: no such file or directory: ${target}` };
+
+			// Construct new path string
+			if (item.id === 'root') return { type: 'change_directory', content: '', newPath: '~' };
+
+			// For this app, IDs are paths like "about" or "projects/featured"
+			// So we can just use the ID prepended with ~
+			return { type: 'change_directory', content: '', newPath: `~/${item.id}` };
 		}
 		case 'whoami':
 			return {
@@ -106,8 +177,6 @@ export function processCommand(input: string): CommandResponse {
 				content: args.join(' '),
 			};
 		case 'theme':
-			// This is a placeholder as theme toggling needs to happen in the component
-			// We'll handle the 'theme' command in CLI.tsx specially or return a special type
 			return {
 				type: 'text',
 				content: 'Use the theme toggle button in the top bar for now.',
@@ -125,31 +194,37 @@ export function processCommand(input: string): CommandResponse {
 			};
 		case 'open': {
 			if (args.length === 0) {
-				return { type: 'error', content: 'Usage: open [module_name]' };
+				return { type: 'error', content: 'Usage: open [filename]' };
 			}
-			const moduleId = args[0].toLowerCase();
+			const target = args[0];
+			const item = resolvePath(currentPath, target);
 
-			// Validate by attempting to resolve the component.
-			try {
-				const component = getModuleComponent(moduleId);
-				if (!component) {
-					return {
-						type: 'error',
-						content: `Error: Module '${moduleId}' not found.`,
-					};
-				}
-			} catch {
+			if (!item) {
+				return { type: 'error', content: `open: ${target}: No such file or directory` };
+			}
+
+			if (item.type === 'folder') {
+				return { type: 'error', content: `open: ${target}: Is a directory` };
+			}
+
+			// Extract module ID from the file ID (e.g. "about/whoami.md" -> "about")
+			let moduleId = item.id;
+			if (moduleId.includes('/')) {
+				moduleId = moduleId.split('/')[0];
+			}
+
+			const component = getModuleComponent(moduleId);
+			if (component) {
 				return {
-					type: 'error',
-					content: `Error: Module '${moduleId}' not found.`,
+					type: 'open_module',
+					content: `Opening ${item.name}...`,
+					moduleId: moduleId,
 				};
 			}
 
 			return {
-				type: 'open_module',
-				content: `Opening ${moduleId}...`,
-				moduleId,
-				// Pass args as initial props if needed
+				type: 'text',
+				content: `Opened ${item.name} (Preview not implemented for this file type)`,
 			};
 		}
 		default:
