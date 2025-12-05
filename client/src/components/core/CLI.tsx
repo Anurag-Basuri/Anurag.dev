@@ -12,6 +12,7 @@ type HistoryItem = {
 	id: string;
 	command: string;
 	response: CommandResponse;
+	path: string;
 };
 
 const responseTone = (type: CommandResponse['type']) => {
@@ -39,7 +40,7 @@ export function CLI() {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [windows, setWindows] = useAtom(windowsAtom);
 
-	const promptLabel = `root@anuragos:${currentPath}#`;
+	const getPromptLabel = (path: string) => `root@anuragos:${path}#`;
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter') {
@@ -57,6 +58,7 @@ export function CLI() {
 							: Math.random().toString(36).slice(2),
 					command: input,
 					response: { type: 'success', content: '' }, // Don't show output for successful cd
+					path: currentPath,
 				};
 				setHistory(prev => [...prev, newItem]);
 			} else {
@@ -67,6 +69,7 @@ export function CLI() {
 							: Math.random().toString(36).slice(2),
 					command: input,
 					response,
+					path: currentPath,
 				};
 				setHistory(prev => [...prev, newItem]);
 
@@ -200,7 +203,7 @@ export function CLI() {
 							>
 								<div className="flex gap-2 text-sm items-baseline">
 									<span className="text-primary font-medium text-glow">
-										{promptLabel}
+										{getPromptLabel(item.path)}
 									</span>
 									<span className="text-foreground/90">{item.command}</span>
 								</div>
@@ -218,7 +221,9 @@ export function CLI() {
 
 					{/* Input Line */}
 					<div className="flex items-center gap-2 text-sm">
-						<span className="text-primary font-medium text-glow">{promptLabel}</span>
+						<span className="text-primary font-medium text-glow">
+							{getPromptLabel(currentPath)}
+						</span>
 						<div className="relative flex-1 group">
 							<input
 								ref={inputRef}

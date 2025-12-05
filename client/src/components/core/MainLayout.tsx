@@ -333,7 +333,7 @@ export function MainLayout() {
 											key={i}
 											className="h-6 bg-muted/20 rounded animate-pulse"
 											style={{
-												width: `${60 + Math.random() * 30}%`,
+												width: `${[60, 75, 90, 65, 80][i] || 70}%`,
 												animationDelay: `${i * 100}ms`,
 											}}
 										/>
