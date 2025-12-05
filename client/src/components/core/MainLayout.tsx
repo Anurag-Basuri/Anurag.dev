@@ -205,14 +205,16 @@ export function MainLayout() {
 									<div className="p-2 text-xs font-semibold border-b border-border bg-muted/40 uppercase tracking-[0.28em] text-muted-foreground">
 										Explorer
 									</div>
-									<ScrollArea className="h-full">
-										<div className="p-2">
-											<FolderTree
-												items={initialFileSystem}
-												onSelect={handleFileSelect}
-											/>
-										</div>
-									</ScrollArea>
+									<div className="flex-1 overflow-hidden">
+										<ScrollArea className="h-[calc(100vh-12rem)]">
+											<div className="p-2">
+												<FolderTree
+													items={initialFileSystem}
+													onSelect={handleFileSelect}
+												/>
+											</div>
+										</ScrollArea>
+									</div>
 								</SheetContent>
 							</Sheet>
 						)}
@@ -369,7 +371,7 @@ export function MainLayout() {
 								collapsedSize={0}
 								onCollapse={() => setSidebarCollapsed(true)}
 								onExpand={() => setSidebarCollapsed(false)}
-								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] transition-transform duration-500 ease-out origin-left hover:rotate-y-0 rotate-y-[2deg] hover:translate-z-0 translate-z-[-10px]"
+								className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] transition-transform duration-500 ease-out origin-left hover:rotate-y-0 rotate-y-2 hover:translate-z-0 translate-z-[-10px]"
 								style={{ transformStyle: 'preserve-3d' }}
 							>
 								<SidebarProfile />
@@ -475,14 +477,16 @@ export function MainLayout() {
 													<PanelLeftClose className="w-3 h-3" />
 												</button>
 											</div>
-											<ScrollArea className="flex-1">
-												<div className="p-2">
-													<FolderTree
-														items={initialFileSystem}
-														onSelect={handleFileSelect}
-													/>
-												</div>
-											</ScrollArea>
+											<div className="flex-1 overflow-hidden">
+												<ScrollArea className="h-full">
+													<div className="p-2">
+														<FolderTree
+															items={initialFileSystem}
+															onSelect={handleFileSelect}
+														/>
+													</div>
+												</ScrollArea>
+											</div>
 										</div>
 									</ResizablePanel>
 								</ResizablePanelGroup>
@@ -529,7 +533,7 @@ export function MainLayout() {
 										collapsedSize={0}
 										onCollapse={() => setTerminalCollapsed(true)}
 										onExpand={() => setTerminalCollapsed(false)}
-										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-out origin-bottom hover:rotate-x-0 rotate-x-[2deg] hover:translate-z-0 translate-z-[-10px]"
+										className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-out origin-bottom hover:rotate-x-0 rotate-x-2 hover:translate-z-0 translate-z-[-10px]"
 										style={{ transformStyle: 'preserve-3d' }}
 									>
 										<div className="h-full flex flex-col">
