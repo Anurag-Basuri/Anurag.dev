@@ -285,9 +285,11 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 					return c.startsWith(command) || (command.length > 2 && c.includes(command));
 				});
 
-				let errorMsg = `Command not found: ${command}.`;
+				let errorMsg = `Hmm, I don't recognize '${command}'. 🤔`;
 				if (suggestion) {
-					errorMsg += ` Did you mean '${suggestion}'?`;
+					errorMsg += `\n\nDid you mean '${suggestion}'? Type 'help' to see all commands!`;
+				} else {
+					errorMsg += `\n\nType 'help' to see what I can do! 💡`;
 				}
 
 				return {

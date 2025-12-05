@@ -30,6 +30,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
 import Background3D from '@/components/core/Background3D';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { WelcomeDialog } from '@/components/core/WelcomeDialog';
+import { HelpButton } from '@/components/core/HelpButton';
 
 // Persistent size helper - defers localStorage read to avoid SSR hydration mismatch
 function usePersistentSizes(key: string, initial: number[]) {
@@ -599,6 +601,12 @@ export function MainLayout() {
 					)}
 				</div>
 			</div>
+
+			{/* Welcome Dialog for first-time visitors */}
+			<WelcomeDialog />
+
+			{/* Floating Help Button */}
+			<HelpButton />
 		</>
 	);
 }
