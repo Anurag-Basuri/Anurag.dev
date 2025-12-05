@@ -97,18 +97,47 @@ function resolvePath(currentPath: string, targetPath: string): FileSystemItem | 
 	return currentItem;
 }
 
+// Helper to parse arguments, handling quoted strings
+function parseArgs(input: string): string[] {
+	const args: string[] = [];
+	let current = '';
+	let inQuote = false;
+
+	for (let i = 0; i < input.length; i++) {
+		const char = input[i];
+		if (char === '"') {
+			inQuote = !inQuote;
+		} else if (char === ' ' && !inQuote) {
+			if (current) {
+				args.push(current);
+				current = '';
+			}
+		} else {
+			current += char;
+		}
+	}
+	if (current) {
+		args.push(current);
+	}
+	return args;
+}
+
 export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
-	const trimmed = input.trim();
-	if (!trimmed) return { type: 'text', content: '' };
+	try {
+		const trimmed = input.trim();
+		if (!trimmed) return { type: 'text', content: '' };
 
-	const [cmd, ...args] = trimmed.split(/\s+/);
-	const command = cmd.toLowerCase();
+		const args = parseArgs(trimmed);
+		const cmd = args.shift(); // Remove command from args
+		if (!cmd) return { type: 'text', content: '' };
 
-	switch (command) {
-		case 'help':
-			return {
-				type: 'text',
-				content: `Available commands:
+		const command = cmd.toLowerCase();
+
+		switch (command) {
+			case 'help':
+				return {
+					type: 'text',
+					content: `Available commands:
   help      - Show this help message
   ls        - List directory contents
   cd        - Change directory
@@ -121,128 +150,158 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
   
   Shortcuts:
   about, projects, journey, ai-lab, blog, contact`,
-			};
-		case 'clear':
-			return { type: 'clear', content: '' };
-		case 'ls': {
-			const target = args.length > 0 ? args[0] : '.';
-			const item = resolvePath(currentPath, target);
-
-			if (!item) {
-				return {
-					type: 'error',
-					content: `ls: cannot access '${target}': No such file or directory`,
 				};
-			}
+			case 'clear':
+				return { type: 'clear', content: '' };
+			case 'ls': {
+				const target = args.length > 0 ? args[0] : '.';
+				const item = resolvePath(currentPath, target);
 
-			if (item.type === 'file') {
-				return { type: 'text', content: item.name };
-			}
+				if (!item) {
+					return {
+						type: 'error',
+						content: `ls: cannot access '${target}': No such file or directory`,
+					};
+				}
 
-			if (item.children) {
-				const names = item.children.map(child => {
-					return child.type === 'folder' ? `${child.name}/` : child.name;
-				});
-				return { type: 'text', content: names.join('  ') };
-			}
-			return { type: 'text', content: '' };
-		}
-		case 'cd': {
-			if (args.length === 0) {
-				return { type: 'change_directory', content: '', newPath: '~' };
-			}
-			const target = args[0];
-			const item = resolvePath(currentPath, target);
+				if (item.type === 'file') {
+					return { type: 'text', content: item.name };
+				}
 
-			if (!item) {
-				return { type: 'error', content: `cd: no such file or directory: ${target}` };
+				if (item.children) {
+					const names = item.children.map(child => {
+						return child.type === 'folder' ? `${child.name}/` : child.name;
+					});
+					return { type: 'text', content: names.join('  ') };
+				}
+				return { type: 'text', content: '' };
 			}
-			if (item.type !== 'folder') {
-				return { type: 'error', content: `cd: not a directory: ${target}` };
-			}
+			case 'cd': {
+				if (args.length === 0) {
+					return { type: 'change_directory', content: '', newPath: '~' };
+				}
+				const target = args[0];
+				const item = resolvePath(currentPath, target);
 
-			// Construct new path string
-			if (item.id === 'root') return { type: 'change_directory', content: '', newPath: '~' };
+				if (!item) {
+					return { type: 'error', content: `cd: no such file or directory: ${target}` };
+				}
+				if (item.type !== 'folder') {
+					return { type: 'error', content: `cd: not a directory: ${target}` };
+				}
 
-			// For this app, IDs are paths like "about" or "projects/featured"
-			// So we can just use the ID prepended with ~
-			return { type: 'change_directory', content: '', newPath: `~/${item.id}` };
-		}
-		case 'whoami':
-			return {
-				type: 'text',
-				content: 'guest@anuragos',
-			};
-		case 'date':
-			return {
-				type: 'text',
-				content: new Date().toString(),
-			};
-		case 'echo':
-			return {
-				type: 'text',
-				content: args.join(' '),
-			};
-		case 'theme': {
-			const subCmd = args[0]?.toLowerCase();
-			if (subCmd === 'dark') {
-				return { type: 'set_theme', theme: 'dark', content: 'Setting theme to dark...' };
-			}
-			if (subCmd === 'light') {
-				return { type: 'set_theme', theme: 'light', content: 'Setting theme to light...' };
-			}
-			return { type: 'set_theme', theme: 'toggle', content: 'Toggling theme...' };
-		}
-		case 'about':
-		case 'projects':
-		case 'journey':
-		case 'ai-lab':
-		case 'blog':
-		case 'contact':
-			return {
-				type: 'open_module',
-				content: `Opening ${command}...`,
-				moduleId: command,
-			};
-		case 'open': {
-			if (args.length === 0) {
-				return { type: 'error', content: 'Usage: open [filename]' };
-			}
-			const target = args[0];
-			const item = resolvePath(currentPath, target);
+				// Construct new path string
+				if (item.id === 'root')
+					return { type: 'change_directory', content: '', newPath: '~' };
 
-			if (!item) {
-				return { type: 'error', content: `open: ${target}: No such file or directory` };
+				// For this app, IDs are paths like "about" or "projects/featured"
+				// So we can just use the ID prepended with ~
+				return { type: 'change_directory', content: '', newPath: `~/${item.id}` };
 			}
-
-			if (item.type === 'folder') {
-				return { type: 'error', content: `open: ${target}: Is a directory` };
+			case 'whoami':
+				return {
+					type: 'text',
+					content: 'guest@anuragos',
+				};
+			case 'date':
+				return {
+					type: 'text',
+					content: new Date().toString(),
+				};
+			case 'echo':
+				return {
+					type: 'text',
+					content: args.join(' '),
+				};
+			case 'theme': {
+				const subCmd = args[0]?.toLowerCase();
+				if (subCmd === 'dark') {
+					return {
+						type: 'set_theme',
+						theme: 'dark',
+						content: 'Setting theme to dark...',
+					};
+				}
+				if (subCmd === 'light') {
+					return {
+						type: 'set_theme',
+						theme: 'light',
+						content: 'Setting theme to light...',
+					};
+				}
+				return { type: 'set_theme', theme: 'toggle', content: 'Toggling theme...' };
 			}
-
-			// Extract module ID from the file ID (e.g. "about/whoami.md" -> "about")
-			let moduleId = item.id;
-			if (moduleId.includes('/')) {
-				moduleId = moduleId.split('/')[0];
-			}
-
-			const component = getModuleComponent(moduleId);
-			if (component) {
+			case 'about':
+			case 'projects':
+			case 'journey':
+			case 'ai-lab':
+			case 'blog':
+			case 'contact':
 				return {
 					type: 'open_module',
-					content: `Opening ${item.name}...`,
-					moduleId: moduleId,
+					content: `Opening ${command}...`,
+					moduleId: command,
+				};
+			case 'open': {
+				if (args.length === 0) {
+					return { type: 'error', content: 'Usage: open [filename]' };
+				}
+				const target = args[0];
+				const item = resolvePath(currentPath, target);
+
+				if (!item) {
+					return { type: 'error', content: `open: ${target}: No such file or directory` };
+				}
+
+				if (item.type === 'folder') {
+					return { type: 'error', content: `open: ${target}: Is a directory` };
+				}
+
+				// Extract module ID from the file ID (e.g. "about/whoami.md" -> "about")
+				let moduleId = item.id;
+				if (moduleId.includes('/')) {
+					moduleId = moduleId.split('/')[0];
+				}
+
+				const component = getModuleComponent(moduleId);
+				if (component) {
+					return {
+						type: 'open_module',
+						content: `Opening ${item.name}...`,
+						moduleId: moduleId,
+					};
+				}
+
+				return {
+					type: 'text',
+					content: `Opened ${item.name} (Preview not implemented for this file type)`,
 				};
 			}
+			default: {
+				// Simple suggestion logic
+				const suggestion = commandsList.find(c => {
+					// Check for Levenshtein distance or simple inclusion
+					// For simplicity, just check if it starts with or is close
+					return c.startsWith(command) || (command.length > 2 && c.includes(command));
+				});
 
-			return {
-				type: 'text',
-				content: `Opened ${item.name} (Preview not implemented for this file type)`,
-			};
+				let errorMsg = `Command not found: ${command}.`;
+				if (suggestion) {
+					errorMsg += ` Did you mean '${suggestion}'?`;
+				}
+
+				return {
+					type: 'error',
+					content: errorMsg,
+				};
+			}
 		}
-		default:
-			return {
-				type: 'error',
-				content: `Command not found: ${command}. Type 'help' for available commands.`,
-			};
+	} catch (error) {
+		return {
+			type: 'error',
+			content: `An unexpected error occurred: ${
+				error instanceof Error ? error.message : String(error)
+			}`,
+		};
 	}
 }
