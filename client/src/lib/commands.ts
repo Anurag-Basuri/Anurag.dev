@@ -18,6 +18,10 @@ export const commandsList = [
 	'ai-lab',
 	'blog',
 	'contact',
+	'whoami',
+	'date',
+	'echo',
+	'theme',
 	'clear',
 	'exit',
 ];
@@ -44,16 +48,41 @@ export function processCommand(input: string): CommandResponse {
   ai-lab    - Open AI Lab
   blog      - List blog posts
   contact   - Open Contact form
+  whoami    - Display current user
+  date      - Display current date and time
+  echo      - Display a line of text
+  theme     - Toggle theme (light/dark)
   clear     - Clear terminal
   exit      - End session`,
 			};
 		case 'clear':
 			return { type: 'clear', content: '' };
 		case 'ls':
-			// TODO: Implement actual directory listing based on current path
 			return {
 				type: 'text',
 				content: 'about  projects  journey  ai-lab  blog  contact  tools  secret',
+			};
+		case 'whoami':
+			return {
+				type: 'text',
+				content: 'guest@anuragos',
+			};
+		case 'date':
+			return {
+				type: 'text',
+				content: new Date().toString(),
+			};
+		case 'echo':
+			return {
+				type: 'text',
+				content: args.join(' '),
+			};
+		case 'theme':
+			// This is a placeholder as theme toggling needs to happen in the component
+			// We'll handle the 'theme' command in CLI.tsx specially or return a special type
+			return {
+				type: 'text',
+				content: 'Use the theme toggle button in the top bar for now.',
 			};
 		case 'about':
 		case 'projects':
@@ -92,6 +121,7 @@ export function processCommand(input: string): CommandResponse {
 				type: 'open_module',
 				content: `Opening ${moduleId}...`,
 				moduleId,
+				// Pass args as initial props if needed
 			};
 		}
 		default:
