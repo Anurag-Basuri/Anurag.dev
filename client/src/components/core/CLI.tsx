@@ -41,6 +41,7 @@ export function CLI() {
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const { setTheme, resolvedTheme } = useTheme();
+	const [isFocused, setIsFocused] = useState(false);
 
 	const getPromptLabel = (path: string) => (
 		<span className="font-medium">
@@ -52,6 +53,47 @@ export function CLI() {
 	);
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
+		// Handle Ctrl+L (Clear Screen)
+		if (e.ctrlKey && e.key === 'l') {
+			e.preventDefault();
+			setHistory([]);
+			return;
+		}
+
+		// Handle Ctrl+C (Cancel Command)
+		if (e.ctrlKey && e.key === 'c') {
+			e.preventDefault();
+			if (input.trim()) {
+				const newItem: HistoryItem = {
+					id:
+						typeof crypto !== 'undefined' && 'randomUUID' in crypto
+							? crypto.randomUUID()
+							: Math.random().toString(36).slice(2),
+					command: input + '^C',
+					response: { type: 'text', content: '' },
+					path: currentPath,
+				};
+				setHistory(prev => [...prev, newItem]);
+				setCmdHistory(prev => [...prev, input]);
+			} else {
+				// Even empty input gets a new line with prompt
+				const newItem: HistoryItem = {
+					id:
+						typeof crypto !== 'undefined' && 'randomUUID' in crypto
+							? crypto.randomUUID()
+							: Math.random().toString(36).slice(2),
+					command: '^C',
+					response: { type: 'text', content: '' },
+					path: currentPath,
+				};
+				setHistory(prev => [...prev, newItem]);
+			}
+			setInput('');
+			setCursorPos(0);
+			setHistoryIndex(-1);
+			return;
+		}
+
 		if (e.key === 'Enter') {
 			const response = processCommand(input, currentPath);
 			if (response.type === 'clear') {
@@ -258,6 +300,8 @@ export function CLI() {
 								onKeyUp={e => {
 									setCursorPos(e.currentTarget.selectionStart || 0);
 								}}
+								onFocus={() => setIsFocused(true)}
+								onBlur={() => setIsFocused(false)}
 								className="w-full bg-transparent border-none outline-none text-transparent caret-transparent absolute inset-0 z-10 font-mono"
 								autoFocus
 								spellCheck={false}
@@ -269,7 +313,7 @@ export function CLI() {
 									{input.slice(0, cursorPos)}
 								</span>
 								<motion.span
-									animate={{ opacity: [1, 1, 0, 0] }}
+									animate={{ opacity: isFocused ? [1, 1, 0, 0] : 0 }}
 									transition={{
 										duration: 0.8,
 										repeat: Infinity,
