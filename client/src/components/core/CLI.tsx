@@ -48,6 +48,16 @@ export function CLI() {
 	const [currentHint, setCurrentHint] = useState(0);
 	const [showHint, setShowHint] = useState(false);
 
+	// Dynamic quotes
+	const quotes = [
+		'💡 Innovation is seeing what everybody has seen and thinking what nobody has thought.',
+		'🚀 The best way to predict the future is to invent it.',
+		'⚡ Code is poetry in motion.',
+		'🎯 First, solve the problem. Then, write the code.',
+		'✨ Simplicity is the ultimate sophistication.',
+	];
+	const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
+
 	const getPromptLabel = (path: string) => (
 		<span className="font-medium">
 			<span className="text-green-500">root@anuragos</span>
@@ -263,6 +273,10 @@ export function CLI() {
 							<span className="mr-2">✔</span>Started network services...
 						</p>
 						<p className="text-primary mt-2 font-semibold">🚀 System Ready.</p>
+					</div>
+					{/* Inspirational Quote */}
+					<div className="mt-3 p-2.5 bg-accent/5 border-l-2 border-accent/40 rounded text-[10px] italic text-accent/80">
+						{currentQuote}
 					</div>
 					{/* Quick Start Guide */}
 					<div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded text-[11px] space-y-2">
