@@ -524,7 +524,7 @@ export function MainLayout() {
 										ref={terminalRef}
 										defaultSize={verticalSizes[1]}
 										minSize={0}
-										maxSize={45}
+										maxSize={80}
 										collapsible
 										collapsedSize={0}
 										onCollapse={() => setTerminalCollapsed(true)}

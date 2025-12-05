@@ -126,36 +126,42 @@ export function CLI() {
 			{/* Subtle terminal gradient overlay */}
 			<div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
 
-			{/* Terminal Header */}
-			<div className="px-4 pt-4 pb-3 select-none space-y-2 relative z-10 border-b border-border/30">
-				<div className="text-[10px] text-muted-foreground/50 font-mono mb-2">
-					Last login: {new Date().toLocaleString()} on ttys001
-				</div>
-				<div className="text-primary font-bold text-xs whitespace-pre leading-none opacity-80 hidden sm:block">
-					{`
+			{/* Main Scrollable Container */}
+			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
+				{/* Terminal Header */}
+				<div className="select-none space-y-2 mb-6 border-b border-border/30 pb-4">
+					<div className="text-[10px] text-muted-foreground/50 font-mono mb-2">
+						Last login: {new Date().toLocaleString()} on ttys001
+					</div>
+					<div className="text-primary font-bold text-xs whitespace-pre leading-none opacity-80 hidden sm:block">
+						{`
     _    _   _ _   _ ____      _    ____   ___  ____  
    / \\  | \\ | | | | |  _ \\    / \\  / ___| / _ \\/ ___| 
   / _ \\ |  \\| | | | | |_) |  / _ \\| |  _ | | | \\___ \\ 
  / ___ \\| |\\  | |_| |  _ <  / ___ \\ |_| || |_| |___) |
 /_/   \\_\\_| \\_|\\___/|_| \\_\\/_/   \\_\\____| \\___/|____/ 
 `}
+					</div>
+					<div className="space-y-1 mt-4 font-mono text-[11px] text-muted-foreground/80">
+						<p>
+							<span className="text-green-500">✔</span> Loaded kernel modules...
+						</p>
+						<p>
+							<span className="text-green-500">✔</span> Initialized graphics engine...
+						</p>
+						<p>
+							<span className="text-green-500">✔</span> Mounted file system...
+						</p>
+						<p>
+							<span className="text-green-500">✔</span> Started network services...
+						</p>
+						<p className="text-primary mt-2">System Ready.</p>
+					</div>
+					<p className="pt-2 text-muted-foreground/50 text-[10px] tracking-wide">
+						Type &apos;help&apos; for available commands. Try &apos;whoami&apos; or
+						&apos;date&apos;.
+					</p>
 				</div>
-				<p className="tracking-[0.35em] uppercase text-primary font-semibold text-xs flex items-center gap-2 mt-2">
-					<span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--primary)]" />
-					AnuragOS Terminal
-				</p>
-				<div className="text-[10px] text-muted-foreground/70 space-y-0.5 font-normal">
-					<p className="tracking-wide">Kernel v2.0.0-alpha [Secure Shell]</p>
-					<p className="tracking-wide">(c) 2025 Anurag Basuri. All rights reserved.</p>
-				</div>
-				<p className="pt-1.5 text-muted-foreground/50 text-[10px] tracking-wide">
-					Type &apos;help&apos; for available commands. Try &apos;whoami&apos; or
-					&apos;date&apos;.
-				</p>
-			</div>
-
-			{/* Terminal Content */}
-			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
 				<div className="space-y-3 pb-4">
 					<AnimatePresence initial={false} mode="popLayout">
 						{history.map(item => (
