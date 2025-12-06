@@ -81,6 +81,7 @@ export function MainLayout() {
 
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
 	const terminalRef = useRef<ImperativePanelHandle>(null);
+	const editorsRef = useRef<ImperativePanelHandle>(null);
 
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const [terminalCollapsed, setTerminalCollapsed] = useState(false);
@@ -386,169 +387,182 @@ export function MainLayout() {
 									className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] transition-transform duration-500 ease-out origin-left hover:rotate-y-0 rotate-y-2 hover:translate-z-0 translate-z-[-10px]"
 									style={{ transformStyle: 'preserve-3d' }}
 								>
-									<SidebarProfile />
-									<ResizablePanelGroup direction="vertical" className="h-full">
-										<ResizablePanel
-											defaultSize={38}
-											minSize={12}
-											collapsible
-											collapsedSize={8}
-											className="border-b border-border/60"
+									<div className="flex flex-col h-full relative">
+										{/* Sidebar Profile with Close Button */}
+										<div className="relative group/sidebar-header">
+											<SidebarProfile />
+											<button
+												onClick={() => {
+													const panel = sidebarRef.current;
+													if (panel) panel.collapse();
+												}}
+												className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground bg-black/20 hover:bg-black/40 rounded transition-colors opacity-0 group-hover/sidebar-header:opacity-100"
+												title="Hide Sidebar"
+												aria-label="Hide Sidebar"
+											>
+												<PanelLeftClose className="w-3.5 h-3.5" />
+											</button>
+										</div>
+
+										{/* Persistent Open Editors Header */}
+										<div
+											className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group cursor-pointer hover:bg-muted/40 transition-colors"
+											onClick={() => {
+												const panel = editorsRef.current;
+												if (panel) {
+													if (isEditorsCollapsed) panel.expand();
+													else panel.collapse();
+												}
+											}}
 										>
-											<div className="h-full flex flex-col">
-												<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
-													<span>Open Editors</span>
-													<button
-														onClick={() =>
-															setIsEditorsCollapsed(
-																!isEditorsCollapsed,
-															)
-														}
-														className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
-														title={
-															isEditorsCollapsed
-																? 'Expand'
-																: 'Collapse'
-														}
-													>
-														<ChevronDown
-															className={cn(
-																'w-3 h-3 transition-transform',
-																isEditorsCollapsed && 'rotate-180',
-															)}
-														/>
-													</button>
-												</div>
-												<AnimatePresence initial={false}>
-													{!isEditorsCollapsed && (
-														<motion.div
-															initial={{ height: 0, opacity: 0 }}
-															animate={{ height: 'auto', opacity: 1 }}
-															exit={{ height: 0, opacity: 0 }}
-															transition={{
-																duration: 0.2,
-																ease: 'easeInOut',
-															}}
-															className="flex-1 overflow-hidden"
-														>
-															<ScrollArea className="h-full">
-																<motion.div
-																	layout
-																	className="flex flex-col"
-																>
-																	<AnimatePresence>
-																		{windows.map(win => (
-																			<motion.div
-																				layout
-																				initial={{
-																					opacity: 0,
-																					x: -16,
-																				}}
-																				animate={{
-																					opacity: 1,
-																					x: 0,
-																				}}
-																				exit={{
-																					opacity: 0,
-																					x: -16,
-																				}}
-																				transition={{
-																					duration: 0.16,
-																				}}
-																				key={win.id}
-																				className={cn(
-																					'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
-																					'hover:bg-muted/40',
-																					activeWindowId ===
-																						win.id &&
-																						'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
-																				)}
-																				onClick={() =>
-																					setActiveWindowId(
-																						win.id,
-																					)
-																				}
-																			>
-																				<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
-																					{win.title}
-																				</span>
-																				<button
-																					onClick={e => {
-																						e.stopPropagation();
-																						const newWindows =
-																							windows.filter(
-																								w =>
-																									w.id !==
-																									win.id,
-																							);
-																						setWindows(
-																							newWindows,
-																						);
-																						setActiveWindowId(
-																							newWindows.length
-																								? newWindows[
-																										newWindows.length -
-																											1
-																								  ]
-																										.id
-																								: null,
-																						);
-																					}}
-																					className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
-																					aria-label={`Close ${win.title}`}
-																				>
-																					<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-																				</button>
-																			</motion.div>
-																		))}
-																	</AnimatePresence>
-																	{windows.length === 0 && (
-																		<div className="p-4 text-xs text-muted-foreground text-center italic">
-																			No open editors
-																		</div>
-																	)}
-																</motion.div>
-															</ScrollArea>
-														</motion.div>
+											<span>Open Editors</span>
+											<button
+												className="text-muted-foreground hover:text-primary transition-colors"
+												title={isEditorsCollapsed ? 'Expand' : 'Collapse'}
+											>
+												<ChevronDown
+													className={cn(
+														'w-3 h-3 transition-transform duration-200',
+														isEditorsCollapsed && 'rotate-180',
 													)}
-												</AnimatePresence>
-											</div>
-										</ResizablePanel>
+												/>
+											</button>
+										</div>
 
-										<ResizableHandle className="bg-border/60 hover:bg-border transition-colors" />
-
-										<ResizablePanel defaultSize={62} minSize={26}>
-											<div className="h-full flex flex-col">
-												<div className="p-2 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
-													<span>Explorer</span>
-													<button
-														onClick={() => {
-															// Dispatch a custom event that FolderTree listens to
-															window.dispatchEvent(
-																new CustomEvent(
-																	'collapse-all-folders',
-																),
-															);
-														}}
-														className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
-														title="Collapse All"
-													>
-														<PanelLeftClose className="w-3 h-3" />
-													</button>
-												</div>
-												<div className="flex-1 overflow-hidden">
+										{/* Resizable Group for Open Editors List vs Explorer */}
+										<ResizablePanelGroup
+											direction="vertical"
+											className="flex-1"
+										>
+											{/* Open Editors List (Collapsible) */}
+											<ResizablePanel
+												ref={editorsRef}
+												defaultSize={30}
+												minSize={0}
+												collapsible
+												collapsedSize={0}
+												onCollapse={() => setIsEditorsCollapsed(true)}
+												onExpand={() => setIsEditorsCollapsed(false)}
+												className={cn(
+													'transition-all duration-300 ease-in-out',
+													isEditorsCollapsed
+														? 'border-b-0'
+														: 'border-b border-border/60',
+												)}
+											>
+												<div className="h-full overflow-hidden">
 													<ScrollArea className="h-full">
-														<div className="p-2">
-															<FolderTree
-																items={initialFileSystem}
-																onSelect={handleFileSelect}
-															/>
+														<div className="flex flex-col">
+															<AnimatePresence>
+																{windows.map(win => (
+																	<motion.div
+																		layout
+																		initial={{
+																			opacity: 0,
+																			x: -10,
+																		}}
+																		animate={{
+																			opacity: 1,
+																			x: 0,
+																		}}
+																		exit={{
+																			opacity: 0,
+																			x: -10,
+																		}}
+																		transition={{
+																			duration: 0.15,
+																		}}
+																		key={win.id}
+																		className={cn(
+																			'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
+																			'hover:bg-muted/40',
+																			activeWindowId ===
+																				win.id &&
+																				'bg-primary/10 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
+																		)}
+																		onClick={() =>
+																			setActiveWindowId(
+																				win.id,
+																			)
+																		}
+																	>
+																		<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																			{win.title}
+																		</span>
+																		<button
+																			onClick={e => {
+																				e.stopPropagation();
+																				const newWindows =
+																					windows.filter(
+																						w =>
+																							w.id !==
+																							win.id,
+																					);
+																				setWindows(
+																					newWindows,
+																				);
+																				setActiveWindowId(
+																					newWindows.length
+																						? newWindows[
+																								newWindows.length -
+																									1
+																						  ].id
+																						: null,
+																				);
+																			}}
+																			className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
+																			aria-label={`Close ${win.title}`}
+																		>
+																			<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+																		</button>
+																	</motion.div>
+																))}
+															</AnimatePresence>
+															{windows.length === 0 && (
+																<div className="p-4 text-xs text-muted-foreground/50 text-center italic">
+																	No open editors
+																</div>
+															)}
 														</div>
 													</ScrollArea>
 												</div>
-											</div>
-										</ResizablePanel>
-									</ResizablePanelGroup>
+											</ResizablePanel>
+
+											<ResizableHandle className="bg-border/40 hover:bg-primary/50 transition-colors h-px" />
+
+											{/* Explorer Panel */}
+											<ResizablePanel defaultSize={70} minSize={20}>
+												<div className="h-full flex flex-col">
+													<div className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
+														<span>Explorer</span>
+														<button
+															onClick={() => {
+																window.dispatchEvent(
+																	new CustomEvent(
+																		'collapse-all-folders',
+																	),
+																);
+															}}
+															className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
+															title="Collapse All Folders"
+														>
+															<PanelLeftClose className="w-3 h-3" />
+														</button>
+													</div>
+													<div className="flex-1 overflow-hidden">
+														<ScrollArea className="h-full">
+															<div className="p-2">
+																<FolderTree
+																	items={initialFileSystem}
+																	onSelect={handleFileSelect}
+																/>
+															</div>
+														</ScrollArea>
+													</div>
+												</div>
+											</ResizablePanel>
+										</ResizablePanelGroup>
+									</div>
 								</ResizablePanel>
 
 								<ResizableHandle
