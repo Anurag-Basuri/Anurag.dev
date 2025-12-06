@@ -34,7 +34,6 @@ export const commandsList = [
 	'open',
 	'clear',
 	'theme',
-	// Easter eggs
 	'matrix',
 	'coffee',
 	'konami',
@@ -128,10 +127,16 @@ function parseArgs(input: string): string[] {
 
 export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
 	try {
-		const trimmed = input.trim();
-		if (!trimmed) return { type: 'text', content: '' };
+		// Validate input type and length
+		if (typeof input !== 'string') {
+			return { type: 'error', content: 'Invalid input type.' };
+		}
 
-		const args = parseArgs(trimmed);
+		// Limit input length to prevent abuse
+		const sanitized = input.trim().slice(0, 500);
+		if (!sanitized) return { type: 'text', content: '' };
+
+		const args = parseArgs(sanitized);
 		const cmd = args.shift(); // Remove command from args
 		if (!cmd) return { type: 'text', content: '' };
 
