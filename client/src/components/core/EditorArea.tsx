@@ -118,7 +118,7 @@ export function EditorArea() {
 								Select a file from the Explorer to get started
 							</p>
 							<div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground/40">
-								<p className="flex items-center gap-2">
+								<p className="flex items-center gap-2 md:flex">
 									<kbd className="px-2 py-1 bg-muted/50 rounded border border-border/50 shadow-sm text-xs font-mono">
 										Ctrl
 									</kbd>

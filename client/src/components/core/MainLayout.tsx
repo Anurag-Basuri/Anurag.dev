@@ -268,61 +268,70 @@ export function MainLayout() {
 							</div>
 
 							{/* Theme Toggle */}
-							<div className="pr-2 border-r border-border">
+							<div className={cn('pr-2', !isMobile && 'border-r border-border')}>
 								<ThemeToggle />
 							</div>
 
-							{/* Sidebar controls */}
-							<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
-								<button
-									className={cn(
-										'p-1 hover:bg-muted/60 rounded transition-all duration-200',
-										sidebarCollapsed && 'text-muted-foreground',
-									)}
-									title={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
-									aria-label={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
-									onClick={() => {
-										const panel = sidebarRef.current;
-										if (panel) {
-											if (sidebarCollapsed) panel.expand();
-											else panel.collapse();
-										}
-									}}
-								>
-									{sidebarCollapsed ? (
-										<PanelLeftOpen className="w-4 h-4" />
-									) : (
-										<PanelLeftClose className="w-4 h-4" />
-									)}
-								</button>
-							</div>
+							{/* Desktop Layout Controls */}
+							{!isMobile && (
+								<>
+									{/* Sidebar controls */}
+									<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
+										<button
+											className={cn(
+												'p-1 hover:bg-muted/60 rounded transition-all duration-200',
+												sidebarCollapsed && 'text-muted-foreground',
+											)}
+											title={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
+											aria-label={
+												sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'
+											}
+											onClick={() => {
+												const panel = sidebarRef.current;
+												if (panel) {
+													if (sidebarCollapsed) panel.expand();
+													else panel.collapse();
+												}
+											}}
+										>
+											{sidebarCollapsed ? (
+												<PanelLeftOpen className="w-4 h-4" />
+											) : (
+												<PanelLeftClose className="w-4 h-4" />
+											)}
+										</button>
+									</div>
 
-							{/* Terminal controls */}
-							<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
-								<button
-									className={cn(
-										'p-1 hover:bg-muted/60 rounded transition-all duration-200',
-										terminalCollapsed && 'text-muted-foreground',
-									)}
-									title={terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'}
-									aria-label={
-										terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'
-									}
-									onClick={() => {
-										const panel = terminalRef.current;
-										if (panel) {
-											if (terminalCollapsed) panel.expand();
-											else panel.collapse();
-										}
-									}}
-								>
-									{terminalCollapsed ? (
-										<TerminalIcon className="w-4 h-4" />
-									) : (
-										<ChevronDown className="w-4 h-4" />
-									)}
-								</button>
-							</div>
+									{/* Terminal controls */}
+									<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
+										<button
+											className={cn(
+												'p-1 hover:bg-muted/60 rounded transition-all duration-200',
+												terminalCollapsed && 'text-muted-foreground',
+											)}
+											title={
+												terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'
+											}
+											aria-label={
+												terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'
+											}
+											onClick={() => {
+												const panel = terminalRef.current;
+												if (panel) {
+													if (terminalCollapsed) panel.expand();
+													else panel.collapse();
+												}
+											}}
+										>
+											{terminalCollapsed ? (
+												<TerminalIcon className="w-4 h-4" />
+											) : (
+												<ChevronDown className="w-4 h-4" />
+											)}
+										</button>
+									</div>
+								</>
+							)}
 						</div>
 					</motion.div>
 
