@@ -12,7 +12,7 @@ import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { EditorArea } from '@/components/core/EditorArea';
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBoundary } from '@/components/core/ErrorBoundary';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import {
