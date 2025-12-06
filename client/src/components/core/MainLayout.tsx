@@ -635,8 +635,8 @@ export function MainLayout() {
 								</ResizablePanel>
 							</ResizablePanelGroup>
 						) : (
-							<div className="flex-1 flex flex-col bg-muted/40 backdrop-blur-sm w-full">
-								<CLI />
+							<div className="flex-1 flex flex-col bg-background w-full overflow-hidden relative">
+								<EditorArea />
 							</div>
 						)}
 					</div>
