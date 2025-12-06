@@ -419,93 +419,99 @@ export function MainLayout() {
 														/>
 													</button>
 												</div>
-												{!isEditorsCollapsed && (
-													<motion.div
-														initial={{ height: 0, opacity: 0 }}
-														animate={{ height: 'auto', opacity: 1 }}
-														exit={{ height: 0, opacity: 0 }}
-														transition={{ duration: 0.2 }}
-														className="flex-1 overflow-hidden"
-													>
-														<ScrollArea className="h-full">
-															<motion.div
-																layout
-																className="flex flex-col"
-															>
-																<AnimatePresence>
-																	{windows.map(win => (
-																		<motion.div
-																			layout
-																			initial={{
-																				opacity: 0,
-																				x: -16,
-																			}}
-																			animate={{
-																				opacity: 1,
-																				x: 0,
-																			}}
-																			exit={{
-																				opacity: 0,
-																				x: -16,
-																			}}
-																			transition={{
-																				duration: 0.16,
-																			}}
-																			key={win.id}
-																			className={cn(
-																				'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
-																				'hover:bg-muted/40',
-																				activeWindowId ===
-																					win.id &&
-																					'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
-																			)}
-																			onClick={() =>
-																				setActiveWindowId(
-																					win.id,
-																				)
-																			}
-																		>
-																			<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
-																				{win.title}
-																			</span>
-																			<button
-																				onClick={e => {
-																					e.stopPropagation();
-																					const newWindows =
-																						windows.filter(
-																							w =>
-																								w.id !==
-																								win.id,
-																						);
-																					setWindows(
-																						newWindows,
-																					);
-																					setActiveWindowId(
-																						newWindows.length
-																							? newWindows[
-																									newWindows.length -
-																										1
-																							  ].id
-																							: null,
-																					);
+												<AnimatePresence initial={false}>
+													{!isEditorsCollapsed && (
+														<motion.div
+															initial={{ height: 0, opacity: 0 }}
+															animate={{ height: 'auto', opacity: 1 }}
+															exit={{ height: 0, opacity: 0 }}
+															transition={{
+																duration: 0.2,
+																ease: 'easeInOut',
+															}}
+															className="flex-1 overflow-hidden"
+														>
+															<ScrollArea className="h-full">
+																<motion.div
+																	layout
+																	className="flex flex-col"
+																>
+																	<AnimatePresence>
+																		{windows.map(win => (
+																			<motion.div
+																				layout
+																				initial={{
+																					opacity: 0,
+																					x: -16,
 																				}}
-																				className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
-																				aria-label={`Close ${win.title}`}
+																				animate={{
+																					opacity: 1,
+																					x: 0,
+																				}}
+																				exit={{
+																					opacity: 0,
+																					x: -16,
+																				}}
+																				transition={{
+																					duration: 0.16,
+																				}}
+																				key={win.id}
+																				className={cn(
+																					'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
+																					'hover:bg-muted/40',
+																					activeWindowId ===
+																						win.id &&
+																						'bg-primary/15 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
+																				)}
+																				onClick={() =>
+																					setActiveWindowId(
+																						win.id,
+																					)
+																				}
 																			>
-																				<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-																			</button>
-																		</motion.div>
-																	))}
-																</AnimatePresence>
-																{windows.length === 0 && (
-																	<div className="p-4 text-xs text-muted-foreground text-center italic">
-																		No open editors
-																	</div>
-																)}
-															</motion.div>
-														</ScrollArea>
-													</motion.div>
-												)}
+																				<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
+																					{win.title}
+																				</span>
+																				<button
+																					onClick={e => {
+																						e.stopPropagation();
+																						const newWindows =
+																							windows.filter(
+																								w =>
+																									w.id !==
+																									win.id,
+																							);
+																						setWindows(
+																							newWindows,
+																						);
+																						setActiveWindowId(
+																							newWindows.length
+																								? newWindows[
+																										newWindows.length -
+																											1
+																								  ]
+																										.id
+																								: null,
+																						);
+																					}}
+																					className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
+																					aria-label={`Close ${win.title}`}
+																				>
+																					<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+																				</button>
+																			</motion.div>
+																		))}
+																	</AnimatePresence>
+																	{windows.length === 0 && (
+																		<div className="p-4 text-xs text-muted-foreground text-center italic">
+																			No open editors
+																		</div>
+																	)}
+																</motion.div>
+															</ScrollArea>
+														</motion.div>
+													)}
+												</AnimatePresence>
 											</div>
 										</ResizablePanel>
 
@@ -590,11 +596,21 @@ export function MainLayout() {
 											style={{ transformStyle: 'preserve-3d' }}
 										>
 											<div className="h-full flex flex-col">
-												<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm">
+												<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm group">
 													<span className="flex items-center gap-2">
 														Terminal{' '}
 														<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
 													</span>
+													<button
+														onClick={() => {
+															const panel = terminalRef.current;
+															if (panel) panel.collapse();
+														}}
+														className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary p-1 rounded hover:bg-muted/40"
+														title="Minimize Terminal"
+													>
+														<ChevronDown className="w-4 h-4" />
+													</button>
 												</div>
 												<div className="flex-1 overflow-hidden">
 													<CLI />
