@@ -39,7 +39,7 @@ export const commandsList = [
 	'konami',
 ];
 
-// Helper to resolve a path string to a FileSystemItem or null
+// Resolves a file system path (absolute or relative) to a FileSystemItem.
 function resolvePath(currentPath: string, targetPath: string): FileSystemItem | null {
 	// Normalize paths
 	if (targetPath === '~' || targetPath === '/')
@@ -100,7 +100,7 @@ function resolvePath(currentPath: string, targetPath: string): FileSystemItem | 
 	return currentItem;
 }
 
-// Helper to parse arguments, handling quoted strings
+// Parses command line arguments, respecting quoted strings.
 function parseArgs(input: string): string[] {
 	const args: string[] = [];
 	let current = '';
@@ -125,6 +125,7 @@ function parseArgs(input: string): string[] {
 	return args;
 }
 
+// Processes a command input and returns the appropriate response.
 export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
 	try {
 		// Validate input type and length
