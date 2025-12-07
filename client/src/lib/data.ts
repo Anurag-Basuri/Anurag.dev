@@ -61,7 +61,10 @@ export const initialFileSystem: FileSystemItem[] = [
 		name: 'tools',
 		type: 'folder',
 		id: 'tools',
-		children: [{ name: 'resume.pdf', type: 'file', id: 'tools/resume.pdf' }],
+		children: [
+			{ name: 'resume.pdf', type: 'file', id: 'tools/resume.pdf' },
+			{ name: 'stats.exe', type: 'file', id: 'stats.exe' },
+		],
 	},
 	{
 		name: 'secret',
