@@ -81,7 +81,7 @@ export function ProjectsModule() {
 				{/* 1. Standardized System Header - PROJECT REGISTRY */}
 				<div className="flex items-end justify-between border-b border-border/40 pb-4">
 					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
+						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-blue-500">
 							DEPLOYMENT REGISTRY
 						</h1>
 						<p className="text-sm text-muted-foreground tracking-wider uppercase font-mono mt-1">
@@ -114,7 +114,7 @@ export function ProjectsModule() {
 									alt={project.title}
 									className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
 								/>
-								<div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+								<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/20 to-transparent" />
 
 								{/* Top Right Actions */}
 								<div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">

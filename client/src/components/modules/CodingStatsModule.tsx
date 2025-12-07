@@ -71,13 +71,13 @@ export default function CodingStatsModule() {
 				<motion.div
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
-					className="flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-gradient-to-br from-background via-muted/10 to-primary/5 border border-border/60 shadow-lg relative overflow-hidden"
+					className="flex flex-col md:flex-row gap-6 p-6 rounded-2xl bg-linear-to-br from-background via-muted/10 to-primary/5 border border-border/60 shadow-lg relative overflow-hidden"
 				>
 					<div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
 
 					{/* ID Card Left */}
 					<div className="flex items-center gap-6 z-10">
-						<div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
+						<div className="w-20 h-20 rounded-2xl bg-linear-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/20">
 							<User className="w-10 h-10 text-white" />
 						</div>
 						<div>
@@ -186,7 +186,7 @@ export default function CodingStatsModule() {
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.2 }}
-						className="col-span-1 lg:col-span-2 bg-gradient-to-br from-card/50 to-background border border-border/50 rounded-2xl p-6 relative overflow-hidden group hover:border-border/80 transition-colors"
+						className="col-span-1 lg:col-span-2 bg-linear-to-br from-card/50 to-background border border-border/50 rounded-2xl p-6 relative overflow-hidden group hover:border-border/80 transition-colors"
 					>
 						<div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity scale-150 transform rotate-12">
 							<Database className="w-32 h-32" />
@@ -194,7 +194,7 @@ export default function CodingStatsModule() {
 
 						<div className="flex flex-col sm:flex-row gap-8 relative z-10">
 							{/* Chart */}
-							<div className="w-32 h-32 sm:w-40 sm:h-40 relative flex-shrink-0 mx-auto sm:mx-0">
+							<div className="w-32 h-32 sm:w-40 sm:h-40 relative shrink-0 mx-auto sm:mx-0">
 								<ResponsiveContainer width="100%" height="100%">
 									<PieChart>
 										<Pie

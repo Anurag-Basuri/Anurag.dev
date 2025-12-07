@@ -77,7 +77,7 @@ export function AboutModule() {
 				{/* 1. Standardized System Header */}
 				<div className="flex items-end justify-between border-b border-border/40 pb-4">
 					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500">
+						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500">
 							PROFILE DOSSIER
 						</h1>
 						<p className="text-sm text-muted-foreground tracking-wider uppercase font-mono mt-1">
@@ -98,7 +98,7 @@ export function AboutModule() {
 							animate={fadeInUp.animate}
 							className="bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl p-6 flex flex-col items-center text-center relative overflow-hidden group"
 						>
-							<div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
 							<div className="relative w-40 h-40 mb-6">
 								<div className="absolute inset-0 rounded-full border-2 border-dashed border-primary/30 animate-[spin_10s_linear_infinite]" />
@@ -164,7 +164,7 @@ export function AboutModule() {
 
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								{/* Frontend */}
-								<div className="p-5 rounded-xl bg-gradient-to-br from-indigo-500/10 to-indigo-600/5 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors group">
+								<div className="p-5 rounded-xl bg-linear-to-br from-indigo-500/10 to-indigo-600/5 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors group">
 									<div className="flex items-center gap-2 mb-3 text-indigo-400">
 										<Layers className="w-4 h-4" />
 										<span className="font-bold text-xs uppercase">
@@ -184,7 +184,7 @@ export function AboutModule() {
 								</div>
 
 								{/* Backend */}
-								<div className="p-5 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group">
+								<div className="p-5 rounded-xl bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group">
 									<div className="flex items-center gap-2 mb-3 text-emerald-400">
 										<Cpu className="w-4 h-4" />
 										<span className="font-bold text-xs uppercase">
@@ -204,7 +204,7 @@ export function AboutModule() {
 								</div>
 
 								{/* ML/AI (Full Width) */}
-								<div className="sm:col-span-2 p-5 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-600/5 border border-purple-500/20 hover:border-purple-500/40 transition-colors group">
+								<div className="sm:col-span-2 p-5 rounded-xl bg-linear-to-br from-purple-500/10 to-pink-600/5 border border-purple-500/20 hover:border-purple-500/40 transition-colors group">
 									<div className="flex items-center gap-2 mb-3 text-purple-400">
 										<Box className="w-4 h-4" />
 										<span className="font-bold text-xs uppercase">
