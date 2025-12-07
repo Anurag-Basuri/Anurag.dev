@@ -2,6 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
+import { getModuleComponent } from '@/lib/moduleRegistry';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -16,6 +17,7 @@ import {
 	ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export function Taskbar() {
 	const [windows, setWindows] = useAtom(windowsAtom);
@@ -38,6 +40,27 @@ export function Taskbar() {
 		} else {
 			setActiveId(id);
 		}
+	};
+
+	const handleOpenModule = (id: string, title: string) => {
+		setIsStartOpen(false);
+		setWindows(prev => {
+			if (prev.find(w => w.id === id)) {
+				setActiveId(id);
+				return prev;
+			}
+			setActiveId(id);
+			return [
+				...prev,
+				{
+					id,
+					title: title.toUpperCase(),
+					component: getModuleComponent(id),
+					isOpen: true,
+					isMinimized: false,
+				},
+			];
+		});
 	};
 
 	return (
@@ -83,14 +106,20 @@ export function Taskbar() {
 							</div>
 
 							<div className="space-y-0.5">
-								{['PROJECTS', 'ABOUT', 'CONTACT', 'JOURNEY'].map(item => (
+								{[
+									{ id: 'projects', label: 'PROJECTS' },
+									{ id: 'about', label: 'ABOUT' },
+									{ id: 'contact', label: 'CONTACT' },
+									{ id: 'journey', label: 'JOURNEY' },
+								].map(item => (
 									<button
-										key={item}
+										key={item.id}
+										onClick={() => handleOpenModule(item.id, item.label)}
 										className="w-full text-left px-3 py-2 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-xs flex items-center justify-between group rounded-sm"
 									>
 										<span className="flex items-center gap-2">
 											<ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-											{item}
+											{item.label}
 										</span>
 										<span className="text-[10px] opacity-50 group-hover:opacity-80">
 											EXE
@@ -100,11 +129,19 @@ export function Taskbar() {
 							</div>
 
 							<div className="mt-1 pt-1 border-t border-border/50 grid grid-cols-2 gap-0.5">
-								<button className="px-3 py-2 hover:bg-muted/50 text-muted-foreground hover:text-foreground text-xs flex items-center gap-2 transition-colors rounded-sm">
+								<button
+									onClick={() =>
+										toast('Configure settings in next version', { icon: '⚙️' })
+									}
+									className="px-3 py-2 hover:bg-muted/50 text-muted-foreground hover:text-foreground text-xs flex items-center gap-2 transition-colors rounded-sm"
+								>
 									<Settings className="w-3 h-3" />
 									CONFIG
 								</button>
-								<button className="px-3 py-2 hover:bg-destructive/20 hover:text-destructive text-destructive/80 text-xs flex items-center gap-2 transition-colors rounded-sm">
+								<button
+									onClick={() => window.location.reload()}
+									className="px-3 py-2 hover:bg-destructive/20 hover:text-destructive text-destructive/80 text-xs flex items-center gap-2 transition-colors rounded-sm"
+								>
 									<Power className="w-3 h-3" />
 									HALT
 								</button>
