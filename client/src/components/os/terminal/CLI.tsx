@@ -43,21 +43,6 @@ export function CLI() {
 	const { setTheme, resolvedTheme } = useTheme();
 	const [isFocused, setIsFocused] = useState(false);
 
-	// Terminal hints
-	const hints = ['help', 'whoami', 'ls', 'open projects', 'open about'];
-	const [currentHint, setCurrentHint] = useState(0);
-	const [showHint, setShowHint] = useState(false);
-
-	// Dynamic quotes
-	const quotes = [
-		'💡 Innovation is seeing what everybody has seen and thinking what nobody has thought.',
-		'🚀 The best way to predict the future is to invent it.',
-		'⚡ Code is poetry in motion.',
-		'🎯 First, solve the problem. Then, write the code.',
-		'✨ Simplicity is the ultimate sophistication.',
-	];
-	const [currentQuote] = useState(() => quotes[Math.floor(Math.random() * quotes.length)]);
-
 	const getPromptLabel = (path: string) => (
 		<span className="font-medium">
 			<span className="text-green-500">root@anuragos</span>
@@ -213,24 +198,6 @@ export function CLI() {
 		}
 	}, [history]);
 
-	// Rotate hints every 3 seconds
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setCurrentHint(prev => (prev + 1) % hints.length);
-		}, 3000);
-		return () => clearInterval(timer);
-	}, [hints.length]);
-
-	// Show hint when input is empty and focused
-	useEffect(() => {
-		if (isFocused && input === '') {
-			const timer = setTimeout(() => setShowHint(true), 1000);
-			return () => clearTimeout(timer);
-		} else {
-			setShowHint(false);
-		}
-	}, [isFocused, input]);
-
 	const handleContainerClick = () => {
 		inputRef.current?.focus();
 	};
@@ -245,70 +212,21 @@ export function CLI() {
 
 			{/* Main Scrollable Container */}
 			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
-				{/* Terminal Header */}
-				<div className="select-none space-y-2 mb-6 border-b border-border/30 pb-4">
-					<div className="text-[10px] text-muted-foreground/50 font-mono mb-2">
-						Last login: {new Date().toLocaleString()} on ttys001
-					</div>
-					<div className="text-primary font-bold text-xs whitespace-pre leading-none opacity-80 hidden sm:block">
-						{`
-    _    _   _ _   _ ____      _    ____   ___  ____  
-   / \\  | \\ | | | | |  _ \\    / \\  / ___| / _ \\/ ___| 
-  / _ \\ |  \\| | | | | |_) |  / _ \\| |  _ | | | \\___ \\ 
- / ___ \\| |\\  | |_| |  _ <  / ___ \\ |_| || |_| |___) |
-/_/   \\_\\_| \\_|\\___/|_| \\_\\/_/   \\_\\____| \\___/|____/ 
-`}
-					</div>
-					<div className="space-y-1 mt-4 font-mono text-[11px]">
-						<p className="text-green-500">
-							<span className="mr-2">✔</span>Loaded kernel modules...
-						</p>
-						<p className="text-green-500">
-							<span className="mr-2">✔</span>Initialized graphics engine...
-						</p>
-						<p className="text-green-500">
-							<span className="mr-2">✔</span>Mounted file system...
-						</p>
-						<p className="text-green-500">
-							<span className="mr-2">✔</span>Started network services...
-						</p>
-						<p className="text-primary mt-2 font-semibold">🚀 System Ready.</p>
-					</div>
-					{/* Inspirational Quote */}
-					<div className="mt-3 p-2.5 bg-accent/5 border-l-2 border-accent/40 rounded text-[10px] italic text-accent/80">
-						{currentQuote}
-					</div>
-					{/* Quick Start Guide */}
-					<div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded text-[11px] space-y-2">
-						<div className="text-primary font-semibold mb-2">⚡ Quick Start:</div>
-						<div className="space-y-1 text-muted-foreground">
-							<p>
-								• Type{' '}
-								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
-									about
-								</code>{' '}
-								to learn about me
-							</p>
-							<p>
-								• Type{' '}
-								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
-									projects
-								</code>{' '}
-								to see my work
-							</p>
-							<p>
-								• Type{' '}
-								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded text-[10px]">
-									help
-								</code>{' '}
-								for all commands
-							</p>
-							<p className="text-[10px] mt-2 text-muted-foreground/70">
-								💡 Or click files in the Explorer →
-							</p>
+				{/* Minimal Terminal Header */}
+				{history.length === 0 && (
+					<div className="select-none mb-4 pb-3 border-b border-border/20">
+						<div className="text-primary font-semibold text-sm mb-1.5">
+							$ AnuragOS Terminal
+						</div>
+						<div className="text-xs text-muted-foreground/70">
+							Type{' '}
+							<code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-[10px]">
+								help
+							</code>{' '}
+							for commands, or click files in Explorer.
 						</div>
 					</div>
-				</div>
+				)}
 				<div className="space-y-3 pb-4">
 					<AnimatePresence initial={false} mode="popLayout">
 						{history.map(item => (
@@ -393,21 +311,6 @@ export function CLI() {
 							</div>
 						</div>
 					</div>
-					{/* Typing Hint */}
-					<AnimatePresence>
-						{showHint && (
-							<motion.div
-								initial={{ opacity: 0, y: -5 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -5 }}
-								transition={{ duration: 0.2 }}
-								className="text-xs text-muted-foreground/50 mt-2 ml-2"
-							>
-								💡 Try:{' '}
-								<code className="text-primary/70">{hints[currentHint]}</code>
-							</motion.div>
-						)}
-					</AnimatePresence>
 				</div>
 			</div>
 		</div>
