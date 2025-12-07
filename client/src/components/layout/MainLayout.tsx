@@ -17,9 +17,8 @@ import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { X, PanelLeftClose, Terminal as TerminalIcon, ChevronDown } from 'lucide-react';
+import { PanelLeftClose, Terminal as TerminalIcon, ChevronDown } from 'lucide-react';
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
 import Background3D from '@/components/layout/Background3D';
 import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
@@ -69,12 +68,10 @@ export function MainLayout() {
 
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
 	const terminalRef = useRef<ImperativePanelHandle>(null);
-	const editorsRef = useRef<ImperativePanelHandle>(null);
 
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	// Default to collapsed for simplicity
 	const [terminalCollapsed, setTerminalCollapsed] = useState(true);
-	const [isEditorsCollapsed, setIsEditorsCollapsed] = useState(false);
 
 	const {
 		sizes: verticalSizes,
@@ -191,6 +188,7 @@ export function MainLayout() {
 									style={{ transformStyle: 'preserve-3d' }}
 								>
 									<div className="flex flex-col h-full relative">
+										{/* Profile Header */}
 										<div className="relative group/sidebar-header">
 											<SidebarProfile />
 											<button
@@ -205,137 +203,33 @@ export function MainLayout() {
 											</button>
 										</div>
 
-										<div
-											className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group cursor-pointer hover:bg-muted/40 transition-colors"
-											onClick={() => {
-												const panel = editorsRef.current;
-												if (panel) {
-													if (isEditorsCollapsed) panel.expand();
-													else panel.collapse();
-												}
-											}}
-										>
-											<span>Open Editors</span>
-											<button className="text-muted-foreground hover:text-primary transition-colors">
-												<ChevronDown
-													className={cn(
-														'w-3 h-3 transition-transform duration-200',
-														isEditorsCollapsed && 'rotate-180',
-													)}
-												/>
-											</button>
-										</div>
-
-										<ResizablePanelGroup
-											direction="vertical"
-											className="flex-1"
-										>
-											<ResizablePanel
-												ref={editorsRef}
-												defaultSize={30}
-												minSize={0}
-												collapsible
-												collapsedSize={0}
-												onCollapse={() => setIsEditorsCollapsed(true)}
-												onExpand={() => setIsEditorsCollapsed(false)}
-												className={cn(
-													'transition-all duration-300 ease-in-out',
-													isEditorsCollapsed
-														? 'border-b-0'
-														: 'border-b border-border/60',
-												)}
-											>
+										{/* Explorer Panel */}
+										<div className="flex-1 overflow-hidden flex flex-col">
+											<div className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
+												<span>Explorer</span>
+												<button
+													onClick={() =>
+														window.dispatchEvent(
+															new CustomEvent('collapse-all-folders'),
+														)
+													}
+													className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
+													title="Collapse All Folders"
+												>
+													<PanelLeftClose className="w-3 h-3" />
+												</button>
+											</div>
+											<div className="flex-1 overflow-hidden">
 												<ScrollArea className="h-full">
-													<div className="flex flex-col">
-														<AnimatePresence>
-															{windows.map(win => (
-																<motion.div
-																	layout
-																	key={win.id}
-																	initial={{ opacity: 0, x: -10 }}
-																	animate={{ opacity: 1, x: 0 }}
-																	exit={{ opacity: 0, x: -10 }}
-																	className={cn(
-																		'flex items-center justify-between px-3 py-1.5 text-sm rounded-sm cursor-pointer group/item',
-																		'hover:bg-muted/40',
-																		activeWindowId === win.id &&
-																			'bg-primary/10 text-primary shadow-[inset_0_0_0_1px_var(--border)]',
-																	)}
-																	onClick={() =>
-																		setActiveWindowId(win.id)
-																	}
-																>
-																	<span className="truncate text-muted-foreground group-hover/item:text-foreground transition-colors text-[12px]">
-																		{win.title}
-																	</span>
-																	<button
-																		onClick={e => {
-																			e.stopPropagation();
-																			const newWindows =
-																				windows.filter(
-																					w =>
-																						w.id !==
-																						win.id,
-																				);
-																			setWindows(newWindows);
-																			setActiveWindowId(
-																				newWindows.length
-																					? newWindows[
-																							newWindows.length -
-																								1
-																					  ].id
-																					: null,
-																			);
-																		}}
-																		className="opacity-0 group-hover/item:opacity-100 p-0.5 hover:bg-muted/60 rounded transition-opacity"
-																	>
-																		<X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-																	</button>
-																</motion.div>
-															))}
-														</AnimatePresence>
-														{windows.length === 0 && (
-															<div className="p-4 text-xs text-muted-foreground/50 text-center italic">
-																No open editors
-															</div>
-														)}
+													<div className="p-2">
+														<FolderTree
+															items={initialFileSystem}
+															onSelect={handleFileSelect}
+														/>
 													</div>
 												</ScrollArea>
-											</ResizablePanel>
-
-											<ResizableHandle className="bg-border/40 hover:bg-primary/50 transition-colors h-px" />
-
-											<ResizablePanel defaultSize={70} minSize={20}>
-												<div className="h-full flex flex-col">
-													<div className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
-														<span>Explorer</span>
-														<button
-															onClick={() =>
-																window.dispatchEvent(
-																	new CustomEvent(
-																		'collapse-all-folders',
-																	),
-																)
-															}
-															className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
-															title="Collapse All Folders"
-														>
-															<PanelLeftClose className="w-3 h-3" />
-														</button>
-													</div>
-													<div className="flex-1 overflow-hidden">
-														<ScrollArea className="h-full">
-															<div className="p-2">
-																<FolderTree
-																	items={initialFileSystem}
-																	onSelect={handleFileSelect}
-																/>
-															</div>
-														</ScrollArea>
-													</div>
-												</div>
-											</ResizablePanel>
-										</ResizablePanelGroup>
+											</div>
+										</div>
 									</div>
 								</ResizablePanel>
 

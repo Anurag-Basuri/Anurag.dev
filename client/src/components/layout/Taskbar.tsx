@@ -13,17 +13,36 @@ import {
 	Volume2,
 	Power,
 	Settings,
-	User,
+	Cpu,
+	Briefcase,
+	Map,
+	Mail,
+	User as UserIcon,
 	ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+
+function useSystemStats() {
+	const [stats, setStats] = useState({ cpu: 12, mem: 4.2 });
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setStats({
+				cpu: Math.floor(Math.random() * (30 - 5) + 5),
+				mem: Number((4 + Math.random()).toFixed(1)),
+			});
+		}, 3000);
+		return () => clearInterval(interval);
+	}, []);
+	return stats;
+}
 
 export function Taskbar() {
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const [activeId, setActiveId] = useAtom(activeWindowIdAtom);
 	const [time, setTime] = useState<Date | null>(null);
 	const [isStartOpen, setIsStartOpen] = useState(false);
+	const stats = useSystemStats();
 
 	useEffect(() => {
 		setTime(new Date());
@@ -63,6 +82,13 @@ export function Taskbar() {
 			];
 		});
 	};
+
+	const menuItems = [
+		{ id: 'projects', label: 'PROJECTS', icon: Briefcase },
+		{ id: 'about', label: 'ABOUT', icon: UserIcon },
+		{ id: 'journey', label: 'JOURNEY', icon: Map },
+		{ id: 'contact', label: 'CONTACT', icon: Mail },
+	];
 
 	return (
 		<div className="h-10 bg-background/95 backdrop-blur-xl border-t border-border/60 flex items-center px-2 z-50 relative select-none font-mono text-sm shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
@@ -107,19 +133,14 @@ export function Taskbar() {
 							</div>
 
 							<div className="space-y-0.5">
-								{[
-									{ id: 'projects', label: 'PROJECTS' },
-									{ id: 'about', label: 'ABOUT' },
-									{ id: 'contact', label: 'CONTACT' },
-									{ id: 'journey', label: 'JOURNEY' },
-								].map(item => (
+								{menuItems.map(item => (
 									<button
 										key={item.id}
 										onClick={() => handleOpenModule(item.id, item.label)}
 										className="w-full text-left px-3 py-2 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-xs flex items-center justify-between group rounded-sm"
 									>
 										<span className="flex items-center gap-2">
-											<ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+											<item.icon className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
 											{item.label}
 										</span>
 										<span className="text-[10px] opacity-50 group-hover:opacity-80">
@@ -174,12 +195,12 @@ export function Taskbar() {
 			<div className="flex items-center gap-4 px-4 border-l border-border/50 ml-2 text-muted-foreground">
 				<div className="items-center gap-3 hidden md:flex">
 					<div className="flex items-center gap-1 text-[10px]">
-						<span className="text-primary">CPU</span>
-						<span>12%</span>
+						<Cpu className="w-3 h-3 text-primary" />
+						<span>{stats.cpu}%</span>
 					</div>
 					<div className="flex items-center gap-1 text-[10px]">
-						<span className="text-primary">MEM</span>
-						<span>4.2GB</span>
+						<span className="text-primary font-bold">MEM</span>
+						<span>{stats.mem}GB</span>
 					</div>
 				</div>
 				<div className="text-right">
