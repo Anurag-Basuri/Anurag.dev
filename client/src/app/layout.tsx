@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import ConnectivityBanner from '@/components/shared/ConnectivityBanner';
+
 import ClientToaster from '@/components/shared/ClientToaster';
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -60,7 +60,6 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<ErrorBoundary>
-						<ConnectivityBanner />
 						<ClientToaster />
 						{children}
 					</ErrorBoundary>
