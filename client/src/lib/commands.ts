@@ -54,6 +54,31 @@ export type CommandResult =
 	| { ok: true; data?: unknown }
 	| { ok: false; error: string; hint?: string };
 
+// Static list of supported command names for autocomplete and suggestions.
+// Keep in sync with `processCommand` cases and shortcuts below.
+export const commandsList: string[] = [
+	'help',
+	'ls',
+	'cd',
+	'open',
+	'whoami',
+	'date',
+	'echo',
+	'theme',
+	'clear',
+	// Shortcuts / modules
+	'about',
+	'projects',
+	'journey',
+	'ai-lab',
+	'blog',
+	'contact',
+	// Easter eggs
+	'matrix',
+	'coffee',
+	'konami',
+];
+
 export const registry: Record<string, CommandSpec> = {
 	help: {
 		name: 'help',
