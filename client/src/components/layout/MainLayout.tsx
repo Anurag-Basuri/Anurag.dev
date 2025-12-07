@@ -4,6 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/features/file-system/FolderTree';
 import { SidebarProfile } from '@/components/layout/SidebarProfile';
+import { Taskbar } from '@/components/layout/Taskbar';
 
 import { CLI } from '@/components/features/terminal/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
@@ -655,6 +656,7 @@ export function MainLayout() {
 							</div>
 						)}
 					</div>
+					<Taskbar />
 				</div>
 
 				{/* Welcome Dialog for first-time visitors */}

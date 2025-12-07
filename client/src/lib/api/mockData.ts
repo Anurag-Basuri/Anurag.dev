@@ -1,4 +1,4 @@
-import { Project, JourneyEntry, BlogPost, AboutData } from './api';
+import { Project, JourneyEntry, BlogPost, AboutData } from '@/types/api';
 
 export const mockProjects: Project[] = [
 	{
