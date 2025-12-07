@@ -1,77 +1,38 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# Next.js build output
+# Next.js
 /.next/
 /out/
 
-# Production build files
+# Production
 /build
 /dist
 
-# Turborepo cache
-.turbo
+# Misc
+.DS_Store
+*.pem
 
-# Static analysis and linting cache
-/.eslintcache
-*.tsbuildinfo
-
-# Environment variables
-# Never commit local environment variables
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Log files
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
-logs
-*.log*
+.pnp
+.pnp.js
 
-# Testing
-/coverage
+# Local Env
+.env*.local
+.env
 
-# Editor directories and files
-# We want to share some .vscode settings, but not user-specific ones
+# Vercel
+.vercel
+
+# Typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Editor
 .vscode/*
-!.vscode/settings.json
 !.vscode/extensions.json
 !.vscode/launch.json
+!.vscode/settings.json
 .idea
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-.prettierignore
-.prettierrc
-.prettierrc.json
-.prettierrc.yml
-.prettierrc.yaml
-.prettierrc.js
-.prettierrc.cjs
-.prettierrc.toml
-.stylelintrc
-.stylelintrc.json
-.stylelintrc.yml
-.stylelintrc.yaml
-
-/.next
-/out
-/build
