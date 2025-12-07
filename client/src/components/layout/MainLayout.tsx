@@ -4,7 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/features/file-system/FolderTree';
 import { SidebarProfile } from '@/components/layout/SidebarProfile';
-import ConnectivityBanner from '@/components/shared/ConnectivityBanner';
+
 import { CLI } from '@/components/features/terminal/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { useAtom } from 'jotai';
@@ -172,7 +172,7 @@ export function MainLayout() {
 						},
 					}}
 				/>
-				<ConnectivityBanner />
+
 				<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
 					{/* 3D Background Layer */}
 					<Background3D />
