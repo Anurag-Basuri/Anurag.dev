@@ -2,17 +2,17 @@
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree } from '@/components/core/FolderTree';
-import { SidebarProfile } from '@/components/core/SidebarProfile';
-import ConnectivityBanner from '@/components/core/ConnectivityBanner';
-import { CLI } from '@/components/core/CLI';
+import { FolderTree } from '@/components/features/file-system/FolderTree';
+import { SidebarProfile } from '@/components/layout/SidebarProfile';
+import ConnectivityBanner from '@/components/shared/ConnectivityBanner';
+import { CLI } from '@/components/features/terminal/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
-import { EditorArea } from '@/components/core/EditorArea';
+import { EditorArea } from '@/components/features/editor/EditorArea';
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from '@/components/core/ErrorBoundary';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import {
@@ -29,10 +29,10 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
-import Background3D from '@/components/core/Background3D';
+import Background3D from '@/components/layout/Background3D';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { WelcomeDialog } from '@/components/core/WelcomeDialog';
-import { HelpButton } from '@/components/core/HelpButton';
+import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
+import { HelpButton } from '@/components/shared/HelpButton';
 
 // Persistent size helper - defers localStorage read to avoid SSR hydration mismatch
 function usePersistentSizes(key: string, initial: number[]) {
@@ -282,7 +282,9 @@ export function MainLayout() {
 												'p-1 hover:bg-muted/60 rounded transition-all duration-200',
 												sidebarCollapsed && 'text-muted-foreground',
 											)}
-											title={sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'}
+											title={
+												sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'
+											}
 											aria-label={
 												sidebarCollapsed ? 'Show Sidebar' : 'Hide Sidebar'
 											}
@@ -310,10 +312,14 @@ export function MainLayout() {
 												terminalCollapsed && 'text-muted-foreground',
 											)}
 											title={
-												terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'
+												terminalCollapsed
+													? 'Show Terminal'
+													: 'Hide Terminal'
 											}
 											aria-label={
-												terminalCollapsed ? 'Show Terminal' : 'Hide Terminal'
+												terminalCollapsed
+													? 'Show Terminal'
+													: 'Hide Terminal'
 											}
 											onClick={() => {
 												const panel = terminalRef.current;
