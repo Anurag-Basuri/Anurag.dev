@@ -4,7 +4,7 @@ import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import { useTheme } from 'next-themes';
-import { ErrorBoundary } from '@/components/core/ErrorBoundary';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 // Simple random sphere generator to avoid external dependency
 function generateSpherePoints(count: number, radius: number) {

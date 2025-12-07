@@ -1,7 +1,7 @@
 'use client';
 
-import { MainLayout } from '@/components/core/MainLayout';
-import { BootAnimation } from '@/components/core/BootAnimation';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { BootAnimation } from '@/components/layout/BootAnimation';
 
 export default function Home() {
 	return (

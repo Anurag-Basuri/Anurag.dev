@@ -2,9 +2,9 @@ import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ErrorBoundary } from '@/components/core/ErrorBoundary';
-import ConnectivityBanner from '@/components/core/ConnectivityBanner';
-import ClientToaster from '@/components/core/ClientToaster';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import ConnectivityBanner from '@/components/shared/ConnectivityBanner';
+import ClientToaster from '@/components/shared/ClientToaster';
 import { ThemeProvider } from '@/components/theme-provider';
 
 const geistSans = Geist({
