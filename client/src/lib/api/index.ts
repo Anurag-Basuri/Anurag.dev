@@ -74,14 +74,29 @@ class ApiClient {
 		return null;
 	}
 
+	// Force mock mode for standalone frontend
+	private useMockData = true;
+
 	private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+		// 1. If in mock mode or standalone, return mock data immediately
+		if (this.useMockData) {
+			const mock = this.getMockData(endpoint);
+			if (mock) {
+				// Simulate network latency for realism
+				await new Promise(resolve => setTimeout(resolve, 600));
+				return mock as T;
+			}
+			console.warn(`No mock data found for ${endpoint}`);
+			// Fall through to fetch if you want mixed mode, or throw/return null
+		}
+
 		const url = `${this.baseUrl}${endpoint}`;
 
 		// Add timeout to avoid hanging requests
 		const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
 		const timeout =
 			typeof window !== 'undefined'
-				? window.setTimeout(() => controller?.abort(), 8000)
+				? window.setTimeout(() => controller?.abort(), 5000)
 				: undefined;
 
 		try {
@@ -95,43 +110,23 @@ class ApiClient {
 			});
 
 			if (!response.ok) {
-				// Try to parse error; fall back to status text/code
-				let errorMessage = `HTTP ${response.status}`;
-				try {
-					const error = await response.json();
-					errorMessage = error?.error?.message || errorMessage;
-				} catch {
-					// ignore
-				}
-				throw new Error(errorMessage);
+				throw new Error(`HTTP ${response.status}`);
 			}
 
 			// Mark online if we got a good response
 			this.setStatus('online');
 			return response.json();
 		} catch (error) {
-			console.error(`API Error (${endpoint}):`, error);
-			this.setStatus('offline', { error });
-
-			// Friendly one-time toast
-			if (!this.hasShownError) {
-				const isLocal =
-					this.baseUrl.includes('localhost') || this.baseUrl.includes('127.0.0.1');
-				toast.error(
-					isLocal
-						? 'Backend is not running. Showing live demo content.'
-						: 'Backend unreachable. Showing live demo content.',
-					{ id: 'backend-error', duration: 5000 },
-				);
-				this.hasShownError = true;
-			}
-
-			// Fallback to mock data
+			// Silent fallback to mock data if fetch fails (and we didn't use it already)
 			const mockData = this.getMockData(endpoint);
 			if (mockData) {
+				this.setStatus('offline'); // Just track status, don't toast if we have mocks
 				return mockData as T;
 			}
 
+			// Only log/toast if we truly have NO data
+			console.error(`API Error (${endpoint}):`, error);
+			this.setStatus('offline', { error });
 			throw error;
 		} finally {
 			if (timeout !== undefined) clearTimeout(timeout);
