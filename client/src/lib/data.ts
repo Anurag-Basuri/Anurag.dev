@@ -1,3 +1,4 @@
+import { FileSystemItem } from '@/types/file-system';
 export * from '@/types/file-system';
 
 export const initialFileSystem: FileSystemItem[] = [
