@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
-import { X, Terminal, Sparkles, Plus, Clock, File } from 'lucide-react';
+import { X, Terminal, Sparkles, File, FolderOpen, Code2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import { ScrollBar } from '@/components/ui/scroll-area';
@@ -10,8 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getFileIcon, getLanguage } from '@/lib/editorUtils';
 import { Breadcrumbs } from '@/components/features/editor/Breadcrumbs';
 import { StatusBar } from '@/components/features/editor/StatusBar';
-import { initialFileSystem, FileSystemItem } from '@/lib/data';
-
+import { getModuleComponent } from '@/lib/moduleRegistry';
 import React from 'react';
 
 export function EditorArea() {
@@ -20,15 +19,23 @@ export function EditorArea() {
 
 	const activeWindow = windows.find(w => w.id === activeWindowId);
 
-	// Helper to open a file from empty state
-	const handleQuickOpen = (id: string, name: string) => {
+	const openModule = (id: string, title: string) => {
 		setWindows(prev => {
 			if (prev.find(w => w.id === id)) {
 				setActiveWindowId(id);
 				return prev;
 			}
-
-			return prev;
+			setActiveWindowId(id);
+			return [
+				...prev,
+				{
+					id,
+					title: title.toUpperCase(),
+					component: getModuleComponent(id),
+					isOpen: true,
+					isMinimized: false,
+				},
+			];
 		});
 	};
 
@@ -38,7 +45,6 @@ export function EditorArea() {
 		setWindows(newWindows);
 
 		if (activeWindowId === id) {
-			// If closing active window, activate the last one if available
 			if (newWindows.length > 0) {
 				setActiveWindowId(newWindows[newWindows.length - 1].id);
 			} else {
@@ -47,7 +53,6 @@ export function EditorArea() {
 		}
 	};
 
-	// Get active file language
 	const currentLanguage = activeWindow ? getLanguage(activeWindow.id) : 'Plain Text';
 
 	return (
@@ -78,7 +83,6 @@ export function EditorArea() {
 													: 'bg-transparent text-muted-foreground hover:bg-muted/30 hover:text-foreground',
 											)}
 										>
-											{/* Active Indicator Top Line */}
 											{isActive && (
 												<div className="absolute top-0 left-0 right-0 h-[2px] bg-primary rounded-t-full" />
 											)}
@@ -95,7 +99,7 @@ export function EditorArea() {
 												onClick={e => handleClose(window.id, e)}
 												className={cn(
 													'p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ml-1',
-													isActive && 'opacity-100', // Always show close on active
+													isActive && 'opacity-100',
 												)}
 												aria-label={`Close ${window.title}`}
 											>
@@ -111,7 +115,7 @@ export function EditorArea() {
 				</ScrollAreaPrimitive.Root>
 			</div>
 
-			{/* Breadcrumbs - Only show if active window exists */}
+			{/* Breadcrumbs */}
 			{activeWindow && <Breadcrumbs path={activeWindow.id} />}
 
 			{/* Content Area */}
@@ -135,71 +139,87 @@ export function EditorArea() {
 							exit={{ opacity: 0, scale: 0.98 }}
 							className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none p-8"
 						>
+							{/* Hero Icon */}
 							<motion.div
-								animate={{
-									y: [0, -10, 0],
-								}}
-								transition={{
-									duration: 4,
-									repeat: Infinity,
-									ease: 'easeInOut',
-								}}
-								className="relative mb-8"
+								animate={{ y: [0, -8, 0] }}
+								transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+								className="relative mb-6"
 							>
-								<div className="w-24 h-24 rounded-2xl bg-linear-to-tr from-primary/20 to-secondary/20 flex items-center justify-center backdrop-blur-xl border border-white/10 shadow-2xl">
-									<Terminal className="w-12 h-12 text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+								<div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/30 via-primary/10 to-transparent flex items-center justify-center backdrop-blur-xl border border-primary/20 shadow-[0_0_40px_rgba(var(--primary),0.15)]">
+									<Code2 className="w-10 h-10 text-primary" />
 								</div>
-								<Sparkles className="w-6 h-6 text-yellow-400 absolute -top-4 -right-4 animate-pulse drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
+								<motion.div
+									animate={{ rotate: 360 }}
+									transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+									className="absolute -inset-3 rounded-3xl border border-dashed border-primary/20"
+								/>
 							</motion.div>
 
-							<h2 className="text-xl font-bold text-foreground mb-2 tracking-tight">
-								AnuragOS Editor
+							<h2 className="text-2xl font-bold text-foreground mb-1 tracking-tight">
+								Welcome to AnuragOS
 							</h2>
-							<p className="text-sm text-muted-foreground/60 max-w-md text-center mb-8">
-								Select a file from the explorer to start editing, or use the quick
-								access shortcuts below.
+							<p className="text-sm text-muted-foreground/70 max-w-sm text-center mb-8">
+								Explore my portfolio by selecting a section below or navigating the
+								file explorer.
 							</p>
 
-							<div className="grid grid-cols-2 gap-3 w-full max-w-sm">
-								<button className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 hover:border-border/80 transition-all text-left group">
-									<div className="p-2 rounded bg-blue-500/10 text-blue-400 group-hover:scale-110 transition-transform">
-										<File className="w-4 h-4" />
+							{/* Quick Access Grid */}
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
+								<motion.button
+									whileHover={{ scale: 1.02, y: -2 }}
+									whileTap={{ scale: 0.98 }}
+									onClick={() => openModule('about', 'About')}
+									className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border/50 bg-gradient-to-br from-emerald-500/5 to-transparent hover:from-emerald-500/10 hover:border-emerald-500/30 transition-all group"
+								>
+									<div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-500 group-hover:scale-110 transition-transform">
+										<Sparkles className="w-5 h-5" />
 									</div>
-									<div className="flex flex-col">
-										<span className="text-xs font-medium text-foreground">
-											Open File
-										</span>
-										<span className="text-[10px] text-muted-foreground">
-											Ctrl+O
-										</span>
+									<span className="text-sm font-medium text-foreground">
+										About Me
+									</span>
+									<span className="text-[10px] text-muted-foreground">
+										whoami.md
+									</span>
+								</motion.button>
+
+								<motion.button
+									whileHover={{ scale: 1.02, y: -2 }}
+									whileTap={{ scale: 0.98 }}
+									onClick={() => openModule('projects', 'Projects')}
+									className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border/50 bg-gradient-to-br from-blue-500/5 to-transparent hover:from-blue-500/10 hover:border-blue-500/30 transition-all group"
+								>
+									<div className="p-3 rounded-lg bg-blue-500/10 text-blue-500 group-hover:scale-110 transition-transform">
+										<FolderOpen className="w-5 h-5" />
 									</div>
-								</button>
-								<button className="flex items-center gap-3 p-3 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 hover:border-border/80 transition-all text-left group">
-									<div className="p-2 rounded bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
-										<Clock className="w-4 h-4" />
+									<span className="text-sm font-medium text-foreground">
+										Projects
+									</span>
+									<span className="text-[10px] text-muted-foreground">
+										all-projects.json
+									</span>
+								</motion.button>
+
+								<motion.button
+									whileHover={{ scale: 1.02, y: -2 }}
+									whileTap={{ scale: 0.98 }}
+									onClick={() => openModule('contact', 'Contact')}
+									className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border/50 bg-gradient-to-br from-purple-500/5 to-transparent hover:from-purple-500/10 hover:border-purple-500/30 transition-all group"
+								>
+									<div className="p-3 rounded-lg bg-purple-500/10 text-purple-500 group-hover:scale-110 transition-transform">
+										<Terminal className="w-5 h-5" />
 									</div>
-									<div className="flex flex-col">
-										<span className="text-xs font-medium text-foreground">
-											Recent
-										</span>
-										<span className="text-[10px] text-muted-foreground">
-											Ctrl+R
-										</span>
-									</div>
-								</button>
+									<span className="text-sm font-medium text-foreground">
+										Contact
+									</span>
+									<span className="text-[10px] text-muted-foreground">
+										email.txt
+									</span>
+								</motion.button>
 							</div>
 
-							<div className="mt-8 flex flex-col gap-2 text-xs text-muted-foreground/40">
-								<p className="items-center gap-2 md:flex hidden">
-									<kbd className="px-2 py-1 bg-muted/50 rounded border border-border/50 shadow-sm text-xs font-mono">
-										Ctrl
-									</kbd>
-									+
-									<kbd className="px-2 py-1 bg-muted/50 rounded border border-border/50 shadow-sm text-xs font-mono">
-										P
-									</kbd>
-									<span>to search files</span>
-								</p>
+							{/* Hint */}
+							<div className="mt-10 hidden md:flex items-center gap-3 text-xs text-muted-foreground/50">
+								<span>Use the terminal below or click files in the explorer</span>
 							</div>
 						</motion.div>
 					)}
