@@ -1,11 +1,11 @@
 import React from 'react';
-import { AboutModule } from '@/components/modules/AboutModule';
-import { ProjectsModule } from '@/components/modules/ProjectsModule';
-import { JourneyModule } from '@/components/modules/JourneyModule';
-import { BlogModule } from '@/components/modules/BlogModule';
-import { ContactModule } from '@/components/modules/ContactModule';
-import { SecretModule } from '@/components/modules/SecretModule';
-import CodingStatsModule from '@/components/modules/CodingStatsModule';
+import { AboutModule } from '@/components/apps/about';
+import { ProjectsModule } from '@/components/apps/projects';
+import { JourneyModule } from '@/components/apps/journey';
+import { BlogModule } from '@/components/apps/blog';
+import { ContactModule } from '@/components/apps/contact';
+import { SecretModule } from '@/components/apps/secret';
+import CodingStatsModule from '@/components/apps/coding-stats';
 
 export const moduleRegistry: Record<string, React.ReactNode> = {
 	about: <AboutModule />,
