@@ -2,17 +2,17 @@
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree } from '@/components/features/file-system/FolderTree';
-import { SidebarProfile } from '@/components/layout/SidebarProfile';
-import { Taskbar } from '@/components/layout/Taskbar';
-import { TopBar } from '@/components/layout/TopBar';
+import { FolderTree } from '@/components/os/file-system/FolderTree';
+import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
+import { Taskbar } from '@/components/os/shell/Taskbar';
+import { TopBar } from '@/components/os/shell/TopBar';
 
-import { CLI } from '@/components/features/terminal/CLI';
+import { CLI } from '@/components/os/terminal/CLI';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
-import { EditorArea } from '@/components/features/editor/EditorArea';
+import { EditorArea } from '@/components/os/editor/EditorArea';
 import { Toaster } from 'react-hot-toast';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { PanelLeftClose, Terminal as TerminalIcon, ChevronDown } from 'lucide-react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import type { ImperativePanelHandle } from 'react-resizable-panels';
-import Background3D from '@/components/layout/Background3D';
+import Background3D from '@/components/os/shell/Background3D';
 import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { HelpButton } from '@/components/shared/HelpButton';
 

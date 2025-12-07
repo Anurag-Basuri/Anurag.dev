@@ -11,7 +11,7 @@ import {
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree } from '@/components/features/file-system/FolderTree';
+import { FolderTree } from '@/components/os/file-system/FolderTree';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';

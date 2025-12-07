@@ -8,8 +8,8 @@ import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import { ScrollBar } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getFileIcon, getLanguage } from '@/lib/editorUtils';
-import { Breadcrumbs } from '@/components/features/editor/Breadcrumbs';
-import { StatusBar } from '@/components/features/editor/StatusBar';
+import { Breadcrumbs } from '@/components/os/editor/Breadcrumbs';
+import { StatusBar } from '@/components/os/editor/StatusBar';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import React from 'react';
 
