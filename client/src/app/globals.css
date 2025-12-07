@@ -177,22 +177,18 @@
 	background: transparent;
 }
 .scanlines {
-	background: linear-gradient(
-		to bottom,
-		rgba(255, 255, 255, 0),
-		rgba(255, 255, 255, 0) 50%,
-		rgba(0, 0, 0, 0.2) 50%,
-		rgba(0, 0, 0, 0.2)
-	);
-	background-size: 100% 4px;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
 	pointer-events: none;
-	z-index: 9999;
-	opacity: 0.15;
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 2px);
+	background-size: 100% 2px;
+	opacity: 0.25;
+	mix-blend-mode: soft-light;
+}
+@media (prefers-reduced-motion: reduce) {
+	.scanlines {
+		display: none;
+	}
 }
 
 /* Glitch Text Effect */
