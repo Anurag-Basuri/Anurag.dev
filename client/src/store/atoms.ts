@@ -3,15 +3,7 @@ import { ReactNode } from 'react';
 
 export const bootCompleteAtom = atom(false);
 
-export type WindowState = {
-	id: string;
-	title: string;
-	component: ReactNode; // We might need to store component name instead if not serializable, but for client-side it's ok
-	isOpen: boolean;
-	isMinimized: boolean;
-	position?: { x: number; y: number };
-	size?: { width: number; height: number };
-};
+import { WindowState } from '@/types/window';
 
 import { getModuleComponent } from '@/lib/moduleRegistry';
 
