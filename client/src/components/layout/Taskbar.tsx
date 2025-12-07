@@ -22,10 +22,11 @@ import { toast } from 'react-hot-toast';
 export function Taskbar() {
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const [activeId, setActiveId] = useAtom(activeWindowIdAtom);
-	const [time, setTime] = useState(new Date());
+	const [time, setTime] = useState<Date | null>(null);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 
 	useEffect(() => {
+		setTime(new Date());
 		const timer = setInterval(() => setTime(new Date()), 1000);
 		return () => clearInterval(timer);
 	}, []);
@@ -183,7 +184,9 @@ export function Taskbar() {
 				</div>
 				<div className="text-right">
 					<div className="text-xs font-medium text-primary drop-shadow-[0_0_5px_rgba(var(--primary),0.4)]">
-						{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+						{time
+							? time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+							: '--:--'}
 					</div>
 				</div>
 			</div>
