@@ -1,5 +1,6 @@
 import { useAtom } from 'jotai';
 import { windowsAtom } from '@/store/atoms';
+import { WindowState } from '@/types/window';
 import { Window } from './Window';
 import { AnimatePresence, motion } from 'framer-motion';
 

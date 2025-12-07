@@ -2,7 +2,8 @@
 
 import { Rnd } from 'react-rnd';
 import { useAtom } from 'jotai';
-import { activeWindowIdAtom, windowsAtom, WindowState } from '@/store/atoms';
+import { activeWindowIdAtom, windowsAtom } from '@/store/atoms';
+import { WindowState } from '@/types/window';
 import { cn } from '@/lib/utils';
 import { X, Minus, Square } from 'lucide-react';
 import { useMediaQuery } from '@/hooks/use-media-query';
