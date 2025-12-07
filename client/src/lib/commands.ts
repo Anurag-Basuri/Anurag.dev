@@ -18,26 +18,196 @@ export type CommandResponse = {
 	theme?: 'light' | 'dark' | 'toggle';
 };
 
-export const commandsList = [
-	'help',
-	'about',
-	'projects',
-	'journey',
-	'ai-lab',
-	'blog',
-	'contact',
-	'ls',
-	'cd',
-	'pwd',
-	'whoami',
-	'date',
-	'open',
-	'clear',
-	'theme',
-	'matrix',
-	'coffee',
-	'konami',
-];
+export type CommandRun = (
+	ctx: CommandContext,
+	args: string[],
+) => Promise<CommandResult> | CommandResult;
+
+export type CommandSpec = {
+	name: string;
+	aliases?: string[];
+	description: string;
+	usage: string;
+	examples?: string[];
+	options?: Record<
+		string,
+		{
+			description: string;
+			alias?: string;
+			type?: 'string' | 'boolean' | 'number';
+			default?: unknown;
+		}
+	>;
+	subcommands?: Record<string, CommandSpec>;
+	hidden?: boolean;
+	run?: CommandRun;
+};
+
+export type CommandContext = {
+	print: (lines: string | string[]) => void;
+	clear: () => void;
+	setBusy: (busy: boolean) => void;
+	getState: () => unknown;
+};
+
+export type CommandResult =
+	| { ok: true; data?: unknown }
+	| { ok: false; error: string; hint?: string };
+
+export const registry: Record<string, CommandSpec> = {
+	help: {
+		name: 'help',
+		aliases: ['h', '?'],
+		description: 'Show available commands or details of a command.',
+		usage: 'help [command]',
+		examples: ['help', 'help project'],
+		run: (_ctx, args) => {
+			if (!args.length) return { ok: true, data: formatAllHelp(registry) };
+			const t = resolveSpec(args[0]);
+			if (!t)
+				return { ok: false, error: `Unknown command "${args[0]}"`, hint: suggest(args[0]) };
+			return { ok: true, data: formatHelp(t) };
+		},
+	},
+	clear: {
+		name: 'clear',
+		description: 'Clear the terminal output.',
+		usage: 'clear',
+		run: ctx => {
+			ctx.clear();
+			return { ok: true };
+		},
+	},
+	open: {
+		name: 'open',
+		description: 'Open an app or section.',
+		usage: 'open <about|blog|projects|contact|journey>',
+		examples: ['open about', 'open projects'],
+		run: (_ctx, args) =>
+			args[0]
+				? { ok: true, data: `Opening "${args[0]}"...` }
+				: { ok: false, error: 'Missing target', hint: 'Usage: open <section>' },
+	},
+	theme: {
+		name: 'theme',
+		description: 'Set or toggle theme.',
+		usage: 'theme <dark|light|system>',
+		aliases: ['th'],
+		examples: ['theme dark', 'theme system'],
+		run: (_ctx, args) =>
+			args[0]
+				? { ok: true, data: `Theme set to ${args[0]}` }
+				: { ok: false, error: 'Missing mode', hint: 'Usage: theme <dark|light|system>' },
+	},
+	project: {
+		name: 'project',
+		description: 'Manage projects.',
+		usage: 'project <list|add|remove> [...options]',
+		subcommands: {
+			list: {
+				name: 'project list',
+				description: 'List projects',
+				usage: 'project list [--tag <tag>] [--json]',
+				run: _ctx => ({ ok: true, data: 'Listing projects...' }),
+			},
+			add: {
+				name: 'project add',
+				description: 'Add a project',
+				usage: 'project add --name <n> --url <u>',
+				run: (_ctx, args) => ({ ok: true, data: `Adding project: ${args.join(' ')}` }),
+			},
+			remove: {
+				name: 'project remove',
+				description: 'Remove a project',
+				usage: 'project remove --id <id>',
+				run: (_ctx, args) =>
+					args[0]
+						? { ok: true, data: `Removing project ${args[0]}` }
+						: {
+								ok: false,
+								error: 'Missing id',
+								hint: 'Usage: project remove --id <id>',
+						  },
+			},
+		},
+	},
+	search: {
+		name: 'search',
+		description: 'Search across content.',
+		usage: 'search "<query>" [--section <name>]',
+		run: (_ctx, args) =>
+			args.length
+				? { ok: true, data: `Searching for ${args.join(' ')}` }
+				: { ok: false, error: 'Missing query', hint: 'Usage: search "<query>"' },
+	},
+};
+
+export function resolveSpec(name: string): CommandSpec | undefined {
+	const key = name.toLowerCase();
+	const direct = registry[key];
+	if (direct) return direct;
+	for (const spec of Object.values(registry)) {
+		if (spec.aliases?.includes(key)) return spec;
+		if (spec.subcommands) {
+			for (const [subName, subSpec] of Object.entries(spec.subcommands)) {
+				if (subName.split(' ').pop() === key) return subSpec;
+			}
+		}
+	}
+	return undefined;
+}
+
+export function formatAllHelp(reg: Record<string, CommandSpec>): string {
+	const lines: string[] = ['Available commands:'];
+	for (const [name, spec] of Object.entries(reg)) {
+		if (spec.hidden) continue;
+		lines.push(`  ${name.padEnd(10)} - ${spec.description}`);
+	}
+	lines.push('Type "help <command>" for details.');
+	return lines.join('\n');
+}
+
+export function formatHelp(spec: CommandSpec): string {
+	const lines = [`${spec.name}`, `Usage: ${spec.usage}`, `Description: ${spec.description}`];
+	if (spec.examples?.length) {
+		lines.push('Examples:');
+		for (const ex of spec.examples) lines.push(`  ${ex}`);
+	}
+	if (spec.options && Object.keys(spec.options).length) {
+		lines.push('Options:');
+		for (const [opt, meta] of Object.entries(spec.options)) {
+			lines.push(`  --${opt}${meta.alias ? `, -${meta.alias}` : ''} - ${meta.description}`);
+		}
+	}
+	if (spec.subcommands && Object.keys(spec.subcommands).length) {
+		lines.push('Subcommands:');
+		for (const [sub, subSpec] of Object.entries(spec.subcommands)) {
+			lines.push(`  ${sub} - ${subSpec.description}`);
+		}
+	}
+	return lines.join('\n');
+}
+
+export function suggest(input: string): string | undefined {
+	const keys = Object.keys(registry);
+	const scored = keys
+		.map(k => ({ k, score: levenshtein(input, k) }))
+		.sort((a, b) => a.score - b.score)[0];
+	return scored && scored.score <= 3 ? `Did you mean "${scored.k}"?` : undefined;
+}
+
+function levenshtein(a: string, b: string): number {
+	const m = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+	for (let i = 0; i <= a.length; i++) m[i][0] = i;
+	for (let j = 0; j <= b.length; j++) m[0][j] = j;
+	for (let i = 1; i <= a.length; i++) {
+		for (let j = 1; j <= b.length; j++) {
+			const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+			m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + cost);
+		}
+	}
+	return m[a.length][b.length];
+}
 
 // Resolves a file system path (absolute or relative) to a FileSystemItem.
 function resolvePath(currentPath: string, targetPath: string): FileSystemItem | null {
