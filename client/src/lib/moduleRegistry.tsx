@@ -19,5 +19,7 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 };
 
 export const getModuleComponent = (id: string): React.ReactNode => {
-	return moduleRegistry[id] || <div className="p-4">Module not found</div>;
+	// Handle complex paths: "about/whoami.md" -> "about"
+	const moduleId = id.includes('/') ? id.split('/')[0] : id;
+	return moduleRegistry[moduleId] || <div className="p-4">Module not found: {id}</div>;
 };
