@@ -321,10 +321,8 @@ export function BootAnimation() {
 
 			{/* Content (clean, centered, responsive) */}
 			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-				<div className="w-full max-w-6xl px-3 sm:px-5 md:px-8">
-					{/* Consistent vertical rhythm; tighter on mobile */}
+				<div className="w-full max-w-[72rem] px-3 sm:px-5 md:px-8">
 					<div className="py-6 sm:py-10 md:py-16 space-y-5 sm:space-y-7 md:space-y-10">
-						{/* Title */}
 						<div
 							className="text-center select-none"
 							style={{
@@ -382,7 +380,7 @@ export function BootAnimation() {
 										aria-valuemax={100}
 										role="progressbar"
 									/>
-									<div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 to-transparent" />
+									<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
 								</div>
 							</div>
 
@@ -432,7 +430,7 @@ export function BootAnimation() {
 						>
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 sm:gap-x-10 gap-y-2 sm:gap-y-3 text-center text-[#bdfccf]/85">
 								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
-									<div>Clean, scalable UX with Modern Tech Stack</div>
+									<div>Clean, scalable UX with Next.js & MERN</div>
 									<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
 								</div>
 								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
