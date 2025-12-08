@@ -130,7 +130,11 @@ export function Taskbar() {
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: 10, scale: 0.95 }}
 									transition={{ duration: 0.15, ease: 'easeOut' }}
-									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 glass-premium border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-2 rounded-lg overflow-hidden"
+									tabIndex={0}
+									onKeyDown={e => {
+										if (e.key === 'Escape') setIsStartOpen(false);
+									}}
+									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-background/75 supports-[backdrop-filter:blur(0)]:bg-background/90 backdrop-blur-xl backdrop-saturate-150 border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-2 rounded-lg overflow-hidden"
 								>
 									<div>
 										<div className="flex items-center gap-3 mb-2">
@@ -235,8 +239,10 @@ export function Taskbar() {
 										<motion.button
 											layout
 											onClick={() => handleTaskbarClick(window.id)}
+											title={window.title}
+											aria-pressed={isActive}
 											className={cn(
-												'h-8 flex items-center gap-2 px-2.5 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40 max-w-[150px]',
+												'h-8 flex items-center gap-2 px-2.5 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40 max-w-[150px] min-w-0',
 												'hover:bg-primary/10',
 												isActive ? 'bg-primary/20' : 'bg-transparent',
 											)}
