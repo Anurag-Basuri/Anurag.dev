@@ -26,21 +26,19 @@ import { HelpButton } from '@/components/shared/HelpButton';
 
 // Persistent size helper
 function usePersistentSizes(key: string, initial: number[]) {
-	const [sizes, setSizes] = useState<number[]>(initial);
-	const [isHydrated, setIsHydrated] = useState(false);
-
-	useEffect(() => {
+	const [sizes, setSizes] = useState<number[]>(() => {
 		try {
 			const raw = localStorage.getItem(key);
 			if (raw) {
 				const parsed = JSON.parse(raw);
 				if (Array.isArray(parsed) && parsed.every(n => typeof n === 'number')) {
-					setSizes(parsed);
+					return parsed;
 				}
 			}
 		} catch {}
-		setIsHydrated(true);
-	}, [key]);
+		return initial;
+	});
+	const [isHydrated] = useState(true);
 
 	const onLayout = useCallback(
 		(next: number[]) => {
@@ -60,12 +58,6 @@ export function MainLayout() {
 	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const isMobile = useMediaQuery('(max-width: 768px)');
 
-	// Track client-side mount
-	const [isMounted, setIsMounted] = useState(false);
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
-
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
 	const terminalRef = useRef<ImperativePanelHandle>(null);
 
@@ -84,10 +76,10 @@ export function MainLayout() {
 		isHydrated: hHydrated,
 	} = usePersistentSizes('layout:h', [20, 80]);
 
-	const isLayoutReady = isMounted && vHydrated && hHydrated;
+	const isLayoutReady = vHydrated && hHydrated;
 
 	const handleFileSelect = (item: FileSystemItem) => {
-		if (item.type === 'file') {
+	const isLayoutReady = vHydrated && hHydrated;
 			let moduleId = item.id;
 			if (moduleId.includes('/')) {
 				moduleId = moduleId.split('/')[0];
@@ -111,7 +103,6 @@ export function MainLayout() {
 				];
 			});
 		}
-	};
 
 	return (
 		<ErrorBoundary>
@@ -160,6 +151,8 @@ export function MainLayout() {
 						}}
 						onFileSelect={handleFileSelect}
 					/>
+
+					<WelcomeDialog />
 
 					{/* Main Workbench Area */}
 					<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth perspective-[2000px]">
@@ -311,7 +304,6 @@ export function MainLayout() {
 					<Taskbar />
 				</div>
 
-				<WelcomeDialog />
 				<HelpButton />
 			</>
 		</ErrorBoundary>
