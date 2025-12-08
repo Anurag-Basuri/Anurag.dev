@@ -5,15 +5,12 @@ import { useRef, useState } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ImperativePanelHandle } from 'react-resizable-panels';
 import { Toaster } from 'react-hot-toast';
-import { Button } from '@/components/ui/button';
 import { FolderGit2, LineChart, Mail, Route, User } from 'lucide-react';
-
 import { horizontalSizesAtom, verticalSizesAtom, windowsAtom } from '@/store/atoms';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { FileSystemItem } from '@/types/file-system';
 import { initialFileSystem as fileSystem } from '@/lib/data';
-
 import Background3D from '../os/shell/Background3D';
 import { EditorArea } from '../os/editor/EditorArea';
 import { FolderTree } from '../os/file-system/FolderTree';
@@ -71,12 +68,6 @@ export function MainLayout() {
 		},
 	];
 
-	const quickStats = [
-		{ label: 'Modules', value: fileSystem.length },
-		{ label: 'Open', value: windows.length },
-		{ label: 'View', value: isMobile ? 'Mobile' : 'Desktop' },
-	];
-
 	return (
 		<ErrorBoundary>
 			<>
@@ -125,51 +116,7 @@ export function MainLayout() {
 					<WelcomeDialog />
 
 					<div className="flex-1 z-10 relative overflow-hidden flex flex-col gap-3 px-3 pb-3 pt-2 md:px-5 md:pb-4">
-						{/* Quick actions / status bar */}
-						<div className="rounded-2xl border border-border/70 bg-card/70 backdrop-blur-2xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.35)] px-3 py-3 md:px-4 md:py-3 flex flex-col gap-3">
-							<div className="flex items-center justify-between gap-3 flex-wrap">
-								<div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
-									<span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.7)]" />
-									<span>Portfolio Workspace</span>
-								</div>
-								<div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-									<span className="px-2 py-1 rounded-full border border-border/60 bg-muted/60 backdrop-blur">
-										Live Preview
-									</span>
-								</div>
-							</div>
-
-							<div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 text-xs text-muted-foreground">
-								{quickStats.map(stat => (
-									<div
-										key={stat.label}
-										className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/60 px-3 py-2 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.45)]"
-									>
-										<span className="text-[11px] uppercase tracking-[0.2em]">
-											{stat.label}
-										</span>
-										<span className="text-sm font-medium text-foreground">
-											{stat.value}
-										</span>
-									</div>
-								))}
-							</div>
-
-							<div className="flex flex-wrap gap-2">
-								{quickLaunch.map(({ label, icon: Icon, item }) => (
-									<Button
-										key={item.id}
-										variant="outline"
-										size="sm"
-										className="gap-2 rounded-lg border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/40 transition-all"
-										onClick={() => handleFileSelect(item)}
-									>
-										<Icon className="h-4 w-4" />
-										<span className="tracking-wide">{label}</span>
-									</Button>
-								))}
-							</div>
-						</div>
+					
 
 						{/* Main Workbench Area */}
 						<div className="flex-1 relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_24px_80px_-32px_rgba(0,0,0,0.4)]">

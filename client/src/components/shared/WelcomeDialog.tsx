@@ -8,14 +8,12 @@ import { cn } from '@/lib/utils';
 export function WelcomeDialog() {
 	const [isOpen, setIsOpen] = useState(false);
 	const [step, setStep] = useState(0);
-	const [hasSeenWelcome, setHasSeenWelcome] = useState(true);
 
 	useEffect(() => {
 		// Check if user has seen welcome before
 		const seen = localStorage.getItem('anuragos-welcome-seen');
 		if (!seen) {
-			setHasSeenWelcome(false);
-			setIsOpen(true);
+			queueMicrotask(() => setIsOpen(true));
 		}
 	}, []);
 
