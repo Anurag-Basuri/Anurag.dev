@@ -15,6 +15,7 @@ import {
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { FileSystemItem } from '@/types/file-system';
+import { fileSystem } from '@/lib/data'; // Import the file system data
 
 import Background3D from '../os/shell/Background3D';
 import { EditorArea } from '../os/editor/EditorArea';
@@ -42,7 +43,7 @@ export function MainLayout() {
 	const [horizontalSizes, setHorizontalSizes] = useAtom(horizontalSizesAtom);
 
 	// Hydration check to prevent layout flicker on initial render
-	const [isLayoutReady] = useState(true);
+	const isLayoutReady = true;
 
 	const { openWindow } = useWindowManager();
 
@@ -109,39 +110,28 @@ export function MainLayout() {
 						{!isMobile && !isLayoutReady ? (
 							/* Loading Skeleton */
 							<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
-								LOADING SYSTEM...
+								{/* You can add a loading spinner or skeleton here */}
+								Loading...
 							</div>
-						) : !isMobile && isLayoutReady ? (
-							<ResizablePanelGroup
-								direction="horizontal"
-								className="h-full w-full transform-style-3d"
-								onLayout={setHorizontalSizes}
-							>
-								<ResizablePanel
-									ref={sidebarRef}
-									collapsible
-									collapsedSize={0}
-									minSize={15}
-									defaultSize={horizontalSizes[0]}
-									onCollapse={() => setSidebarCollapsed(true)}
-									onExpand={() => setSidebarCollapsed(false)}
-									className="transition-all duration-300 ease-in-out"
-								>
-									<FolderTree items={[]} onSelect={handleFileSelect} />
-								</ResizablePanel>
-
-								<ResizableHandle
-									withHandle
-									className="bg-border/60 hover:bg-border transition-colors"
-								/>
-
-								<ResizablePanel defaultSize={horizontalSizes[1]}>
+						) : (
+							<>
+								{!isMobile ? (
 									<ResizablePanelGroup
-										direction="vertical"
-										onLayout={setVerticalSizes}
+										direction="horizontal"
+										className="h-full w-full transform-style-3d"
+										onLayout={setHorizontalSizes}
 									>
-										<ResizablePanel defaultSize={verticalSizes[0]}>
-											<EditorArea />
+										<ResizablePanel
+											ref={sidebarRef}
+											collapsible
+											collapsedSize={0}
+											minSize={15}
+											defaultSize={horizontalSizes[0]}
+											onCollapse={() => setSidebarCollapsed(true)}
+											onExpand={() => setSidebarCollapsed(false)}
+											className="transition-all duration-300 ease-in-out"
+										>
+											<FolderTree items={fileSystem} onSelect={handleFileSelect} />
 										</ResizablePanel>
 
 										<ResizableHandle
@@ -149,28 +139,43 @@ export function MainLayout() {
 											className="bg-border/60 hover:bg-border transition-colors"
 										/>
 
-										<ResizablePanel
-											ref={terminalRef}
-											collapsible
-											collapsedSize={0}
-											minSize={10}
-											defaultSize={verticalSizes[1]}
-											onCollapse={() => setTerminalCollapsed(true)}
-											onExpand={() => setTerminalCollapsed(false)}
-											className="transition-all duration-300 ease-in-out"
-										>
-											<CLI />
+										<ResizablePanel defaultSize={horizontalSizes[1]}>
+											<ResizablePanelGroup
+												direction="vertical"
+												onLayout={setVerticalSizes}
+											>
+												<ResizablePanel defaultSize={verticalSizes[0]}>
+													<EditorArea />
+												</ResizablePanel>
+
+												<ResizableHandle
+													withHandle
+													className="bg-border/60 hover:bg-border transition-colors"
+												/>
+
+												<ResizablePanel
+													ref={terminalRef}
+													collapsible
+													collapsedSize={0}
+													minSize={10}
+													defaultSize={verticalSizes[1]}
+													onCollapse={() => setTerminalCollapsed(true)}
+													onExpand={() => setTerminalCollapsed(false)}
+													className="transition-all duration-300 ease-in-out"
+												>
+													<CLI />
+												</ResizablePanel>
+											</ResizablePanelGroup>
 										</ResizablePanel>
 									</ResizablePanelGroup>
-								</ResizablePanel>
-							</ResizablePanelGroup>
-						) : (
-							/* Mobile view: EditorArea takes full space */
-							<div className="h-full w-full">
-								<EditorArea />
-							</div>
+								) : (
+									/* Mobile view: EditorArea takes full space */
+									<div className="h-full w-full">
+										<EditorArea />
+									</div>
+								)}
+							</>
 						)}
-					</div>
 					<Taskbar />
 				</div>
 
