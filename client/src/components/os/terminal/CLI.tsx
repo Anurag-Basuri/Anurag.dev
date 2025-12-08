@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { processCommand, commandsList, CommandResponse } from '@/lib/commands';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { processCommand, CommandResponse, getCommandSuggestions } from '@/lib/commands';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { windowsAtom } from '@/store/atoms';
@@ -30,6 +30,15 @@ const responseTone = (type: CommandResponse['type']) => {
 	}
 };
 
+const CMD_HISTORY_STORAGE_KEY = 'anuragos-terminal-cmd-history';
+const PATH_STORAGE_KEY = 'anuragos-terminal-path';
+const CMD_HISTORY_LIMIT = 50;
+
+const generateHistoryId = () =>
+	typeof crypto !== 'undefined' && 'randomUUID' in crypto
+		? crypto.randomUUID()
+		: Math.random().toString(36).slice(2);
+
 export function CLI() {
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
@@ -42,6 +51,74 @@ export function CLI() {
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const { setTheme, resolvedTheme } = useTheme();
 	const [isFocused, setIsFocused] = useState(false);
+	const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+
+	const normalizedInput = input.trim().toLowerCase();
+	const suggestions = useMemo(
+		() => (normalizedInput ? getCommandSuggestions(normalizedInput, 5) : []),
+		[normalizedInput],
+	);
+	const showSuggestions = normalizedInput.length > 0 && suggestions.length > 0;
+
+	const pushCommandToHistory = useCallback((value: string) => {
+		if (!value) return;
+		setCmdHistory(prev => {
+			const next = [...prev, value];
+			return next.length > CMD_HISTORY_LIMIT
+				? next.slice(next.length - CMD_HISTORY_LIMIT)
+				: next;
+		});
+	}, []);
+
+	const applySuggestion = useCallback((value: string) => {
+		if (!value) return;
+		setInput(value);
+		setCursorPos(value.length);
+		requestAnimationFrame(() => {
+			inputRef.current?.setSelectionRange(value.length, value.length);
+		});
+	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+			if (storedHistory) {
+				const parsed = JSON.parse(storedHistory);
+				if (Array.isArray(parsed)) {
+					setCmdHistory(
+						parsed.filter((entry): entry is string => typeof entry === 'string'),
+					);
+				}
+			}
+			const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
+			if (storedPath) setCurrentPath(storedPath);
+		} catch (error) {
+			console.warn('Failed to hydrate terminal state', error);
+		}
+	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			const payload =
+				cmdHistory.length > CMD_HISTORY_LIMIT
+					? cmdHistory.slice(cmdHistory.length - CMD_HISTORY_LIMIT)
+					: cmdHistory;
+			window.localStorage.setItem(CMD_HISTORY_STORAGE_KEY, JSON.stringify(payload));
+		} catch (error) {
+			console.warn('Failed to persist terminal commands', error);
+		}
+	}, [cmdHistory]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			window.localStorage.setItem(PATH_STORAGE_KEY, currentPath);
+		} catch (error) {
+			console.warn('Failed to persist terminal path', error);
+		}
+	}, [currentPath]);
 
 	const getPromptLabel = (path: string) => (
 		<span className="font-medium">
@@ -65,10 +142,7 @@ export function CLI() {
 			e.preventDefault();
 			if (input.trim()) {
 				const newItem: HistoryItem = {
-					id:
-						typeof crypto !== 'undefined' && 'randomUUID' in crypto
-							? crypto.randomUUID()
-							: Math.random().toString(36).slice(2),
+					id: generateHistoryId(),
 					command: input + '^C',
 					response: { type: 'text', content: '' },
 					path: currentPath,
@@ -78,10 +152,7 @@ export function CLI() {
 			} else {
 				// Even empty input gets a new line with prompt
 				const newItem: HistoryItem = {
-					id:
-						typeof crypto !== 'undefined' && 'randomUUID' in crypto
-							? crypto.randomUUID()
-							: Math.random().toString(36).slice(2),
+					id: generateHistoryId(),
 					command: '^C',
 					response: { type: 'text', content: '' },
 					path: currentPath,
@@ -103,10 +174,7 @@ export function CLI() {
 					setCurrentPath(response.newPath);
 				}
 				const newItem: HistoryItem = {
-					id:
-						typeof crypto !== 'undefined' && 'randomUUID' in crypto
-							? crypto.randomUUID()
-							: Math.random().toString(36).slice(2),
+					id: generateHistoryId(),
 					command: input,
 					response: { type: 'success', content: '' }, // Don't show output for successful cd
 					path: currentPath,
@@ -114,10 +182,7 @@ export function CLI() {
 				setHistory(prev => [...prev, newItem]);
 			} else {
 				const newItem: HistoryItem = {
-					id:
-						typeof crypto !== 'undefined' && 'randomUUID' in crypto
-							? crypto.randomUUID()
-							: Math.random().toString(36).slice(2),
+					id: generateHistoryId(),
 					command: input,
 					response,
 					path: currentPath,
@@ -152,7 +217,7 @@ export function CLI() {
 				}
 			}
 			if (input.trim()) {
-				setCmdHistory(prev => [...prev, input]);
+				pushCommandToHistory(input);
 			}
 			setInput('');
 			setCursorPos(0);
@@ -184,10 +249,14 @@ export function CLI() {
 			}
 		} else if (e.key === 'Tab') {
 			e.preventDefault();
-			const match = commandsList.find(cmd => cmd.startsWith(input.toLowerCase()));
-			if (match) {
-				setInput(match);
-				setCursorPos(match.length);
+			if (!suggestions.length) return;
+			const nextValue = suggestions[activeSuggestionIndex];
+			applySuggestion(nextValue);
+			if (suggestions.length > 1) {
+				const direction = e.shiftKey ? -1 : 1;
+				const newIndex =
+					(activeSuggestionIndex + direction + suggestions.length) % suggestions.length;
+				setActiveSuggestionIndex(newIndex);
 			}
 		}
 	};
@@ -270,6 +339,7 @@ export function CLI() {
 								onChange={e => {
 									setInput(e.target.value);
 									setCursorPos(e.target.selectionStart || 0);
+									setActiveSuggestionIndex(0);
 								}}
 								onKeyDown={handleKeyDown}
 								onSelect={e => {
@@ -311,6 +381,39 @@ export function CLI() {
 							</div>
 						</div>
 					</div>
+					{showSuggestions && (
+						<div className="flex items-start gap-2 text-[11px] text-muted-foreground/80 flex-wrap">
+							<span className="text-glow shrink-0 invisible">
+								{getPromptLabel(currentPath)}
+							</span>
+							<div
+								className="flex flex-wrap gap-1"
+								role="listbox"
+								aria-label="Command suggestions"
+							>
+								{suggestions.map((suggestion, idx) => (
+									<button
+										key={`${suggestion}-${idx}`}
+										type="button"
+										tabIndex={-1}
+										onMouseDown={e => e.preventDefault()}
+										onClick={() => {
+											setActiveSuggestionIndex(idx);
+											applySuggestion(suggestion);
+										}}
+										className={cn(
+											'px-2 py-0.5 rounded border transition-colors bg-background/40',
+											idx === activeSuggestionIndex
+												? 'border-primary/70 text-primary bg-primary/10'
+												: 'border-border/40 hover:border-border/70',
+										)}
+									>
+										{suggestion}
+									</button>
+								))}
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
