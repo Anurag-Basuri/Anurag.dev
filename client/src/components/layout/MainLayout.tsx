@@ -5,8 +5,7 @@ import { useRef, useState } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ImperativePanelHandle } from 'react-resizable-panels';
 import { Toaster } from 'react-hot-toast';
-import { FolderGit2, LineChart, Mail, Route, User } from 'lucide-react';
-import { horizontalSizesAtom, verticalSizesAtom, windowsAtom } from '@/store/atoms';
+import { horizontalSizesAtom, verticalSizesAtom } from '@/store/atoms';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { FileSystemItem } from '@/types/file-system';
@@ -21,7 +20,6 @@ import { WelcomeDialog } from '../shared/WelcomeDialog';
 import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { HelpButton } from '../shared/HelpButton';
 import { SidebarProfile } from '../os/shell/SidebarProfile';
-import { OpenEditors } from '../os/file-system/OpenEditors';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -34,7 +32,6 @@ export function MainLayout() {
 
 	const [verticalSizes, setVerticalSizes] = useAtom(verticalSizesAtom);
 	const [horizontalSizes, setHorizontalSizes] = useAtom(horizontalSizesAtom);
-	const [windows] = useAtom(windowsAtom);
 
 	const [isLayoutReady] = useState(() => typeof window !== 'undefined');
 
@@ -47,26 +44,6 @@ export function MainLayout() {
 		}
 		openWindow(moduleId, item.name);
 	};
-
-	const quickLaunch: {
-		label: string;
-		icon: React.ComponentType<{ className?: string }>;
-		item: FileSystemItem;
-	}[] = [
-		{ label: 'About', icon: User, item: { id: 'about', name: 'about', type: 'folder' } },
-		{
-			label: 'Projects',
-			icon: FolderGit2,
-			item: { id: 'projects', name: 'projects', type: 'folder' },
-		},
-		{ label: 'Journey', icon: Route, item: { id: 'journey', name: 'journey', type: 'folder' } },
-		{ label: 'Contact', icon: Mail, item: { id: 'contact', name: 'contact', type: 'folder' } },
-		{
-			label: 'Stats',
-			icon: LineChart,
-			item: { id: 'tools/stats.exe', name: 'stats.exe', type: 'file' },
-		},
-	];
 
 	return (
 		<ErrorBoundary>
@@ -116,7 +93,6 @@ export function MainLayout() {
 					<WelcomeDialog />
 
 					<div className="flex-1 z-10 relative overflow-hidden flex flex-col gap-3 px-3 pb-3 pt-2 md:px-5 md:pb-4">
-					
 
 						{/* Main Workbench Area */}
 						<div className="flex-1 relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_24px_80px_-32px_rgba(0,0,0,0.4)]">
@@ -142,16 +118,6 @@ export function MainLayout() {
 									>
 										<div className="h-full flex flex-col overflow-hidden bg-card/40 border-r border-border/60">
 											<SidebarProfile />
-
-											<div className="px-3 py-2 border-b border-border/60 flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-												<span>Open Editors</span>
-												<span className="text-[10px] text-muted-foreground/70">
-													{windows.length}
-												</span>
-											</div>
-											<div className="px-3 py-3 border-b border-border/60">
-												<OpenEditors />
-											</div>
 
 											<div className="px-3 py-2 border-b border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
 												Explorer
