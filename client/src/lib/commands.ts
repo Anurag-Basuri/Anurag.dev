@@ -43,16 +43,10 @@ export type CommandSpec = {
 };
 
 export type CommandContext = {
-	print: (lines: string | string[]) => void;
-	clear: () => void;
-	setBusy: (busy: boolean) => void;
-	getState: () => unknown;
 	currentPath: string;
 };
 
-export type CommandResult =
-	| { ok: true; data?: unknown }
-	| { ok: false; error: string; hint?: string };
+export type CommandResult = { ok: true; data?: string | Record<string, unknown> } | { ok: false; error: string; hint?: string };
 
 // The registry is now the single source of truth for all commands.
 export const registry: Record<string, CommandSpec> = {
@@ -75,7 +69,7 @@ export const registry: Record<string, CommandSpec> = {
 		aliases: ['cls'],
 		description: 'Clear the terminal output.',
 		usage: 'clear',
-		run: () => ({ ok: true, data: { type: 'clear', content: '' } }),
+		run: () => ({ ok: true, data: { type: 'clear' } }),
 	},
 	ls: {
 		name: 'ls',
@@ -103,7 +97,6 @@ export const registry: Record<string, CommandSpec> = {
 			const output = item.children
 				.map(child => {
 					const isDir = child.type === 'folder';
-					// Simple formatting, can be enhanced later
 					return `${isDir ? 'd' : '-'}rw-r--r-- 1 root root 4096 Dec 8 12:00 ${
 						child.name
 					}${isDir ? '/' : ''}`;
@@ -127,15 +120,17 @@ export const registry: Record<string, CommandSpec> = {
 
 			let newPath = '~';
 			if (item.id !== 'root') {
+				// This part needs a function to derive path from item, for now, we simplify
 				if (targetPath.startsWith('/') || targetPath.startsWith('~')) {
 					newPath = targetPath;
 				} else {
 					newPath = [currentPath.replace(/\/$/, ''), targetPath].join('/');
 				}
 				// Basic normalization
-				newPath = newPath.replace('~/', '');
-				if (!newPath.startsWith('~')) newPath = '~/' + newPath;
-				newPath = newPath.replace(/\/+/g, '/');
+				newPath = newPath.replace(/^~?\/?/, '');
+				newPath = '~/' + newPath;
+				newPath = newPath.replace(/\/+/g, '/').replace(/\/$/, '');
+				if (newPath === '~/') newPath = '~';
 			}
 
 			return { ok: true, data: { type: 'change_directory', newPath } };
@@ -147,19 +142,16 @@ export const registry: Record<string, CommandSpec> = {
 		usage: 'open <module_name_or_path>',
 		examples: ['open about', 'open /apps/projects.app'],
 		run: ({ currentPath }, args) => {
-		run: ({ currentPath }, args) => {
 			const target = args[0];
 			if (!target) {
 				return { ok: false, error: 'Missing target', hint: 'Usage: open <module | path>' };
 			}
 
-			// Check if it's a direct module name
 			const moduleNames = ['about', 'projects', 'journey', 'blog', 'contact', 'secret'];
 			if (moduleNames.includes(target.toLowerCase())) {
 				return { ok: true, data: { type: 'open_module', moduleId: target.toLowerCase() } };
 			}
 
-			// Otherwise, treat it as a path
 			const item = resolvePath(currentPath, target);
 			if (!item) {
 				return { ok: false, error: `open: file not found: ${target}` };
@@ -168,27 +160,27 @@ export const registry: Record<string, CommandSpec> = {
 				return { ok: false, error: `open: cannot open directory: ${target}` };
 			}
 
-			// Assuming file IDs correspond to module IDs
 			return { ok: true, data: { type: 'open_module', moduleId: item.id } };
 		},
+	},
 	whoami: {
 		name: 'whoami',
 		description: 'Display the current user.',
 		usage: 'whoami',
-		run: () => ({ type: 'text', content: 'root' }),
 		run: () => ({ ok: true, data: 'root' }),
+	},
 	date: {
 		name: 'date',
 		description: 'Display the current date and time.',
 		usage: 'date',
-		run: () => ({ type: 'text', content: new Date().toString() }),
 		run: () => ({ ok: true, data: new Date().toString() }),
+	},
 	echo: {
 		name: 'echo',
 		description: 'Display a line of text.',
 		usage: 'echo [text...]',
-		run: (_ctx, args) => ({ type: 'text', content: args.join(' ') }),
 		run: (_ctx, args) => ({ ok: true, data: args.join(' ') }),
+	},
 	theme: {
 		name: 'theme',
 		description: 'Set or toggle the UI theme.',
@@ -196,10 +188,12 @@ export const registry: Record<string, CommandSpec> = {
 		aliases: ['th'],
 		examples: ['theme dark', 'theme toggle'],
 		run: (_ctx, args) => {
-		run: (_ctx, args) => {
 			const mode = args[0]?.toLowerCase();
 			if (mode === 'dark' || mode === 'light' || mode === 'toggle') {
-				return { ok: true, data: { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' } };
+				return {
+					ok: true,
+					data: { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' },
+				};
 			}
 			return {
 				ok: false,
@@ -207,44 +201,45 @@ export const registry: Record<string, CommandSpec> = {
 				hint: 'Usage: theme <dark|light|toggle>',
 			};
 		},
+	},
 	// Module shortcuts
 	about: {
 		name: 'about',
 		description: 'Open the About section.',
 		usage: 'about',
-		run: () => ({ type: 'open_module', moduleId: 'about' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'about' } }),
+	},
 	projects: {
 		name: 'projects',
 		description: 'Open the Projects section.',
 		usage: 'projects',
-		run: () => ({ type: 'open_module', moduleId: 'projects' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'projects' } }),
+	},
 	journey: {
 		name: 'journey',
 		description: 'Open the Journey section.',
 		usage: 'journey',
-		run: () => ({ type: 'open_module', moduleId: 'journey' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'journey' } }),
+	},
 	blog: {
 		name: 'blog',
 		description: 'Open the Blog section.',
 		usage: 'blog',
-		run: () => ({ type: 'open_module', moduleId: 'blog' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'blog' } }),
+	},
 	contact: {
 		name: 'contact',
 		description: 'Open the Contact section.',
 		usage: 'contact',
-		run: () => ({ type: 'open_module', moduleId: 'contact' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'contact' } }),
+	},
 	secret: {
 		name: 'secret',
 		description: '???',
 		usage: 'secret',
 		hidden: true,
-		run: () => ({ type: 'open_module', moduleId: 'secret' }),
 		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'secret' } }),
+	},
 
 	// Easter eggs
 	matrix: {
@@ -252,22 +247,22 @@ export const registry: Record<string, CommandSpec> = {
 		description: 'Enter the Matrix.',
 		usage: 'matrix',
 		hidden: true,
-		run: () => ({ type: 'component', content: 'Entering the matrix...' }), // Placeholder
-		run: () => ({ ok: true, data: { type: 'component', content: 'Entering the matrix...' } }), // Placeholder
+		run: () => ({ ok: true, data: { type: 'component', content: 'Entering the matrix...' } }),
+	},
 	coffee: {
 		name: 'coffee',
 		description: 'Brew some coffee.',
 		usage: 'coffee',
 		hidden: true,
-		run: () => ({ type: 'error', content: "I'm a teapot" }), // HTTP 418
 		run: () => ({ ok: false, error: "I'm a teapot" }), // HTTP 418
+	},
 	konami: {
 		name: 'konami',
 		description: 'Konami code.',
 		usage: 'konami',
 		hidden: true,
-		run: () => ({ type: 'success', content: 'Konami code activated! 🎉' }),
 		run: () => ({ ok: true, data: 'Konami code activated! 🎉' }),
+	},
 };
 
 // Dynamically generate the commands list from the registry.
@@ -305,24 +300,27 @@ export function formatAllHelp(reg: Record<string, CommandSpec>): string {
 		if (spec.hidden) continue;
 		lines.push(`  ${name.padEnd(10)} - ${spec.description}`);
 	}
-	lines.push('Type "help <command>" for details.');
+	lines.push('\nType "help <command>" for details.');
 	return lines.join('\n');
 }
 
 export function formatHelp(spec: CommandSpec): string {
-	const lines = [`${spec.name}`, `Usage: ${spec.usage}`, `Description: ${spec.description}`];
+	const lines = [`Usage: ${spec.usage}`, `\n${spec.description}`];
+	if (spec.aliases?.length) {
+		lines.push(`Aliases: ${spec.aliases.join(', ')}`);
+	}
 	if (spec.examples?.length) {
-		lines.push('Examples:');
+		lines.push('\nExamples:');
 		for (const ex of spec.examples) lines.push(`  ${ex}`);
 	}
 	if (spec.options && Object.keys(spec.options).length) {
-		lines.push('Options:');
+		lines.push('\nOptions:');
 		for (const [opt, meta] of Object.entries(spec.options)) {
 			lines.push(`  --${opt}${meta.alias ? `, -${meta.alias}` : ''} - ${meta.description}`);
 		}
 	}
 	if (spec.subcommands && Object.keys(spec.subcommands).length) {
-		lines.push('Subcommands:');
+		lines.push('\nSubcommands:');
 		for (const [sub, subSpec] of Object.entries(spec.subcommands)) {
 			lines.push(`  ${sub} - ${subSpec.description}`);
 		}
@@ -354,10 +352,7 @@ function levenshtein(a: string, b: string): number {
 // Resolves a file system path (absolute or relative) to a FileSystemItem.
 function resolvePath(currentPath: string, targetPath: string): FileSystemItem | null {
 	// Normalize paths
-	if (targetPath === '~')
-		return { type: 'folder', name: 'root', id: 'root', children: initialFileSystem };
-	// FIX: Handle root path correctly
-	if (targetPath === '/')
+	if (targetPath === '~' || targetPath === '/')
 		return { type: 'folder', name: 'root', id: 'root', children: initialFileSystem };
 
 	let pathParts: string[] = [];
@@ -456,10 +451,36 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 		const spec = findCommandSpec(cmd);
 
 		if (spec && spec.run) {
-			const context = { currentPath };
-			// @ts-ignore
-			// @ts-expect-error
-			return spec.run(context, args);
+			const context: CommandContext = { currentPath };
+			const resultOrPromise = spec.run(context, args);
+
+			if (resultOrPromise instanceof Promise) {
+				// If the result is a Promise, throw an error or handle async appropriately
+				throw new Error(
+					'processCommand does not support async commands. Use an async handler.',
+				);
+			}
+
+			const result = resultOrPromise;
+
+			if (result.ok) {
+				// Handle successful commands
+				if (typeof result.data === 'string') {
+					return { type: 'text', content: result.data };
+				}
+				if (typeof result.data === 'object' && result.data !== null) {
+					// For commands that return special types like 'clear', 'open_module', etc.
+					return { ...result.data, content: result.data.content || '' };
+				}
+				return { type: 'success', content: '' }; // Default success response
+			} else {
+				// Handle failed commands
+				return {
+					type: 'error',
+					content: `${result.error}${result.hint ? `\nHint: ${result.hint}` : ''}`,
+				};
+			}
+		}
 
 		// Command not found, provide a suggestion.
 		const suggestion = getCommandSuggestions(cmd, 1)[0];
@@ -487,26 +508,26 @@ export function getCommandSuggestions(command: string, max: number): string[] {
 	const normalizedInput = command.toLowerCase();
 	if (!normalizedInput) return [];
 
-	const scored = commandsList
+	const allCommands = Object.values(registry).flatMap(cmd => [cmd.name, ...(cmd.aliases || [])]);
+	const uniqueCommands = [...new Set(allCommands)];
+
+	const scored = uniqueCommands
 		.map(name => {
 			const lowerName = name.toLowerCase();
 			const startsWith = lowerName.startsWith(normalizedInput);
-			const contains = !startsWith && lowerName.includes(normalizedInput);
 			// Penalize non-starting matches to prioritize prefixes
 			const distance = levenshtein(normalizedInput, lowerName) + (startsWith ? 0 : 1);
 
-			return { name, startsWith, contains, distance };
+			return { name, startsWith, distance };
 		})
 		.filter(
 			item =>
 				item.startsWith ||
-				item.contains ||
 				item.distance <= Math.max(2, Math.floor(normalizedInput.length / 2)),
 		)
 		.sort((a, b) => {
 			if (a.startsWith !== b.startsWith) return a.startsWith ? -1 : 1;
 			if (a.distance !== b.distance) return a.distance - b.distance;
-			if (a.contains !== b.contains) return a.contains ? -1 : 1;
 			return a.name.length - b.name.length;
 		});
 
