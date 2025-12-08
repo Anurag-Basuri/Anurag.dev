@@ -78,6 +78,24 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 		}
 	};
 
+	// Close panel when clicking outside
+	useEffect(() => {
+		if (!isOpen) return;
+		const handleDocMouseDown = (e: MouseEvent) => {
+			const target = e.target as Node | null;
+			const panelEl = panelRef.current;
+			const triggerEl = triggerRef.current;
+			if (!panelEl || !triggerEl) return;
+			const clickedInsidePanel = panelEl.contains(target as Node);
+			const clickedTrigger = triggerEl.contains(target as Node);
+			if (!clickedInsidePanel && !clickedTrigger) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleDocMouseDown);
+		return () => document.removeEventListener('mousedown', handleDocMouseDown);
+	}, [isOpen]);
+
 	return (
 		<TooltipProvider delayDuration={0}>
 			{/* Trigger */}
