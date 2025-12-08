@@ -67,9 +67,9 @@ export function Taskbar() {
 		}
 	};
 
-	const handleOpenModule = (id: string, title: string) => {
+	const handleOpenModule = (id: string) => {
 		setIsStartOpen(false);
-		openWindow(id, title);
+		openWindow(id);
 	};
 
 	const menuItems = [
@@ -156,9 +156,7 @@ export function Taskbar() {
 											{menuItems.map(item => (
 												<button
 													key={item.id}
-													onClick={() =>
-														handleOpenModule(item.id, item.label)
-													}
+													onClick={() => handleOpenModule(item.id)}
 													className="w-full text-left px-3 py-2 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
 												>
 													<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
