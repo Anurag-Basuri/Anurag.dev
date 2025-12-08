@@ -553,17 +553,32 @@ Now go check out my 'projects' and 'journey'! 🚀`,
 		};
 	}
 }
-function getCommandSuggestions(command: string, max: number): string[] {
-	const candidates = commandsList;
-	const scored = candidates
-		.map(cmd => ({
-			cmd,
-			score: levenshtein(command, cmd),
-		}))
-		.sort((a, b) => a.score - b.score);
+export function getCommandSuggestions(command: string, max: number): string[] {
+	const normalizedInput = command.toLowerCase();
+	if (!normalizedInput) return [];
 
-	// Only suggest commands with a reasonable similarity (score <= 3)
-	const suggestions = scored.filter(s => s.score <= 3).map(s => s.cmd);
-	return suggestions.slice(0, max);
+	const scored = commandsList
+		.map(name => {
+			const lowerName = name.toLowerCase();
+			const startsWith = lowerName.startsWith(normalizedInput);
+			const contains = !startsWith && lowerName.includes(normalizedInput);
+			// Penalize non-starting matches to prioritize prefixes
+			const distance = levenshtein(normalizedInput, lowerName) + (startsWith ? 0 : 1);
+
+			return { name, startsWith, contains, distance };
+		})
+		.filter(
+			item =>
+				item.startsWith ||
+				item.contains ||
+				item.distance <= Math.max(2, Math.floor(normalizedInput.length / 2)),
+		)
+		.sort((a, b) => {
+			if (a.startsWith !== b.startsWith) return a.startsWith ? -1 : 1;
+			if (a.distance !== b.distance) return a.distance - b.distance;
+			if (a.contains !== b.contains) return a.contains ? -1 : 1;
+			return a.name.length - b.name.length;
+		});
+
+	return scored.slice(0, max).map(item => item.name);
 }
-
