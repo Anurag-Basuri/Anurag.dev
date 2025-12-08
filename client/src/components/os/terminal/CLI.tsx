@@ -8,6 +8,7 @@ import { windowsAtom } from '@/store/atoms';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 type HistoryItem = {
 	id: string;
@@ -24,8 +25,6 @@ const responseTone = (type: CommandResponse['type']): string => {
 		case 'success':
 		case 'open_module':
 			return 'text-primary';
-		case 'component':
-			return 'text-muted-foreground';
 		default:
 			return 'text-muted-foreground';
 	}
@@ -35,7 +34,6 @@ const responseTone = (type: CommandResponse['type']): string => {
 const CMD_HISTORY_STORAGE_KEY = 'anuragos-terminal-cmd-history';
 const PATH_STORAGE_KEY = 'anuragos-terminal-path';
 const CMD_HISTORY_LIMIT = 100;
-const QUICK_COMMANDS = ['help', 'about', 'projects', 'contact'] as const;
 
 const generateHistoryId = (): string =>
 	typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -90,7 +88,11 @@ const saveCurrentPath = (path: string): void => {
 	}
 };
 
-export function CLI() {
+interface CLIProps {
+	onToggleCollapse?: () => void;
+}
+
+export function CLI({ onToggleCollapse }: CLIProps) {
 	// State
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
@@ -100,6 +102,7 @@ export function CLI() {
 	const [currentPath, setCurrentPath] = useState(loadCurrentPath);
 	const [isFocused, setIsFocused] = useState(false);
 	const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
+	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	// Refs
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -112,7 +115,7 @@ export function CLI() {
 	// Computed values
 	const normalizedInput = input.trim().toLowerCase();
 	const suggestions = useMemo(
-		() => (normalizedInput ? getCommandSuggestions(normalizedInput, 5) : []),
+		() => (normalizedInput ? getCommandSuggestions(normalizedInput, 3) : []),
 		[normalizedInput],
 	);
 	const showSuggestions = isFocused && suggestions.length > 0 && input.length > 0;
@@ -354,19 +357,10 @@ export function CLI() {
 		inputRef.current?.focus();
 	}, []);
 
-	const handleQuickCommand = useCallback((cmd: string) => {
-		setInput(cmd);
-		setCursorPos(cmd.length);
-		setTimeout(() => inputRef.current?.focus(), 0);
-	}, []);
-
-	const handleClear = useCallback(() => {
-		setHistory([]);
-		setCmdHistory([]);
-		if (typeof window !== 'undefined') {
-			window.localStorage.removeItem(CMD_HISTORY_STORAGE_KEY);
-		}
-	}, []);
+	const handleToggleCollapse = useCallback(() => {
+		setIsCollapsed(!isCollapsed);
+		onToggleCollapse?.();
+	}, [isCollapsed, onToggleCollapse]);
 
 	const getPromptLabel = useCallback(
 		(path: string) => (
@@ -374,7 +368,7 @@ export function CLI() {
 				<span className="text-green-500">root@anuragos</span>
 				<span className="text-muted-foreground">:</span>
 				<span className="text-blue-500">{path}</span>
-				<span className="text-muted-foreground">#</span>
+				<span className="text-muted-foreground">$</span>
 			</span>
 		),
 		[],
@@ -382,127 +376,67 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm overflow-hidden transition-colors duration-300 relative rounded-xl"
+			className="h-full flex flex-col bg-background/95 backdrop-blur-sm text-foreground font-mono text-sm overflow-hidden"
 			onClick={handleContainerClick}
 		>
-			{/* Ambient gradient overlay */}
-			<div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-[0.06] pointer-events-none" />
-
-			{/* Terminal Toolbar */}
-			<div className="px-4 py-3 border-b border-border/30 bg-background/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs relative z-10 shrink-0">
-				<div className="flex items-center gap-3 text-muted-foreground">
-					<div className="flex items-center gap-1.5" aria-label="Window controls">
-						<span className="w-2.5 h-2.5 rounded-full bg-destructive/70 shadow-[0_0_0_4px_rgba(239,68,68,0.15)]" />
-						<span className="w-2.5 h-2.5 rounded-full bg-amber-400/70 shadow-[0_0_0_4px_rgba(251,191,36,0.12)]" />
-						<span className="w-2.5 h-2.5 rounded-full bg-emerald-400/70 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
-					</div>
-					<span className="text-[11px] tracking-[0.28em] uppercase">Terminal</span>
-					<span className="hidden sm:inline px-2 py-0.5 rounded-full border border-border/60 text-[10px]">
-						Ctrl+L clear
-					</span>
+			{/* Simple Header */}
+			<div className="px-3 py-2 border-b border-border/40 bg-background/60 flex items-center justify-between shrink-0">
+				<div className="flex items-center gap-2 text-xs text-muted-foreground">
+					<span className="font-semibold">TERMINAL</span>
+					<span className="text-[10px]">{currentPath}</span>
 				</div>
-				<div className="flex items-center gap-2 flex-wrap">
-					{QUICK_COMMANDS.map(cmd => (
-						<button
-							key={cmd}
-							type="button"
-							className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-primary/10 hover:border-primary/40 transition-colors text-[11px]"
-							onClick={e => {
-								e.stopPropagation();
-								handleQuickCommand(cmd);
-							}}
-							aria-label={`Quick command: ${cmd}`}
-						>
-							{cmd}
-						</button>
-					))}
-					<button
-						type="button"
-						className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-destructive/10 hover:border-destructive/50 transition-colors text-destructive text-[11px]"
-						onClick={e => {
-							e.stopPropagation();
-							handleClear();
-						}}
-						aria-label="Clear terminal"
-					>
-						Clear
-					</button>
-				</div>
-			</div>
-
-			{/* Status strip */}
-			<div className="px-4 py-2 border-b border-border/20 bg-background/60 backdrop-blur-sm text-[11px] flex flex-wrap items-center justify-between gap-2 relative z-10 shrink-0">
-				<div className="flex items-center gap-2 text-muted-foreground">
-					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60 text-foreground/90">
-						<span className="hidden sm:inline">Path: </span>
-						{currentPath}
-					</span>
-					<span className="hidden sm:inline px-2 py-1 rounded-md border border-border/50 bg-background/60">
-						Theme: {resolvedTheme ?? 'system'}
-					</span>
-				</div>
-				<div className="flex items-center gap-2 text-muted-foreground">
-					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60">
-						History: {history.length}
-					</span>
-					{suggestions.length > 0 && (
-						<span className="px-2 py-1 rounded-md border border-primary/50 bg-primary/10 text-primary">
-							{suggestions.length} suggestion{suggestions.length !== 1 ? 's' : ''}
-						</span>
+				<button
+					type="button"
+					onClick={handleToggleCollapse}
+					className="p-1 hover:bg-accent rounded transition-colors"
+					aria-label="Toggle terminal"
+				>
+					{isCollapsed ? (
+						<ChevronUp className="w-3.5 h-3.5" />
+					) : (
+						<ChevronDown className="w-3.5 h-3.5" />
 					)}
-				</div>
+				</button>
 			</div>
 
 			{/* Main Scrollable Container */}
 			<div
 				ref={scrollRef}
-				className="flex-1 min-h-0 overflow-y-auto px-4 py-4 custom-scrollbar space-y-4 relative z-10"
+				className="flex-1 min-h-0 overflow-y-auto px-3 py-3 custom-scrollbar space-y-2"
 			>
 				{/* Welcome message when terminal is empty */}
 				{history.length === 0 && (
-					<div className="select-none mb-2 pb-3 border-b border-border/20">
-						<div className="text-primary font-semibold text-sm mb-1.5">
-							$ AnuragOS Terminal v1.0.0
-						</div>
-						<div className="text-xs text-muted-foreground/70 space-y-1">
-							<div>
-								Type{' '}
-								<code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-[10px]">
-									help
-								</code>{' '}
-								for available commands, or click files in Explorer.
-							</div>
-							<div className="text-[10px] mt-2">
-								Shortcuts: Tab (autocomplete) • ↑/↓ (history) • Ctrl+L (clear) •
-								Ctrl+C (cancel)
-							</div>
+					<div className="select-none text-xs text-muted-foreground space-y-1 pb-2">
+						<div className="text-primary font-semibold">AnuragOS Terminal</div>
+						<div>
+							Type{' '}
+							<code className="text-primary bg-primary/10 px-1 rounded">help</code>{' '}
+							for commands
 						</div>
 					</div>
 				)}
 
 				{/* Command history */}
-				<div className="space-y-3 pb-4">
+				<div className="space-y-2">
 					<AnimatePresence initial={false} mode="popLayout">
 						{history.map(item => (
 							<motion.div
 								key={item.id}
 								layout
-								initial={{ opacity: 0, y: 12 }}
+								initial={{ opacity: 0, y: 8 }}
 								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -8 }}
-								transition={{ duration: 0.18, ease: 'easeOut' }}
-								className="rounded-xl border border-border/30 bg-background/50 backdrop-blur-sm shadow-[0_12px_45px_-28px_rgba(0,0,0,0.6)] p-3"
+								exit={{ opacity: 0, y: -4 }}
+								transition={{ duration: 0.15, ease: 'easeOut' }}
+								className="space-y-1"
 							>
-								<div className="flex gap-2 text-sm items-baseline flex-wrap">
-									<span className="text-glow shrink-0">
-										{getPromptLabel(item.path)}
-									</span>
+								<div className="flex gap-2 text-sm items-baseline">
+									<span className="shrink-0">{getPromptLabel(item.path)}</span>
 									<span className="flex-1 break-all">{item.command}</span>
 								</div>
 								{item.response.content && (
 									<div
 										className={cn(
-											'mt-2 pl-3 border-l-2 border-border/40 whitespace-pre-wrap leading-relaxed text-[13px]',
+											'pl-3 text-xs whitespace-pre-wrap',
 											responseTone(item.response.type),
 										)}
 									>
@@ -516,11 +450,11 @@ export function CLI() {
 			</div>
 
 			{/* Input Area */}
-			<div className="px-4 pb-4 pt-3 border-t border-border/20 bg-background/70 backdrop-blur-sm relative z-10 shrink-0">
-				<div className="flex items-start gap-3 text-sm">
-					<span className="text-glow shrink-0 mt-1">{getPromptLabel(currentPath)}</span>
-					<div className="relative flex-1 min-w-[140px]">
-						<div className="rounded-lg border border-border/50 bg-background/60 px-3 py-2 shadow-inner">
+			<div className="px-3 py-2 border-t border-border/40 bg-background/60 shrink-0 space-y-2">
+				<div className="flex items-start gap-2 text-sm">
+					<span className="shrink-0 mt-1">{getPromptLabel(currentPath)}</span>
+					<div className="relative flex-1 min-w-0">
+						<div className="bg-background/60 px-2 py-1 rounded border border-border/40">
 							{/* Hidden input for text capture */}
 							<input
 								ref={inputRef}
@@ -531,7 +465,7 @@ export function CLI() {
 								onSelect={handleInputSelect}
 								onFocus={() => setIsFocused(true)}
 								onBlur={() => setIsFocused(false)}
-								className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none px-3 py-2"
+								className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none px-2 py-1"
 								autoComplete="off"
 								autoCorrect="off"
 								autoCapitalize="off"
@@ -543,9 +477,9 @@ export function CLI() {
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block w-2 h-4 -mb-1',
+										'inline-block w-1.5 h-3.5 -mb-0.5',
 										isFocused
-											? 'bg-terminal-text animate-pulse'
+											? 'bg-foreground animate-pulse'
 											: 'bg-transparent',
 									)}
 									aria-hidden="true"
@@ -556,64 +490,32 @@ export function CLI() {
 					</div>
 				</div>
 
-				{/* Suggestions and helpers */}
-				<div
-					className={cn(
-						'mt-3 transition-opacity duration-150 space-y-2',
-						showSuggestions ? 'opacity-100' : 'opacity-75',
-					)}
-				>
-					{/* Suggestions */}
-					<div className="flex flex-wrap gap-2 items-center text-xs">
-						<span className="text-muted-foreground font-medium">Suggestions:</span>
-						{suggestions.length === 0 ? (
-							<span className="text-muted-foreground/70">
-								Start typing for autocomplete
-							</span>
-						) : (
-							suggestions.map((suggestion, idx) => (
-								<button
-									key={`${suggestion}-${idx}`}
-									type="button"
-									tabIndex={-1}
-									onMouseDown={e => e.preventDefault()}
-									onClick={e => {
-										e.stopPropagation();
-										applySuggestion(suggestion);
-									}}
-									className={cn(
-										'px-2 py-0.5 rounded border transition-colors bg-background/50',
-										idx === activeSuggestionIndex
-											? 'border-primary/70 text-primary bg-primary/10'
-											: 'border-border/40 hover:border-border/70',
-									)}
-									aria-label={`Suggestion: ${suggestion}`}
-								>
-									{suggestion}
-								</button>
-							))
-						)}
+				{/* Suggestions - only show when typing */}
+				{showSuggestions && (
+					<div className="flex flex-wrap gap-1.5 text-xs">
+						{suggestions.map((suggestion, idx) => (
+							<button
+								key={`${suggestion}-${idx}`}
+								type="button"
+								tabIndex={-1}
+								onMouseDown={e => e.preventDefault()}
+								onClick={e => {
+									e.stopPropagation();
+									applySuggestion(suggestion);
+								}}
+								className={cn(
+									'px-2 py-0.5 rounded border transition-colors',
+									idx === activeSuggestionIndex
+										? 'border-primary text-primary bg-primary/10'
+										: 'border-border/40 hover:border-border',
+								)}
+								aria-label={`Suggestion: ${suggestion}`}
+							>
+								{suggestion}
+							</button>
+						))}
 					</div>
-
-					{/* Keyboard shortcuts */}
-					<div className="flex flex-wrap gap-2 text-[10px] text-muted-foreground">
-						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
-							<kbd className="font-mono">Tab</kbd> autocomplete
-						</span>
-						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
-							<kbd className="font-mono">↑/↓</kbd> history
-						</span>
-						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
-							<kbd className="font-mono">Ctrl+C</kbd> cancel
-						</span>
-						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
-							<kbd className="font-mono">Ctrl+L</kbd> clear
-						</span>
-						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
-							<kbd className="font-mono">Ctrl+U</kbd> clear line
-						</span>
-					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);
