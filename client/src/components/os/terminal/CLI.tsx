@@ -39,26 +39,63 @@ const generateHistoryId = () =>
 		? crypto.randomUUID()
 		: Math.random().toString(36).slice(2);
 
+interface SuggestionButtonProps {
+	suggestion: string;
+	idx: number;
+	activeSuggestionIndex: number;
+	applySuggestion: (suggestion: string) => void;
+	setActiveSuggestionIndex: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const SuggestionButton: React.FC<SuggestionButtonProps> = ({
+	suggestion,
+	idx,
+	activeSuggestionIndex,
+	applySuggestion,
+	setActiveSuggestionIndex,
+}) => (
+	<button
+		type="button"
+		tabIndex={-1}
+		onMouseDown={(e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault()}
+		onClick={() => {
+			setActiveSuggestionIndex(idx);
+			applySuggestion(suggestion);
+		}}
+		className={cn(
+			'px-2 py-0.5 rounded border transition-colors bg-background/40',
+			idx === activeSuggestionIndex
+				? 'border-primary/70 text-primary bg-primary/10'
+				: 'border-border/40 hover:border-border/70',
+		)}
+	>
+		{suggestion}
+	</button>
+);
+
 export function CLI() {
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
 	const [history, setHistory] = useState<HistoryItem[]>([]);
 	const [cmdHistory, setCmdHistory] = useState<string[]>(() => {
-		if (typeof window === 'undefined') return [];
-		try {
-			const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
-			let filteredHistory: string[] = [];
-			if (storedHistory) {
-				const parsed = JSON.parse(storedHistory);
-				if (Array.isArray(parsed)) {
-					filteredHistory = parsed.filter((entry): entry is string => typeof entry === 'string');
-				}
-			}
-			return filteredHistory;
-		} catch {
-			return [];
-		}
-	});
+        if (typeof window === 'undefined') return [];
+        try {
+            const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+            let filteredHistory: string[] = [];
+            if (storedHistory) {
+                const parsed = JSON.parse(storedHistory);
+                if (Array.isArray(parsed)) {
+                    filteredHistory = parsed.filter(
+                        (entry): entry is string => typeof entry === 'string',
+                    );
+                }
+            }
+            return filteredHistory;
+        } catch (error) {
+            console.warn('Failed to restore terminal history', error);
+            return [];
+        }
+    });
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [currentPath, setCurrentPath] = useState('~');
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -73,35 +110,15 @@ export function CLI() {
 		() => (normalizedInput ? getCommandSuggestions(normalizedInput, 5) : []),
 		[normalizedInput],
 	);
-	const showSuggestions = normalizedInput.length > 0 && suggestions.length > 0;
+
+	const applySuggestion = useCallback((suggestion: string) => {
+		setInput(suggestion);
+		setCursorPos(suggestion.length);
+	}, []);
 
 	const pushCommandToHistory = useCallback((value: string) => {
 		if (!value) return;
-		setCmdHistory(prev => {
-			const next = [...prev, value];
-	useEffect(() => {
-		if (typeof window === 'undefined') return;
-		try {
-			const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
-			if (storedPath) setCurrentPath(storedPath);
-		} catch (error) {
-			console.warn('Failed to hydrate terminal state', error);
-		}
-	}, []);
-			if (storedHistory) {
-				const parsed = JSON.parse(storedHistory);
-				if (Array.isArray(parsed)) {
-					filteredHistory = parsed.filter((entry): entry is string => typeof entry === 'string');
-				}
-			}
-			if (filteredHistory.length > 0) {
-				setCmdHistory(filteredHistory);
-			}
-			const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
-			if (storedPath) setCurrentPath(storedPath);
-		} catch (error) {
-			console.warn('Failed to hydrate terminal state', error);
-		}
+		setCmdHistory(prev => [...prev, value]);
 	}, []);
 
 	useEffect(() => {
@@ -358,68 +375,25 @@ export function CLI() {
 									setCursorPos(e.currentTarget.selectionStart || 0);
 								}}
 								onFocus={() => setIsFocused(true)}
-								onBlur={() => setIsFocused(false)}
-								className="w-full bg-transparent border-none outline-none text-transparent caret-transparent absolute inset-0 z-10 font-mono"
-								autoFocus
-								spellCheck={false}
-								autoComplete="off"
 							/>
-							{/* Custom Rendered Input with Cursor */}
-							<div className="font-mono whitespace-pre-wrap break-all relative z-0 pointer-events-none">
-								<span className="text-foreground/90">
-									{input.slice(0, cursorPos)}
-								</span>
-								<motion.span
-									animate={{ opacity: isFocused ? [1, 1, 0, 0] : 0 }}
-									transition={{
-										duration: 0.8,
-										repeat: Infinity,
-										times: [0, 0.5, 0.5, 1],
-										ease: 'linear',
-									}}
-									className="inline-block w-[0.6em] h-[1.2em] bg-primary/90 align-text-bottom -mb-[2px] rounded-[1px] shadow-[0_0_8px_var(--primary)]"
-								>
-									<span className="text-primary-foreground opacity-0">
-										{input[cursorPos] || ' '}
-									</span>
-								</motion.span>
-								<span className="text-foreground/90">{input.slice(cursorPos)}</span>
-							</div>
-						</div>
-					</div>
-					{showSuggestions && (
-						<div className="flex items-start gap-2 text-[11px] text-muted-foreground/80 flex-wrap">
-							<span className="text-glow shrink-0 invisible">
-								{getPromptLabel(currentPath)}
-							</span>
 							<div
 								className="flex flex-wrap gap-1"
 								role="listbox"
 								aria-label="Command suggestions"
 							>
-								{suggestions.map((suggestion, idx) => (
-									<button
+								{suggestions.map((suggestion: string, idx: number) => (
+									<SuggestionButton
 										key={`${suggestion}-${idx}`}
-										type="button"
-										tabIndex={-1}
-										onMouseDown={e => e.preventDefault()}
-										onClick={() => {
-											setActiveSuggestionIndex(idx);
-											applySuggestion(suggestion);
-										}}
-										className={cn(
-											'px-2 py-0.5 rounded border transition-colors bg-background/40',
-											idx === activeSuggestionIndex
-												? 'border-primary/70 text-primary bg-primary/10'
-												: 'border-border/40 hover:border-border/70',
-										)}
-									>
-										{suggestion}
-									</button>
+										suggestion={suggestion}
+										idx={idx}
+										activeSuggestionIndex={activeSuggestionIndex}
+										applySuggestion={applySuggestion}
+										setActiveSuggestionIndex={setActiveSuggestionIndex}
+									/>
 								))}
 							</div>
 						</div>
-					)}
+					</div>
 				</div>
 			</div>
 		</div>
