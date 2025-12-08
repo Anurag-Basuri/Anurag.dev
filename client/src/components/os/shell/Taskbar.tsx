@@ -18,6 +18,7 @@ import {
 	ChevronRight,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useWindowManager } from '@/hooks/use-window-manager';
 
 function useSystemStats() {
 	const [stats, setStats] = useState({ cpu: 12, mem: 4.2 });
@@ -40,6 +41,7 @@ export function Taskbar() {
 	const [time, setTime] = useState<Date | null>(null);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 	const stats = useSystemStats();
+	const { openWindow } = useWindowManager();
 
 	useEffect(() => {
 		const timer = setInterval(() => setTime(new Date()), 1000);
@@ -52,18 +54,14 @@ export function Taskbar() {
 
 		// If the window is already active, minimize it
 		if (id === activeWindowId && !window.isMinimized) {
-			setWindows(
-				windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)),
-			);
+			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
 			// Set the next window in the stack as active
 			const nextActiveId = windowStack.filter(wid => wid !== id).pop();
 			setActiveWindowId(nextActiveId || null);
 		} else {
 			// If minimized, restore it and bring to front
 			// If not active, bring to front
-			setWindows(
-				windows.map(w => (w.id === id ? { ...w, isMinimized: false } : w)),
-			);
+			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: false } : w)));
 			setActiveWindowId(id);
 			// Move to the top of the stack
 			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
@@ -72,23 +70,7 @@ export function Taskbar() {
 
 	const handleOpenModule = (id: string, title: string) => {
 		setIsStartOpen(false);
-		setWindows(prev => {
-			if (prev.find(w => w.id === id)) {
-				setActiveWindowId(id);
-				return prev;
-			}
-			setActiveWindowId(id);
-			return [
-				...prev,
-				{
-					id,
-					title: title.toUpperCase(),
-					component: getModuleComponent(id),
-					isOpen: true,
-					isMinimized: false,
-				},
-			];
-		});
+		openWindow(id, title);
 	};
 
 	const menuItems = [
@@ -117,7 +99,11 @@ export function Taskbar() {
 				{/* Start Menu */}
 				<motion.div
 					initial={{ opacity: 0, y: 10, scale: 0.95 }}
-					animate={isStartOpen ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 10, scale: 0.95 }}
+					animate={
+						isStartOpen
+							? { opacity: 1, y: 0, scale: 1 }
+							: { opacity: 0, y: 10, scale: 0.95 }
+					}
 					exit={{ opacity: 0, y: 10, scale: 0.95 }}
 					transition={{ duration: 0.2 }}
 					className="absolute bottom-12 left-0 w-64 glass-premium border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-1 rounded-lg overflow-hidden"

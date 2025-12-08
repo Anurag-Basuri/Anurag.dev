@@ -23,12 +23,13 @@ import type { ImperativePanelHandle } from 'react-resizable-panels';
 import Background3D from '@/components/os/shell/Background3D';
 import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { HelpButton } from '@/components/shared/HelpButton';
+import { useWindowManager } from '@/hooks/use-window-manager';
 
 // Add WindowState type definition
 type WindowState = {
 	id: string;
 	title: string;
-	component: React.ComponentType<any>;
+	component: React.ComponentType<unknown>;
 	isOpen: boolean;
 	isMinimized: boolean;
 	position: { x: number; y: number };
@@ -88,37 +89,14 @@ export function MainLayout() {
 	} = usePersistentSizes('layout:h', [20, 80]);
 
 	const isLayoutReady = vHydrated && hHydrated;
+	const { openWindow } = useWindowManager();
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		let moduleId = item.id;
 		if (moduleId.includes('/')) {
 			moduleId = moduleId.split('/')[0];
 		}
-
-		setWindows(prev => {
-			// If window exists, just bring it to front
-			if (prev.find(w => w.id === moduleId)) {
-				setActiveWindowId(moduleId);
-				return prev.map(w => (w.id === moduleId ? { ...w, isMinimized: false } : w));
-			}
-
-			// Add new window
-			const newWindow: WindowState = {
-				id: moduleId,
-				title: moduleId.toUpperCase(),
-				component: getModuleComponent(moduleId),
-				isOpen: true,
-				isMinimized: false,
-				position: {
-					x: 150 + prev.length * 20,
-					y: 100 + prev.length * 20,
-				},
-				size: { width: 720, height: 480 },
-			};
-
-			setActiveWindowId(moduleId);
-			return [...prev, newWindow];
-		});
+		openWindow(moduleId, item.name);
 	};
 
 	return (
