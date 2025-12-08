@@ -48,124 +48,242 @@ export type CommandContext = {
 	clear: () => void;
 	setBusy: (busy: boolean) => void;
 	getState: () => unknown;
+	currentPath: string;
 };
 
 export type CommandResult =
 	| { ok: true; data?: unknown }
 	| { ok: false; error: string; hint?: string };
 
-// Static list of supported command names for autocomplete and suggestions.
-// Keep in sync with `processCommand` cases and shortcuts below.
-export const commandsList: string[] = [
-	'help',
-	'ls',
-	'cd',
-	'open',
-	'whoami',
-	'date',
-	'echo',
-	'theme',
-	'clear',
-	// Shortcuts / modules
-	'about',
-	'projects',
-	'journey',
-	'ai-lab',
-	'blog',
-	'contact',
-	// Easter eggs
-	'matrix',
-	'coffee',
-	'konami',
-];
-
+// The registry is now the single source of truth for all commands.
 export const registry: Record<string, CommandSpec> = {
 	help: {
 		name: 'help',
 		aliases: ['h', '?'],
 		description: 'Show available commands or details of a command.',
 		usage: 'help [command]',
-		examples: ['help', 'help project'],
+		examples: ['help', 'help projects'],
 		run: (_ctx, args) => {
 			if (!args.length) return { ok: true, data: formatAllHelp(registry) };
-			const t = resolveSpec(args[0]);
-			if (!t)
+			const spec = findCommandSpec(args[0]);
+			if (!spec)
 				return { ok: false, error: `Unknown command "${args[0]}"`, hint: suggest(args[0]) };
-			return { ok: true, data: formatHelp(t) };
+			return { ok: true, data: formatHelp(spec) };
 		},
 	},
 	clear: {
 		name: 'clear',
+		aliases: ['cls'],
 		description: 'Clear the terminal output.',
 		usage: 'clear',
-		run: ctx => {
-			ctx.clear();
-			return { ok: true };
+		run: () => ({ ok: true, data: { type: 'clear', content: '' } }),
+	},
+	ls: {
+		name: 'ls',
+		description: 'List files and directories.',
+		usage: 'ls [path]',
+		run: ({ currentPath }, args) => {
+			const targetPath = args[0] || '.';
+			const item = resolvePath(currentPath, targetPath);
+
+			if (!item) {
+				return {
+					ok: false,
+					error: `ls: cannot access '${targetPath}': No such file or directory`,
+				};
+			}
+
+			if (item.type === 'file') {
+				return { ok: true, data: item.name };
+			}
+
+			if (!item.children || item.children.length === 0) {
+				return { ok: true, data: '' };
+			}
+
+			const output = item.children
+				.map(child => {
+					const isDir = child.type === 'folder';
+					// Simple formatting, can be enhanced later
+					return `${isDir ? 'd' : '-'}rw-r--r-- 1 root root 4096 Dec 8 12:00 ${
+						child.name
+					}${isDir ? '/' : ''}`;
+				})
+				.join('\n');
+
+			return { ok: true, data: output };
+		},
+	},
+	cd: {
+		name: 'cd',
+		description: 'Change the current directory.',
+		usage: 'cd <path>',
+		run: ({ currentPath }, args) => {
+			const targetPath = args[0] || '~';
+			const item = resolvePath(currentPath, targetPath);
+
+			if (!item || item.type !== 'folder') {
+				return { ok: false, error: `cd: not a directory: ${targetPath}` };
+			}
+
+			let newPath = '~';
+			if (item.id !== 'root') {
+				if (targetPath.startsWith('/') || targetPath.startsWith('~')) {
+					newPath = targetPath;
+				} else {
+					newPath = [currentPath.replace(/\/$/, ''), targetPath].join('/');
+				}
+				// Basic normalization
+				newPath = newPath.replace('~/', '');
+				if (!newPath.startsWith('~')) newPath = '~/' + newPath;
+				newPath = newPath.replace(/\/+/g, '/');
+			}
+
+			return { ok: true, data: { type: 'change_directory', newPath } };
 		},
 	},
 	open: {
 		name: 'open',
-		description: 'Open an app or section.',
-		usage: 'open <about|blog|projects|contact|journey>',
-		examples: ['open about', 'open projects'],
-		run: (_ctx, args) =>
-			args[0]
-				? { ok: true, data: `Opening "${args[0]}"...` }
-				: { ok: false, error: 'Missing target', hint: 'Usage: open <section>' },
+		description: 'Open an app or a file.',
+		usage: 'open <module_name_or_path>',
+		examples: ['open about', 'open /apps/projects.app'],
+		run: ({ currentPath }, args) => {
+			const target = args[0];
+			if (!target) {
+				return { ok: false, error: 'Missing target', hint: 'Usage: open <module | path>' };
+			}
+
+			// Check if it's a direct module name
+			const moduleNames = ['about', 'projects', 'journey', 'blog', 'contact', 'secret'];
+			if (moduleNames.includes(target.toLowerCase())) {
+				return { type: 'open_module', moduleId: target.toLowerCase() };
+			}
+
+			// Otherwise, treat it as a path
+			const item = resolvePath(currentPath, target);
+			if (!item) {
+				return { type: 'error', content: `open: file not found: ${target}` };
+			}
+			if (item.type === 'folder') {
+				return { type: 'error', content: `open: cannot open directory: ${target}` };
+			}
+
+			// Assuming file IDs correspond to module IDs
+			return { type: 'open_module', moduleId: item.id };
+		},
+	},
+	whoami: {
+		name: 'whoami',
+		description: 'Display the current user.',
+		usage: 'whoami',
+		run: () => ({ type: 'text', content: 'root' }),
+	},
+	date: {
+		name: 'date',
+		description: 'Display the current date and time.',
+		usage: 'date',
+		run: () => ({ type: 'text', content: new Date().toString() }),
+	},
+	echo: {
+		name: 'echo',
+		description: 'Display a line of text.',
+		usage: 'echo [text...]',
+		run: (_ctx, args) => ({ type: 'text', content: args.join(' ') }),
 	},
 	theme: {
 		name: 'theme',
-		description: 'Set or toggle theme.',
-		usage: 'theme <dark|light|system>',
+		description: 'Set or toggle the UI theme.',
+		usage: 'theme <dark|light|toggle>',
 		aliases: ['th'],
-		examples: ['theme dark', 'theme system'],
-		run: (_ctx, args) =>
-			args[0]
-				? { ok: true, data: `Theme set to ${args[0]}` }
-				: { ok: false, error: 'Missing mode', hint: 'Usage: theme <dark|light|system>' },
-	},
-	project: {
-		name: 'project',
-		description: 'Manage projects.',
-		usage: 'project <list|add|remove> [...options]',
-		subcommands: {
-			list: {
-				name: 'project list',
-				description: 'List projects',
-				usage: 'project list [--tag <tag>] [--json]',
-				run: _ctx => ({ ok: true, data: 'Listing projects...' }),
-			},
-			add: {
-				name: 'project add',
-				description: 'Add a project',
-				usage: 'project add --name <n> --url <u>',
-				run: (_ctx, args) => ({ ok: true, data: `Adding project: ${args.join(' ')}` }),
-			},
-			remove: {
-				name: 'project remove',
-				description: 'Remove a project',
-				usage: 'project remove --id <id>',
-				run: (_ctx, args) =>
-					args[0]
-						? { ok: true, data: `Removing project ${args[0]}` }
-						: {
-								ok: false,
-								error: 'Missing id',
-								hint: 'Usage: project remove --id <id>',
-						  },
-			},
+		examples: ['theme dark', 'theme toggle'],
+		run: (_ctx, args) => {
+			const mode = args[0]?.toLowerCase();
+			if (mode === 'dark' || mode === 'light' || mode === 'toggle') {
+				return { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' };
+			}
+			return {
+				type: 'error',
+				content: 'Invalid theme',
+				hint: 'Usage: theme <dark|light|toggle>',
+			};
 		},
 	},
-	search: {
-		name: 'search',
-		description: 'Search across content.',
-		usage: 'search "<query>" [--section <name>]',
-		run: (_ctx, args) =>
-			args.length
-				? { ok: true, data: `Searching for ${args.join(' ')}` }
-				: { ok: false, error: 'Missing query', hint: 'Usage: search "<query>"' },
+	// Module shortcuts
+	about: {
+		name: 'about',
+		description: 'Open the About section.',
+		usage: 'about',
+		run: () => ({ type: 'open_module', moduleId: 'about' }),
+	},
+	projects: {
+		name: 'projects',
+		description: 'Open the Projects section.',
+		usage: 'projects',
+		run: () => ({ type: 'open_module', moduleId: 'projects' }),
+	},
+	journey: {
+		name: 'journey',
+		description: 'Open the Journey section.',
+		usage: 'journey',
+		run: () => ({ type: 'open_module', moduleId: 'journey' }),
+	},
+	blog: {
+		name: 'blog',
+		description: 'Open the Blog section.',
+		usage: 'blog',
+		run: () => ({ type: 'open_module', moduleId: 'blog' }),
+	},
+	contact: {
+		name: 'contact',
+		description: 'Open the Contact section.',
+		usage: 'contact',
+		run: () => ({ type: 'open_module', moduleId: 'contact' }),
+	},
+	secret: {
+		name: 'secret',
+		description: '???',
+		usage: 'secret',
+		hidden: true,
+		run: () => ({ type: 'open_module', moduleId: 'secret' }),
+	},
+
+	// Easter eggs
+	matrix: {
+		name: 'matrix',
+		description: 'Enter the Matrix.',
+		usage: 'matrix',
+		hidden: true,
+		run: () => ({ type: 'component', content: 'Entering the matrix...' }), // Placeholder
+	},
+	coffee: {
+		name: 'coffee',
+		description: 'Brew some coffee.',
+		usage: 'coffee',
+		hidden: true,
+		run: () => ({ type: 'error', content: "I'm a teapot" }), // HTTP 418
+	},
+	konami: {
+		name: 'konami',
+		description: 'Konami code.',
+		usage: 'konami',
+		hidden: true,
+		run: () => ({ type: 'success', content: 'Konami code activated! 🎉' }),
 	},
 };
+
+// Dynamically generate the commands list from the registry.
+export const commandsList: string[] = Object.keys(registry);
+
+// Finds a command spec by name or alias.
+export function findCommandSpec(name: string): CommandSpec | undefined {
+	const key = name.toLowerCase();
+	const direct = registry[key];
+	if (direct) return direct;
+	for (const spec of Object.values(registry)) {
+		if (spec.aliases?.includes(key)) return spec;
+	}
+	return undefined;
+}
 
 export function resolveSpec(name: string): CommandSpec | undefined {
 	const key = name.toLowerCase();
@@ -237,7 +355,10 @@ function levenshtein(a: string, b: string): number {
 // Resolves a file system path (absolute or relative) to a FileSystemItem.
 function resolvePath(currentPath: string, targetPath: string): FileSystemItem | null {
 	// Normalize paths
-	if (targetPath === '~' || targetPath === '/')
+	if (targetPath === '~')
+		return { type: 'folder', name: 'root', id: 'root', children: initialFileSystem };
+	// FIX: Handle root path correctly
+	if (targetPath === '/')
 		return { type: 'folder', name: 'root', id: 'root', children: initialFileSystem };
 
 	let pathParts: string[] = [];
@@ -322,228 +443,38 @@ function parseArgs(input: string): string[] {
 // Processes a command input and returns the appropriate response.
 export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
 	try {
-		// Validate input type and length
 		if (typeof input !== 'string') {
 			return { type: 'error', content: 'Invalid input type.' };
 		}
 
-		// Limit input length to prevent abuse
 		const sanitized = input.trim().slice(0, 500);
 		if (!sanitized) return { type: 'text', content: '' };
 
 		const args = parseArgs(sanitized);
-		const cmd = args.shift(); // Remove command from args
+		const cmd = args.shift()?.toLowerCase();
 		if (!cmd) return { type: 'text', content: '' };
 
-		const command = cmd.toLowerCase();
+		const spec = findCommandSpec(cmd);
 
-		switch (command) {
-			case 'help':
-				return {
-					type: 'text',
-					content: `Available commands:
-  help      - Show this help message
-  ls        - List directory contents
-  cd        - Change directory
-  open      - Open a file or module
-  whoami    - Display current user
-  date      - Display current date and time
-  echo      - Display a line of text
-  theme     - Toggle theme (light/dark)
-  clear     - Clear terminal
-  
-  Shortcuts:
-  about, projects, journey, ai-lab, blog, contact`,
-				};
-			case 'clear':
-				return { type: 'clear', content: '' };
-			case 'ls': {
-				const target = args.length > 0 ? args[0] : '.';
-				const item = resolvePath(currentPath, target);
-
-				if (!item) {
-					return {
-						type: 'error',
-						content: `ls: cannot access '${target}': No such file or directory`,
-					};
-				}
-
-				if (item.type === 'file') {
-					return { type: 'text', content: item.name };
-				}
-
-				if (item.children) {
-					const names = item.children.map(child => {
-						return child.type === 'folder' ? `${child.name}/` : child.name;
-					});
-					return { type: 'text', content: names.join('  ') };
-				}
-				return { type: 'text', content: '' };
-			}
-			case 'cd': {
-				if (args.length === 0) {
-					return { type: 'change_directory', content: '', newPath: '~' };
-				}
-				const target = args[0];
-				const item = resolvePath(currentPath, target);
-
-				if (!item) {
-					return { type: 'error', content: `cd: no such file or directory: ${target}` };
-				}
-				if (item.type !== 'folder') {
-					return { type: 'error', content: `cd: not a directory: ${target}` };
-				}
-
-				// Construct new path string
-				if (item.id === 'root')
-					return { type: 'change_directory', content: '', newPath: '~' };
-
-				// For this app, IDs are paths like "about" or "projects/featured"
-				// So we can just use the ID prepended with ~
-				return { type: 'change_directory', content: '', newPath: `~/${item.id}` };
-			}
-			case 'whoami':
-				return {
-					type: 'text',
-					content: 'guest@anuragos',
-				};
-			case 'date':
-				return {
-					type: 'text',
-					content: new Date().toString(),
-				};
-			case 'echo':
-				return {
-					type: 'text',
-					content: args.join(' '),
-				};
-			case 'theme': {
-				const subCmd = args[0]?.toLowerCase();
-				if (subCmd === 'dark') {
-					return {
-						type: 'set_theme',
-						theme: 'dark',
-						content: 'Setting theme to dark...',
-					};
-				}
-				if (subCmd === 'light') {
-					return {
-						type: 'set_theme',
-						theme: 'light',
-						content: 'Setting theme to light...',
-					};
-				}
-				return { type: 'set_theme', theme: 'toggle', content: 'Toggling theme...' };
-			}
-			case 'about':
-			case 'projects':
-			case 'journey':
-			case 'ai-lab':
-			case 'blog':
-			case 'contact':
-				return {
-					type: 'open_module',
-					content: `Opening ${command}...`,
-					moduleId: command,
-				};
-			case 'open': {
-				if (args.length === 0) {
-					return { type: 'error', content: 'Usage: open [filename]' };
-				}
-				const target = args[0];
-				const item = resolvePath(currentPath, target);
-
-				if (!item) {
-					return { type: 'error', content: `open: ${target}: No such file or directory` };
-				}
-
-				if (item.type === 'folder') {
-					return { type: 'error', content: `open: ${target}: Is a directory` };
-				}
-
-				// Extract module ID from the file ID (e.g. "about/whoami.md" -> "about")
-				let moduleId = item.id;
-				if (moduleId.includes('/')) {
-					moduleId = moduleId.split('/')[0];
-				}
-
-				const component = getModuleComponent(moduleId);
-				if (component) {
-					return {
-						type: 'open_module',
-						content: `Opening ${item.name}...`,
-						moduleId: moduleId,
-					};
-				}
-
-				return {
-					type: 'text',
-					content: `Opened ${item.name} (Preview not implemented for this file type)`,
-				};
-			}
-
-			// Easter Eggs
-			case 'matrix':
-				return {
-					type: 'success',
-					content: `Following the white rabbit...
-
-01100100 01101111 01110111 01101110
-01110100 01101000 01100101
-01110010 01100001 01100010 01100010
-01101001 01110100 01101000 01101111
-01101100 01100101
-
-Wake up, Neo... The Matrix has you.
-Try exploring 'projects' to see the real world! 💊`,
-				};
-
-			case 'coffee':
-				return {
-					type: 'success',
-					content: `      ( (
-       ) )
-    ........
-    |      |]
-    \\      /
-     \`----'
-
-☕ Brewing a fresh cup...
-
-Take a break! You've been exploring for a while.
-When you're ready, check out 'about' or 'projects'! 🚀`,
-				};
-
-			case 'konami':
-				return {
-					type: 'success',
-					content: `⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ B A START
-
-🎮 ACHIEVEMENT UNLOCKED! 🎮
-
-✨ Secret Discovered: You found the Konami Code! ✨
-
-You've unlocked 30 extra lives... in your career!
-Now go check out my 'projects' and 'journey'! 🚀`,
-				};
-
-			default: {
-				// Simple suggestion logic
-				const suggestion = getCommandSuggestions(command, 1)[0];
-
-				let errorMsg = `Hmm, I don't recognize '${command}'. 🤔`;
-				if (suggestion) {
-					errorMsg += `\n\nDid you mean '${suggestion}'? Type 'help' to see all commands!`;
-				} else {
-					errorMsg += `\n\nType 'help' to see what I can do! 💡`;
-				}
-
-				return {
-					type: 'error',
-					content: errorMsg,
-				};
-			}
+		if (spec && spec.run) {
+			const context = { currentPath };
+			// @ts-ignore
+			return spec.run(context, args);
 		}
+
+		// Command not found, provide a suggestion.
+		const suggestion = getCommandSuggestions(cmd, 1)[0];
+		let errorMsg = `Hmm, I don't recognize '${cmd}'. 🤔`;
+		if (suggestion) {
+			errorMsg += ` Did you mean "${suggestion}"?`;
+		} else {
+			errorMsg += ' Type "help" to see a list of available commands.';
+		}
+
+		return {
+			type: 'error',
+			content: errorMsg,
+		};
 	} catch (error) {
 		return {
 			type: 'error',
