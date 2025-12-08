@@ -24,6 +24,17 @@ import Background3D from '@/components/os/shell/Background3D';
 import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { HelpButton } from '@/components/shared/HelpButton';
 
+// Add WindowState type definition
+type WindowState = {
+	id: string;
+	title: string;
+	component: React.ComponentType<any>;
+	isOpen: boolean;
+	isMinimized: boolean;
+	position: { x: number; y: number };
+	size: { width: number; height: number };
+};
+
 // Persistent size helper
 function usePersistentSizes(key: string, initial: number[]) {
 	const [sizes, setSizes] = useState<number[]>(() => {
@@ -79,30 +90,36 @@ export function MainLayout() {
 	const isLayoutReady = vHydrated && hHydrated;
 
 	const handleFileSelect = (item: FileSystemItem) => {
-	const isLayoutReady = vHydrated && hHydrated;
-			let moduleId = item.id;
-			if (moduleId.includes('/')) {
-				moduleId = moduleId.split('/')[0];
+		let moduleId = item.id;
+		if (moduleId.includes('/')) {
+			moduleId = moduleId.split('/')[0];
+		}
+
+		setWindows(prev => {
+			// If window exists, just bring it to front
+			if (prev.find(w => w.id === moduleId)) {
+				setActiveWindowId(moduleId);
+				return prev.map(w => (w.id === moduleId ? { ...w, isMinimized: false } : w));
 			}
 
-			setWindows(prev => {
-				if (prev.find(w => w.id === moduleId)) {
-					setActiveWindowId(moduleId);
-					return prev;
-				}
-				setActiveWindowId(moduleId);
-				return [
-					...prev,
-					{
-						id: moduleId,
-						title: moduleId.toUpperCase(),
-						component: getModuleComponent(moduleId),
-						isOpen: true,
-						isMinimized: false,
-					},
-				];
-			});
-		}
+			// Add new window
+			const newWindow: WindowState = {
+				id: moduleId,
+				title: moduleId.toUpperCase(),
+				component: getModuleComponent(moduleId),
+				isOpen: true,
+				isMinimized: false,
+				position: {
+					x: 150 + prev.length * 20,
+					y: 100 + prev.length * 20,
+				},
+				size: { width: 720, height: 480 },
+			};
+
+			setActiveWindowId(moduleId);
+			return [...prev, newWindow];
+		});
+	};
 
 	return (
 		<ErrorBoundary>
