@@ -21,22 +21,7 @@ import {
 import { toast } from 'react-hot-toast';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-function useSystemStats() {
-	const [stats, setStats] = useState({ cpu: 12, mem: 4.2, disk: 78 });
-	useEffect(() => {
-		const intervals = [
-			setInterval(() => {
-				setStats(s => ({ ...s, cpu: Math.floor(Math.random() * (25 - 5) + 5) }));
-			}, 2000),
-			setInterval(() => {
-				setStats(s => ({ ...s, mem: Number((4 + Math.random() * 2).toFixed(1)) }));
-			}, 5000),
-		];
-		return () => intervals.forEach(clearInterval);
-	}, []);
-	return stats;
-}
+import { HelpButton } from '@/components/shared/HelpButton';
 
 // A simple logo component
 const Logo = () => (
@@ -51,14 +36,11 @@ export function Taskbar() {
 	const [windows, setWindows] = useAtom(windowsAtom);
 	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
-	const [time, setTime] = useState<Date | null>(null);
 	const [isStartOpen, setIsStartOpen] = useState(false);
-	const stats = useSystemStats();
 	const { openWindow } = useWindowManager();
 	const startMenuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const timer = setInterval(() => setTime(new Date()), 1000);
 		const handleClickOutside = (event: MouseEvent) => {
 			if (startMenuRef.current && !startMenuRef.current.contains(event.target as Node)) {
 				setIsStartOpen(false);
@@ -66,7 +48,6 @@ export function Taskbar() {
 		};
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
-			clearInterval(timer);
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, []);
@@ -118,7 +99,7 @@ export function Taskbar() {
 
 	return (
 		<TooltipProvider delayDuration={0}>
-			<div className="h-12 bg-background/30 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-2">
+			<div className="h-12 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-3">
 				{/* Left side: Start and Window Icons */}
 				<div className="flex items-center gap-2">
 					{/* Start Button */}
@@ -241,7 +222,7 @@ export function Taskbar() {
 					</div>
 
 					{/* Window Icons */}
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-1.5">
 						{windows.map(window => {
 							const Icon = getModuleIcon(window.id);
 							const isActive = window.id === activeWindowId && !window.isMinimized;
@@ -275,49 +256,9 @@ export function Taskbar() {
 					</div>
 				</div>
 
-				{/* Right side: System Tray */}
-				<div className="flex items-center gap-3 px-2 text-muted-foreground text-xs">
-					<Tooltip>
-						<TooltipTrigger className="hidden sm:flex items-center gap-1.5">
-							<Cpu className="w-3.5 h-3.5 text-primary/80" />
-							<span>{stats.cpu}%</span>
-						</TooltipTrigger>
-						<TooltipContent side="top">
-							<p>CPU Usage</p>
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger className="hidden lg:flex items-center gap-1.5">
-							<div className="w-2.5 h-3.5 border-2 border-primary/80 rounded-sm flex items-end">
-								<div
-									className="w-full bg-primary/80"
-									style={{ height: `${(stats.mem / 16) * 100}%` }}
-								/>
-							</div>
-							<span>{stats.mem}GB</span>
-						</TooltipTrigger>
-						<TooltipContent side="top">
-							<p>Memory Usage</p>
-						</TooltipContent>
-					</Tooltip>
-					<Tooltip>
-						<TooltipTrigger className="text-right">
-							<div className="font-medium text-foreground">
-								{time
-									? time.toLocaleTimeString([], {
-											hour: '2-digit',
-											minute: '2-digit',
-									  })
-									: '--:--'}
-							</div>
-							<div className="text-[10px] -mt-0.5">
-								{time ? time.toLocaleDateString() : ''}
-							</div>
-						</TooltipTrigger>
-						<TooltipContent side="top">
-							<p>It&apos;s currently {time?.toLocaleString()}</p>
-						</TooltipContent>
-					</Tooltip>
+				{/* Right side: Actions */}
+				<div className="flex items-center gap-2">
+					<HelpButton placement="taskbar" />
 				</div>
 			</div>
 		</TooltipProvider>
