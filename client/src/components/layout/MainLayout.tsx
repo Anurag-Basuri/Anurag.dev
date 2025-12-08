@@ -70,58 +70,61 @@ export function MainLayout() {
 	};
 
 	const renderDesktopLayout = () => (
-		<ResizablePanelGroup direction="vertical" onLayout={setMainVerticalSizes} className="gap-3">
-			<ResizablePanel defaultSize={mainVerticalSizes[0]} minSize={40}>
+		<ResizablePanelGroup
+			direction="horizontal"
+			onLayout={setMainHorizontalSizes}
+			className="gap-3"
+		>
+			<ResizablePanel
+				ref={sidebarRef}
+				collapsible
+				collapsedSize={0}
+				minSize={15}
+				maxSize={30}
+				defaultSize={mainHorizontalSizes[0]}
+				onCollapse={() => setSidebarCollapsed(true)}
+				onExpand={() => setSidebarCollapsed(false)}
+				className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+			>
+				<div className="h-full flex flex-col overflow-hidden">
+					<SidebarProfile />
+					<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+						Explorer
+					</div>
+					<div className="flex-1 overflow-auto px-2 pb-3">
+						<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+					</div>
+				</div>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
 				<ResizablePanelGroup
-					direction="horizontal"
-					onLayout={setMainHorizontalSizes}
+					direction="vertical"
+					onLayout={setMainVerticalSizes}
 					className="gap-3"
 				>
 					<ResizablePanel
-						ref={sidebarRef}
-						collapsible
-						collapsedSize={0}
-						minSize={15}
-						maxSize={30}
-						defaultSize={mainHorizontalSizes[0]}
-						onCollapse={() => setSidebarCollapsed(true)}
-						onExpand={() => setSidebarCollapsed(false)}
-						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
-					>
-						<div className="h-full flex flex-col overflow-hidden">
-							<SidebarProfile />
-
-							<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-								Explorer
-							</div>
-							<div className="flex-1 overflow-auto px-2 pb-3">
-								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-							</div>
-						</div>
-					</ResizablePanel>
-					<ResizableHandle withHandle />
-					<ResizablePanel
-						defaultSize={mainHorizontalSizes[1]}
-						minSize={30}
+						defaultSize={mainVerticalSizes[0]}
+						minSize={40}
 						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
 					>
 						<EditorArea />
 					</ResizablePanel>
+					<ResizableHandle withHandle />
+					<ResizablePanel
+						ref={terminalRef}
+						collapsible
+						collapsedSize={4}
+						minSize={4}
+						maxSize={50}
+						defaultSize={mainVerticalSizes[1]}
+						onCollapse={() => setTerminalCollapsed(true)}
+						onExpand={() => setTerminalCollapsed(false)}
+						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+					>
+						<CLI onToggleCollapse={handleToggleTerminal} />
+					</ResizablePanel>
 				</ResizablePanelGroup>
-			</ResizablePanel>
-			<ResizableHandle withHandle />
-			<ResizablePanel
-				ref={terminalRef}
-				collapsible
-				collapsedSize={4}
-				minSize={4}
-				maxSize={50}
-				defaultSize={mainVerticalSizes[1]}
-				onCollapse={() => setTerminalCollapsed(true)}
-				onExpand={() => setTerminalCollapsed(false)}
-				className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
-			>
-				<CLI onToggleCollapse={handleToggleTerminal} />
 			</ResizablePanel>
 		</ResizablePanelGroup>
 	);
