@@ -23,6 +23,8 @@ import { TopBar } from '../os/shell/TopBar';
 import { WelcomeDialog } from '../shared/WelcomeDialog';
 import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { HelpButton } from '../shared/HelpButton';
+import { SidebarProfile } from '../os/shell/SidebarProfile';
+import { OpenEditors } from '../os/file-system/OpenEditors';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -191,10 +193,29 @@ export function MainLayout() {
 										onExpand={() => setSidebarCollapsed(false)}
 										className="transition-all duration-300 ease-in-out"
 									>
-										<FolderTree
-											items={fileSystem}
-											onSelect={handleFileSelect}
-										/>
+										<div className="h-full flex flex-col overflow-hidden bg-card/40 border-r border-border/60">
+											<SidebarProfile />
+
+											<div className="px-3 py-2 border-b border-border/60 flex items-center justify-between text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+												<span>Open Editors</span>
+												<span className="text-[10px] text-muted-foreground/70">
+													{windows.length}
+												</span>
+											</div>
+											<div className="px-3 py-3 border-b border-border/60">
+												<OpenEditors />
+											</div>
+
+											<div className="px-3 py-2 border-b border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+												Explorer
+											</div>
+											<div className="flex-1 overflow-auto px-2 pb-3">
+												<FolderTree
+													items={fileSystem}
+													onSelect={handleFileSelect}
+												/>
+											</div>
+										</div>
 									</ResizablePanel>
 
 									<ResizableHandle
