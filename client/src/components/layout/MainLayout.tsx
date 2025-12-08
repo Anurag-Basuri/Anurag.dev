@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
 import { useRef, useState } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -20,6 +21,14 @@ import { WelcomeDialog } from '../shared/WelcomeDialog';
 import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { HelpButton } from '../shared/HelpButton';
 import { SidebarProfile } from '../os/shell/SidebarProfile';
+
+const quickLinks: { label: string; id: string }[] = [
+	{ label: 'About', id: 'about' },
+	{ label: 'Projects', id: 'projects' },
+	{ label: 'Journey', id: 'journey' },
+	{ label: 'Contact', id: 'contact' },
+	{ label: 'Stats', id: 'tools/stats.exe' },
+];
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -93,7 +102,6 @@ export function MainLayout() {
 					<WelcomeDialog />
 
 					<div className="flex-1 z-10 relative overflow-hidden flex flex-col gap-3 px-3 pb-3 pt-2 md:px-5 md:pb-4">
-
 						{/* Main Workbench Area */}
 						<div className="flex-1 relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_24px_80px_-32px_rgba(0,0,0,0.4)]">
 							{!isMobile && !isLayoutReady ? (
@@ -111,7 +119,8 @@ export function MainLayout() {
 										collapsible
 										collapsedSize={0}
 										minSize={15}
-										defaultSize={horizontalSizes[0]}
+										maxSize={32}
+										defaultSize={Math.min(horizontalSizes[0], 32)}
 										onCollapse={() => setSidebarCollapsed(true)}
 										onExpand={() => setSidebarCollapsed(false)}
 										className="transition-all duration-300 ease-in-out"
@@ -120,6 +129,29 @@ export function MainLayout() {
 											<SidebarProfile />
 
 											<div className="px-3 py-2 border-b border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+												Quick Access
+											</div>
+											<div className="grid grid-cols-2 gap-2 px-3 py-3">
+												{quickLinks.map(link => (
+													<Button
+														key={link.id}
+														variant="outline"
+														size="sm"
+														className="justify-start text-xs gap-2 border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/40"
+														onClick={() =>
+															handleFileSelect({
+																id: link.id,
+																name: link.label,
+																type: 'file',
+															} as FileSystemItem)
+														}
+													>
+														{link.label}
+													</Button>
+												))}
+											</div>
+
+											<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
 												Explorer
 											</div>
 											<div className="flex-1 overflow-auto px-2 pb-3">
@@ -155,7 +187,8 @@ export function MainLayout() {
 												collapsible
 												collapsedSize={0}
 												minSize={10}
-												defaultSize={verticalSizes[1]}
+												maxSize={45}
+												defaultSize={Math.min(verticalSizes[1], 45)}
 												onCollapse={() => setTerminalCollapsed(true)}
 												onExpand={() => setTerminalCollapsed(false)}
 												className="transition-all duration-300 ease-in-out"
