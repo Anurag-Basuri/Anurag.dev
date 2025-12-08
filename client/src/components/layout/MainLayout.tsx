@@ -1,69 +1,30 @@
 'use client';
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree } from '@/components/os/file-system/FolderTree';
-import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
-import { Taskbar } from '@/components/os/shell/Taskbar';
-import { TopBar } from '@/components/os/shell/TopBar';
-
-import { CLI } from '@/components/os/terminal/CLI';
-import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { useAtom } from 'jotai';
-import { windowsAtom, activeWindowIdAtom } from '@/store/atoms';
-import { getModuleComponent } from '@/lib/moduleRegistry';
-import { EditorArea } from '@/components/os/editor/EditorArea';
+import { useRef, useState, useEffect } from 'react';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
+import { ImperativePanelHandle } from 'react-resizable-panels';
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import { cn } from '@/lib/utils';
+
+import {
+	windowsAtom,
+	activeWindowIdAtom,
+	verticalSizesAtom,
+	horizontalSizesAtom,
+} from '@/store/atoms';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { PanelLeftClose, Terminal as TerminalIcon, ChevronDown } from 'lucide-react';
-import { useState, useRef, useCallback, useEffect } from 'react';
-import type { ImperativePanelHandle } from 'react-resizable-panels';
-import Background3D from '@/components/os/shell/Background3D';
-import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
-import { HelpButton } from '@/components/shared/HelpButton';
 import { useWindowManager } from '@/hooks/use-window-manager';
+import { FileSystemItem } from '@/types/file-system';
 
-// Add WindowState type definition
-type WindowState = {
-	id: string;
-	title: string;
-	component: React.ComponentType<unknown>;
-	isOpen: boolean;
-	isMinimized: boolean;
-	position: { x: number; y: number };
-	size: { width: number; height: number };
-};
-
-// Persistent size helper
-function usePersistentSizes(key: string, initial: number[]) {
-	const [sizes, setSizes] = useState<number[]>(() => {
-		try {
-			const raw = localStorage.getItem(key);
-			if (raw) {
-				const parsed = JSON.parse(raw);
-				if (Array.isArray(parsed) && parsed.every(n => typeof n === 'number')) {
-					return parsed;
-				}
-			}
-		} catch {}
-		return initial;
-	});
-	const [isHydrated] = useState(true);
-
-	const onLayout = useCallback(
-		(next: number[]) => {
-			setSizes(next);
-			try {
-				localStorage.setItem(key, JSON.stringify(next));
-			} catch {}
-		},
-		[key],
-	);
-
-	return { sizes, onLayout, isHydrated };
-}
+import Background3D from '../os/shell/Background3D';
+import { EditorArea } from '../os/editor/EditorArea';
+import { FolderTree } from '../os/file-system/FolderTree';
+import { CLI } from '../os/terminal/CLI';
+import { Taskbar } from '../os/shell/Taskbar';
+import { TopBar } from '../os/shell/TopBar';
+import { WelcomeDialog } from '../shared/WelcomeDialog';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
+import { HelpButton } from '../shared/HelpButton';
 
 export function MainLayout() {
 	const [windows, setWindows] = useAtom(windowsAtom);
@@ -77,18 +38,12 @@ export function MainLayout() {
 	// Default to collapsed for simplicity
 	const [terminalCollapsed, setTerminalCollapsed] = useState(true);
 
-	const {
-		sizes: verticalSizes,
-		onLayout: onVerticalLayout,
-		isHydrated: vHydrated,
-	} = usePersistentSizes('layout:v', [100, 0]);
-	const {
-		sizes: horizontalSizes,
-		onLayout: onHorizontalLayout,
-		isHydrated: hHydrated,
-	} = usePersistentSizes('layout:h', [20, 80]);
+	const [verticalSizes, setVerticalSizes] = useAtom(verticalSizesAtom);
+	const [horizontalSizes, setHorizontalSizes] = useAtom(horizontalSizesAtom);
 
-	const isLayoutReady = vHydrated && hHydrated;
+	// Hydration check to prevent layout flicker on initial render
+	const [isLayoutReady] = useState(true);
+
 	const { openWindow } = useWindowManager();
 
 	const handleFileSelect = (item: FileSystemItem) => {
@@ -160,65 +115,19 @@ export function MainLayout() {
 							<ResizablePanelGroup
 								direction="horizontal"
 								className="h-full w-full transform-style-3d"
-								onLayout={onHorizontalLayout}
+								onLayout={setHorizontalSizes}
 							>
-								{/* Sidebar (Left) */}
 								<ResizablePanel
 									ref={sidebarRef}
-									defaultSize={horizontalSizes[0]}
-									minSize={0}
-									maxSize={30}
 									collapsible
 									collapsedSize={0}
+									minSize={15}
+									defaultSize={horizontalSizes[0]}
 									onCollapse={() => setSidebarCollapsed(true)}
 									onExpand={() => setSidebarCollapsed(false)}
-									className="flex flex-col border-r border-border/60 bg-linear-to-b from-background/70 via-background/80 to-background/70 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] transition-transform duration-500 ease-out origin-left hover:rotate-y-0 rotate-y-2 hover:translate-z-0 translate-z-[-10px]"
-									style={{ transformStyle: 'preserve-3d' }}
+									className="transition-all duration-300 ease-in-out"
 								>
-									<div className="flex flex-col h-full relative">
-										{/* Profile Header */}
-										<div className="relative group/sidebar-header">
-											<SidebarProfile />
-											<button
-												onClick={() => {
-													const panel = sidebarRef.current;
-													if (panel) panel.collapse();
-												}}
-												className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground bg-black/20 hover:bg-black/40 rounded transition-colors opacity-0 group-hover/sidebar-header:opacity-100"
-												title="Hide Sidebar"
-											>
-												<PanelLeftClose className="w-3.5 h-3.5" />
-											</button>
-										</div>
-
-										{/* Explorer Panel */}
-										<div className="flex-1 overflow-hidden flex flex-col">
-											<div className="px-2 py-1.5 text-[11px] font-semibold border-b border-border/50 bg-linear-to-r from-muted/50 to-muted/30 uppercase tracking-[0.25em] text-muted-foreground backdrop-blur-sm flex justify-between items-center group">
-												<span>Explorer</span>
-												<button
-													onClick={() =>
-														window.dispatchEvent(
-															new CustomEvent('collapse-all-folders'),
-														)
-													}
-													className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary"
-													title="Collapse All Folders"
-												>
-													<PanelLeftClose className="w-3 h-3" />
-												</button>
-											</div>
-											<div className="flex-1 overflow-hidden">
-												<ScrollArea className="h-full">
-													<div className="p-2">
-														<FolderTree
-															items={initialFileSystem}
-															onSelect={handleFileSelect}
-														/>
-													</div>
-												</ScrollArea>
-											</div>
-										</div>
-									</div>
+									<FolderTree items={[]} onSelect={handleFileSelect} />
 								</ResizablePanel>
 
 								<ResizableHandle
@@ -226,25 +135,13 @@ export function MainLayout() {
 									className="bg-border/60 hover:bg-border transition-colors"
 								/>
 
-								{/* Right Side (Editor + Terminal) */}
-								<ResizablePanel
-									defaultSize={horizontalSizes[1]}
-									className="transform-style-3d"
-								>
+								<ResizablePanel defaultSize={horizontalSizes[1]}>
 									<ResizablePanelGroup
 										direction="vertical"
-										className="h-full w-full"
-										onLayout={onVerticalLayout}
+										onLayout={setVerticalSizes}
 									>
-										{/* Editor Area */}
-										<ResizablePanel
-											defaultSize={verticalSizes[0]}
-											minSize={30}
-											className="relative overflow-hidden bg-linear-to-br from-background/85 via-background/95 to-background/85 transition-transform duration-500 ease-out origin-center hover:scale-[1.002] shadow-2xl"
-										>
-											<div className="relative z-10 h-full flex flex-col">
-												<EditorArea />
-											</div>
+										<ResizablePanel defaultSize={verticalSizes[0]}>
+											<EditorArea />
 										</ResizablePanel>
 
 										<ResizableHandle
@@ -252,46 +149,24 @@ export function MainLayout() {
 											className="bg-border/60 hover:bg-border transition-colors"
 										/>
 
-										{/* Terminal */}
 										<ResizablePanel
 											ref={terminalRef}
-											defaultSize={verticalSizes[1]}
-											minSize={0}
-											maxSize={80}
 											collapsible
 											collapsedSize={0}
+											minSize={10}
+											defaultSize={verticalSizes[1]}
 											onCollapse={() => setTerminalCollapsed(true)}
 											onExpand={() => setTerminalCollapsed(false)}
-											className="border-t border-border/60 bg-linear-to-r from-background/90 via-background/95 to-background/90 backdrop-blur-2xl shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.3)] dark:shadow-[0_-4px_24px_-4px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-out origin-bottom hover:rotate-x-0 rotate-x-2 hover:translate-z-0 translate-z-[-10px]"
-											style={{ transformStyle: 'preserve-3d' }}
+											className="transition-all duration-300 ease-in-out"
 										>
-											<div className="h-full flex flex-col">
-												<div className="p-3 border-b border-border/50 bg-linear-to-r from-muted/40 to-muted/20 text-[11px] uppercase tracking-[0.4em] text-muted-foreground flex items-center justify-between backdrop-blur-sm group">
-													<span className="flex items-center gap-2">
-														Terminal{' '}
-														<span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-													</span>
-													<button
-														onClick={() => {
-															const panel = terminalRef.current;
-															if (panel) panel.collapse();
-														}}
-														className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary p-1 rounded hover:bg-muted/40"
-														title="Minimize Terminal"
-													>
-														<ChevronDown className="w-4 h-4" />
-													</button>
-												</div>
-												<div className="flex-1 overflow-hidden">
-													<CLI />
-												</div>
-											</div>
+											<CLI />
 										</ResizablePanel>
 									</ResizablePanelGroup>
 								</ResizablePanel>
 							</ResizablePanelGroup>
 						) : (
-							<div className="flex-1 flex flex-col bg-background w-full overflow-hidden relative">
+							/* Mobile view: EditorArea takes full space */
+							<div className="h-full w-full">
 								<EditorArea />
 							</div>
 						)}
