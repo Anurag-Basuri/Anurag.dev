@@ -2,7 +2,7 @@
 
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
-import { getModuleComponent, getModuleIcon } from '@/lib/moduleRegistry';
+import { getModuleComponent } from '@/lib/moduleRegistry';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -15,10 +15,8 @@ import {
 	Map,
 	Mail,
 	User as UserIcon,
-	ChevronRight,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useWindowManager } from '@/hooks/use-window-manager';
 
 function useSystemStats() {
 	const [stats, setStats] = useState({ cpu: 12, mem: 4.2 });

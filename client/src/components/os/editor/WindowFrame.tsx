@@ -5,7 +5,7 @@ import { Rnd } from 'react-rnd';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
-import { X, Minus, Square, ChevronsUpLeft } from 'lucide-react';
+import { X, Minus, Square, ChevronsLeft } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
@@ -29,17 +29,17 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 		size,
 	});
 
-	useEffect(() => {
-		if (isActive) {
-			bringToFront();
-		}
-	}, [isActive]);
-
 	const bringToFront = () => {
 		if (windowStack.at(-1) !== id) {
 			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
 		}
 	};
+
+	useEffect(() => {
+		if (isActive) {
+			bringToFront();
+		}
+	}, [isActive]);
 
 	const handleFocus = () => {
 		setActiveWindowId(id);
@@ -160,7 +160,7 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 								onClick={handleMaximizeToggle}
 								className="w-4 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground"
 							>
-								{isMaximized ? <ChevronsUpLeft size={12} /> : <Square size={12} />}
+								{isMaximized ? <ChevronsLeft size={12} /> : <Square size={12} />}
 							</button>
 							<button
 								onClick={handleClose}
