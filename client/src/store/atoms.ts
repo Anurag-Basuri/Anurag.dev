@@ -1,10 +1,11 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 import { WindowState } from '@/types/window';
 
 export const bootCompleteAtom = atom(false);
 
-export const windowsAtom = atom<WindowState[]>([]);
-export const activeWindowIdAtom = atom<string | null>(null);
+// Persist window state in localStorage
+export const windowsAtom = atomWithStorage<WindowState[]>('windows', []);
+export const windowStackAtom = atomWithStorage<string[]>('window-stack', []);
 
-// Derived atom to get the order of windows for z-index management
-export const windowStackAtom = atom<string[]>([]);
+export const activeWindowIdAtom = atom<string | null>(null);
