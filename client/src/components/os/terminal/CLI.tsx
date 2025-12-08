@@ -43,7 +43,22 @@ export function CLI() {
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
 	const [history, setHistory] = useState<HistoryItem[]>([]);
-	const [cmdHistory, setCmdHistory] = useState<string[]>([]);
+	const [cmdHistory, setCmdHistory] = useState<string[]>(() => {
+		if (typeof window === 'undefined') return [];
+		try {
+			const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+			let filteredHistory: string[] = [];
+			if (storedHistory) {
+				const parsed = JSON.parse(storedHistory);
+				if (Array.isArray(parsed)) {
+					filteredHistory = parsed.filter((entry): entry is string => typeof entry === 'string');
+				}
+			}
+			return filteredHistory;
+		} catch {
+			return [];
+		}
+	});
 	const [historyIndex, setHistoryIndex] = useState(-1);
 	const [currentPath, setCurrentPath] = useState('~');
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -64,32 +79,23 @@ export function CLI() {
 		if (!value) return;
 		setCmdHistory(prev => {
 			const next = [...prev, value];
-			return next.length > CMD_HISTORY_LIMIT
-				? next.slice(next.length - CMD_HISTORY_LIMIT)
-				: next;
-		});
-	}, []);
-
-	const applySuggestion = useCallback((value: string) => {
-		if (!value) return;
-		setInput(value);
-		setCursorPos(value.length);
-		requestAnimationFrame(() => {
-			inputRef.current?.setSelectionRange(value.length, value.length);
-		});
-	}, []);
-
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
 		try {
-			const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+			const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
+			if (storedPath) setCurrentPath(storedPath);
+		} catch (error) {
+			console.warn('Failed to hydrate terminal state', error);
+		}
+	}, []);
 			if (storedHistory) {
 				const parsed = JSON.parse(storedHistory);
 				if (Array.isArray(parsed)) {
-					setCmdHistory(
-						parsed.filter((entry): entry is string => typeof entry === 'string'),
-					);
+					filteredHistory = parsed.filter((entry): entry is string => typeof entry === 'string');
 				}
+			}
+			if (filteredHistory.length > 0) {
+				setCmdHistory(filteredHistory);
 			}
 			const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
 			if (storedPath) setCurrentPath(storedPath);
