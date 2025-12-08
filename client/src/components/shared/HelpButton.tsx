@@ -2,9 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, X, Terminal, Folder, Key } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+import { Terminal, HelpCircle, X, Folder, Key, MousePointer, Sparkles } from 'lucide-react';
 
-export function HelpButton() {
+type HelpButtonProps = {
+	placement?: 'floating' | 'taskbar';
+	className?: string;
+};
+
+export function HelpButton({ placement = 'floating', className }: HelpButtonProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const commands = [
@@ -17,19 +24,41 @@ export function HelpButton() {
 	];
 
 	return (
-		<>
-			{/* Help Button */}
-			<motion.button
-				initial={{ scale: 0, opacity: 0 }}
-				animate={{ scale: 1, opacity: 1 }}
-				transition={{ delay: 1, type: 'spring' }}
-				onClick={() => setIsOpen(!isOpen)}
-				className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center group"
-				aria-label="Help"
-			>
-				<HelpCircle className="w-6 h-6" />
-				<span className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-ping" />
-			</motion.button>
+		<TooltipProvider delayDuration={0}>
+			{/* Trigger */}
+			{placement === 'floating' ? (
+				<motion.button
+					initial={{ scale: 0, opacity: 0 }}
+					animate={{ scale: 1, opacity: 1 }}
+					transition={{ delay: 1, type: 'spring' }}
+					onClick={() => setIsOpen(!isOpen)}
+					className={cn(
+						'fixed bottom-6 right-6 z-40 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center group',
+						className,
+					)}
+					aria-label="Help"
+				>
+					<HelpCircle className="w-6 h-6" />
+					<span className="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full animate-ping" />
+				</motion.button>
+			) : (
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<button
+							onClick={() => setIsOpen(true)}
+							className={cn(
+								'h-8 px-2 rounded-md border border-border/50 bg-background/60 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2',
+								className,
+							)}
+							aria-label="Quick Help"
+						>
+							<HelpCircle className="w-4 h-4" />
+							<span className="text-xs">Help</span>
+						</button>
+					</TooltipTrigger>
+					<TooltipContent>Quick Help</TooltipContent>
+				</Tooltip>
+			)}
 
 			{/* Help Popover */}
 			<AnimatePresence>
@@ -50,7 +79,12 @@ export function HelpButton() {
 							animate={{ opacity: 1, scale: 1, y: 0 }}
 							exit={{ opacity: 0, scale: 0.9, y: 20 }}
 							transition={{ type: 'spring', duration: 0.3 }}
-							className="fixed bottom-24 right-6 z-50 w-80"
+							className={cn(
+								'fixed z-50 w-80',
+								placement === 'floating'
+									? 'bottom-24 right-6'
+									: 'bottom-16 right-6',
+							)}
 						>
 							<div className="bg-background/95 backdrop-blur-xl border border-border/50 rounded-xl shadow-2xl overflow-hidden">
 								{/* Header */}
@@ -115,6 +149,6 @@ export function HelpButton() {
 					</>
 				)}
 			</AnimatePresence>
-		</>
+		</TooltipProvider>
 	);
 }

@@ -195,7 +195,6 @@ export function MainLayout() {
 				</main>
 
 				<Taskbar />
-				<HelpButton />
 			</div>
 		</ErrorBoundary>
 	);
