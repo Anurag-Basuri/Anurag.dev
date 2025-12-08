@@ -6,6 +6,7 @@ export interface WindowState {
 	component: ReactNode;
 	isOpen: boolean;
 	isMinimized: boolean;
+	isMaximized?: boolean;
 	position?: { x: number; y: number };
 	size?: { width: number | string; height: number | string };
 	zIndex?: number;
