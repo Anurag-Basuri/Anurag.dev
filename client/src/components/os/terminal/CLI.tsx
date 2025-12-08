@@ -380,7 +380,7 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 			onClick={handleContainerClick}
 		>
 			{/* Simple Header */}
-			<div className="px-3 py-2 border-b border-border/40 bg-background/60 flex items-center justify-between shrink-0">
+			<div className="px-3 py-2 border-b border-border/50 bg-background/65 backdrop-blur-md flex items-center justify-between shrink-0">
 				<div className="flex items-center gap-2 text-xs text-muted-foreground">
 					<span className="font-semibold">TERMINAL</span>
 					<span className="text-[10px]">{currentPath}</span>
@@ -454,7 +454,7 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 				<div className="flex items-start gap-2 text-sm">
 					<span className="shrink-0 mt-1">{getPromptLabel(currentPath)}</span>
 					<div className="relative flex-1 min-w-0">
-						<div className="bg-background/60 px-2 py-1 rounded border border-border/40">
+						<div className="bg-background/60 px-2 py-1 rounded-md border border-border/50 shadow-inner">
 							{/* Hidden input for text capture */}
 							<input
 								ref={inputRef}
