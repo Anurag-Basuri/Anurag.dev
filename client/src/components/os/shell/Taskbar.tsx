@@ -6,10 +6,10 @@ import { getModuleIcon } from '@/lib/moduleRegistry';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import {
 	Power,
 	Settings,
-	Cpu,
 	Briefcase,
 	Map,
 	Mail,
@@ -99,7 +99,7 @@ export function Taskbar() {
 
 	return (
 		<TooltipProvider delayDuration={0}>
-			<div className="h-12 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-3">
+			<div className="h-12 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-2 sm:px-3">
 				{/* Left side: Start and Window Icons */}
 				<div className="flex items-center gap-2">
 					{/* Start Button */}
@@ -109,7 +109,7 @@ export function Taskbar() {
 								<button
 									onClick={() => setIsStartOpen(!isStartOpen)}
 									className={cn(
-										'h-9 w-9 flex items-center justify-center rounded-md transition-all duration-200',
+										'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40',
 										'hover:bg-primary/10 hover:text-primary',
 										isStartOpen && 'bg-primary/15 text-primary',
 									)}
@@ -130,90 +130,95 @@ export function Taskbar() {
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: 10, scale: 0.95 }}
 									transition={{ duration: 0.15, ease: 'easeOut' }}
-									className="absolute bottom-12 left-0 w-80 glass-premium border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-2 rounded-lg overflow-hidden"
+									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 glass-premium border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-2 rounded-lg overflow-hidden"
 								>
-									<div className="flex items-center gap-4 p-3 border-b border-border/50 mb-2">
-										<img
-											src="/me.jpg"
-											alt="Anurag Basuri"
-											className="w-12 h-12 rounded-full border-2 border-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
-										/>
-										<div>
-											<div className="font-bold text-primary drop-shadow-[0_0_5px_rgba(var(--primary-rgb),0.3)]">
-												Anurag Basuri
-											</div>
-											<div className="text-xs text-muted-foreground">
-												Full-Stack Developer
+									<div>
+										<div className="flex items-center gap-3 mb-2">
+											<Image
+												src="/me.jpg"
+												alt="Anurag Basuri"
+												width={48}
+												height={48}
+												className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
+												priority
+											/>
+											<div>
+												<div className="font-bold text-primary drop-shadow-[0_0_5px_rgba(var(--primary-rgb),0.3)]">
+													Anurag Basuri
+												</div>
+												<div className="text-xs text-muted-foreground">
+													Full-Stack Developer
+												</div>
 											</div>
 										</div>
-									</div>
 
-									<div className="grid grid-cols-2 gap-1">
-										{menuItems.map(item => (
-											<button
-												key={item.id}
-												onClick={() =>
-													handleOpenModule(item.id, item.label)
-												}
-												className="w-full text-left px-3 py-2.5 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
-											>
-												<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
-												{item.label}
-											</button>
-										))}
-									</div>
-
-									<div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
-										<div className="flex items-center gap-1">
-											{socialLinks.map(link => (
-												<Tooltip key={link.label}>
-													<TooltipTrigger asChild>
-														<a
-															href={link.href}
-															target="_blank"
-															rel="noopener noreferrer"
-															className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-														>
-															<link.icon className="w-4 h-4" />
-														</a>
-													</TooltipTrigger>
-													<TooltipContent side="top">
-														<p>{link.label}</p>
-													</TooltipContent>
-												</Tooltip>
+										<div className="grid grid-cols-2 gap-1">
+											{menuItems.map(item => (
+												<button
+													key={item.id}
+													onClick={() =>
+														handleOpenModule(item.id, item.label)
+													}
+													className="w-full text-left px-3 py-2 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
+												>
+													<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
+													{item.label}
+												</button>
 											))}
 										</div>
-										<div className="flex items-center">
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<button
-														onClick={() =>
-															toast('Settings coming soon!', {
-																icon: '⚙️',
-															})
-														}
-														className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-													>
-														<Settings className="w-4 h-4" />
-													</button>
-												</TooltipTrigger>
-												<TooltipContent side="top">
-													<p>Settings</p>
-												</TooltipContent>
-											</Tooltip>
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<button
-														onClick={() => window.location.reload()}
-														className="h-8 w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-													>
-														<Power className="w-4 h-4" />
-													</button>
-												</TooltipTrigger>
-												<TooltipContent side="top">
-													<p>Restart Session</p>
-												</TooltipContent>
-											</Tooltip>
+
+										<div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
+											<div className="flex items-center gap-1">
+												{socialLinks.map(link => (
+													<Tooltip key={link.label}>
+														<TooltipTrigger asChild>
+															<a
+																href={link.href}
+																target="_blank"
+																rel="noopener noreferrer"
+																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+															>
+																<link.icon className="w-4 h-4" />
+															</a>
+														</TooltipTrigger>
+														<TooltipContent side="top">
+															<p>{link.label}</p>
+														</TooltipContent>
+													</Tooltip>
+												))}
+											</div>
+											<div className="flex items-center">
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<button
+															onClick={() =>
+																toast('Settings coming soon!', {
+																	icon: '⚙️',
+																})
+															}
+															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+														>
+															<Settings className="w-4 h-4" />
+														</button>
+													</TooltipTrigger>
+													<TooltipContent side="top">
+														<p>Settings</p>
+													</TooltipContent>
+												</Tooltip>
+												<Tooltip>
+													<TooltipTrigger asChild>
+														<button
+															onClick={() => window.location.reload()}
+															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus:outline-none focus:ring-2 focus:ring-destructive/40"
+														>
+															<Power className="w-4 h-4" />
+														</button>
+													</TooltipTrigger>
+													<TooltipContent side="top">
+														<p>Restart Session</p>
+													</TooltipContent>
+												</Tooltip>
+											</div>
 										</div>
 									</div>
 								</motion.div>
@@ -233,12 +238,12 @@ export function Taskbar() {
 											layout
 											onClick={() => handleTaskbarClick(window.id)}
 											className={cn(
-												'h-9 w-9 flex items-center justify-center rounded-md transition-colors duration-200 relative',
+												'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40',
 												'hover:bg-primary/10',
 												isActive ? 'bg-primary/20' : 'bg-transparent',
 											)}
 										>
-											<Icon className="h-5 w-5" />
+											<Icon className="h-4 w-4 sm:h-5 sm:w-5" />
 											<motion.div
 												className={cn(
 													'absolute -bottom-1 h-0.5 w-4 rounded-full',
