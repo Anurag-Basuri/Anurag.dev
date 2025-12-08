@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Terminal, HelpCircle, X, Folder, Key } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 type HelpButtonProps = {
 	placement?: 'floating' | 'taskbar';
@@ -131,7 +132,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 							<span className="text-[11px] sm:text-xs">Help</span>
 						</button>
 					</TooltipTrigger>
-					<TooltipContent>Quick Help</TooltipContent>
+					<TooltipContent side="top">Quick Help</TooltipContent>
 				</Tooltip>
 			)}
 
@@ -174,14 +175,14 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 								)}
 							>
 								{/* Header */}
-								<div className="p-4 border-b border-border/50 bg-linear-to-r from-primary/10 to-accent/10 flex justify-between items-center">
+								<div className="p-4 border-b border-border/50 bg-muted/20 flex justify-between items-center">
 									<h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
 										<Terminal className="w-4 h-4" />
 										<span>Quick Help</span>
 									</h3>
 									<button
 										onClick={() => setIsOpen(false)}
-										className="p-2 sm:p-1 hover:bg-muted/50 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+										className="p-2 sm:p-1 hover:bg-muted/50 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
 										aria-label="Close help"
 										ref={closeBtnRef}
 									>
@@ -192,42 +193,51 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 								{/* Content */}
 								<div className="p-4 space-y-4 text-sm sm:text-[13px]">
 									<div>
-										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
 											Common Commands
 										</h4>
-										<div className="space-y-2">
+										<div className="space-y-1">
 											{commands.map((item, i) => (
 												<div
 													key={i}
-													className="flex items-start gap-3 p-2 rounded hover:bg-muted/30 transition-colors group"
+													className="grid grid-cols-[1fr_auto] items-center gap-4 p-2 rounded-md hover:bg-muted/40 transition-colors"
 												>
-													<code className="text-xs sm:text-[11px] bg-muted px-2 py-1 rounded font-mono text-primary shrink-0">
-														{item.cmd}
-													</code>
-													<span className="text-xs sm:text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">
+													<span className="text-muted-foreground group-hover:text-foreground transition-colors text-xs sm:text-[13px]">
 														{item.desc}
 													</span>
+													<code className="text-xs sm:text-[11px] bg-muted px-2 py-1 rounded font-mono text-primary shrink-0 justify-self-end">
+														{item.cmd}
+													</code>
 												</div>
 											))}
 										</div>
 									</div>
 
-									<div className="pt-3 border-t border-border/50">
-										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+									<Separator className="bg-border/50" />
+
+									<div>
+										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
 											Tips
 										</h4>
-										<ul className="space-y-2 text-xs sm:text-[11px] text-muted-foreground">
-											<li className="flex items-start gap-2">
-												<Folder className="w-3 h-3 mt-0.5 shrink-0" />
-												<span>Click files in Explorer to open them</span>
+										<ul className="space-y-3 text-xs sm:text-[13px] text-muted-foreground">
+											<li className="flex items-center gap-3">
+												<Folder className="w-4 h-4 text-primary/80 shrink-0" />
+												<span>Click files in Explorer to open them.</span>
 											</li>
-											<li className="flex items-start gap-2">
-												<Key className="w-3 h-3 mt-0.5 shrink-0" />
-												<span>Press Tab to autocomplete</span>
+											<li className="flex items-center gap-3">
+												<Key className="w-4 h-4 text-primary/80 shrink-0" />
+												<span>
+													Press <kbd className="kbd">Tab</kbd> to
+													autocomplete.
+												</span>
 											</li>
-											<li className="flex items-start gap-2">
-												<Terminal className="w-3 h-3 mt-0.5 shrink-0" />
-												<span>Use ↑/↓ for command history</span>
+											<li className="flex items-center gap-3">
+												<Terminal className="w-4 h-4 text-primary/80 shrink-0" />
+												<span>
+													Use <kbd className="kbd">↑</kbd> /{' '}
+													<kbd className="kbd">↓</kbd> for command
+													history.
+												</span>
 											</li>
 										</ul>
 									</div>
