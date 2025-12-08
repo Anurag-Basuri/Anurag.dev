@@ -49,3 +49,28 @@ export const getModuleComponent = (id: string): React.ReactNode => {
 export function getModuleIcon(id: string): LucideIcon {
 	return moduleIcons[id] || moduleIcons.default;
 }
+
+export function getModuleTitle(id: string): string {
+	// Handle complex paths: "about/whoami.md" -> "about"
+	const moduleId = id.includes('/') ? id.split('/')[0] : id;
+	switch (moduleId) {
+		case 'about':
+			return 'About Me';
+		case 'projects':
+			return 'Projects';
+		case 'journey':
+			return 'Journey';
+		case 'blog':
+			return 'Blog';
+		case 'contact':
+			return 'Contact';
+		case 'ai-lab':
+			return 'AI Lab';
+		case 'secret':
+			return 'Secret';
+		case 'stats.exe':
+			return 'Coding Stats';
+		default:
+			return 'Unknown Module';
+	}
+}
