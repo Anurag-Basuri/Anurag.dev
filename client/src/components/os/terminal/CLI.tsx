@@ -276,6 +276,41 @@ export function CLI() {
 			{/* Subtle terminal gradient overlay */}
 			<div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
 
+			{/* Terminal Toolbar */}
+			<div className="px-4 py-2 border-b border-border/30 bg-background/60 backdrop-blur-sm flex items-center justify-between gap-3 text-xs">
+				<div className="flex items-center gap-2 text-muted-foreground">
+					<span className="text-[11px] tracking-[0.28em] uppercase">Terminal</span>
+					<span className="px-2 py-0.5 rounded-full border border-border/60 text-[10px]">
+						Press Ctrl+L to clear
+					</span>
+				</div>
+				<div className="flex items-center gap-2">
+					{['help', 'about', 'projects', 'contact'].map(cmd => (
+						<button
+							key={cmd}
+							type="button"
+							className="px-2 py-1 rounded border border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/40 transition-colors"
+							onClick={() => applySuggestion(cmd)}
+						>
+							{cmd}
+						</button>
+					))}
+					<button
+						type="button"
+						className="px-2 py-1 rounded border border-border/60 bg-background/60 hover:bg-destructive/10 hover:border-destructive/50 transition-colors text-destructive"
+						onClick={() => {
+							setHistory([]);
+							setCmdHistory([]);
+							if (typeof window !== 'undefined') {
+								window.localStorage.removeItem(CMD_HISTORY_STORAGE_KEY);
+							}
+						}}
+					>
+						Clear
+					</button>
+				</div>
+			</div>
+
 			{/* Main Scrollable Container */}
 			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pt-3 custom-scrollbar">
 				{/* Minimal Terminal Header */}
