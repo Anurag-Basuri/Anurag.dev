@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { getModuleComponent } from '@/lib/moduleRegistry';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 
 export type CommandResponse = {
@@ -148,6 +147,7 @@ export const registry: Record<string, CommandSpec> = {
 		usage: 'open <module_name_or_path>',
 		examples: ['open about', 'open /apps/projects.app'],
 		run: ({ currentPath }, args) => {
+		run: ({ currentPath }, args) => {
 			const target = args[0];
 			if (!target) {
 				return { ok: false, error: 'Missing target', hint: 'Usage: open <module | path>' };
@@ -156,40 +156,39 @@ export const registry: Record<string, CommandSpec> = {
 			// Check if it's a direct module name
 			const moduleNames = ['about', 'projects', 'journey', 'blog', 'contact', 'secret'];
 			if (moduleNames.includes(target.toLowerCase())) {
-				return { type: 'open_module', moduleId: target.toLowerCase() };
+				return { ok: true, data: { type: 'open_module', moduleId: target.toLowerCase() } };
 			}
 
 			// Otherwise, treat it as a path
 			const item = resolvePath(currentPath, target);
 			if (!item) {
-				return { type: 'error', content: `open: file not found: ${target}` };
+				return { ok: false, error: `open: file not found: ${target}` };
 			}
 			if (item.type === 'folder') {
-				return { type: 'error', content: `open: cannot open directory: ${target}` };
+				return { ok: false, error: `open: cannot open directory: ${target}` };
 			}
 
 			// Assuming file IDs correspond to module IDs
-			return { type: 'open_module', moduleId: item.id };
+			return { ok: true, data: { type: 'open_module', moduleId: item.id } };
 		},
-	},
 	whoami: {
 		name: 'whoami',
 		description: 'Display the current user.',
 		usage: 'whoami',
 		run: () => ({ type: 'text', content: 'root' }),
-	},
+		run: () => ({ ok: true, data: 'root' }),
 	date: {
 		name: 'date',
 		description: 'Display the current date and time.',
 		usage: 'date',
 		run: () => ({ type: 'text', content: new Date().toString() }),
-	},
+		run: () => ({ ok: true, data: new Date().toString() }),
 	echo: {
 		name: 'echo',
 		description: 'Display a line of text.',
 		usage: 'echo [text...]',
 		run: (_ctx, args) => ({ type: 'text', content: args.join(' ') }),
-	},
+		run: (_ctx, args) => ({ ok: true, data: args.join(' ') }),
 	theme: {
 		name: 'theme',
 		description: 'Set or toggle the UI theme.',
@@ -197,55 +196,55 @@ export const registry: Record<string, CommandSpec> = {
 		aliases: ['th'],
 		examples: ['theme dark', 'theme toggle'],
 		run: (_ctx, args) => {
+		run: (_ctx, args) => {
 			const mode = args[0]?.toLowerCase();
 			if (mode === 'dark' || mode === 'light' || mode === 'toggle') {
-				return { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' };
+				return { ok: true, data: { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' } };
 			}
 			return {
-				type: 'error',
-				content: 'Invalid theme',
+				ok: false,
+				error: 'Invalid theme',
 				hint: 'Usage: theme <dark|light|toggle>',
 			};
 		},
-	},
 	// Module shortcuts
 	about: {
 		name: 'about',
 		description: 'Open the About section.',
 		usage: 'about',
 		run: () => ({ type: 'open_module', moduleId: 'about' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'about' } }),
 	projects: {
 		name: 'projects',
 		description: 'Open the Projects section.',
 		usage: 'projects',
 		run: () => ({ type: 'open_module', moduleId: 'projects' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'projects' } }),
 	journey: {
 		name: 'journey',
 		description: 'Open the Journey section.',
 		usage: 'journey',
 		run: () => ({ type: 'open_module', moduleId: 'journey' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'journey' } }),
 	blog: {
 		name: 'blog',
 		description: 'Open the Blog section.',
 		usage: 'blog',
 		run: () => ({ type: 'open_module', moduleId: 'blog' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'blog' } }),
 	contact: {
 		name: 'contact',
 		description: 'Open the Contact section.',
 		usage: 'contact',
 		run: () => ({ type: 'open_module', moduleId: 'contact' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'contact' } }),
 	secret: {
 		name: 'secret',
 		description: '???',
 		usage: 'secret',
 		hidden: true,
 		run: () => ({ type: 'open_module', moduleId: 'secret' }),
-	},
+		run: () => ({ ok: true, data: { type: 'open_module', moduleId: 'secret' } }),
 
 	// Easter eggs
 	matrix: {
@@ -254,21 +253,21 @@ export const registry: Record<string, CommandSpec> = {
 		usage: 'matrix',
 		hidden: true,
 		run: () => ({ type: 'component', content: 'Entering the matrix...' }), // Placeholder
-	},
+		run: () => ({ ok: true, data: { type: 'component', content: 'Entering the matrix...' } }), // Placeholder
 	coffee: {
 		name: 'coffee',
 		description: 'Brew some coffee.',
 		usage: 'coffee',
 		hidden: true,
 		run: () => ({ type: 'error', content: "I'm a teapot" }), // HTTP 418
-	},
+		run: () => ({ ok: false, error: "I'm a teapot" }), // HTTP 418
 	konami: {
 		name: 'konami',
 		description: 'Konami code.',
 		usage: 'konami',
 		hidden: true,
 		run: () => ({ type: 'success', content: 'Konami code activated! 🎉' }),
-	},
+		run: () => ({ ok: true, data: 'Konami code activated! 🎉' }),
 };
 
 // Dynamically generate the commands list from the registry.
@@ -459,8 +458,8 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 		if (spec && spec.run) {
 			const context = { currentPath };
 			// @ts-ignore
+			// @ts-expect-error
 			return spec.run(context, args);
-		}
 
 		// Command not found, provide a suggestion.
 		const suggestion = getCommandSuggestions(cmd, 1)[0];
