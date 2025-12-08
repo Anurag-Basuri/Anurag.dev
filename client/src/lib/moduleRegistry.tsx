@@ -6,6 +6,17 @@ import { BlogModule } from '@/components/apps/blog';
 import { ContactModule } from '@/components/apps/contact';
 import { SecretModule } from '@/components/apps/secret';
 import CodingStatsModule from '@/components/apps/coding-stats';
+import {
+	Info,
+	LayoutDashboard,
+	Terminal,
+	Code,
+	Contact,
+	GitBranch,
+	Book,
+	ShieldQuestion,
+	type LucideIcon,
+} from 'lucide-react';
 
 export const moduleRegistry: Record<string, React.ReactNode> = {
 	about: <AboutModule />,
@@ -18,8 +29,23 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	'stats.exe': <CodingStatsModule />,
 };
 
+const moduleIcons: Record<string, LucideIcon> = {
+	about: Info,
+	projects: LayoutDashboard,
+	terminal: Terminal,
+	'coding-stats': Code,
+	contact: Contact,
+	journey: GitBranch,
+	blog: Book,
+	default: ShieldQuestion,
+};
+
 export const getModuleComponent = (id: string): React.ReactNode => {
 	// Handle complex paths: "about/whoami.md" -> "about"
 	const moduleId = id.includes('/') ? id.split('/')[0] : id;
 	return moduleRegistry[moduleId] || <div className="p-4">Module not found: {id}</div>;
 };
+
+export function getModuleIcon(id: string): LucideIcon {
+	return moduleIcons[id] || moduleIcons.default;
+}
