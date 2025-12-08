@@ -202,3 +202,33 @@ export function Taskbar() {
 		</div>
 	);
 }
+function useWindowManager(): { openWindow: (id: string, title: string) => void } {
+	const [windows, setWindows] = useAtom(windowsAtom);
+	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
+	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
+
+	const openWindow = (id: string, title: string) => {
+		const existingWindow = windows.find(w => w.id === id);
+		if (existingWindow) {
+			// Restore if minimized, bring to front
+			setWindows(windows.map(w => w.id === id ? { ...w, isMinimized: false } : w));
+			setActiveWindowId(id);
+			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
+		} else {
+			// Create new window
+			const newWindow = {
+				id,
+				title,
+				isMinimized: false,
+				isOpen: true,
+				component: getModuleComponent(id),
+			};
+			setWindows([...windows, newWindow]);
+			setActiveWindowId(id);
+			setWindowStack([...windowStack, id]);
+		}
+	};
+
+	return { openWindow };
+}
+
