@@ -99,9 +99,9 @@ export function Taskbar() {
 
 	return (
 		<TooltipProvider delayDuration={0}>
-			<div className="h-12 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-2 sm:px-3">
+			<div className="h-10 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-2 sm:px-3">
 				{/* Left side: Start and Window Icons */}
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 overflow-hidden">
 					{/* Start Button */}
 					<div className="relative" ref={startMenuRef}>
 						<Tooltip>
@@ -238,15 +238,19 @@ export function Taskbar() {
 											layout
 											onClick={() => handleTaskbarClick(window.id)}
 											className={cn(
-												'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40',
+												'h-8 flex items-center gap-2 px-2.5 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40 max-w-[150px]',
 												'hover:bg-primary/10',
 												isActive ? 'bg-primary/20' : 'bg-transparent',
 											)}
 										>
-											<Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+											<Icon className="h-4 w-4 shrink-0" />
+											<span className="text-xs truncate hidden sm:inline">
+												{window.title}
+											</span>
 											<motion.div
+												layoutId={`taskbar-active-indicator-${window.id}`}
 												className={cn(
-													'absolute -bottom-1 h-0.5 w-4 rounded-full',
+													'absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4 rounded-full',
 													isActive ? 'bg-primary' : 'bg-transparent',
 												)}
 											/>
