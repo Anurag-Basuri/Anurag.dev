@@ -6,18 +6,13 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { ImperativePanelHandle } from 'react-resizable-panels';
 import { Toaster } from 'react-hot-toast';
 
-import {
-	windowsAtom,
-	activeWindowIdAtom,
-	verticalSizesAtom,
-	horizontalSizesAtom,
-} from '@/store/atoms';
+import { verticalSizesAtom, horizontalSizesAtom } from '@/store/atoms';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { FileSystemItem } from '@/types/file-system';
-import fileSystem from '@/lib/data';
+import { initialFileSystem as fileSystem } from '@/lib/data';
 
-import { Background3D } from '../os/shell/Background3D';
+import Background3D from '../os/shell/Background3D';
 import { EditorArea } from '../os/editor/EditorArea';
 import { FolderTree } from '../os/file-system/FolderTree';
 import { CLI } from '../os/terminal/CLI';
@@ -28,8 +23,6 @@ import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { HelpButton } from '../shared/HelpButton';
 
 export function MainLayout() {
-	const [windows, setWindows] = useAtom(windowsAtom);
-	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const isMobile = useMediaQuery('(max-width: 768px)');
 
 	const sidebarRef = useRef<ImperativePanelHandle>(null);
@@ -43,10 +36,7 @@ export function MainLayout() {
 	const [horizontalSizes, setHorizontalSizes] = useAtom(horizontalSizesAtom);
 
 	// Hydration check to prevent layout flicker on initial render
-	const [isLayoutReady, setIsLayoutReady] = useState(false);
-	useEffect(() => {
-		setIsLayoutReady(true);
-	}, []);
+	const [isLayoutReady] = useState(true);
 
 	const { openWindow } = useWindowManager();
 
