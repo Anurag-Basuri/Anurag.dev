@@ -469,8 +469,18 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 					return { type: 'text', content: result.data };
 				}
 				if (typeof result.data === 'object' && result.data !== null) {
-					// For commands that return special types like 'clear', 'open_module', etc.
-					return { ...result.data, content: result.data.content || '' };
+					return { 
+						type: (result.data && typeof (result.data as Record<string, unknown>).type === 'string')
+							? (result.data as Record<string, unknown>).type as CommandResponse['type']
+							: 'component',
+						...result.data, 
+						content: (
+							result.data && 
+							typeof (result.data as Record<string, unknown>).content !== 'undefined'
+						) 
+							? (result.data as Record<string, unknown>).content as string | ReactNode 
+							: '' 
+					};
 				}
 				return { type: 'success', content: '' }; // Default success response
 			} else {
