@@ -33,6 +33,7 @@ const responseTone = (type: CommandResponse['type']) => {
 const CMD_HISTORY_STORAGE_KEY = 'anuragos-terminal-cmd-history';
 const PATH_STORAGE_KEY = 'anuragos-terminal-path';
 const CMD_HISTORY_LIMIT = 50;
+const QUICK_COMMANDS = ['help', 'about', 'projects', 'contact'];
 
 const generateHistoryId = () =>
 	typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -270,26 +271,31 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm overflow-hidden transition-colors duration-300 relative"
+			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm overflow-hidden transition-colors duration-300 relative rounded-xl"
 			onClick={handleContainerClick}
 		>
-			{/* Subtle terminal gradient overlay */}
-			<div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
+			{/* Ambient gradient overlay */}
+			<div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-[0.06] pointer-events-none" />
 
 			{/* Terminal Toolbar */}
-			<div className="px-4 py-2 border-b border-border/30 bg-background/60 backdrop-blur-sm flex items-center justify-between gap-3 text-xs">
-				<div className="flex items-center gap-2 text-muted-foreground">
+			<div className="px-4 py-3 border-b border-border/30 bg-background/70 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 text-xs relative z-10">
+				<div className="flex items-center gap-3 text-muted-foreground">
+					<div className="flex items-center gap-1.5">
+						<span className="w-2.5 h-2.5 rounded-full bg-destructive/70 shadow-[0_0_0_4px_rgba(239,68,68,0.15)]" />
+						<span className="w-2.5 h-2.5 rounded-full bg-amber-400/70 shadow-[0_0_0_4px_rgba(251,191,36,0.12)]" />
+						<span className="w-2.5 h-2.5 rounded-full bg-emerald-400/70 shadow-[0_0_0_4px_rgba(52,211,153,0.12)]" />
+					</div>
 					<span className="text-[11px] tracking-[0.28em] uppercase">Terminal</span>
 					<span className="px-2 py-0.5 rounded-full border border-border/60 text-[10px]">
-						Press Ctrl+L to clear
+						Ctrl+L clear
 					</span>
 				</div>
-				<div className="flex items-center gap-2">
-					{['help', 'about', 'projects', 'contact'].map(cmd => (
+				<div className="flex items-center gap-2 flex-wrap">
+					{QUICK_COMMANDS.map(cmd => (
 						<button
 							key={cmd}
 							type="button"
-							className="px-2 py-1 rounded border border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/40 transition-colors"
+							className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-primary/10 hover:border-primary/40 transition-colors"
 							onClick={() => applySuggestion(cmd)}
 						>
 							{cmd}
@@ -297,7 +303,7 @@ export function CLI() {
 					))}
 					<button
 						type="button"
-						className="px-2 py-1 rounded border border-border/60 bg-background/60 hover:bg-destructive/10 hover:border-destructive/50 transition-colors text-destructive"
+						className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-destructive/10 hover:border-destructive/50 transition-colors text-destructive"
 						onClick={() => {
 							setHistory([]);
 							setCmdHistory([]);
@@ -311,11 +317,34 @@ export function CLI() {
 				</div>
 			</div>
 
+			{/* Status strip */}
+			<div className="px-4 py-2 border-b border-border/20 bg-background/60 backdrop-blur-sm text-[11px] flex flex-wrap items-center justify-between gap-2 relative z-10">
+				<div className="flex items-center gap-2 text-muted-foreground">
+					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60 text-foreground/90">
+						Path: {currentPath}
+					</span>
+					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60">
+						Theme: {resolvedTheme ?? 'system'}
+					</span>
+				</div>
+				<div className="flex items-center gap-2 text-muted-foreground">
+					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60">
+						History: {history.length}
+					</span>
+					<span className="px-2 py-1 rounded-md border border-border/50 bg-background/60">
+						Suggestions: {suggestions.length}
+					</span>
+				</div>
+			</div>
+
 			{/* Main Scrollable Container */}
-			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pt-3 custom-scrollbar">
+			<div
+				ref={scrollRef}
+				className="flex-1 min-h-0 overflow-y-auto px-4 py-4 custom-scrollbar space-y-4 relative z-10"
+			>
 				{/* Minimal Terminal Header */}
 				{history.length === 0 && (
-					<div className="select-none mb-4 pb-3 border-b border-border/20">
+					<div className="select-none mb-2 pb-3 border-b border-border/20">
 						<div className="text-primary font-semibold text-sm mb-1.5">
 							$ AnuragOS Terminal
 						</div>
@@ -338,7 +367,7 @@ export function CLI() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: -8 }}
 								transition={{ duration: 0.18, ease: 'easeOut' }}
-								className="rounded"
+								className="rounded-xl border border-border/30 bg-background/50 backdrop-blur-sm shadow-[0_12px_45px_-28px_rgba(0,0,0,0.6)] p-3"
 							>
 								<div className="flex gap-2 text-sm items-baseline flex-wrap">
 									<span className="text-glow shrink-0">
@@ -348,7 +377,7 @@ export function CLI() {
 								</div>
 								<div
 									className={cn(
-										'mt-1.5 pl-2 border-l-2 border-border/40 whitespace-pre-wrap leading-relaxed text-[13px]',
+										'mt-2 pl-3 border-l-2 border-border/40 whitespace-pre-wrap leading-relaxed text-[13px]',
 										responseTone(item.response.type),
 									)}
 								>
@@ -361,53 +390,63 @@ export function CLI() {
 			</div>
 
 			{/* Input Area at the bottom */}
-			<div className="px-4 pb-3 pt-2 border-t border-border/20">
-				<div className="flex items-center gap-2 text-sm flex-wrap">
-					<span className="text-glow shrink-0">{getPromptLabel(currentPath)}</span>
-					<div className="relative flex-1 min-w-[100px]">
-						{/* Hidden input for text capture */}
-						<input
-							ref={inputRef}
-							type="text"
-							value={input}
-							onChange={e => {
-								setInput(e.target.value);
-								setCursorPos(e.target.selectionStart || 0);
-								setActiveSuggestionIndex(0);
-								setHistoryIndex(-1); // Reset history navigation
-							}}
-							onKeyDown={handleKeyDown}
-							onSelect={e => setCursorPos(e.currentTarget.selectionStart || 0)}
-							onFocus={() => setIsFocused(true)}
-							onBlur={() => setIsFocused(false)}
-							className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none"
-							autoComplete="off"
-							autoCorrect="off"
-							autoCapitalize="off"
-							spellCheck="false"
-						/>
-						{/* Visible input display */}
-						<div className="whitespace-pre-wrap break-all">
-							<span>{input.substring(0, cursorPos)}</span>
-							<span
-								className={cn(
-									'inline-block w-2 h-4 -mb-1',
-									isFocused ? 'bg-terminal-text animate-pulse' : 'bg-transparent',
-								)}
+			<div className="px-4 pb-4 pt-3 border-t border-border/20 bg-background/70 backdrop-blur-sm relative z-10">
+				<div className="flex items-start gap-3 text-sm flex-wrap">
+					<span className="text-glow shrink-0 mt-1">{getPromptLabel(currentPath)}</span>
+					<div className="relative flex-1 min-w-[140px]">
+						<div className="rounded-lg border border-border/50 bg-background/60 px-3 py-2 shadow-inner">
+							{/* Hidden input for text capture */}
+							<input
+								ref={inputRef}
+								type="text"
+								value={input}
+								onChange={e => {
+									setInput(e.target.value);
+									setCursorPos(e.target.selectionStart || 0);
+									setActiveSuggestionIndex(0);
+									setHistoryIndex(-1); // Reset history navigation
+								}}
+								onKeyDown={handleKeyDown}
+								onSelect={e => setCursorPos(e.currentTarget.selectionStart || 0)}
+								onFocus={() => setIsFocused(true)}
+								onBlur={() => setIsFocused(false)}
+								className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none"
+								autoComplete="off"
+								autoCorrect="off"
+								autoCapitalize="off"
+								spellCheck="false"
 							/>
-							<span>{input.substring(cursorPos)}</span>
+							{/* Visible input display */}
+							<div className="whitespace-pre-wrap break-all">
+								<span>{input.substring(0, cursorPos)}</span>
+								<span
+									className={cn(
+										'inline-block w-2 h-4 -mb-1',
+										isFocused
+											? 'bg-terminal-text animate-pulse'
+											: 'bg-transparent',
+									)}
+								/>
+								<span>{input.substring(cursorPos)}</span>
+							</div>
 						</div>
 					</div>
 				</div>
-				{/* Suggestions Box */}
+
+				{/* Suggestions and helpers */}
 				<div
 					className={cn(
-						'mt-2 transition-opacity duration-150',
-						showSuggestions ? 'opacity-100' : 'opacity-0 pointer-events-none',
+						'mt-3 transition-opacity duration-150 space-y-2',
+						showSuggestions ? 'opacity-100' : 'opacity-75',
 					)}
 				>
 					<div className="flex flex-wrap gap-2 items-center text-xs">
 						<span className="text-muted-foreground font-medium">Suggestions:</span>
+						{suggestions.length === 0 && (
+							<span className="text-muted-foreground/70">
+								Start typing to see tips
+							</span>
+						)}
 						{suggestions.map((suggestion, idx) => (
 							<button
 								key={suggestion}
@@ -416,7 +455,7 @@ export function CLI() {
 								onMouseDown={e => e.preventDefault()}
 								onClick={() => applySuggestion(suggestion)}
 								className={cn(
-									'px-2 py-0.5 rounded border transition-colors bg-background/40',
+									'px-2 py-0.5 rounded border transition-colors bg-background/50',
 									idx === activeSuggestionIndex
 										? 'border-primary/70 text-primary bg-primary/10'
 										: 'border-border/40 hover:border-border/70',
@@ -425,6 +464,20 @@ export function CLI() {
 								{suggestion}
 							</button>
 						))}
+					</div>
+					<div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
+							Tab autocomplete
+						</span>
+						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
+							↑/↓ history
+						</span>
+						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
+							Ctrl+C cancel
+						</span>
+						<span className="px-2 py-1 rounded border border-border/40 bg-muted/30">
+							Ctrl+L clear
+						</span>
 					</div>
 				</div>
 			</div>
