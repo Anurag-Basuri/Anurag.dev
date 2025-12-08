@@ -38,7 +38,7 @@ export function MainLayout() {
 	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
 
-	const isLayoutReady = true;
+	const [isLayoutReady] = useState(true);
 
 	const { openWindow } = useWindowManager();
 
@@ -69,9 +69,72 @@ export function MainLayout() {
 		}
 	};
 
+	const renderDesktopLayout = () => (
+		<ResizablePanelGroup direction="vertical" onLayout={setMainVerticalSizes} className="gap-3">
+			<ResizablePanel defaultSize={mainVerticalSizes[0]} minSize={40}>
+				<ResizablePanelGroup
+					direction="horizontal"
+					onLayout={setMainHorizontalSizes}
+					className="gap-3"
+				>
+					<ResizablePanel
+						ref={sidebarRef}
+						collapsible
+						collapsedSize={0}
+						minSize={15}
+						maxSize={30}
+						defaultSize={mainHorizontalSizes[0]}
+						onCollapse={() => setSidebarCollapsed(true)}
+						onExpand={() => setSidebarCollapsed(false)}
+						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+					>
+						<div className="h-full flex flex-col overflow-hidden">
+							<SidebarProfile />
+
+							<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+								Explorer
+							</div>
+							<div className="flex-1 overflow-auto px-2 pb-3">
+								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+							</div>
+						</div>
+					</ResizablePanel>
+					<ResizableHandle withHandle />
+					<ResizablePanel
+						defaultSize={mainHorizontalSizes[1]}
+						minSize={30}
+						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+					>
+						<EditorArea />
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel
+				ref={terminalRef}
+				collapsible
+				collapsedSize={4}
+				minSize={4}
+				maxSize={50}
+				defaultSize={mainVerticalSizes[1]}
+				onCollapse={() => setTerminalCollapsed(true)}
+				onExpand={() => setTerminalCollapsed(false)}
+				className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+			>
+				<CLI onToggleCollapse={handleToggleTerminal} />
+			</ResizablePanel>
+		</ResizablePanelGroup>
+	);
+
+	const renderMobileLayout = () => (
+		<div className="h-full w-full rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg overflow-hidden">
+			<EditorArea />
+		</div>
+	);
+
 	return (
 		<ErrorBoundary>
-			<>
+			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
 				<Toaster
 					position="bottom-right"
 					toastOptions={{
@@ -83,111 +146,42 @@ export function MainLayout() {
 						},
 					}}
 				/>
+				<Background3D />
 
-				<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
-					<Background3D />
-
-					{/* Ambient overlays */}
-					<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-						<div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,var(--primary)_0%,transparent_60%)] opacity-[0.12] dark:opacity-[0.08]" />
-						<div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_100%_100%,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.06] dark:opacity-[0.08]" />
-						<div className="absolute inset-0 bg-[radial-gradient(ellipse_30%_60%_at_0%_50%,var(--primary)_0%,transparent_40%)] opacity-[0.05] dark:opacity-[0.04]" />
-						<div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px)] bg-size-[56px_56px]" />
-					</div>
-
-					<TopBar
-						isMobile={isMobile}
-						sidebarCollapsed={sidebarCollapsed}
-						terminalCollapsed={terminalCollapsed}
-						onToggleSidebar={handleToggleSidebar}
-						onToggleTerminal={handleToggleTerminal}
-						onFileSelect={handleFileSelect}
-					/>
-
-					<WelcomeDialog />
-
-					<div className="flex-1 z-10 relative overflow-hidden">
-						{/* Main Workbench Area */}
-						<div className="flex-1 relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_24px_80px_-32px_rgba(0,0,0,0.4)]">
-							{!isMobile && !isLayoutReady ? (
-								<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
-									LOADING SYSTEM...
-								</div>
-							) : !isMobile ? (
-								<ResizablePanelGroup
-									direction="vertical"
-									onLayout={setMainVerticalSizes}
-									className="p-3 gap-3"
-								>
-									<ResizablePanelGroup
-										direction="horizontal"
-										onLayout={setMainHorizontalSizes}
-										className="gap-3"
-									>
-										<ResizablePanel
-											ref={sidebarRef}
-											collapsible
-											collapsedSize={0}
-											minSize={15}
-											maxSize={30}
-											defaultSize={mainHorizontalSizes[0]}
-											onCollapse={() => setSidebarCollapsed(true)}
-											onExpand={() => setSidebarCollapsed(false)}
-											className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
-										>
-											<div className="h-full flex flex-col overflow-hidden">
-												<SidebarProfile />
-
-												<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-													Explorer
-												</div>
-												<div className="flex-1 overflow-auto px-2 pb-3">
-													<FolderTree
-														items={fileSystem}
-														onSelect={handleFileSelect}
-													/>
-												</div>
-											</div>
-										</ResizablePanel>
-										<ResizableHandle withHandle />
-										<ResizablePanel
-											defaultSize={mainHorizontalSizes[1]}
-											minSize={30}
-											className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
-										>
-											<EditorArea />
-										</ResizablePanel>
-									</ResizablePanelGroup>
-									<ResizableHandle withHandle />
-									<ResizablePanel
-										ref={terminalRef}
-										collapsible
-										collapsedSize={4}
-										minSize={10}
-										maxSize={50}
-										defaultSize={mainVerticalSizes[1]}
-										onCollapse={() => setTerminalCollapsed(true)}
-										onExpand={() => setTerminalCollapsed(false)}
-										className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
-									>
-										<CLI onToggleCollapse={handleToggleTerminal} />
-									</ResizablePanel>
-								</ResizablePanelGroup>
-							) : (
-								<div className="h-full w-full p-3">
-									<div className="h-full w-full rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg overflow-hidden">
-										<EditorArea />
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-
-					<Taskbar />
+				{/* Ambient overlays */}
+				<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,var(--primary)_0%,transparent_60%)] opacity-[0.12] dark:opacity-[0.08]" />
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_100%_100%,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.06] dark:opacity-[0.08]" />
+					<div className="absolute inset-0 bg-[radial-gradient(ellipse_30%_60%_at_0%_50%,var(--primary)_0%,transparent_40%)] opacity-[0.05] dark:opacity-[0.04]" />
+					<div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px)] bg-size-[56px_56px]" />
 				</div>
 
+				<TopBar
+					isMobile={isMobile}
+					sidebarCollapsed={sidebarCollapsed}
+					terminalCollapsed={terminalCollapsed}
+					onToggleSidebar={handleToggleSidebar}
+					onToggleTerminal={handleToggleTerminal}
+					onFileSelect={handleFileSelect}
+				/>
+
+				<WelcomeDialog />
+
+				<main className="flex-1 z-10 relative overflow-hidden p-3 pt-0">
+					{!isLayoutReady ? (
+						<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
+							LOADING SYSTEM...
+						</div>
+					) : isMobile ? (
+						renderMobileLayout()
+					) : (
+						renderDesktopLayout()
+					)}
+				</main>
+
+				<Taskbar />
 				<HelpButton />
-			</>
+			</div>
 		</ErrorBoundary>
 	);
 }
