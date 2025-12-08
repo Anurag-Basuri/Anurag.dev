@@ -57,6 +57,9 @@ const windowsStorage: Storage<WindowState[]> = {
 // Persist window state without storing React nodes
 export const windowsAtom = atomWithStorage<WindowState[]>('windows', [], windowsStorage);
 export const windowStackAtom = atomWithStorage<string[]>('window-stack', []);
-export const verticalSizesAtom = atomWithStorage<number[]>('layout:v', [100, 0]);
-export const horizontalSizesAtom = atomWithStorage<number[]>('layout:h', [20, 80]);
+export const mainVerticalSizesAtom = atomWithStorage<number[]>('layout:main-v', [75, 25]);
+export const mainHorizontalSizesAtom = atomWithStorage<number[]>('layout:main-h', [20, 80]);
+export const sidebarCollapsedAtom = atomWithStorage('layout:sidebar-collapsed', false);
+export const terminalCollapsedAtom = atomWithStorage('layout:terminal-collapsed', false);
+
 export const activeWindowIdAtom = atom<string | null>(null);
