@@ -123,7 +123,7 @@ export function TopBar({
 				{!isMobile && (
 					<>
 						{/* Sidebar controls */}
-						<div className="flex items-center gap-1 pl-2 pr-1 rounded bg-muted/40 border border-border backdrop-blur-sm">
+						<div className="flex items-center gap-1 pl-2 pr-1 rounded-md bg-muted/40 border border-border backdrop-blur-sm">
 							<button
 								className={cn(
 									'p-1 hover:bg-muted/60 rounded transition-all duration-200',
