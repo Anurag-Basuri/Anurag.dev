@@ -170,7 +170,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						>
 							<div
 								className={cn(
-									'bg-background/80 backdrop-blur-lg border border-border/50 shadow-2xl overflow-hidden',
+									'bg-background/75 supports-[backdrop-filter:blur(0)]:bg-background/90 backdrop-blur-xl backdrop-saturate-150 border border-border/60 shadow-2xl overflow-hidden',
 									'rounded-t-2xl sm:rounded-2xl',
 								)}
 							>
