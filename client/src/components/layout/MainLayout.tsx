@@ -5,6 +5,8 @@ import { useRef, useState, useEffect } from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { ImperativePanelHandle } from 'react-resizable-panels';
 import { Toaster } from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Compass, FolderGit2, LineChart, Mail, Route, User } from 'lucide-react';
 
 import { verticalSizesAtom, horizontalSizesAtom } from '@/store/atoms';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -29,14 +31,12 @@ export function MainLayout() {
 	const terminalRef = useRef<ImperativePanelHandle>(null);
 
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-	// Default to collapsed for simplicity
 	const [terminalCollapsed, setTerminalCollapsed] = useState(true);
 
 	const [verticalSizes, setVerticalSizes] = useAtom(verticalSizesAtom);
 	const [horizontalSizes, setHorizontalSizes] = useAtom(horizontalSizesAtom);
 
-	// Hydration check to prevent layout flicker on initial render
-	const [isLayoutReady] = useState(true);
+	const [isLayoutReady] = useState(() => typeof window !== 'undefined');
 
 	const { openWindow } = useWindowManager();
 
@@ -47,6 +47,26 @@ export function MainLayout() {
 		}
 		openWindow(moduleId, item.name);
 	};
+
+	const quickLaunch: {
+		label: string;
+		icon: React.ComponentType<{ className?: string }>;
+		item: FileSystemItem;
+	}[] = [
+		{ label: 'About', icon: User, item: { id: 'about', name: 'about', type: 'folder' } },
+		{
+			label: 'Projects',
+			icon: FolderGit2,
+			item: { id: 'projects', name: 'projects', type: 'folder' },
+		},
+		{ label: 'Journey', icon: Route, item: { id: 'journey', name: 'journey', type: 'folder' } },
+		{ label: 'Contact', icon: Mail, item: { id: 'contact', name: 'contact', type: 'folder' } },
+		{
+			label: 'Stats',
+			icon: LineChart,
+			item: { id: 'tools/stats.exe', name: 'stats.exe', type: 'file' },
+		},
+	];
 
 	return (
 		<ErrorBoundary>
@@ -66,7 +86,7 @@ export function MainLayout() {
 				<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
 					<Background3D />
 
-					{/* Background Gradients */}
+					{/* Ambient overlays */}
 					<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
 						<div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,var(--primary)_0%,transparent_60%)] opacity-[0.12] dark:opacity-[0.08]" />
 						<div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_100%_100%,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.06] dark:opacity-[0.08]" />
@@ -74,97 +94,127 @@ export function MainLayout() {
 						<div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px)] bg-size-[56px_56px]" />
 					</div>
 
-					{/* Top Layout Bar */}
 					<TopBar
 						isMobile={isMobile}
 						sidebarCollapsed={sidebarCollapsed}
 						terminalCollapsed={terminalCollapsed}
 						onToggleSidebar={() => {
 							const panel = sidebarRef.current;
-							if (panel) {
-								if (sidebarCollapsed) panel.expand();
-								else panel.collapse();
-							}
+							if (!panel) return;
+							if (sidebarCollapsed) panel.expand();
+							else panel.collapse();
 						}}
 						onToggleTerminal={() => {
 							const panel = terminalRef.current;
-							if (panel) {
-								if (terminalCollapsed) panel.expand();
-								else panel.collapse();
-							}
+							if (!panel) return;
+							if (terminalCollapsed) panel.expand();
+							else panel.collapse();
 						}}
 						onFileSelect={handleFileSelect}
 					/>
 
 					<WelcomeDialog />
 
-					{/* Main Workbench Area */}
-					<div className="flex-1 z-10 relative overflow-hidden flex resize-smooth perspective-[2000px]">
-						{!isMobile && !isLayoutReady ? (
-							/* Loading Skeleton */
-							<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
-								LOADING SYSTEM...
+					<div className="flex-1 z-10 relative overflow-hidden flex flex-col gap-3 px-3 pb-3 pt-2 md:px-5 md:pb-4">
+						{/* Quick actions / status bar */}
+						<div className="rounded-2xl border border-border/70 bg-card/70 backdrop-blur-2xl shadow-[0_20px_60px_-25px_rgba(0,0,0,0.35)] px-3 py-3 md:px-4 md:py-3 flex flex-col gap-2">
+							<div className="flex items-center justify-between gap-3 flex-wrap">
+								<div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
+									<span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.7)]" />
+									<span>Portfolio Workspace</span>
+								</div>
+								<div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+									<span className="px-2 py-1 rounded-full border border-border/60 bg-muted/60 backdrop-blur">
+										Live Preview
+									</span>
+								</div>
 							</div>
-						) : !isMobile && isLayoutReady ? (
-							<ResizablePanelGroup
-								direction="horizontal"
-								className="h-full w-full transform-style-3d"
-								onLayout={setHorizontalSizes}
-							>
-								<ResizablePanel
-									ref={sidebarRef}
-									collapsible
-									collapsedSize={0}
-									minSize={15}
-									defaultSize={horizontalSizes[0]}
-									onCollapse={() => setSidebarCollapsed(true)}
-									onExpand={() => setSidebarCollapsed(false)}
-									className="transition-all duration-300 ease-in-out"
-								>
-									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-								</ResizablePanel>
-
-								<ResizableHandle
-									withHandle
-									className="bg-border/60 hover:bg-border transition-colors"
-								/>
-
-								<ResizablePanel defaultSize={horizontalSizes[1]}>
-									<ResizablePanelGroup
-										direction="vertical"
-										onLayout={setVerticalSizes}
+							<div className="flex flex-wrap gap-2">
+								{quickLaunch.map(({ label, icon: Icon, item }) => (
+									<Button
+										key={item.id}
+										variant="outline"
+										size="sm"
+										className="gap-2 rounded-lg border-border/60 bg-background/60 hover:bg-primary/10 hover:border-primary/40 transition-all"
+										onClick={() => handleFileSelect(item)}
 									>
-										<ResizablePanel defaultSize={verticalSizes[0]}>
-											<EditorArea />
-										</ResizablePanel>
-
-										<ResizableHandle
-											withHandle
-											className="bg-border/60 hover:bg-border transition-colors"
-										/>
-
-										<ResizablePanel
-											ref={terminalRef}
-											collapsible
-											collapsedSize={0}
-											minSize={10}
-											defaultSize={verticalSizes[1]}
-											onCollapse={() => setTerminalCollapsed(true)}
-											onExpand={() => setTerminalCollapsed(false)}
-											className="transition-all duration-300 ease-in-out"
-										>
-											<CLI />
-										</ResizablePanel>
-									</ResizablePanelGroup>
-								</ResizablePanel>
-							</ResizablePanelGroup>
-						) : (
-							/* Mobile view: EditorArea takes full space */
-							<div className="h-full w-full">
-								<EditorArea />
+										<Icon className="h-4 w-4" />
+										<span className="tracking-wide">{label}</span>
+									</Button>
+								))}
 							</div>
-						)}
+						</div>
+
+						{/* Main Workbench Area */}
+						<div className="flex-1 relative overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-[0_24px_80px_-32px_rgba(0,0,0,0.4)]">
+							{!isMobile && !isLayoutReady ? (
+								<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
+									LOADING SYSTEM...
+								</div>
+							) : !isMobile && isLayoutReady ? (
+								<ResizablePanelGroup
+									direction="horizontal"
+									className="h-full w-full transform-style-3d"
+									onLayout={setHorizontalSizes}
+								>
+									<ResizablePanel
+										ref={sidebarRef}
+										collapsible
+										collapsedSize={0}
+										minSize={15}
+										defaultSize={horizontalSizes[0]}
+										onCollapse={() => setSidebarCollapsed(true)}
+										onExpand={() => setSidebarCollapsed(false)}
+										className="transition-all duration-300 ease-in-out"
+									>
+										<FolderTree
+											items={fileSystem}
+											onSelect={handleFileSelect}
+										/>
+									</ResizablePanel>
+
+									<ResizableHandle
+										withHandle
+										className="bg-border/60 hover:bg-border transition-colors"
+									/>
+
+									<ResizablePanel defaultSize={horizontalSizes[1]}>
+										<ResizablePanelGroup
+											direction="vertical"
+											onLayout={setVerticalSizes}
+										>
+											<ResizablePanel defaultSize={verticalSizes[0]}>
+												<EditorArea />
+											</ResizablePanel>
+
+											<ResizableHandle
+												withHandle
+												className="bg-border/60 hover:bg-border transition-colors"
+											/>
+
+											<ResizablePanel
+												ref={terminalRef}
+												collapsible
+												collapsedSize={0}
+												minSize={10}
+												defaultSize={verticalSizes[1]}
+												onCollapse={() => setTerminalCollapsed(true)}
+												onExpand={() => setTerminalCollapsed(false)}
+												className="transition-all duration-300 ease-in-out"
+											>
+												<CLI />
+											</ResizablePanel>
+										</ResizablePanelGroup>
+									</ResizablePanel>
+								</ResizablePanelGroup>
+							) : (
+								<div className="h-full w-full">
+									<EditorArea />
+								</div>
+							)}
+						</div>
 					</div>
+
 					<Taskbar />
 				</div>
 
