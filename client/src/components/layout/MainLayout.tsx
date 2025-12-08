@@ -79,24 +79,31 @@ export function MainLayout() {
 				ref={sidebarRef}
 				collapsible
 				collapsedSize={0}
-				minSize={15}
-				maxSize={30}
+				minSize={16}
+				maxSize={32}
 				defaultSize={mainHorizontalSizes[0]}
 				onCollapse={() => setSidebarCollapsed(true)}
 				onExpand={() => setSidebarCollapsed(false)}
-				className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+				className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 			>
 				<div className="h-full flex flex-col overflow-hidden">
 					<SidebarProfile />
-					<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+
+					<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
 						Explorer
 					</div>
-					<div className="flex-1 overflow-auto px-2 pb-3">
+
+					<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
 						<FolderTree items={fileSystem} onSelect={handleFileSelect} />
 					</div>
 				</div>
 			</ResizablePanel>
-			<ResizableHandle withHandle />
+
+			<ResizableHandle
+				withHandle
+				className="bg-border/50 hover:bg-border transition-colors rounded"
+			/>
+
 			<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
 				<ResizablePanelGroup
 					direction="vertical"
@@ -106,21 +113,26 @@ export function MainLayout() {
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+						className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 					>
 						<EditorArea />
 					</ResizablePanel>
-					<ResizableHandle withHandle />
+
+					<ResizableHandle
+						withHandle
+						className="bg-border/50 hover:bg-border transition-colors rounded"
+					/>
+
 					<ResizablePanel
 						ref={terminalRef}
 						collapsible
-						collapsedSize={4}
-						minSize={4}
-						maxSize={50}
+						collapsedSize={6}
+						minSize={8}
+						maxSize={45}
 						defaultSize={mainVerticalSizes[1]}
 						onCollapse={() => setTerminalCollapsed(true)}
 						onExpand={() => setTerminalCollapsed(false)}
-						className="!overflow-hidden rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg"
+						className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 					>
 						<CLI onToggleCollapse={handleToggleTerminal} />
 					</ResizablePanel>
