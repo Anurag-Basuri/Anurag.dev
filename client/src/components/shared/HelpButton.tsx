@@ -15,6 +15,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 	const [isOpen, setIsOpen] = useState(false);
 	const panelRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
+	const closeBtnRef = useRef<HTMLButtonElement>(null);
 
 	const commands = [
 		{ cmd: 'help', desc: 'List commands' },
@@ -37,6 +38,45 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 		document.addEventListener('keydown', onKey);
 		return () => document.removeEventListener('keydown', onKey);
 	}, [isOpen]);
+
+	// Focus the close button for immediate keyboard access
+	useEffect(() => {
+		if (!isOpen) return;
+		closeBtnRef.current?.focus();
+	}, [isOpen]);
+
+	// Trap Tab inside the panel when open
+	const handlePanelKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (!isOpen || !panelRef.current) return;
+		if (e.key !== 'Tab') return;
+
+		const focusableSelectors = [
+			'button',
+			'[href]',
+			'input',
+			'select',
+			'textarea',
+			'[tabindex]:not([tabindex="-1"])',
+		].join(',');
+		const focusables = Array.from(
+			panelRef.current.querySelectorAll<HTMLElement>(focusableSelectors),
+		).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+
+		if (focusables.length === 0) return;
+
+		const first = focusables[0];
+		const last = focusables[focusables.length - 1];
+		const active = document.activeElement as HTMLElement | null;
+		const isShift = e.shiftKey;
+
+		if (!isShift && active === last) {
+			e.preventDefault();
+			first.focus();
+		} else if (isShift && active === first) {
+			e.preventDefault();
+			last.focus();
+		}
+	};
 
 	return (
 		<TooltipProvider delayDuration={0}>
@@ -107,6 +147,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									: 'sm:bottom-16 sm:right-6',
 							)}
 							ref={panelRef}
+							onKeyDown={handlePanelKeyDown}
 						>
 							<div
 								className={cn(
@@ -124,6 +165,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 										onClick={() => setIsOpen(false)}
 										className="p-2 sm:p-1 hover:bg-muted/50 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
 										aria-label="Close help"
+										ref={closeBtnRef}
 									>
 										<X className="w-5 h-5 sm:w-4 sm:h-4" />
 									</button>
