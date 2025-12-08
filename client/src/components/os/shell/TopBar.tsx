@@ -49,14 +49,14 @@ export function TopBar({
 			initial={{ y: -28, opacity: 0 }}
 			animate={{ y: 0, opacity: 1 }}
 			transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-			className="h-11 border-b flex items-center px-4 text-xs select-none backdrop-blur-2xl z-20 relative justify-between bg-linear-to-r from-card/80 via-card/90 to-card/80 border-border/50 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08),inset_0_-1px_0_0_rgba(255,255,255,0.05)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4),inset_0_-1px_0_0_rgba(255,255,255,0.03)]"
+			className="h-10 bg-background/40 backdrop-blur-xl border-b border-border/60 flex items-center justify-between z-40 shadow-[0_2px_10px_rgba(0,0,0,0.08)] px-2 sm:px-3 text-xs select-none"
 		>
 			<div className="flex items-center gap-3">
 				{isMobile && (
 					<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 						<SheetTrigger asChild>
 							<button
-								className="p-1.5 hover:bg-muted/40 rounded transition-colors"
+								className="h-8 w-8 flex items-center justify-center rounded-md hover:bg-muted/40 transition-colors"
 								aria-label="Toggle explorer"
 							>
 								<Menu className="w-4 h-4" />
