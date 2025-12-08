@@ -92,6 +92,7 @@ export function CLI() {
 		setInput(suggestion);
 		setCursorPos(suggestion.length);
 		setActiveSuggestionIndex(0);
+		inputRef.current?.focus();
 	}, []);
 
 	const pushCommandToHistory = useCallback((value: string) => {
@@ -105,6 +106,15 @@ export function CLI() {
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
 		try {
+			window.localStorage.setItem(CMD_HISTORY_STORAGE_KEY, JSON.stringify(cmdHistory));
+		} catch (error) {
+			console.warn('Failed to persist command history', error);
+		}
+	}, [cmdHistory]);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
 			window.localStorage.setItem(PATH_STORAGE_KEY, currentPath);
 		} catch (error) {
 			console.warn('Failed to persist terminal path', error);
@@ -112,7 +122,7 @@ export function CLI() {
 	}, [currentPath]);
 
 	const getPromptLabel = (path: string) => (
-		<span className="font-medium">
+		<span className="font-medium select-none">
 			<span className="text-green-500">root@anuragos</span>
 			<span className="text-muted-foreground">:</span>
 			<span className="text-blue-500">{path}</span>
@@ -141,7 +151,6 @@ export function CLI() {
 				setHistory(prev => [...prev, newItem]);
 				setCmdHistory(prev => [...prev, input]);
 			} else {
-				// Even empty input gets a new line with prompt
 				const newItem: HistoryItem = {
 					id: generateHistoryId(),
 					command: '^C',
@@ -158,12 +167,12 @@ export function CLI() {
 
 		if (e.key === 'Enter') {
 			e.preventDefault();
-			if (suggestions.length > 0) {
-				applySuggestion(suggestions[activeSuggestionIndex]);
-				return;
-			}
 
-			const response = processCommand(input, currentPath);
+			const commandToRun = input.trim();
+			if (!commandToRun) return;
+
+			const response = processCommand(commandToRun, currentPath);
+
 			if (response.type === 'clear') {
 				setHistory([]);
 			} else if (response.type === 'change_directory') {
@@ -172,15 +181,15 @@ export function CLI() {
 				}
 				const newItem: HistoryItem = {
 					id: generateHistoryId(),
-					command: input,
-					response: { type: 'success', content: '' }, // Don't show output for successful cd
+					command: commandToRun,
+					response: { type: 'success', content: '' },
 					path: currentPath,
 				};
 				setHistory(prev => [...prev, newItem]);
 			} else {
 				const newItem: HistoryItem = {
 					id: generateHistoryId(),
-					command: input,
+					command: commandToRun,
 					response,
 					path: currentPath,
 				};
@@ -213,18 +222,15 @@ export function CLI() {
 					}
 				}
 			}
-			if (input.trim()) {
-				pushCommandToHistory(input);
-			}
+
+			pushCommandToHistory(commandToRun);
 			setInput('');
 			setCursorPos(0);
 			setHistoryIndex(-1);
 			setActiveSuggestionIndex(0);
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			if (suggestions.length > 0) {
-				setActiveSuggestionIndex(prev => Math.max(0, prev - 1));
-			} else if (cmdHistory.length > 0) {
+			if (cmdHistory.length > 0) {
 				const newIndex =
 					historyIndex === -1 ? cmdHistory.length - 1 : Math.max(0, historyIndex - 1);
 				setHistoryIndex(newIndex);
@@ -234,9 +240,7 @@ export function CLI() {
 			}
 		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			if (suggestions.length > 0) {
-				setActiveSuggestionIndex(prev => Math.min(suggestions.length - 1, prev + 1));
-			} else if (historyIndex !== -1) {
+			if (historyIndex !== -1) {
 				if (historyIndex === cmdHistory.length - 1) {
 					setHistoryIndex(-1);
 					setInput('');
@@ -251,9 +255,10 @@ export function CLI() {
 			}
 		} else if (e.key === 'Tab') {
 			e.preventDefault();
-			if (!suggestions.length) return;
-			const nextValue = suggestions[activeSuggestionIndex];
-			applySuggestion(nextValue);
+			if (suggestions.length > 0) {
+				const nextValue = suggestions[activeSuggestionIndex];
+				applySuggestion(nextValue);
+			}
 		}
 	};
 
@@ -296,7 +301,10 @@ export function CLI() {
 							key={cmd}
 							type="button"
 							className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-primary/10 hover:border-primary/40 transition-colors"
-							onClick={() => applySuggestion(cmd)}
+							onClick={e => {
+								e.stopPropagation();
+								applySuggestion(cmd);
+							}}
 						>
 							{cmd}
 						</button>
@@ -304,7 +312,8 @@ export function CLI() {
 					<button
 						type="button"
 						className="px-2 py-1 rounded border border-border/60 bg-background/70 hover:bg-destructive/10 hover:border-destructive/50 transition-colors text-destructive"
-						onClick={() => {
+						onClick={e => {
+							e.stopPropagation();
 							setHistory([]);
 							setCmdHistory([]);
 							if (typeof window !== 'undefined') {
@@ -453,7 +462,10 @@ export function CLI() {
 								type="button"
 								tabIndex={-1}
 								onMouseDown={e => e.preventDefault()}
-								onClick={() => applySuggestion(suggestion)}
+								onClick={e => {
+									e.stopPropagation();
+									applySuggestion(suggestion);
+								}}
 								className={cn(
 									'px-2 py-0.5 rounded border transition-colors bg-background/50',
 									idx === activeSuggestionIndex
