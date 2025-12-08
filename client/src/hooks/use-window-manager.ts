@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
-import { getModuleComponent } from '@/lib/moduleRegistry';
+import { getModuleComponent, getModuleTitle } from '@/lib/moduleRegistry';
 import { WindowState } from '@/types/window';
 
 export function useWindowManager() {
@@ -8,7 +8,7 @@ export function useWindowManager() {
 	const [, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
 
-	const openWindow = (id: string, title: string) => {
+	const openWindow = (id: string) => {
 		const existingWindow = windows.find(w => w.id === id);
 
 		if (existingWindow) {
@@ -22,7 +22,7 @@ export function useWindowManager() {
 			// Add new window
 			const newWindow: WindowState = {
 				id,
-				title: title.toUpperCase(),
+				title: getModuleTitle(id),
 				component: getModuleComponent(id),
 				isOpen: true,
 				isMinimized: false,
