@@ -260,8 +260,7 @@ function resolvePath(currentPath: string, targetPath: string): FileSystemItem | 
 		pathParts = [...currentParts, ...targetPath.split('/')].filter(Boolean);
 	}
 
-	// Resolve parts
-	let currentItems = initialFileSystem;
+	// Start from root
 	let currentItem: FileSystemItem | null = {
 		type: 'folder',
 		name: 'root',
@@ -530,11 +529,7 @@ Now go check out my 'projects' and 'journey'! 🚀`,
 
 			default: {
 				// Simple suggestion logic
-				const suggestion = commandsList.find(c => {
-					// Check for Levenshtein distance or simple inclusion
-					// For simplicity, just check if it starts with or is close
-					return c.startsWith(command) || (command.length > 2 && c.includes(command));
-				});
+				const suggestion = getCommandSuggestions(command, 1)[0];
 
 				let errorMsg = `Hmm, I don't recognize '${command}'. 🤔`;
 				if (suggestion) {
@@ -558,3 +553,17 @@ Now go check out my 'projects' and 'journey'! 🚀`,
 		};
 	}
 }
+function getCommandSuggestions(command: string, max: number): string[] {
+	const candidates = commandsList;
+	const scored = candidates
+		.map(cmd => ({
+			cmd,
+			score: levenshtein(command, cmd),
+		}))
+		.sort((a, b) => a.score - b.score);
+
+	// Only suggest commands with a reasonable similarity (score <= 3)
+	const suggestions = scored.filter(s => s.score <= 3).map(s => s.cmd);
+	return suggestions.slice(0, max);
+}
+
