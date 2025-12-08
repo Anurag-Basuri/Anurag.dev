@@ -39,65 +39,41 @@ const generateHistoryId = () =>
 		? crypto.randomUUID()
 		: Math.random().toString(36).slice(2);
 
-interface SuggestionButtonProps {
-	suggestion: string;
-	idx: number;
-	activeSuggestionIndex: number;
-	applySuggestion: (suggestion: string) => void;
-	setActiveSuggestionIndex: React.Dispatch<React.SetStateAction<number>>;
-}
-
-const SuggestionButton: React.FC<SuggestionButtonProps> = ({
-	suggestion,
-	idx,
-	activeSuggestionIndex,
-	applySuggestion,
-	setActiveSuggestionIndex,
-}) => (
-	<button
-		type="button"
-		tabIndex={-1}
-		onMouseDown={(e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault()}
-		onClick={() => {
-			setActiveSuggestionIndex(idx);
-			applySuggestion(suggestion);
-		}}
-		className={cn(
-			'px-2 py-0.5 rounded border transition-colors bg-background/40',
-			idx === activeSuggestionIndex
-				? 'border-primary/70 text-primary bg-primary/10'
-				: 'border-border/40 hover:border-border/70',
-		)}
-	>
-		{suggestion}
-	</button>
-);
-
 export function CLI() {
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
 	const [history, setHistory] = useState<HistoryItem[]>([]);
 	const [cmdHistory, setCmdHistory] = useState<string[]>(() => {
-        if (typeof window === 'undefined') return [];
-        try {
-            const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
-            let filteredHistory: string[] = [];
-            if (storedHistory) {
-                const parsed = JSON.parse(storedHistory);
-                if (Array.isArray(parsed)) {
-                    filteredHistory = parsed.filter(
-                        (entry): entry is string => typeof entry === 'string',
-                    );
-                }
-            }
-            return filteredHistory;
-        } catch (error) {
-            console.warn('Failed to restore terminal history', error);
-            return [];
-        }
-    });
+		if (typeof window === 'undefined') return [];
+		try {
+			const storedHistory = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+			let filteredHistory: string[] = [];
+			if (storedHistory) {
+				const parsed = JSON.parse(storedHistory);
+				if (Array.isArray(parsed)) {
+					filteredHistory = parsed.filter(
+						(entry): entry is string => typeof entry === 'string',
+					);
+				}
+			}
+			return filteredHistory;
+		} catch (error) {
+			console.warn('Failed to restore terminal history', error);
+			return [];
+		}
+	});
 	const [historyIndex, setHistoryIndex] = useState(-1);
-	const [currentPath, setCurrentPath] = useState('~');
+	const [currentPath, setCurrentPath] = useState(() => {
+		if (typeof window !== 'undefined') {
+			try {
+				const storedPath = window.localStorage.getItem(PATH_STORAGE_KEY);
+				if (storedPath) return storedPath;
+			} catch (error) {
+				console.warn('Failed to hydrate terminal state', error);
+			}
+		}
+		return '~';
+	});
 	const inputRef = useRef<HTMLInputElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 	const [windows, setWindows] = useAtom(windowsAtom);
@@ -114,25 +90,16 @@ export function CLI() {
 	const applySuggestion = useCallback((suggestion: string) => {
 		setInput(suggestion);
 		setCursorPos(suggestion.length);
+		setActiveSuggestionIndex(0);
 	}, []);
 
 	const pushCommandToHistory = useCallback((value: string) => {
 		if (!value) return;
-		setCmdHistory(prev => [...prev, value]);
+		setCmdHistory(prev => {
+			const newHistory = [...prev.filter(v => v !== value), value];
+			return newHistory.slice(-CMD_HISTORY_LIMIT);
+		});
 	}, []);
-
-	useEffect(() => {
-		if (typeof window === 'undefined') return;
-		try {
-			const payload =
-				cmdHistory.length > CMD_HISTORY_LIMIT
-					? cmdHistory.slice(cmdHistory.length - CMD_HISTORY_LIMIT)
-					: cmdHistory;
-			window.localStorage.setItem(CMD_HISTORY_STORAGE_KEY, JSON.stringify(payload));
-		} catch (error) {
-			console.warn('Failed to persist terminal commands', error);
-		}
-	}, [cmdHistory]);
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -189,6 +156,12 @@ export function CLI() {
 		}
 
 		if (e.key === 'Enter') {
+			e.preventDefault();
+			if (suggestions.length > 0) {
+				applySuggestion(suggestions[activeSuggestionIndex]);
+				return;
+			}
+
 			const response = processCommand(input, currentPath);
 			if (response.type === 'clear') {
 				setHistory([]);
@@ -245,9 +218,12 @@ export function CLI() {
 			setInput('');
 			setCursorPos(0);
 			setHistoryIndex(-1);
+			setActiveSuggestionIndex(0);
 		} else if (e.key === 'ArrowUp') {
 			e.preventDefault();
-			if (cmdHistory.length > 0) {
+			if (suggestions.length > 0) {
+				setActiveSuggestionIndex(prev => Math.max(0, prev - 1));
+			} else if (cmdHistory.length > 0) {
 				const newIndex =
 					historyIndex === -1 ? cmdHistory.length - 1 : Math.max(0, historyIndex - 1);
 				setHistoryIndex(newIndex);
@@ -257,7 +233,9 @@ export function CLI() {
 			}
 		} else if (e.key === 'ArrowDown') {
 			e.preventDefault();
-			if (historyIndex !== -1) {
+			if (suggestions.length > 0) {
+				setActiveSuggestionIndex(prev => Math.min(suggestions.length - 1, prev + 1));
+			} else if (historyIndex !== -1) {
 				if (historyIndex === cmdHistory.length - 1) {
 					setHistoryIndex(-1);
 					setInput('');
@@ -275,12 +253,6 @@ export function CLI() {
 			if (!suggestions.length) return;
 			const nextValue = suggestions[activeSuggestionIndex];
 			applySuggestion(nextValue);
-			if (suggestions.length > 1) {
-				const direction = e.shiftKey ? -1 : 1;
-				const newIndex =
-					(activeSuggestionIndex + direction + suggestions.length) % suggestions.length;
-				setActiveSuggestionIndex(newIndex);
-			}
 		}
 	};
 
@@ -294,16 +266,18 @@ export function CLI() {
 		inputRef.current?.focus();
 	};
 
+	const showSuggestions = isFocused && suggestions.length > 0 && input.length > 0;
+
 	return (
 		<div
 			className="h-full flex flex-col bg-terminal-bg text-terminal-text font-mono text-sm overflow-hidden transition-colors duration-300 relative"
 			onClick={handleContainerClick}
 		>
 			{/* Subtle terminal gradient overlay */}
-			<div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
+			<div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02] pointer-events-none" />
 
 			{/* Main Scrollable Container */}
-			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 custom-scrollbar">
+			<div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pt-3 custom-scrollbar">
 				{/* Minimal Terminal Header */}
 				{history.length === 0 && (
 					<div className="select-none mb-4 pb-3 border-b border-border/20">
@@ -335,9 +309,7 @@ export function CLI() {
 									<span className="text-glow shrink-0">
 										{getPromptLabel(item.path)}
 									</span>
-									<span className="text-foreground/90 break-all">
-										{item.command}
-									</span>
+									<span className="flex-1 break-all">{item.command}</span>
 								</div>
 								<div
 									className={cn(
@@ -350,49 +322,74 @@ export function CLI() {
 							</motion.div>
 						))}
 					</AnimatePresence>
+				</div>
+			</div>
 
-					{/* Input Line */}
-					<div className="flex items-center gap-2 text-sm flex-wrap">
-						<span className="text-glow shrink-0">{getPromptLabel(currentPath)}</span>
-						<div className="relative flex-1 group min-w-[100px]">
-							<input
-								ref={inputRef}
-								type="text"
-								value={input}
-								onChange={e => {
-									setInput(e.target.value);
-									setCursorPos(e.target.selectionStart || 0);
-									setActiveSuggestionIndex(0);
-								}}
-								onKeyDown={handleKeyDown}
-								onSelect={e => {
-									setCursorPos(e.currentTarget.selectionStart || 0);
-								}}
-								onClick={e => {
-									setCursorPos(e.currentTarget.selectionStart || 0);
-								}}
-								onKeyUp={e => {
-									setCursorPos(e.currentTarget.selectionStart || 0);
-								}}
-								onFocus={() => setIsFocused(true)}
+			{/* Input Area at the bottom */}
+			<div className="px-4 pb-3 pt-2 border-t border-border/20">
+				<div className="flex items-center gap-2 text-sm flex-wrap">
+					<span className="text-glow shrink-0">{getPromptLabel(currentPath)}</span>
+					<div className="relative flex-1 min-w-[100px]">
+						{/* Hidden input for text capture */}
+						<input
+							ref={inputRef}
+							type="text"
+							value={input}
+							onChange={e => {
+								setInput(e.target.value);
+								setCursorPos(e.target.selectionStart || 0);
+								setActiveSuggestionIndex(0);
+								setHistoryIndex(-1); // Reset history navigation
+							}}
+							onKeyDown={handleKeyDown}
+							onSelect={e => setCursorPos(e.currentTarget.selectionStart || 0)}
+							onFocus={() => setIsFocused(true)}
+							onBlur={() => setIsFocused(false)}
+							className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none"
+							autoComplete="off"
+							autoCorrect="off"
+							autoCapitalize="off"
+							spellCheck="false"
+						/>
+						{/* Visible input display */}
+						<div className="whitespace-pre-wrap break-all">
+							<span>{input.substring(0, cursorPos)}</span>
+							<span
+								className={cn(
+									'inline-block w-2 h-4 -mb-1',
+									isFocused ? 'bg-terminal-text animate-pulse' : 'bg-transparent',
+								)}
 							/>
-							<div
-								className="flex flex-wrap gap-1"
-								role="listbox"
-								aria-label="Command suggestions"
-							>
-								{suggestions.map((suggestion: string, idx: number) => (
-									<SuggestionButton
-										key={`${suggestion}-${idx}`}
-										suggestion={suggestion}
-										idx={idx}
-										activeSuggestionIndex={activeSuggestionIndex}
-										applySuggestion={applySuggestion}
-										setActiveSuggestionIndex={setActiveSuggestionIndex}
-									/>
-								))}
-							</div>
+							<span>{input.substring(cursorPos)}</span>
 						</div>
+					</div>
+				</div>
+				{/* Suggestions Box */}
+				<div
+					className={cn(
+						'mt-2 transition-opacity duration-150',
+						showSuggestions ? 'opacity-100' : 'opacity-0 pointer-events-none',
+					)}
+				>
+					<div className="flex flex-wrap gap-2 items-center text-xs">
+						<span className="text-muted-foreground font-medium">Suggestions:</span>
+						{suggestions.map((suggestion, idx) => (
+							<button
+								key={suggestion}
+								type="button"
+								tabIndex={-1}
+								onMouseDown={e => e.preventDefault()}
+								onClick={() => applySuggestion(suggestion)}
+								className={cn(
+									'px-2 py-0.5 rounded border transition-colors bg-background/40',
+									idx === activeSuggestionIndex
+										? 'border-primary/70 text-primary bg-primary/10'
+										: 'border-border/40 hover:border-border/70',
+								)}
+							>
+								{suggestion}
+							</button>
+						))}
 					</div>
 				</div>
 			</div>
