@@ -29,15 +29,18 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	'stats.exe': <CodingStatsModule />,
 };
 
-const moduleIcons: Record<string, LucideIcon> = {
-	about: Info,
-	projects: LayoutDashboard,
-	terminal: Terminal,
-	'coding-stats': Code,
-	contact: Contact,
-	journey: GitBranch,
-	blog: Book,
-	default: ShieldQuestion,
+const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
+	about: { title: 'About Me', icon: Info },
+	projects: { title: 'Projects', icon: LayoutDashboard },
+	terminal: { title: 'Terminal', icon: Terminal },
+	'coding-stats': { title: 'Coding Stats', icon: Code },
+	contact: { title: 'Contact', icon: Contact },
+	journey: { title: 'My Journey', icon: GitBranch },
+	blog: { title: 'Blog', icon: Book },
+	secret: { title: 'Secret', icon: ShieldQuestion },
+	'ai-lab': { title: 'AI Lab', icon: Code },
+	'stats.exe': { title: 'Coding Stats', icon: Code },
+	default: { title: 'Untitled', icon: ShieldQuestion },
 };
 
 export const getModuleComponent = (id: string): React.ReactNode => {
@@ -47,30 +50,9 @@ export const getModuleComponent = (id: string): React.ReactNode => {
 };
 
 export function getModuleIcon(id: string): LucideIcon {
-	return moduleIcons[id] || moduleIcons.default;
+	return moduleMeta[id]?.icon || moduleMeta.default.icon;
 }
 
 export function getModuleTitle(id: string): string {
-	// Handle complex paths: "about/whoami.md" -> "about"
-	const moduleId = id.includes('/') ? id.split('/')[0] : id;
-	switch (moduleId) {
-		case 'about':
-			return 'About Me';
-		case 'projects':
-			return 'Projects';
-		case 'journey':
-			return 'Journey';
-		case 'blog':
-			return 'Blog';
-		case 'contact':
-			return 'Contact';
-		case 'ai-lab':
-			return 'AI Lab';
-		case 'secret':
-			return 'Secret';
-		case 'stats.exe':
-			return 'Coding Stats';
-		default:
-			return 'Unknown Module';
-	}
+	return moduleMeta[id]?.title || moduleMeta.default.title;
 }
