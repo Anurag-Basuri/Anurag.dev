@@ -40,13 +40,20 @@ export function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
 		<TooltipProvider delayDuration={0}>
 			<div className="h-full flex flex-col items-center justify-between py-4 bg-background/70 backdrop-blur-xl">
 				<div className="flex flex-col items-center gap-3">
-					<button
-						onClick={onExpand}
-						className="h-10 w-10 flex items-center justify-center rounded-lg bg-muted/40 hover:bg-primary/15 text-muted-foreground hover:text-primary transition-all duration-200"
-						aria-label="Expand sidebar"
-					>
-						<PanelLeftOpen className="w-5 h-5" />
-					</button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<button
+								onClick={onExpand}
+								className="h-10 w-10 flex items-center justify-center rounded-lg bg-muted/40 hover:bg-primary/15 text-muted-foreground hover:text-primary transition-all duration-200"
+								aria-label="Expand sidebar"
+							>
+								<PanelLeftOpen className="w-5 h-5" />
+							</button>
+						</TooltipTrigger>
+						<TooltipContent side="right" align="center">
+							<p>Expand Sidebar</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 
 				<div className="flex flex-col items-center gap-2">
