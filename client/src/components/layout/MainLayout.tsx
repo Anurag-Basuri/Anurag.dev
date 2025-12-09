@@ -11,7 +11,6 @@ import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-	ImperativePanelHandle,
 } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -20,7 +19,7 @@ import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
 import { initialFileSystem as fileSystem, FileSystemItem } from '@/lib/data';
 import { Taskbar } from '@/components/os/shell/Taskbar';
 import { TopBar } from '@/components/os/shell/TopBar';
-import { Background3D } from '@/components/os/shell/Background3D';
+import Background3D from '@/components/os/shell/Background3D';
 import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -34,9 +33,8 @@ import { cn } from '@/lib/utils';
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 
-	const sidebarRef = useRef<ImperativePanelHandle>(null);
-	const terminalRef = useRef<ImperativePanelHandle>(null);
-
+	const sidebarRef = useRef<React.ElementRef<typeof ResizablePanel> | null>(null);
+	const terminalRef = useRef<React.ElementRef<typeof ResizablePanel> | null>(null);
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
 
