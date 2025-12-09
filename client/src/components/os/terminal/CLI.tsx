@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { Terminal } from 'lucide-react';
+import { useRef, useCallback, useEffect } from 'react';
 import { TerminalHeader } from './TerminalHeader';
-import { TerminalWelcome } from './TerminalWelcome';
-import { TerminalOutput } from './TerminalOutput';
 import { TerminalInput } from './TerminalInput';
+import { TerminalOutput } from './TerminalOutput';
+import { TerminalWelcome } from './TerminalWelcome';
 import { CommandSuggestions } from './CommandSuggestions';
 import { useTerminalState } from './useTerminalState';
+import { ChevronUp, Terminal as TerminalIcon, MoreHorizontal } from 'lucide-react';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
@@ -35,20 +35,10 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 	// Handlers
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
-			// Announce actions to screen readers
-			const announceAction = (message: string) => {
-				if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-					const utterance = new SpeechSynthesisUtterance(message);
-					utterance.rate = 1.5;
-					window.speechSynthesis.speak(utterance);
-				}
-			};
-
 			// Ctrl+L: Clear screen
 			if (e.ctrlKey && e.key === 'l') {
 				e.preventDefault();
 				terminalState.clearHistory();
-				announceAction('Terminal cleared');
 				return;
 			}
 
@@ -57,21 +47,15 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				e.preventDefault();
 				terminalState.resetInput();
 				terminalState.addToHistory(terminalState.input, { type: 'error', content: '^C' });
-				announceAction('Command cancelled');
 				return;
 			}
 
-			// Enter: Execute command
+			// Enter: Execute command (always execute, don't apply suggestions)
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				if (terminalState.suggestions.length > 0 && terminalState.activeSuggestionIndex >= 0) {
-					const suggestion = terminalState.suggestions[terminalState.activeSuggestionIndex];
-					terminalState.applySuggestion(suggestion);
-					announceAction(`Applied suggestion: ${suggestion}`);
-				} else {
+				if (terminalState.input.trim()) {
 					terminalState.executeCommand(terminalState.input);
 					terminalState.resetInput();
-					announceAction('Command executed');
 				}
 				return;
 			}
@@ -80,9 +64,9 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 			if (e.key === 'Tab') {
 				e.preventDefault();
 				if (terminalState.suggestions.length > 0) {
-					const suggestion = terminalState.suggestions[terminalState.activeSuggestionIndex];
+					const suggestion =
+						terminalState.suggestions[terminalState.activeSuggestionIndex];
 					terminalState.applySuggestion(suggestion);
-					announceAction(`Autocompleted: ${suggestion}`);
 				}
 				return;
 			}
@@ -91,7 +75,6 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 			if (e.key === 'Escape') {
 				e.preventDefault();
 				terminalState.setActiveSuggestionIndex(0);
-				announceAction('Suggestions cleared');
 				return;
 			}
 
@@ -99,20 +82,20 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 			if (e.key === 'ArrowUp') {
 				e.preventDefault();
 				if (terminalState.suggestions.length > 0) {
-					const newIndex = Math.max(0, terminalState.activeSuggestionIndex - 1);
+					const newIndex =
+						terminalState.activeSuggestionIndex > 0
+							? terminalState.activeSuggestionIndex - 1
+							: terminalState.suggestions.length - 1;
 					terminalState.setActiveSuggestionIndex(newIndex);
-					const suggestion = terminalState.suggestions[newIndex];
-					announceAction(`Suggestion ${newIndex + 1}: ${suggestion}`);
 				} else if (terminalState.cmdHistory.length > 0) {
 					const newIndex =
-						terminalState.historyIndex === -1 
-							? terminalState.cmdHistory.length - 1 
+						terminalState.historyIndex === -1
+							? terminalState.cmdHistory.length - 1
 							: Math.max(0, terminalState.historyIndex - 1);
 					terminalState.setHistoryIndex(newIndex);
-					const cmd = terminalState.cmdHistory[newIndex];
-					terminalState.setInput(cmd);
-					terminalState.setCursorPos(cmd.length);
-					announceAction(`Previous command: ${cmd}`);
+					const command = terminalState.cmdHistory[newIndex];
+					terminalState.setInput(command);
+					terminalState.setCursorPos(command.length);
 				}
 				return;
 			}
@@ -121,23 +104,22 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
 				if (terminalState.suggestions.length > 0) {
-					const newIndex = Math.min(terminalState.suggestions.length - 1, terminalState.activeSuggestionIndex + 1);
+					const newIndex =
+						terminalState.activeSuggestionIndex < terminalState.suggestions.length - 1
+							? terminalState.activeSuggestionIndex + 1
+							: 0;
 					terminalState.setActiveSuggestionIndex(newIndex);
-					const suggestion = terminalState.suggestions[newIndex];
-					announceAction(`Suggestion ${newIndex + 1}: ${suggestion}`);
 				} else if (terminalState.historyIndex !== -1) {
-					if (terminalState.historyIndex === terminalState.cmdHistory.length - 1) {
+					const newIndex = terminalState.historyIndex + 1;
+					if (newIndex >= terminalState.cmdHistory.length) {
 						terminalState.setHistoryIndex(-1);
 						terminalState.setInput('');
 						terminalState.setCursorPos(0);
-						announceAction('Cleared command history navigation');
 					} else {
-						const newIndex = Math.min(terminalState.cmdHistory.length - 1, terminalState.historyIndex + 1);
 						terminalState.setHistoryIndex(newIndex);
-						const cmd = terminalState.cmdHistory[newIndex];
-						terminalState.setInput(cmd);
-						terminalState.setCursorPos(cmd.length);
-						announceAction(`Next command: ${cmd}`);
+						const command = terminalState.cmdHistory[newIndex];
+						terminalState.setInput(command);
+						terminalState.setCursorPos(command.length);
 					}
 				}
 				return;
@@ -148,10 +130,9 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				e.preventDefault();
 				if (terminalState.cmdHistory.length > 0) {
 					terminalState.setHistoryIndex(0);
-					const cmd = terminalState.cmdHistory[0];
-					terminalState.setInput(cmd);
-					terminalState.setCursorPos(cmd.length);
-					announceAction('First command in history');
+					const command = terminalState.cmdHistory[0];
+					terminalState.setInput(command);
+					terminalState.setCursorPos(command.length);
 				}
 				return;
 			}
@@ -161,23 +142,28 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				terminalState.setHistoryIndex(-1);
 				terminalState.setInput('');
 				terminalState.setCursorPos(0);
-				announceAction('Cleared to current input');
 				return;
 			}
 		},
 		[terminalState],
 	);
 
-	const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		terminalState.setInput(e.target.value);
-		terminalState.setCursorPos(e.target.selectionStart || 0);
-		terminalState.setActiveSuggestionIndex(0);
-		terminalState.setHistoryIndex(-1);
-	}, [terminalState]);
+	const handleInputChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			terminalState.setInput(e.target.value);
+			terminalState.setCursorPos(e.target.selectionStart || 0);
+			terminalState.setActiveSuggestionIndex(0);
+			terminalState.setHistoryIndex(-1);
+		},
+		[terminalState],
+	);
 
-	const handleInputSelect = useCallback((e: React.SyntheticEvent<HTMLInputElement>) => {
-		terminalState.setCursorPos(e.currentTarget.selectionStart || 0);
-	}, [terminalState]);
+	const handleInputSelect = useCallback(
+		(e: React.SyntheticEvent<HTMLInputElement>) => {
+			terminalState.setCursorPos(e.currentTarget.selectionStart || 0);
+		},
+		[terminalState],
+	);
 
 	const handleContainerClick = useCallback(() => {
 		inputRef.current?.focus();
@@ -190,14 +176,11 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				onClick={onToggleCollapse}
 				className="h-full flex items-center justify-center bg-transparent cursor-pointer group"
 			>
-				<div className="flex items-center gap-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
-					<Terminal className="w-4 h-4" />
-					<span className="font-semibold tracking-wide">TERMINAL</span>
-					<div className="flex items-center gap-0.5">
-						<span className="w-1 h-1 rounded-full bg-current" />
-						<span className="w-1 h-1 rounded-full bg-current" />
-						<span className="w-1 h-1 rounded-full bg-current" />
-					</div>
+				<div className="flex items-center gap-3 px-4 py-2 bg-background/80 backdrop-blur-sm border border-border/60 rounded-lg shadow-sm group-hover:border-primary/50 group-hover:bg-background/90 transition-all duration-200">
+					<TerminalIcon className="w-4 h-4 text-primary" />
+					<span className="text-sm font-medium text-foreground">Terminal</span>
+					<MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+					<ChevronUp className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
 				</div>
 			</div>
 		);
@@ -220,10 +203,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				ref={scrollRef}
 				className="flex-1 min-h-0 overflow-y-auto px-4 py-3 custom-scrollbar space-y-2"
 			>
-				{/* Welcome message when terminal is empty */}
 				{terminalState.history.length === 0 && <TerminalWelcome />}
-
-				{/* Command history */}
 				<TerminalOutput history={terminalState.history} />
 			</div>
 
