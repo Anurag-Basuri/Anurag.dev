@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -51,26 +52,45 @@ export function MainLayout() {
 			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 				<div
 					className={cn(
-						'h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden',
-						sidebar.isCollapsed &&
-							'bg-transparent border-none shadow-none backdrop-blur-none overflow-visible!',
+						'h-full rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ease-in-out',
+						sidebar.isCollapsed
+							? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
+							: 'border-border/60 bg-background/70 backdrop-blur-xl',
 					)}
 				>
-					{sidebar.isCollapsed ? (
-						<CollapsedSidebar onExpand={sidebar.expand} />
-					) : (
-						<div className="h-full flex flex-col overflow-hidden">
-							<SidebarProfile />
+					<AnimatePresence mode="wait">
+						{sidebar.isCollapsed ? (
+							<motion.div
+								key="collapsed-sidebar"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.2 }}
+								className="h-full"
+							>
+								<CollapsedSidebar onExpand={sidebar.expand} />
+							</motion.div>
+						) : (
+							<motion.div
+								key="expanded-sidebar"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.3, delay: 0.1 }}
+								className="h-full flex flex-col overflow-hidden"
+							>
+								<SidebarProfile />
 
-							<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-muted/20">
-								Explorer
-							</div>
+								<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-muted/20">
+									Explorer
+								</div>
 
-							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-							</div>
-						</div>
-					)}
+								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 			</ResizablePanel>
 
@@ -92,9 +112,10 @@ export function MainLayout() {
 						{...terminal.panelProps}
 						defaultSize={mainVerticalSizes[1]}
 						className={cn(
-							'rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden!',
-							terminal.isCollapsed &&
-								'bg-transparent border-none shadow-none backdrop-blur-none overflow-visible!',
+							'rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden! transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ease-in-out',
+							terminal.isCollapsed
+								? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
+								: 'border-border/60 bg-background/70 backdrop-blur-xl',
 						)}
 					>
 						<CLI
