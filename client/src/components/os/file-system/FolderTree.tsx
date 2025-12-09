@@ -13,19 +13,18 @@ interface FolderTreeProps {
 }
 
 const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json'))
-		return <FileJson className="w-4 h-4 text-amber-500 dark:text-amber-400" />;
+	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-amber-400" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 text-primary" />;
+		return <FileText className="w-4 h-4 text-sky-400" />;
 	if (
 		name.endsWith('.py') ||
 		name.endsWith('.js') ||
 		name.endsWith('.tsx') ||
 		name.endsWith('.exe')
 	)
-		return <FileCode className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />;
-	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-500 dark:text-red-400" />;
-	return <File className="w-4 h-4 text-muted-foreground" />;
+		return <FileCode className="w-4 h-4 text-emerald-400" />;
+	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-400" />;
+	return <File className="w-4 h-4 text-white/40" />;
 };
 
 export function FolderTree({ items, level = 0, onSelect }: FolderTreeProps) {
@@ -72,10 +71,9 @@ function FolderTreeItem({
 		<div>
 			<div
 				className={cn(
-					'flex items-center py-1.5 px-2.5 cursor-pointer select-none text-xs transition-all duration-200 rounded-md group border relative',
-					'hover:bg-muted/40 hover:backdrop-blur-sm hover:border-border/60 hover:shadow-sm',
-					isHovered && 'bg-muted/30 border-border/50',
-					!isHovered && 'border-transparent',
+					'flex items-center py-1.5 px-2.5 cursor-pointer select-none text-xs transition-all duration-200 rounded-md group relative',
+					'hover:bg-white/5',
+					isHovered && 'bg-white/5',
 					level > 0 && 'ml-2',
 				)}
 				style={{ paddingLeft: `${level * 14 + 10}px` }}
@@ -86,7 +84,7 @@ function FolderTreeItem({
 				{/* Tree Guide Line */}
 				{level > 0 && (
 					<div
-						className="absolute left-0 top-0 bottom-0 w-px bg-border/30 group-hover:bg-border/60 transition-colors"
+						className="absolute left-0 top-0 bottom-0 w-px bg-white/10 group-hover:bg-white/20 transition-colors"
 						style={{ left: `${(level - 1) * 14 + 14}px` }}
 					/>
 				)}
@@ -94,7 +92,7 @@ function FolderTreeItem({
 				<motion.span
 					animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
 					transition={{ duration: 0.2, ease: 'easeOut' }}
-					className="mr-1.5 text-muted-foreground group-hover:text-primary flex items-center justify-center transition-colors"
+					className="mr-1.5 text-white/40 group-hover:text-emerald-400 flex items-center justify-center transition-colors"
 				>
 					{isFolder ? (
 						<ChevronRight className="w-3.5 h-3.5" />
@@ -106,9 +104,9 @@ function FolderTreeItem({
 				<span className="mr-2.5">
 					{isFolder ? (
 						isOpen ? (
-							<FolderOpen className="w-4 h-4 text-primary drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.35)]" />
+							<FolderOpen className="w-4 h-4 text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.35)]" />
 						) : (
-							<Folder className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
+							<Folder className="w-4 h-4 text-emerald-400/70 group-hover:text-emerald-400 transition-colors" />
 						)
 					) : (
 						<FileIcon name={item.name} />
@@ -119,9 +117,9 @@ function FolderTreeItem({
 					className={cn(
 						'truncate transition-colors font-medium',
 						isFolder
-							? 'text-foreground group-hover:text-foreground'
-							: 'text-muted-foreground group-hover:text-foreground',
-						item.name === 'secret' && 'text-muted-foreground/40 italic',
+							? 'text-white/90 group-hover:text-white'
+							: 'text-white/60 group-hover:text-white/90',
+						item.name === 'secret' && 'text-white/30 italic',
 					)}
 				>
 					{item.name}
