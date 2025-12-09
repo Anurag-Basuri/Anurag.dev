@@ -11,6 +11,33 @@ import { WindowState } from '@/types/window';
 
 export const bootCompleteAtom = atom(false);
 
+// Consolidated layout state
+export interface LayoutState {
+	sidebar: {
+		collapsed: boolean;
+		size: number;
+	};
+	terminal: {
+		collapsed: boolean;
+		size: number;
+	};
+	main: {
+		vertical: number[];
+		horizontal: number[];
+	};
+}
+
+export const defaultLayoutState: LayoutState = {
+	sidebar: { collapsed: false, size: 20 },
+	terminal: { collapsed: false, size: 25 },
+	main: {
+		vertical: [75, 25],
+		horizontal: [20, 80],
+	},
+};
+
+export const layoutStateAtom = atomWithStorage<LayoutState>('layout:state', defaultLayoutState);
+
 type PersistedWindowState = Omit<WindowState, 'component'>;
 
 const windowsStorage: Storage<WindowState[]> = {

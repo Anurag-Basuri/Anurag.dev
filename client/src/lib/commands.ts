@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { commandRegistry } from './commandSystem';
 import { registerCoreCommands } from './coreCommands';
 
 // Initialize core commands
