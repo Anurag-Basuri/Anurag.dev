@@ -1,13 +1,11 @@
 'use client';
 
-import { useRef, useCallback, useEffect } from 'react';
-import { TerminalHeader } from './TerminalHeader';
-import { TerminalInput } from './TerminalInput';
-import { TerminalOutput } from './TerminalOutput';
-import { TerminalWelcome } from './TerminalWelcome';
-import { CommandSuggestions } from './CommandSuggestions';
+import { useCallback } from 'react';
 import { useTerminalState } from './useTerminalState';
-import { ChevronUp, Terminal as TerminalIcon, MoreHorizontal } from 'lucide-react';
+import { TerminalLayout } from './TerminalLayout';
+import { TerminalHistory } from './TerminalHistory';
+import { TerminalPrompt } from './TerminalPrompt';
+import { Terminal as TerminalIcon, MoreHorizontal, ChevronUp } from 'lucide-react';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
@@ -15,22 +13,7 @@ interface CLIProps {
 }
 
 export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIProps) {
-	const inputRef = useRef<HTMLInputElement>(null);
-	const scrollRef = useRef<HTMLDivElement>(null);
-
 	const terminalState = useTerminalState();
-
-	// Effects
-	useEffect(() => {
-		if (scrollRef.current) {
-			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-		}
-	}, [terminalState.history]);
-
-	// Auto-focus input on mount
-	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
 
 	// Handlers
 	const handleKeyDown = useCallback(
@@ -148,27 +131,6 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 		[terminalState],
 	);
 
-	const handleInputChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			terminalState.setInput(e.target.value);
-			terminalState.setCursorPos(e.target.selectionStart || 0);
-			terminalState.setActiveSuggestionIndex(0);
-			terminalState.setHistoryIndex(-1);
-		},
-		[terminalState],
-	);
-
-	const handleInputSelect = useCallback(
-		(e: React.SyntheticEvent<HTMLInputElement>) => {
-			terminalState.setCursorPos(e.currentTarget.selectionStart || 0);
-		},
-		[terminalState],
-	);
-
-	const handleContainerClick = useCallback(() => {
-		inputRef.current?.focus();
-	}, []);
-
 	// Collapsed view
 	if (externalIsCollapsed) {
 		return (
@@ -187,49 +149,14 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 	}
 
 	return (
-		<div
-			className="h-full flex flex-col bg-gradient-to-b from-background/98 to-background/95 backdrop-blur-md text-foreground font-mono text-sm overflow-hidden"
-			onClick={handleContainerClick}
+		<TerminalLayout
+			currentPath={terminalState.currentPath}
+			historyLength={terminalState.history.length}
+			onClearHistory={terminalState.clearHistory}
+			onToggleCollapse={onToggleCollapse}
 		>
-			<TerminalHeader
-				currentPath={terminalState.currentPath}
-				historyLength={terminalState.history.length}
-				onClearHistory={terminalState.clearHistory}
-				onToggleCollapse={onToggleCollapse!}
-			/>
-
-			{/* Main Scrollable Container */}
-			<div
-				ref={scrollRef}
-				className="flex-1 min-h-0 overflow-y-auto px-4 py-3 custom-scrollbar space-y-2"
-			>
-				{terminalState.history.length === 0 && <TerminalWelcome />}
-				<TerminalOutput history={terminalState.history} />
-			</div>
-
-			{/* Input Area */}
-			<TerminalInput
-				ref={inputRef}
-				input={terminalState.input}
-				cursorPos={terminalState.cursorPos}
-				isFocused={terminalState.isFocused}
-				onInputChange={handleInputChange}
-				onKeyDown={handleKeyDown}
-				onInputSelect={handleInputSelect}
-				onFocus={() => terminalState.setIsFocused(true)}
-				onBlur={() => terminalState.setIsFocused(false)}
-				currentPath={terminalState.currentPath}
-			/>
-
-			{/* Suggestions */}
-			{terminalState.showSuggestions && (
-				<CommandSuggestions
-					suggestions={terminalState.suggestions}
-					activeSuggestionIndex={terminalState.activeSuggestionIndex}
-					onApplySuggestion={terminalState.applySuggestion}
-					onSetActiveIndex={terminalState.setActiveSuggestionIndex}
-				/>
-			)}
-		</div>
+			<TerminalHistory history={terminalState.history} />
+			<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
+		</TerminalLayout>
 	);
 }
