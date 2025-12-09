@@ -365,15 +365,19 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 	// Collapsed view
 	if (externalIsCollapsed) {
 		return (
-			<div className="h-full flex items-center justify-center bg-background/95 backdrop-blur-sm border-t border-border/40">
-				<button
-					onClick={onToggleCollapse}
-					className="flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-				>
+			<div
+				onClick={onToggleCollapse}
+				className="h-full flex items-center justify-center bg-transparent cursor-pointer group"
+			>
+				<div className="flex items-center gap-3 text-xs text-muted-foreground group-hover:text-foreground transition-colors">
 					<Terminal className="w-4 h-4" />
 					<span className="font-semibold tracking-wide">TERMINAL</span>
-					<ChevronUp className="w-3.5 h-3.5" />
-				</button>
+					<div className="flex items-center gap-0.5">
+						<span className="w-1 h-1 rounded-full bg-current" />
+						<span className="w-1 h-1 rounded-full bg-current" />
+						<span className="w-1 h-1 rounded-full bg-current" />
+					</div>
+				</div>
 			</div>
 		);
 	}
