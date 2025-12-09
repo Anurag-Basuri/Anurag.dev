@@ -157,7 +157,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.2 }}
-					className="h-full w-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden"
+					className="h-full w-full rounded-xl border border-white/10 bg-[#0d1117] shadow-2xl overflow-hidden"
 				>
 					<TerminalLayout
 						currentPath={terminalState.currentPath}
@@ -166,12 +166,10 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 						onToggleCollapse={onToggleCollapse}
 					>
 						<TerminalHistory history={terminalState.history} />
-						<div className="shrink-0 pt-2 pb-1 px-4 bg-linear-to-t from-background/95 via-background/90 to-transparent backdrop-blur-sm z-10 border-t border-white/5">
-							<TerminalPrompt
-								terminalState={terminalState}
-								onKeyDown={handleKeyDown}
-							/>
-						</div>
+						<TerminalPrompt
+							terminalState={terminalState}
+							onKeyDown={handleKeyDown}
+						/>
 					</TerminalLayout>
 				</motion.div>
 			)}

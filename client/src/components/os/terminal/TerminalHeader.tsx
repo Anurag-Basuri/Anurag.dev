@@ -1,5 +1,4 @@
-import { Terminal, X, ChevronDown } from 'lucide-react';
-import { useCallback } from 'react';
+import { Terminal, ChevronDown, Trash2 } from 'lucide-react';
 
 interface TerminalHeaderProps {
 	currentPath: string;
@@ -14,64 +13,59 @@ export function TerminalHeader({
 	onClearHistory,
 	onToggleCollapse,
 }: TerminalHeaderProps) {
-	const handleKeyDown = useCallback((e: React.KeyboardEvent, action: () => void) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			action();
-		}
-	}, []);
-
 	return (
-		<header 
-			className="px-4 py-2.5 border-b border-border/60 bg-gradient-to-r from-muted/30 via-muted/20 to-muted/30 backdrop-blur-sm flex items-center justify-between shrink-0 shadow-sm"
+		<header
+			className="px-3 py-2 border-b border-white/5 bg-black/20 backdrop-blur-sm flex items-center justify-between shrink-0"
 			role="banner"
 			aria-label="Terminal header"
 		>
+			{/* Left: Traffic lights */}
 			<div className="flex items-center gap-3">
-				<div className="flex items-center gap-2 text-xs">
-					<Terminal 
-						className="w-4 h-4 text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]" 
-						aria-hidden="true"
+				<div className="flex items-center gap-1.5">
+					<button
+						onClick={onToggleCollapse}
+						className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors shadow-[0_0_4px_rgba(239,68,68,0.5)]"
+						aria-label="Close terminal"
+						title="Collapse terminal"
 					/>
-					<span className="font-bold tracking-wide text-foreground">TERMINAL</span>
+					<button
+						onClick={onClearHistory}
+						className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors shadow-[0_0_4px_rgba(234,179,8,0.5)]"
+						aria-label="Clear history"
+						title="Clear history"
+					/>
+					<div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.5)]" />
 				</div>
-				<div className="h-4 w-px bg-border/50" aria-hidden="true" />
-				<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-					<span className="opacity-70">Path:</span>
-					<code 
-						className="px-1.5 py-0.5 bg-muted/40 rounded text-primary font-medium"
-						aria-label={`Current path: ${currentPath}`}
-					>
-						{currentPath}
-					</code>
+
+				{/* Divider */}
+				<div className="h-4 w-px bg-white/10" aria-hidden="true" />
+
+				{/* Title */}
+				<div className="flex items-center gap-2">
+					<Terminal className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+					<span className="text-xs font-medium text-white/80 tracking-wide">
+						anuragos — {currentPath}
+					</span>
 				</div>
 			</div>
 
-			<nav className="flex items-center gap-1" role="toolbar" aria-label="Terminal controls">
+			{/* Right: Controls */}
+			<div className="flex items-center gap-1">
 				{historyLength > 0 && (
-					<button
-						type="button"
-						onClick={onClearHistory}
-						onKeyDown={(e) => handleKeyDown(e, onClearHistory)}
-						className="p-1.5 hover:bg-destructive/10 hover:text-destructive rounded-md transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-destructive/50"
-						aria-label={`Clear terminal history (${historyLength} items)`}
-						title={`Clear terminal history (${historyLength} items)`}
-					>
-						<X className="w-3.5 h-3.5" />
-					</button>
+					<span className="text-[10px] text-white/40 mr-2">
+						{historyLength} cmd{historyLength !== 1 ? 's' : ''}
+					</span>
 				)}
 				<button
 					type="button"
 					onClick={onToggleCollapse}
-					onKeyDown={(e) => handleKeyDown(e, onToggleCollapse)}
-					className="p-1.5 hover:bg-muted/60 rounded-md transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-primary/50"
+					className="p-1 hover:bg-white/10 rounded transition-colors"
 					aria-label="Collapse terminal panel"
-					title="Collapse terminal panel"
+					title="Collapse"
 				>
-					<ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+					<ChevronDown className="w-4 h-4 text-white/50 hover:text-white/80" />
 				</button>
-			</nav>
+			</div>
 		</header>
 	);
 }
-
