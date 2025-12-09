@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useRef, useMemo, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import type { JSX } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import type { Points as ThreePoints } from 'three';
 
 // Simple random sphere generator to avoid external dependency
 function generateSpherePoints(count: number, radius: number) {
@@ -25,23 +27,22 @@ function generateSpherePoints(count: number, radius: number) {
 	return points;
 }
 
-function Stars(props: any) {
-	const ref = useRef<any>(null);
+function Stars(props: JSX.IntrinsicElements["group"]) {
+	const ref = useRef<ThreePoints>(null);
 	const [sphere] = useState(() => generateSpherePoints(5000, 1.5));
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
 
-	useFrame((state, delta) => {
+	useFrame((_, delta) => {
 		if (ref.current) {
 			ref.current.rotation.x -= delta / 10;
 			ref.current.rotation.y -= delta / 15;
 		}
 	});
 
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
 	return (
-		<group rotation={[0, 0, Math.PI / 4]}>
-			<Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
+		<group rotation={[0, 0, Math.PI / 4]} {...props}>
+			<Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
 				<PointMaterial
 					transparent
 					color={isDark ? '#00ffcc' : '#4f46e5'}
@@ -64,15 +65,15 @@ function Grid() {
 			<planeGeometry args={[50, 50, 50, 50]} />
 			<meshBasicMaterial
 				color={isDark ? '#00ffcc' : '#4f46e5'}
-				wireframe
-				transparent
+				wireframe={true}
+				transparent={true}
 				opacity={isDark ? 0.05 : 0.03}
 			/>
 		</mesh>
 	);
 }
 
-export default function Background3D() {
+export function Background3D() {
 	const [hasWebGLError, setHasWebGLError] = useState(false);
 
 	// Check if WebGL is available
@@ -81,10 +82,10 @@ export default function Background3D() {
 			const canvas = document.createElement('canvas');
 			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 			if (!gl) {
-				setHasWebGLError(true);
+				Promise.resolve().then(() => setHasWebGLError(true));
 			}
 		} catch (e) {
-			setHasWebGLError(true);
+			Promise.resolve().then(() => setHasWebGLError(true));
 		}
 	}, []);
 
