@@ -19,7 +19,7 @@ export function TerminalLayout({
 	onClearHistory,
 }: TerminalLayoutProps) {
 	return (
-		<div className="h-full flex flex-col bg-gradient-to-b from-background/98 to-background/95 backdrop-blur-md text-foreground font-mono text-sm overflow-hidden">
+		<div className="h-full flex flex-col bg-linear-to-b from-background/98 to-background/95 backdrop-blur-md text-foreground font-mono text-sm overflow-hidden">
 			<TerminalHeader
 				currentPath={currentPath}
 				historyLength={historyLength}
