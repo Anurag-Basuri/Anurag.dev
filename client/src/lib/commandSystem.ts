@@ -1,23 +1,29 @@
 import { ReactNode } from 'react';
-import type { CommandResponse } from './commands';
 
 export interface CommandContext {
 	currentPath: string;
 	args: string[];
 }
 
-export interface CommandResult {
-	ok: true;
-	data?: string | Record<string, unknown>;
-}
+export type CommandExecuteResult =
+	| { ok: true; data?: string | Record<string, unknown> }
+	| { ok: false; error: string; hint?: string };
 
-export interface CommandError {
-	ok: false;
-	error: string;
-	hint?: string;
-}
-
-export type CommandResult = CommandResult | CommandError;
+export type CommandResponse = {
+	type:
+		| 'text'
+		| 'error'
+		| 'success'
+		| 'component'
+		| 'clear'
+		| 'open_module'
+		| 'change_directory'
+		| 'set_theme';
+	content: string | ReactNode;
+	moduleId?: string;
+	newPath?: string;
+	theme?: 'light' | 'dark' | 'toggle';
+};
 
 export interface CommandPlugin {
 	name: string;
@@ -26,7 +32,7 @@ export interface CommandPlugin {
 	usage: string;
 	category: 'Navigation' | 'System' | 'Fun' | 'Development' | 'Files';
 	hidden?: boolean;
-	execute: (ctx: CommandContext) => Promise<CommandResult> | CommandResult;
+	execute: (ctx: CommandContext) => Promise<CommandExecuteResult> | CommandExecuteResult;
 	autocomplete?: (input: string) => string[];
 	validate?: (args: string[]) => string | null;
 }
@@ -105,26 +111,27 @@ class CommandRegistryImpl implements CommandRegistry {
 		const uniqueCommands = [...new Set(allCommands)];
 
 		// Simple scoring algorithm
-		const scored = uniqueCommands.map(name => {
-			const lowerName = name.toLowerCase();
-			const startsWith = lowerName.startsWith(normalizedInput);
-			const contains = lowerName.includes(normalizedInput);
-			const distance = this.levenshtein(normalizedInput, lowerName);
-			
-			return {
-				name,
-				starts: startsWith,
-				contains,
-				distance,
-			};
-		})
-		.filter(item => item.starts || item.contains || item.distance <= 2)
-		.sort((a, b) => {
-			if (a.starts !== b.starts) return a.starts ? -1 : 1;
-			if (a.contains !== b.contains) return a.contains ? -1 : 1;
-			if (a.distance !== b.distance) return a.distance - b.distance;
-			return a.name.length - b.name.length;
-		});
+		const scored = uniqueCommands
+			.map(name => {
+				const lowerName = name.toLowerCase();
+				const startsWith = lowerName.startsWith(normalizedInput);
+				const contains = lowerName.includes(normalizedInput);
+				const distance = this.levenshtein(normalizedInput, lowerName);
+
+				return {
+					name,
+					starts: startsWith,
+					contains,
+					distance,
+				};
+			})
+			.filter(item => item.starts || item.contains || item.distance <= 2)
+			.sort((a, b) => {
+				if (a.starts !== b.starts) return a.starts ? -1 : 1;
+				if (a.contains !== b.contains) return a.contains ? -1 : 1;
+				if (a.distance !== b.distance) return a.distance - b.distance;
+				return a.name.length - b.name.length;
+			});
 
 		return scored.slice(0, max).map(item => item.name);
 	}
@@ -132,7 +139,7 @@ class CommandRegistryImpl implements CommandRegistry {
 	async execute(name: string, ctx: CommandContext): Promise<CommandResponse> {
 		try {
 			const plugin = this.get(name) || this.findByAlias(name);
-			
+
 			if (!plugin) {
 				const suggestion = this.getSuggestions(name, 1)[0];
 				let errorMsg = `Command not found: '${name}'.`;
