@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTerminalState } from './useTerminalState';
 import { TerminalLayout } from './TerminalLayout';
 import { TerminalHistory } from './TerminalHistory';
 import { TerminalPrompt } from './TerminalPrompt';
-import { Terminal as TerminalIcon, MoreHorizontal, ChevronUp } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
@@ -131,32 +132,50 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 		[terminalState],
 	);
 
-	// Collapsed view
-	if (externalIsCollapsed) {
-		return (
-			<div
-				onClick={onToggleCollapse}
-				className="h-full flex items-center justify-center bg-transparent cursor-pointer group"
-			>
-				<div className="flex items-center gap-3 px-4 py-2 bg-background/80 backdrop-blur-sm border border-border/60 rounded-lg shadow-sm group-hover:border-primary/50 group-hover:bg-background/90 transition-all duration-200">
-					<TerminalIcon className="w-4 h-4 text-primary" />
-					<span className="text-sm font-medium text-foreground">Terminal</span>
-					<MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-					<ChevronUp className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<TerminalLayout
-			currentPath={terminalState.currentPath}
-			historyLength={terminalState.history.length}
-			onClearHistory={terminalState.clearHistory}
-			onToggleCollapse={onToggleCollapse}
-		>
-			<TerminalHistory history={terminalState.history} />
-			<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
-		</TerminalLayout>
+		<AnimatePresence mode="wait">
+			{externalIsCollapsed ? (
+				<motion.div
+					key="collapsed"
+					initial={{ opacity: 0, scale: 0.8, y: 20 }}
+					animate={{ opacity: 1, scale: 1, y: 0 }}
+					exit={{ opacity: 0, scale: 0.8, y: 20 }}
+					transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+					className="h-full flex items-start justify-center pt-2"
+				>
+					<button
+						onClick={onToggleCollapse}
+						className="group flex items-center justify-center p-3 rounded-full bg-background/40 hover:bg-background/60 backdrop-blur-md border border-white/10 hover:border-white/20 shadow-lg hover:shadow-primary/10 transition-all duration-300"
+						aria-label="Expand Terminal"
+					>
+						<MoreHorizontal className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+					</button>
+				</motion.div>
+			) : (
+				<motion.div
+					key="expanded"
+					initial={{ opacity: 0, scale: 0.98, y: 10 }}
+					animate={{ opacity: 1, scale: 1, y: 0 }}
+					exit={{ opacity: 0, scale: 0.98, y: 10 }}
+					transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+					className="h-full w-full"
+				>
+					<TerminalLayout
+						currentPath={terminalState.currentPath}
+						historyLength={terminalState.history.length}
+						onClearHistory={terminalState.clearHistory}
+						onToggleCollapse={onToggleCollapse}
+					>
+						<TerminalHistory history={terminalState.history} />
+						<div className="shrink-0 pt-2 pb-1 px-4 bg-linear-to-t from-background/95 via-background/90 to-transparent backdrop-blur-sm z-10 border-t border-white/5">
+							<TerminalPrompt
+								terminalState={terminalState}
+								onKeyDown={handleKeyDown}
+							/>
+						</div>
+					</TerminalLayout>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	);
 }
