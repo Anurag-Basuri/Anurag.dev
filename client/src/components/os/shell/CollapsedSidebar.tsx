@@ -1,5 +1,10 @@
+'use client';
+
 import { motion } from 'framer-motion';
-// ... imports
+
+interface CollapsedSidebarProps {
+	onExpand: () => void;
+}
 
 export function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
 	return (
