@@ -1,30 +1,35 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
-import { useEffect, useRef, useState } from 'react';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { ImperativePanelHandle } from 'react-resizable-panels';
-import { Toaster } from 'react-hot-toast';
 import {
-	mainHorizontalSizesAtom,
-	mainVerticalSizesAtom,
 	sidebarCollapsedAtom,
 	terminalCollapsedAtom,
+	mainVerticalSizesAtom,
+	mainHorizontalSizesAtom,
 } from '@/store/atoms';
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+	ImperativePanelHandle,
+} from '@/components/ui/resizable';
+import { CLI } from '@/components/os/terminal/CLI';
+import { EditorArea } from '@/components/os/editor/EditorArea';
+import { FolderTree } from '@/components/os/file-system/FolderTree';
+import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
+import { initialFileSystem as fileSystem, FileSystemItem } from '@/lib/data';
+import { Taskbar } from '@/components/os/shell/Taskbar';
+import { TopBar } from '@/components/os/shell/TopBar';
+import { Background3D } from '@/components/os/shell/Background3D';
+import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
-import { FileSystemItem, initialFileSystem as fileSystem } from '@/lib/data';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import Background3D from '@/components/os/shell/Background3D';
-import { TopBar } from '@/components/os/shell/TopBar';
-import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
-import { EditorArea } from '@/components/os/editor/EditorArea';
-import { CLI } from '@/components/os/terminal/CLI';
-import { Taskbar } from '@/components/os/shell/Taskbar';
-import { HelpButton } from '@/components/shared/HelpButton';
-import { FolderTree } from '../os/file-system/FolderTree';
-import { SidebarProfile } from '../os/shell/SidebarProfile';
+import { useRef, useState, useCallback } from 'react';
+import { Toaster } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PanelLeftOpen, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -49,7 +54,7 @@ export function MainLayout() {
 		}
 	};
 
-	const handleToggleSidebar = () => {
+	const handleToggleSidebar = useCallback(() => {
 		const panel = sidebarRef.current;
 		if (!panel) return;
 		if (panel.isCollapsed()) {
@@ -57,9 +62,9 @@ export function MainLayout() {
 		} else {
 			panel.collapse();
 		}
-	};
+	}, []);
 
-	const handleToggleTerminal = () => {
+	const handleToggleTerminal = useCallback(() => {
 		const panel = terminalRef.current;
 		if (!panel) return;
 		if (panel.isCollapsed()) {
@@ -67,7 +72,7 @@ export function MainLayout() {
 		} else {
 			panel.collapse();
 		}
-	};
+	}, []);
 
 	const renderDesktopLayout = () => (
 		<ResizablePanelGroup
@@ -79,30 +84,76 @@ export function MainLayout() {
 				ref={sidebarRef}
 				collapsible
 				collapsedSize={0}
-				minSize={16}
-				maxSize={32}
+				minSize={14}
+				maxSize={30}
 				defaultSize={mainHorizontalSizes[0]}
 				onCollapse={() => setSidebarCollapsed(true)}
 				onExpand={() => setSidebarCollapsed(false)}
-				className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
+				className="relative"
 			>
-				<div className="h-full flex flex-col overflow-hidden">
-					<SidebarProfile />
+				<AnimatePresence mode="wait">
+					{sidebarCollapsed ? (
+						// Collapsed sidebar - floating icon button
+						<motion.div
+							key="collapsed"
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: -20 }}
+							transition={{ duration: 0.2 }}
+							className="h-full flex items-center justify-center"
+						>
+							<button
+								onClick={handleToggleSidebar}
+								className="group p-3 rounded-xl border border-border/60 bg-background/80 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] hover:bg-background/95 hover:border-primary/40 hover:shadow-[0_10px_40px_-10px_var(--primary)] transition-all duration-300"
+								aria-label="Expand sidebar"
+							>
+								<ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+							</button>
+						</motion.div>
+					) : (
+						// Expanded sidebar - full view
+						<motion.div
+							key="expanded"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden"
+						>
+							<div className="h-full flex flex-col overflow-hidden relative">
+								{/* Collapse button overlay */}
+								<button
+									onClick={handleToggleSidebar}
+									className="absolute top-3 right-3 z-10 p-1.5 rounded-md bg-background/80 backdrop-blur-sm border border-border/50 hover:border-primary/40 hover:bg-background/95 transition-all duration-200 opacity-0 hover:opacity-100 focus:opacity-100 group"
+									aria-label="Collapse sidebar"
+								>
+									<PanelLeftOpen className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
+								</button>
 
-					<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-						Explorer
-					</div>
+								<SidebarProfile />
 
-					<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-						<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-					</div>
-				</div>
+								<div className="px-3 py-2.5 border-y border-border/60 bg-muted/20 backdrop-blur-sm text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-semibold flex items-center justify-between">
+									<span>Explorer</span>
+									<span className="text-[9px] opacity-60 normal-case tracking-normal font-normal">
+										{fileSystem.length} folders
+									</span>
+								</div>
+
+								<div className="flex-1 overflow-auto px-2 py-3 custom-scrollbar">
+									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+								</div>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</ResizablePanel>
 
-			<ResizableHandle
-				withHandle
-				className="bg-border/50 hover:bg-border transition-colors rounded"
-			/>
+			{!sidebarCollapsed && (
+				<ResizableHandle
+					withHandle
+					className="bg-border/40 hover:bg-primary/30 transition-all duration-200 rounded-full shadow-sm hover:shadow-[0_0_12px_rgba(var(--primary-rgb),0.3)]"
+				/>
+			)}
 
 			<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
 				<ResizablePanelGroup
@@ -113,28 +164,31 @@ export function MainLayout() {
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
+						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 					>
 						<EditorArea />
 					</ResizablePanel>
 
 					<ResizableHandle
 						withHandle
-						className="bg-border/50 hover:bg-border transition-colors rounded"
+						className="bg-border/40 hover:bg-primary/30 transition-all duration-200 rounded-full shadow-sm hover:shadow-[0_0_12px_rgba(var(--primary-rgb),0.3)]"
 					/>
 
 					<ResizablePanel
 						ref={terminalRef}
 						collapsible
 						collapsedSize={6}
-						minSize={8}
-						maxSize={45}
+						minSize={10}
+						maxSize={50}
 						defaultSize={mainVerticalSizes[1]}
 						onCollapse={() => setTerminalCollapsed(true)}
 						onExpand={() => setTerminalCollapsed(false)}
-						className="rounded-xl border border-border/60 bg-background/55 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
+						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 					>
-						<CLI onToggleCollapse={handleToggleTerminal} />
+						<CLI
+							onToggleCollapse={handleToggleTerminal}
+							isCollapsed={terminalCollapsed}
+						/>
 					</ResizablePanel>
 				</ResizablePanelGroup>
 			</ResizablePanel>
@@ -163,14 +217,6 @@ export function MainLayout() {
 				/>
 				<Background3D />
 
-				{/* Ambient overlays */}
-				<div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_-10%,var(--primary)_0%,transparent_60%)] opacity-[0.12] dark:opacity-[0.08]" />
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_100%_100%,var(--accent-foreground)_0%,transparent_50%)] opacity-[0.06] dark:opacity-[0.08]" />
-					<div className="absolute inset-0 bg-[radial-gradient(ellipse_30%_60%_at_0%_50%,var(--primary)_0%,transparent_40%)] opacity-[0.05] dark:opacity-[0.04]" />
-					<div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] bg-[linear-gradient(color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(90deg,color-mix(in_oklch,var(--foreground)_12%,transparent)_1px,transparent_1px)] bg-size-[56px_56px]" />
-				</div>
-
 				<TopBar
 					isMobile={isMobile}
 					sidebarCollapsed={sidebarCollapsed}
@@ -182,17 +228,9 @@ export function MainLayout() {
 
 				<WelcomeDialog />
 
-				<main className="flex-1 z-10 relative overflow-hidden p-3 pt-0">
-					{!isLayoutReady ? (
-						<div className="h-full w-full flex items-center justify-center text-muted-foreground animate-pulse">
-							LOADING SYSTEM...
-						</div>
-					) : isMobile ? (
-						renderMobileLayout()
-					) : (
-						renderDesktopLayout()
-					)}
-				</main>
+				<div className="flex-1 overflow-hidden p-3">
+					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
+				</div>
 
 				<Taskbar />
 			</div>
