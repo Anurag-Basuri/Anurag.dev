@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { processCommand, CommandResponse, getCommandSuggestions } from '@/lib/commands';
-import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { windowsAtom } from '@/store/atoms';
+import { processCommand, getCommandSuggestions } from '@/lib/commands';
+import type { CommandResponse } from '@/lib/commands';
 import { getModuleComponent } from '@/lib/moduleRegistry';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronUp, ChevronDown, Terminal, Maximize2, Minimize2, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type HistoryItem = {
 	id: string;
@@ -21,10 +22,11 @@ type HistoryItem = {
 const responseTone = (type: CommandResponse['type']): string => {
 	switch (type) {
 		case 'error':
-			return 'text-destructive';
+			return 'text-red-400';
 		case 'success':
-		case 'open_module':
-			return 'text-primary';
+			return 'text-emerald-400';
+		case 'text':
+			return 'text-foreground/90';
 		default:
 			return 'text-muted-foreground';
 	}
@@ -44,14 +46,11 @@ const generateHistoryId = (): string =>
 const loadCommandHistory = (): string[] => {
 	if (typeof window === 'undefined') return [];
 	try {
-		const stored = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
-		if (!stored) return [];
-		const parsed = JSON.parse(stored);
-		return Array.isArray(parsed)
-			? parsed.filter((entry): entry is string => typeof entry === 'string')
-			: [];
+		const raw = window.localStorage.getItem(CMD_HISTORY_STORAGE_KEY);
+		if (!raw) return [];
+		const parsed = JSON.parse(raw);
+		return Array.isArray(parsed) ? parsed.slice(-CMD_HISTORY_LIMIT) : [];
 	} catch (error) {
-		console.warn('Failed to restore terminal history:', error);
 		return [];
 	}
 };
@@ -62,7 +61,7 @@ const saveCommandHistory = (history: string[]): void => {
 	try {
 		window.localStorage.setItem(CMD_HISTORY_STORAGE_KEY, JSON.stringify(history));
 	} catch (error) {
-		console.warn('Failed to persist command history:', error);
+		console.warn('Failed to save command history', error);
 	}
 };
 
@@ -70,10 +69,8 @@ const saveCommandHistory = (history: string[]): void => {
 const loadCurrentPath = (): string => {
 	if (typeof window === 'undefined') return '~';
 	try {
-		const stored = window.localStorage.getItem(PATH_STORAGE_KEY);
-		return stored || '~';
+		return window.localStorage.getItem(PATH_STORAGE_KEY) || '~';
 	} catch (error) {
-		console.warn('Failed to hydrate terminal path:', error);
 		return '~';
 	}
 };
@@ -84,15 +81,16 @@ const saveCurrentPath = (path: string): void => {
 	try {
 		window.localStorage.setItem(PATH_STORAGE_KEY, path);
 	} catch (error) {
-		console.warn('Failed to persist terminal path:', error);
+		console.warn('Failed to save path', error);
 	}
 };
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
+	isCollapsed?: boolean;
 }
 
-export function CLI({ onToggleCollapse }: CLIProps) {
+export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIProps) {
 	// State
 	const [input, setInput] = useState('');
 	const [cursorPos, setCursorPos] = useState(0);
@@ -102,7 +100,6 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 	const [currentPath, setCurrentPath] = useState(loadCurrentPath);
 	const [isFocused, setIsFocused] = useState(false);
 	const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(0);
-	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	// Refs
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -145,28 +142,27 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 		setInput(suggestion);
 		setCursorPos(suggestion.length);
 		setActiveSuggestionIndex(0);
-		setTimeout(() => inputRef.current?.focus(), 0);
+		inputRef.current?.focus();
 	}, []);
 
 	const pushCommandToHistory = useCallback((command: string) => {
-		if (!command.trim()) return;
 		setCmdHistory(prev => {
-			const filtered = prev.filter(cmd => cmd !== command);
-			const newHistory = [...filtered, command];
-			return newHistory.slice(-CMD_HISTORY_LIMIT);
+			const filtered = prev.filter(c => c !== command);
+			const updated = [...filtered, command];
+			return updated.slice(-CMD_HISTORY_LIMIT);
 		});
 	}, []);
 
 	const addToHistory = useCallback(
 		(command: string, response: CommandResponse) => {
-			const newItem: HistoryItem = {
+			const item: HistoryItem = {
 				id: generateHistoryId(),
 				command,
 				response,
 				path: currentPath,
 				timestamp: new Date(),
 			};
-			setHistory(prev => [...prev, newItem]);
+			setHistory(prev => [...prev, item]);
 		},
 		[currentPath],
 	);
@@ -253,38 +249,31 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 				return;
 			}
 
-			// Ctrl+C: Cancel current input
+			// Ctrl+C: Clear input
 			if (e.ctrlKey && e.key === 'c') {
 				e.preventDefault();
-				if (input.trim()) {
-					addToHistory(input + ' ^C', { type: 'text', content: '' });
-				}
 				setInput('');
 				setCursorPos(0);
 				setHistoryIndex(-1);
-				return;
-			}
-
-			// Ctrl+U: Clear line
-			if (e.ctrlKey && e.key === 'u') {
-				e.preventDefault();
-				setInput('');
-				setCursorPos(0);
+				addToHistory(input, { type: 'error', content: '^C' });
 				return;
 			}
 
 			// Enter: Execute command
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				executeCommand(input);
-				setInput('');
-				setCursorPos(0);
-				setHistoryIndex(-1);
-				setActiveSuggestionIndex(0);
+				if (suggestions.length > 0 && activeSuggestionIndex >= 0) {
+					applySuggestion(suggestions[activeSuggestionIndex]);
+				} else {
+					executeCommand(input);
+					setInput('');
+					setCursorPos(0);
+					setHistoryIndex(-1);
+				}
 				return;
 			}
 
-			// Tab: Autocomplete
+			// Tab: Apply first suggestion
 			if (e.key === 'Tab') {
 				e.preventDefault();
 				if (suggestions.length > 0) {
@@ -293,7 +282,7 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 				return;
 			}
 
-			// Arrow Up: Previous command
+			// Arrow Up: Previous command or navigate suggestions
 			if (e.key === 'ArrowUp') {
 				e.preventDefault();
 				if (suggestions.length > 0) {
@@ -357,63 +346,116 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 		inputRef.current?.focus();
 	}, []);
 
-	const handleToggleCollapse = useCallback(() => {
-		setIsCollapsed(!isCollapsed);
-		onToggleCollapse?.();
-	}, [isCollapsed, onToggleCollapse]);
+	const handleClearHistory = useCallback(() => {
+		setHistory([]);
+	}, []);
 
 	const getPromptLabel = useCallback(
 		(path: string) => (
 			<span className="font-medium select-none">
-				<span className="text-green-500">root@anuragos</span>
+				<span className="text-emerald-500 dark:text-emerald-400">root@anuragos</span>
 				<span className="text-muted-foreground">:</span>
-				<span className="text-blue-500">{path}</span>
-				<span className="text-muted-foreground">$</span>
+				<span className="text-sky-500 dark:text-sky-400">{path}</span>
+				<span className="text-primary">$</span>
 			</span>
 		),
 		[],
 	);
 
+	// Collapsed view
+	if (externalIsCollapsed) {
+		return (
+			<div className="h-full flex items-center justify-center bg-background/95 backdrop-blur-sm border-t border-border/40">
+				<button
+					onClick={onToggleCollapse}
+					className="flex items-center gap-2 px-4 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+				>
+					<Terminal className="w-4 h-4" />
+					<span className="font-semibold tracking-wide">TERMINAL</span>
+					<ChevronUp className="w-3.5 h-3.5" />
+				</button>
+			</div>
+		);
+	}
+
 	return (
 		<div
-			className="h-full flex flex-col bg-background/95 backdrop-blur-sm text-foreground font-mono text-sm overflow-hidden"
+			className="h-full flex flex-col bg-gradient-to-b from-background/98 to-background/95 backdrop-blur-md text-foreground font-mono text-sm overflow-hidden"
 			onClick={handleContainerClick}
 		>
-			{/* Simple Header */}
-			<div className="px-3 py-2 border-b border-border/50 bg-background/65 backdrop-blur-md flex items-center justify-between shrink-0">
-				<div className="flex items-center gap-2 text-xs text-muted-foreground">
-					<span className="font-semibold">TERMINAL</span>
-					<span className="text-[10px]">{currentPath}</span>
+			{/* Enhanced Header */}
+			<div className="px-4 py-2.5 border-b border-border/60 bg-gradient-to-r from-muted/30 via-muted/20 to-muted/30 backdrop-blur-sm flex items-center justify-between shrink-0 shadow-sm">
+				<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2 text-xs">
+						<Terminal className="w-4 h-4 text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]" />
+						<span className="font-bold tracking-wide text-foreground">TERMINAL</span>
+					</div>
+					<div className="h-4 w-px bg-border/50" />
+					<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+						<span className="opacity-70">Path:</span>
+						<code className="px-1.5 py-0.5 bg-muted/40 rounded text-primary font-medium">
+							{currentPath}
+						</code>
+					</div>
 				</div>
-				<button
-					type="button"
-					onClick={handleToggleCollapse}
-					className="p-1 hover:bg-accent rounded transition-colors"
-					aria-label="Toggle terminal"
-				>
-					{isCollapsed ? (
-						<ChevronUp className="w-3.5 h-3.5" />
-					) : (
-						<ChevronDown className="w-3.5 h-3.5" />
+
+				<div className="flex items-center gap-1">
+					{history.length > 0 && (
+						<button
+							type="button"
+							onClick={handleClearHistory}
+							className="p-1.5 hover:bg-destructive/10 hover:text-destructive rounded-md transition-all duration-200 group"
+							aria-label="Clear terminal"
+							title="Clear terminal"
+						>
+							<X className="w-3.5 h-3.5" />
+						</button>
 					)}
-				</button>
+					<button
+						type="button"
+						onClick={onToggleCollapse}
+						className="p-1.5 hover:bg-muted/60 rounded-md transition-all duration-200 group"
+						aria-label="Toggle terminal"
+						title="Collapse terminal"
+					>
+						<ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+					</button>
+				</div>
 			</div>
 
 			{/* Main Scrollable Container */}
 			<div
 				ref={scrollRef}
-				className="flex-1 min-h-0 overflow-y-auto px-3 py-3 custom-scrollbar space-y-2"
+				className="flex-1 min-h-0 overflow-y-auto px-4 py-3 custom-scrollbar space-y-2"
 			>
 				{/* Welcome message when terminal is empty */}
 				{history.length === 0 && (
-					<div className="select-none text-xs text-muted-foreground space-y-1 pb-2">
-						<div className="text-primary font-semibold">AnuragOS Terminal</div>
-						<div>
-							Type{' '}
-							<code className="text-primary bg-primary/10 px-1 rounded">help</code>{' '}
-							for commands
+					<motion.div
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						className="select-none text-xs space-y-2 pb-2"
+					>
+						<div className="flex items-center gap-2">
+							<Terminal className="w-5 h-5 text-primary" />
+							<span className="text-primary font-bold text-sm">
+								AnuragOS Terminal v1.0
+							</span>
 						</div>
-					</div>
+						<div className="text-muted-foreground space-y-1 pl-7">
+							<div>
+								Type{' '}
+								<code className="text-primary bg-primary/10 px-1.5 py-0.5 rounded font-semibold">
+									help
+								</code>{' '}
+								to see available commands
+							</div>
+							<div className="text-[10px] opacity-70">
+								Pro tip: Use <kbd className="kbd">↑</kbd> /{' '}
+								<kbd className="kbd">↓</kbd> for history,{' '}
+								<kbd className="kbd">Tab</kbd> to autocomplete
+							</div>
+						</div>
+					</motion.div>
 				)}
 
 				{/* Command history */}
@@ -431,12 +473,14 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 							>
 								<div className="flex gap-2 text-sm items-baseline">
 									<span className="shrink-0">{getPromptLabel(item.path)}</span>
-									<span className="flex-1 break-all">{item.command}</span>
+									<span className="flex-1 break-all text-foreground/90">
+										{item.command}
+									</span>
 								</div>
 								{item.response.content && (
 									<div
 										className={cn(
-											'pl-3 text-xs whitespace-pre-wrap',
+											'pl-3 text-xs whitespace-pre-wrap leading-relaxed',
 											responseTone(item.response.type),
 										)}
 									>
@@ -450,11 +494,11 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 			</div>
 
 			{/* Input Area */}
-			<div className="px-3 py-2 border-t border-border/40 bg-background/60 shrink-0 space-y-2">
+			<div className="px-4 py-2.5 border-t border-border/50 bg-gradient-to-t from-muted/20 to-transparent backdrop-blur-sm shrink-0 space-y-2">
 				<div className="flex items-start gap-2 text-sm">
 					<span className="shrink-0 mt-1">{getPromptLabel(currentPath)}</span>
 					<div className="relative flex-1 min-w-0">
-						<div className="bg-background/60 px-2 py-1 rounded-md border border-border/50 shadow-inner">
+						<div className="bg-muted/30 px-2.5 py-1.5 rounded-lg border border-border/60 shadow-inner backdrop-blur-sm hover:border-border/80 focus-within:border-primary/50 focus-within:bg-muted/40 transition-all duration-200">
 							{/* Hidden input for text capture */}
 							<input
 								ref={inputRef}
@@ -465,7 +509,7 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 								onSelect={handleInputSelect}
 								onFocus={() => setIsFocused(true)}
 								onBlur={() => setIsFocused(false)}
-								className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none px-2 py-1"
+								className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none px-2.5 py-1.5"
 								autoComplete="off"
 								autoCorrect="off"
 								autoCapitalize="off"
@@ -473,13 +517,13 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 								aria-label="Terminal input"
 							/>
 							{/* Visible input display */}
-							<div className="whitespace-pre-wrap break-all min-h-[1rem]">
+							<div className="whitespace-pre-wrap break-all min-h-[1.25rem] text-foreground">
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block w-1.5 h-3.5 -mb-0.5',
+										'inline-block w-2 h-4 -mb-0.5 rounded-sm',
 										isFocused
-											? 'bg-foreground animate-pulse'
+											? 'bg-primary/80 shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)] animate-pulse'
 											: 'bg-transparent',
 									)}
 									aria-hidden="true"
@@ -492,7 +536,12 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 
 				{/* Suggestions - only show when typing */}
 				{showSuggestions && (
-					<div className="flex flex-wrap gap-1.5 text-xs">
+					<motion.div
+						initial={{ opacity: 0, y: -4 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -4 }}
+						className="flex flex-wrap gap-1.5 text-xs pl-2"
+					>
 						{suggestions.map((suggestion, idx) => (
 							<button
 								key={`${suggestion}-${idx}`}
@@ -504,17 +553,17 @@ export function CLI({ onToggleCollapse }: CLIProps) {
 									applySuggestion(suggestion);
 								}}
 								className={cn(
-									'px-2 py-0.5 rounded border transition-colors',
+									'px-2.5 py-1 rounded-md border transition-all duration-200 font-medium',
 									idx === activeSuggestionIndex
-										? 'border-primary text-primary bg-primary/10'
-										: 'border-border/40 hover:border-border',
+										? 'border-primary/60 text-primary bg-primary/15 shadow-[0_0_8px_rgba(var(--primary-rgb),0.2)]'
+										: 'border-border/50 hover:border-border/80 text-muted-foreground hover:text-foreground bg-background/40 hover:bg-muted/40',
 								)}
 								aria-label={`Suggestion: ${suggestion}`}
 							>
 								{suggestion}
 							</button>
 						))}
-					</div>
+					</motion.div>
 				)}
 			</div>
 		</div>
