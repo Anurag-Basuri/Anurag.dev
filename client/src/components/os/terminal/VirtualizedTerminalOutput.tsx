@@ -10,20 +10,11 @@ const responseTone = (type: CommandResponse['type']): string => {
 		case 'success':
 			return 'text-emerald-400';
 		case 'text':
-			return 'text-foreground/90';
+			return 'text-white/80';
 		default:
-			return 'text-muted-foreground';
+			return 'text-white/60';
 	}
 };
-
-const getPromptLabel = (path: string) => (
-	<span className="font-medium select-none">
-		<span className="text-emerald-500 dark:text-emerald-400">root@anuragos</span>
-		<span className="text-muted-foreground">:</span>
-		<span className="text-sky-500 dark:text-sky-400">{path}</span>
-		<span className="text-primary">$</span>
-	</span>
-);
 
 interface HistoryItemComponentProps {
 	item: HistoryItem;
@@ -42,19 +33,17 @@ const HistoryItemComponent = memo(({ item, onItemClick }: HistoryItemComponentPr
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: -4 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className="space-y-1 cursor-pointer hover:bg-muted/20 rounded p-1 -m-1 transition-colors"
+			className="space-y-1 cursor-pointer hover:bg-white/5 rounded px-2 py-1 -mx-2 transition-colors"
 			onClick={handleClick}
 		>
 			<div className="flex gap-2 text-sm items-baseline">
-				<span className="shrink-0">{getPromptLabel(item.path)}</span>
-				<span className="flex-1 break-all text-foreground/90">
-					{item.command}
-				</span>
+				<span className="shrink-0 text-emerald-400">❯</span>
+				<span className="flex-1 break-all text-white/90">{item.command}</span>
 			</div>
 			{item.response.content && (
 				<div
 					className={cn(
-						'pl-3 text-xs whitespace-pre-wrap leading-relaxed',
+						'pl-5 text-xs whitespace-pre-wrap leading-relaxed',
 						responseTone(item.response.type),
 					)}
 				>
@@ -84,9 +73,12 @@ export function OptimizedTerminalOutput({
 	}, [history, maxVisibleItems]);
 
 	// Memoize click handler
-	const handleItemClick = useCallback((item: HistoryItem) => {
-		onItemClick?.(item);
-	}, [onItemClick]);
+	const handleItemClick = useCallback(
+		(item: HistoryItem) => {
+			onItemClick?.(item);
+		},
+		[onItemClick],
+	);
 
 	if (visibleHistory.length === 0) {
 		return null;
@@ -104,11 +96,7 @@ export function OptimizedTerminalOutput({
 			)}
 			<AnimatePresence initial={false} mode="popLayout">
 				{visibleHistory.map(item => (
-					<HistoryItemComponent
-						key={item.id}
-						item={item}
-						onItemClick={handleItemClick}
-					/>
+					<HistoryItemComponent key={item.id} item={item} onItemClick={handleItemClick} />
 				))}
 			</AnimatePresence>
 		</div>
