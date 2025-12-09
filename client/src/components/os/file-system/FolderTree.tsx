@@ -13,11 +13,18 @@ interface FolderTreeProps {
 }
 
 const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-amber-500" />;
+	if (name.endsWith('.json'))
+		return <FileJson className="w-4 h-4 text-amber-500 dark:text-amber-400" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
 		return <FileText className="w-4 h-4 text-primary" />;
-	if (name.endsWith('.py') || name.endsWith('.js') || name.endsWith('.tsx'))
+	if (
+		name.endsWith('.py') ||
+		name.endsWith('.js') ||
+		name.endsWith('.tsx') ||
+		name.endsWith('.exe')
+	)
 		return <FileCode className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />;
+	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-500 dark:text-red-400" />;
 	return <File className="w-4 h-4 text-muted-foreground" />;
 };
 
@@ -42,6 +49,7 @@ function FolderTreeItem({
 }) {
 	const isFolder = item.type === 'folder';
 	const [isOpen, setIsOpen] = useState(isFolder && level < 1);
+	const [isHovered, setIsHovered] = useState(false);
 
 	React.useEffect(() => {
 		const handleCollapse = () => {
@@ -64,38 +72,43 @@ function FolderTreeItem({
 		<div>
 			<div
 				className={cn(
-					'flex items-center py-1 px-2 cursor-pointer select-none text-xs transition-all duration-200 rounded-sm group border border-transparent relative',
-					'hover:bg-muted/30 hover:backdrop-blur-sm hover:border-border/50',
+					'flex items-center py-1.5 px-2.5 cursor-pointer select-none text-xs transition-all duration-200 rounded-md group border relative',
+					'hover:bg-muted/40 hover:backdrop-blur-sm hover:border-border/60 hover:shadow-sm',
+					isHovered && 'bg-muted/30 border-border/50',
+					!isHovered && 'border-transparent',
 					level > 0 && 'ml-2',
 				)}
-				style={{ paddingLeft: `${level * 12 + 8}px` }}
+				style={{ paddingLeft: `${level * 14 + 10}px` }}
 				onClick={handleToggle}
+				onMouseEnter={() => setIsHovered(true)}
+				onMouseLeave={() => setIsHovered(false)}
 			>
 				{/* Tree Guide Line */}
 				{level > 0 && (
 					<div
 						className="absolute left-0 top-0 bottom-0 w-px bg-border/30 group-hover:bg-border/60 transition-colors"
-						style={{ left: `${(level - 1) * 12 + 12}px` }}
+						style={{ left: `${(level - 1) * 14 + 14}px` }}
 					/>
 				)}
+
 				<motion.span
 					animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
-					transition={{ duration: 0.15 }}
-					className="mr-1 text-muted-foreground group-hover:text-primary flex items-center justify-center transition-colors"
+					transition={{ duration: 0.2, ease: 'easeOut' }}
+					className="mr-1.5 text-muted-foreground group-hover:text-primary flex items-center justify-center transition-colors"
 				>
 					{isFolder ? (
-						<ChevronRight className="w-3 h-3" />
+						<ChevronRight className="w-3.5 h-3.5" />
 					) : (
-						<span className="w-3 h-3 inline-block" />
+						<span className="w-3.5 h-3.5 inline-block" />
 					)}
 				</motion.span>
 
-				<span className="mr-2">
+				<span className="mr-2.5">
 					{isFolder ? (
 						isOpen ? (
-							<FolderOpen className="w-4 h-4 text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.3)]" />
+							<FolderOpen className="w-4 h-4 text-primary drop-shadow-[0_0_10px_rgba(var(--primary-rgb),0.35)]" />
 						) : (
-							<Folder className="w-4 h-4 text-primary/80 group-hover:text-primary transition-colors" />
+							<Folder className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
 						)
 					) : (
 						<FileIcon name={item.name} />
@@ -104,8 +117,11 @@ function FolderTreeItem({
 
 				<span
 					className={cn(
-						'truncate transition-colors text-muted-foreground group-hover:text-foreground font-medium',
-						item.name === 'secret' && 'text-muted-foreground/50',
+						'truncate transition-colors font-medium',
+						isFolder
+							? 'text-foreground group-hover:text-foreground'
+							: 'text-muted-foreground group-hover:text-foreground',
+						item.name === 'secret' && 'text-muted-foreground/40 italic',
 					)}
 				>
 					{item.name}
@@ -118,7 +134,7 @@ function FolderTreeItem({
 						initial={{ height: 0, opacity: 0 }}
 						animate={{ height: 'auto', opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.18, ease: 'easeInOut' }}
+						transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
 						style={{ overflow: 'hidden' }}
 					>
 						<FolderTree items={item.children} level={level + 1} onSelect={onSelect} />
