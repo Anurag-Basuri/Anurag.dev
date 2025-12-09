@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTerminalState } from './useTerminalState';
 import { TerminalLayout } from './TerminalLayout';
@@ -137,28 +137,28 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 			{externalIsCollapsed ? (
 				<motion.div
 					key="collapsed"
-					initial={{ opacity: 0, scale: 0.8, y: 20 }}
-					animate={{ opacity: 1, scale: 1, y: 0 }}
-					exit={{ opacity: 0, scale: 0.8, y: 20 }}
-					transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-					className="h-full flex items-start justify-center pt-2"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.15 }}
+					className="h-full flex items-center justify-center"
 				>
 					<button
 						onClick={onToggleCollapse}
-						className="group flex items-center justify-center w-full h-full cursor-pointer hover:bg-primary/5 transition-colors duration-300"
+						className="group flex items-center justify-center w-full h-full cursor-pointer hover:bg-primary/5 transition-colors duration-200"
 						aria-label="Expand Terminal"
 					>
-						<div className="w-96 h-1 rounded-full bg-white/20 group-hover:bg-primary/50 transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_20px_var(--primary)]" />
+						<div className="w-64 h-1 rounded-full bg-white/20 group-hover:bg-primary/50 transition-all duration-200 shadow-[0_0_8px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_16px_var(--primary)]" />
 					</button>
 				</motion.div>
 			) : (
 				<motion.div
 					key="expanded"
-					initial={{ opacity: 0, scale: 0.98, y: 10 }}
-					animate={{ opacity: 1, scale: 1, y: 0 }}
-					exit={{ opacity: 0, scale: 0.98, y: 10 }}
-					transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-					className="h-full w-full"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					className="h-full w-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden"
 				>
 					<TerminalLayout
 						currentPath={terminalState.currentPath}

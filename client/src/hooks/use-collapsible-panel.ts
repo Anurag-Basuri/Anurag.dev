@@ -115,15 +115,8 @@ export function useCollapsiblePanel({
 				setIsCollapsed(false);
 				onExpand?.();
 			},
-			style: {
-				transition:
-					'flex-basis 0.5s cubic-bezier(0.4, 0, 0.2, 1), flex-grow 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-			},
-			className: `${
-				isCollapsed ? (type === 'sidebar' ? 'min-w-[64px]!' : 'min-h-[56px]!') : ''
-			}`,
 		}),
-		[panelConfig, type, isCollapsed, setIsCollapsed, onCollapse, onExpand],
+		[panelConfig, setIsCollapsed, onCollapse, onExpand],
 	);
 
 	return {
