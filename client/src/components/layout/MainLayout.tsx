@@ -68,15 +68,21 @@ export function MainLayout() {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.2 }}
-							className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden flex flex-col"
+							className="h-full rounded-xl border border-white/10 bg-[#0d1117] shadow-2xl overflow-hidden flex flex-col"
 						>
-							<SidebarProfile />
+							<SidebarProfile onCollapse={sidebar.collapse} />
 
-							<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-muted/20">
-								Explorer
+							<div className="px-3 py-2 border-b border-white/5 text-[10px] uppercase tracking-[0.22em] text-white/40">
+								Files
 							</div>
 
-							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+							<div
+								className="flex-1 overflow-auto px-2 pb-3"
+								style={{
+									scrollbarWidth: 'thin',
+									scrollbarColor: 'rgba(255,255,255,0.1) transparent',
+								}}
+							>
 								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
 							</div>
 						</motion.div>
