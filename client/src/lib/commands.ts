@@ -1,4 +1,11 @@
 import { ReactNode } from 'react';
+import { commandRegistry } from './commandSystem';
+import { registerCoreCommands } from './coreCommands';
+
+// Initialize core commands
+if (typeof window !== 'undefined') {
+	registerCoreCommands();
+}
 
 export type CommandResponse = {
 	type:
@@ -16,6 +23,15 @@ export type CommandResponse = {
 	theme?: 'light' | 'dark' | 'toggle';
 };
 
+export type CommandContext = {
+	currentPath: string;
+	args: string[];
+};
+
+export type CommandResult =
+	| { ok: true; data?: string | Record<string, unknown> }
+	| { ok: false; error: string; hint?: string };
+
 export type CommandRun = (
 	ctx: CommandContext,
 	args: string[],
@@ -31,17 +47,8 @@ export type CommandSpec = {
 	run?: CommandRun;
 };
 
-export type CommandContext = {
-	currentPath: string;
-};
-
-export type CommandResult =
-	| { ok: true; data?: string | Record<string, unknown> }
-	| { ok: false; error: string; hint?: string };
-
 // The registry is the single source of truth for all commands.
 export const registry: Record<string, CommandSpec> = {
-	// --- Navigation Commands ---
 	help: {
 		name: 'help',
 		aliases: ['h', '?'],
@@ -105,8 +112,6 @@ export const registry: Record<string, CommandSpec> = {
 			return { ok: true, data: 'Opening resume in a new tab...' };
 		},
 	},
-
-	// --- System Commands ---
 	clear: {
 		name: 'clear',
 		aliases: ['cls'],
@@ -142,8 +147,6 @@ export const registry: Record<string, CommandSpec> = {
 		category: 'System',
 		run: () => ({ ok: true, data: 'guest' }),
 	},
-
-	// --- Fun/Hidden Commands ---
 	secret: {
 		name: 'secret',
 		description: '???',
@@ -162,66 +165,13 @@ export const registry: Record<string, CommandSpec> = {
 	},
 };
 
-// Finds a command spec by name or alias.
-export function findCommandSpec(name: string): CommandSpec | undefined {
-	const key = name.toLowerCase();
-	const direct = registry[key];
-	if (direct) return direct;
-	for (const spec of Object.values(registry)) {
-		if (spec.aliases?.includes(key)) return spec;
-	}
-	return undefined;
-}
-
-export function formatAllHelp(reg: Record<string, CommandSpec>): string {
-	const categories: Record<string, CommandSpec[]> = {
-		Navigation: [],
-		System: [],
-		Fun: [],
-	};
-
-	for (const spec of Object.values(reg)) {
-		if (!spec.hidden) {
-			categories[spec.category].push(spec);
-		}
-	}
-
-	let helpText = 'Welcome to my interactive portfolio! Here are the available commands:\n\n';
-
-	helpText += '--- Navigation ---\n';
-	helpText += categories.Navigation.map(
-		spec => `  ${spec.name.padEnd(10)} - ${spec.description}`,
-	).join('\n');
-	helpText += '\n\n';
-
-	helpText += '--- System ---\n';
-	helpText += categories.System.map(
-		spec => `  ${spec.name.padEnd(10)} - ${spec.description}`,
-	).join('\n');
-
-	return helpText;
-}
-
-function levenshtein(a: string, b: string): number {
-	const m = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
-	for (let i = 0; i <= a.length; i++) m[i][0] = i;
-	for (let j = 0; j <= b.length; j++) m[0][j] = j;
-	for (let i = 1; i <= a.length; i++) {
-		for (let j = 1; j <= b.length; j++) {
-			const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-			m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + cost);
-		}
-	}
-	return m[a.length][b.length];
-}
-
 // Parses command line arguments.
 function parseArgs(input: string): string[] {
 	return input.split(' ').filter(Boolean);
 }
 
-// Processes a command input and returns the appropriate response.
-export function processCommand(input: string, currentPath: string = '~'): CommandResponse {
+// Processes a command input and returns appropriate response.
+export async function processCommand(input: string, currentPath: string = '~'): Promise<CommandResponse> {
 	try {
 		if (typeof input !== 'string') {
 			return { type: 'error', content: 'Invalid input type.' };
@@ -237,8 +187,8 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 		const spec = findCommandSpec(cmd);
 
 		if (spec && spec.run) {
-			const context: CommandContext = { currentPath };
-			const result = spec.run(context, args) as CommandResult;
+			const context: CommandContext = { currentPath, args };
+			const result = await spec.run(context, args);
 
 			if (result.ok) {
 				if (typeof result.data === 'string') {
@@ -283,7 +233,7 @@ export function processCommand(input: string, currentPath: string = '~'): Comman
 	}
 }
 
-export function getCommandSuggestions(command: string, max: number): string[] {
+export function getCommandSuggestions(command: string, max: number = 3): string[] {
 	const normalizedInput = command.toLowerCase();
 	if (!normalizedInput) return [];
 
@@ -307,4 +257,62 @@ export function getCommandSuggestions(command: string, max: number): string[] {
 		});
 
 	return scored.slice(0, max).map(item => item.name);
+}
+
+export function findCommandSpec(name: string): CommandSpec | undefined {
+	const lowerName = name.toLowerCase();
+	for (const spec of Object.values(registry)) {
+		if (spec.name.toLowerCase() === lowerName || (spec.aliases?.some(a => a.toLowerCase() === lowerName))) {
+			return spec;
+		}
+	}
+	return undefined;
+}
+
+export function formatAllHelp(reg: Record<string, CommandSpec>): string {
+	const categories: Record<string, CommandSpec[]> = {
+		Navigation: [],
+		System: [],
+		Fun: [],
+	};
+
+	for (const spec of Object.values(reg)) {
+		if (!spec.hidden) {
+			categories[spec.category].push(spec);
+		}
+	}
+
+	let helpText = 'Welcome to my interactive portfolio! Here are the available commands:\n\n';
+
+	helpText += '--- Navigation ---\n';
+	helpText += categories.Navigation.map(
+		spec => `  ${spec.name.padEnd(10)} - ${spec.description}`,
+	).join('\n');
+	helpText += '\n\n';
+
+	helpText += '--- System ---\n';
+	helpText += categories.System.map(
+		spec => `  ${spec.name.padEnd(10)} - ${spec.description}`,
+	).join('\n');
+	helpText += '\n\n';
+
+	helpText += '--- Fun ---\n';
+	helpText += categories.Fun.map(
+		spec => `  ${spec.name.padEnd(10)} - ${spec.description}`,
+	).join('\n');
+
+	return helpText;
+}
+
+function levenshtein(a: string, b: string): number {
+	const m = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+	for (let i = 0; i <= a.length; i++) m[i][0] = i;
+	for (let j = 0; j <= b.length; j++) m[0][j] = j;
+	for (let i = 1; i <= a.length; i++) {
+		for (let j = 1; j <= b.length; j++) {
+			const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+			m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + cost);
+		}
+	}
+	return m[a.length][b.length];
 }
