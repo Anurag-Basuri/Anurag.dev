@@ -57,7 +57,17 @@ const ResizableHandle = React.forwardRef<
 });
 ResizableHandle.displayName = ResizablePrimitive.PanelResizeHandle.displayName;
 
-export type { ImperativePanelHandle } from 'react-resizable-panels';
+// Export all necessary types from react-resizable-panels
+export type { 
+	ImperativePanelHandle,
+	ImperativePanelGroupHandle,
+	PanelGroupProps,
+	PanelProps,
+	PanelResizeHandleProps,
+	PanelOnCollapse,
+	PanelOnExpand,
+	PanelOnResize
+} from 'react-resizable-panels';
 
 export {
 	ResizablePanelGroup,
