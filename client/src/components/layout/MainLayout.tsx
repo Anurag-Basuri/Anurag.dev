@@ -2,8 +2,6 @@
 
 import { useAtom } from 'jotai';
 import {
-	sidebarCollapsedAtom,
-	terminalCollapsedAtom,
 	mainVerticalSizesAtom,
 	mainHorizontalSizesAtom,
 } from '@/store/atoms';
@@ -11,7 +9,6 @@ import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-	type ImperativePanelHandle,
 } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -25,19 +22,13 @@ import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
-import { useRef, useState, useCallback } from 'react';
+import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
+import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
-import { cn } from '@/lib/utils';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
-
-	const sidebarRef = useRef<ImperativePanelHandle>(null);
-	const terminalRef = useRef<ImperativePanelHandle>(null);
-
-	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
-	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
 
 	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
@@ -46,32 +37,16 @@ export function MainLayout() {
 
 	const { openWindow } = useWindowManager();
 
+	// Use the new collapsible panel hooks
+	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
+	const terminal = useCollapsiblePanel({ type: 'terminal' });
+
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
 			const moduleId = item.id.split('/')[0];
 			openWindow(moduleId);
 		}
 	};
-
-	const handleToggleSidebar = useCallback(() => {
-		const panel = sidebarRef.current;
-		if (!panel) return;
-		if (panel.isCollapsed()) {
-			panel.expand();
-		} else {
-			panel.collapse();
-		}
-	}, []);
-
-	const handleToggleTerminal = useCallback(() => {
-		const panel = terminalRef.current;
-		if (!panel) return;
-		if (panel.isCollapsed()) {
-			panel.expand();
-		} else {
-			panel.collapse();
-		}
-	}, []);
 
 	const renderDesktopLayout = () => (
 		<ResizablePanelGroup
@@ -80,22 +55,12 @@ export function MainLayout() {
 			className="h-full"
 		>
 			<ResizablePanel
-				ref={sidebarRef}
-				collapsible
-				collapsedSize={4} // Collapse to 4rem (64px)
-				minSize={15}
-				maxSize={25}
+				{...sidebar.panelProps}
 				defaultSize={mainHorizontalSizes[0]}
-				onCollapse={() => setSidebarCollapsed(true)}
-				onExpand={() => setSidebarCollapsed(false)}
-				className={cn(
-					'transition-all duration-300 ease-in-out',
-					sidebarCollapsed ? 'min-w-[64px]!' : 'min-w-[280px]!',
-				)}
 			>
 				<div className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden">
-					{sidebarCollapsed ? (
-						<CollapsedSidebar onExpand={handleToggleSidebar} />
+					{sidebar.isCollapsed ? (
+						<CollapsedSidebar onExpand={sidebar.expand} />
 					) : (
 						<div className="h-full flex flex-col overflow-hidden">
 							<SidebarProfile />
@@ -127,22 +92,13 @@ export function MainLayout() {
 					<ResizableHandle withHandle />
 
 					<ResizablePanel
-						ref={terminalRef}
-						collapsible
-						collapsedSize={3.5} // Collapse to 3.5rem (56px)
-						minSize={10}
-						maxSize={50}
+						{...terminal.panelProps}
 						defaultSize={mainVerticalSizes[1]}
-						onCollapse={() => setTerminalCollapsed(true)}
-						onExpand={() => setTerminalCollapsed(false)}
-						className={cn(
-							'rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden transition-all duration-300 ease-in-out',
-							terminalCollapsed && 'min-h-[56px]!',
-						)}
+						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
 					>
 						<CLI
-							onToggleCollapse={handleToggleTerminal}
-							isCollapsed={terminalCollapsed}
+							onToggleCollapse={terminal.toggle}
+							isCollapsed={terminal.isCollapsed}
 						/>
 					</ResizablePanel>
 				</ResizablePanelGroup>
@@ -174,10 +130,10 @@ export function MainLayout() {
 
 				<TopBar
 					isMobile={isMobile}
-					sidebarCollapsed={sidebarCollapsed}
-					terminalCollapsed={terminalCollapsed}
-					onToggleSidebar={handleToggleSidebar}
-					onToggleTerminal={handleToggleTerminal}
+					sidebarCollapsed={sidebar.isCollapsed}
+					terminalCollapsed={terminal.isCollapsed}
+					onToggleSidebar={sidebar.toggle}
+					onToggleTerminal={terminal.toggle}
 					onFileSelect={handleFileSelect}
 				/>
 
