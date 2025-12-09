@@ -22,7 +22,8 @@ export function TerminalHistory({ history }: TerminalHistoryProps) {
 	return (
 		<div
 			ref={scrollRef}
-			className="flex-1 min-h-0 overflow-y-auto px-4 py-3 custom-scrollbar space-y-2"
+			className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth"
+			style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
 		>
 			{history.length === 0 && <TerminalWelcome />}
 			<TerminalOutput history={history} />
