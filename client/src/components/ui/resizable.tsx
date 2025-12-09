@@ -7,7 +7,7 @@ import * as ResizablePrimitive from 'react-resizable-panels';
 import { cn } from '@/lib/utils';
 
 const ResizablePanelGroup = React.forwardRef<
-	React.ComponentRef<typeof ResizablePrimitive.PanelGroup>,
+	React.ElementRef<typeof ResizablePrimitive.PanelGroup>,
 	React.ComponentProps<typeof ResizablePrimitive.PanelGroup>
 >(({ className, ...props }, ref) => (
 	<ResizablePrimitive.PanelGroup
@@ -22,23 +22,19 @@ const ResizablePanelGroup = React.forwardRef<
 ResizablePanelGroup.displayName = ResizablePrimitive.PanelGroup.displayName;
 
 const ResizablePanel = React.forwardRef<
-	React.ComponentRef<typeof ResizablePrimitive.Panel>,
+	React.ElementRef<typeof ResizablePrimitive.Panel>,
 	React.ComponentProps<typeof ResizablePrimitive.Panel>
 >((props, ref) => {
 	return <ResizablePrimitive.Panel ref={ref} {...props} />;
 });
 ResizablePanel.displayName = ResizablePrimitive.Panel.displayName;
 
-type ResizableHandleProps = React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
-	withHandle?: boolean;
-	className?: string;
-};
-
-const ResizableHandle = ({
-	withHandle,
-	className,
-	...props
-}: ResizableHandleProps) => {
+const ResizableHandle = React.forwardRef<
+	React.ElementRef<typeof ResizablePrimitive.PanelResizeHandle>,
+	React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
+		withHandle?: boolean;
+	}
+>(({ withHandle, className, ...props }, ref) => {
 	return (
 		<ResizablePrimitive.PanelResizeHandle
 			className={cn(
@@ -49,18 +45,22 @@ const ResizableHandle = ({
 			{...props}
 		>
 			{withHandle && (
-				<div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border">
+				<div
+					ref={ref}
+					className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border bg-border"
+				>
 					<GripVerticalIcon className="h-2.5 w-2.5" />
 				</div>
 			)}
 		</ResizablePrimitive.PanelResizeHandle>
 	);
-};
+});
+ResizableHandle.displayName = ResizablePrimitive.PanelResizeHandle.displayName;
 
-ResizableHandle.displayName = 'ResizableHandle';
+export type { ImperativePanelHandle } from 'react-resizable-panels';
 
 export {
 	ResizablePanelGroup,
 	ResizablePanel,
 	ResizableHandle,
-}
+};
