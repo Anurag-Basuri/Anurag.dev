@@ -6,7 +6,6 @@ import { useTerminalState } from './useTerminalState';
 import { TerminalLayout } from './TerminalLayout';
 import { TerminalHistory } from './TerminalHistory';
 import { TerminalPrompt } from './TerminalPrompt';
-import { MoreHorizontal } from 'lucide-react';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;

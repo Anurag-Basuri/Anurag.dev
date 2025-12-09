@@ -19,7 +19,6 @@ import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
-import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function MainLayout() {

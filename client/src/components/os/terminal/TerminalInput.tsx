@@ -74,14 +74,14 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 							/>
 							{/* Visible input display with blinking cursor */}
 							<div
-								className="whitespace-pre-wrap break-all min-h-5 text-foreground"
+								className="whitespace-pre-wrap break-all min-h-5 text-foreground font-mono"
 								aria-hidden="true"
 							>
 								{/* Render text with block cursor */}
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block min-w-[0.6em] bg-primary text-primary-foreground select-none',
+										'inline-block min-w-[0.55em] h-[1.1em] align-middle bg-primary text-primary-foreground select-none text-center',
 										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
