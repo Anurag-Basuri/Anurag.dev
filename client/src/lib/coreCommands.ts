@@ -1,4 +1,4 @@
-import { createCommand, registerCommands } from './commandSystem';
+import { createCommand, registerCommands, commandRegistry } from './commandSystem';
 
 // Navigation Commands
 const helpCommand = createCommand({
@@ -7,9 +7,8 @@ const helpCommand = createCommand({
 	description: 'Shows a list of available commands.',
 	usage: 'help',
 	category: 'System',
-	execute: (ctx) => {
-		const { commandRegistry } = require('./commandSystem');
-		const categories = {
+	execute: () => {
+		const categories: Record<string, (typeof helpCommand)[]> = {
 			Navigation: [],
 			System: [],
 			Fun: [],
@@ -44,9 +43,9 @@ const aboutCommand = createCommand({
 	description: 'Opens the "About Me" section.',
 	usage: 'about',
 	category: 'Navigation',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'about' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'about' },
 	}),
 });
 
@@ -55,9 +54,9 @@ const projectsCommand = createCommand({
 	description: 'Lists my key projects.',
 	usage: 'projects',
 	category: 'Navigation',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'projects' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'projects' },
 	}),
 });
 
@@ -66,9 +65,9 @@ const journeyCommand = createCommand({
 	description: 'Shows my career and education journey.',
 	usage: 'journey',
 	category: 'Navigation',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'journey' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'journey' },
 	}),
 });
 
@@ -77,9 +76,9 @@ const contactCommand = createCommand({
 	description: 'Provides my contact information.',
 	usage: 'contact',
 	category: 'Navigation',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'contact' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'contact' },
 	}),
 });
 
@@ -127,14 +126,14 @@ const themeCommand = createCommand({
 	description: 'Changes the UI theme.',
 	usage: 'theme <dark|light|toggle>',
 	category: 'System',
-	validate: (args) => {
+	validate: args => {
 		const mode = args[0]?.toLowerCase();
 		if (!mode || !['dark', 'light', 'toggle'].includes(mode)) {
 			return 'Invalid theme mode';
 		}
 		return null;
 	},
-	execute: (ctx) => {
+	execute: ctx => {
 		const mode = ctx.args[0]?.toLowerCase();
 		return {
 			ok: true,
@@ -158,9 +157,9 @@ const secretCommand = createCommand({
 	usage: 'secret',
 	category: 'Fun',
 	hidden: true,
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'secret' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'secret' },
 	}),
 });
 
@@ -170,9 +169,9 @@ const coffeeCommand = createCommand({
 	usage: 'coffee',
 	category: 'Fun',
 	hidden: true,
-	execute: () => ({ 
-		ok: false, 
-		error: "I'm a teapot" // HTTP 418
+	execute: () => ({
+		ok: false,
+		error: "I'm a teapot", // HTTP 418
 	}),
 });
 
@@ -183,9 +182,9 @@ const statsCommand = createCommand({
 	description: 'Shows coding statistics.',
 	usage: 'stats',
 	category: 'Development',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'coding-stats' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'coding-stats' },
 	}),
 });
 
@@ -194,9 +193,9 @@ const blogCommand = createCommand({
 	description: 'Opens the blog section.',
 	usage: 'blog',
 	category: 'Development',
-	execute: () => ({ 
-		ok: true, 
-		data: { type: 'open_module', moduleId: 'blog' } 
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'blog' },
 	}),
 });
 
@@ -207,12 +206,12 @@ const lsCommand = createCommand({
 	description: 'List directory contents.',
 	usage: 'ls [path]',
 	category: 'Files',
-	execute: (ctx) => {
+	execute: ctx => {
 		const path = ctx.args[0] || ctx.currentPath;
 		// This would integrate with the file system
-		return { 
-			ok: true, 
-			data: `Contents of ${path}:\n  about/\n  projects/\n  contact/\n  resume.pdf` 
+		return {
+			ok: true,
+			data: `Contents of ${path}:\n  about/\n  projects/\n  contact/\n  resume.pdf`,
 		};
 	},
 });
@@ -222,13 +221,13 @@ const cdCommand = createCommand({
 	description: 'Change directory.',
 	usage: 'cd <path>',
 	category: 'Files',
-	validate: (args) => {
+	validate: args => {
 		if (args.length === 0) {
 			return 'Path required';
 		}
 		return null;
 	},
-	execute: (ctx) => {
+	execute: ctx => {
 		const newPath = ctx.args[0];
 		// Simple path validation
 		if (newPath === '..') {
