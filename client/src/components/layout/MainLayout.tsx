@@ -50,53 +50,39 @@ export function MainLayout() {
 			className="h-full"
 		>
 			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
-				<div
-					style={{
-						willChange: sidebar.isCollapsed
-							? 'auto'
-							: 'background-color, border-color, box-shadow',
-					}}
-					className={cn(
-						'h-full rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden transition-[background-color,border-color,box-shadow,backdrop-filter] duration-600 ease-out',
-						sidebar.isCollapsed
-							? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
-							: 'border-border/60 bg-background/70 backdrop-blur-xl',
+				<AnimatePresence mode="wait">
+					{sidebar.isCollapsed ? (
+						<motion.div
+							key="collapsed-sidebar"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.15 }}
+							className="h-full"
+						>
+							<CollapsedSidebar onExpand={sidebar.expand} />
+						</motion.div>
+					) : (
+						<motion.div
+							key="expanded-sidebar"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden flex flex-col"
+						>
+							<SidebarProfile />
+
+							<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-muted/20">
+								Explorer
+							</div>
+
+							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+							</div>
+						</motion.div>
 					)}
-				>
-					<AnimatePresence mode="wait">
-						{sidebar.isCollapsed ? (
-							<motion.div
-								key="collapsed-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.2 }}
-								className="h-full"
-							>
-								<CollapsedSidebar onExpand={sidebar.expand} />
-							</motion.div>
-						) : (
-							<motion.div
-								key="expanded-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.3, delay: 0.1 }}
-								className="h-full flex flex-col overflow-hidden"
-							>
-								<SidebarProfile />
-
-								<div className="px-3 py-2 border-y border-border/60 text-[10px] uppercase tracking-[0.22em] text-muted-foreground bg-muted/20">
-									Explorer
-								</div>
-
-								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-				</div>
+				</AnimatePresence>
 			</ResizablePanel>
 
 			<ResizableHandle withHandle />
@@ -106,28 +92,14 @@ export function MainLayout() {
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden!"
+						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden"
 					>
 						<EditorArea />
 					</ResizablePanel>
 
 					<ResizableHandle withHandle />
 
-					<ResizablePanel
-						{...terminal.panelProps}
-						defaultSize={mainVerticalSizes[1]}
-						style={{
-							willChange: terminal.isCollapsed
-								? 'auto'
-								: 'background-color, border-color, box-shadow',
-						}}
-						className={cn(
-							'rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden! transition-[background-color,border-color,box-shadow,backdrop-filter] duration-600 ease-out',
-							terminal.isCollapsed
-								? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
-								: 'border-border/60 bg-background/70 backdrop-blur-xl',
-						)}
-					>
+					<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
 						<CLI
 							onToggleCollapse={terminal.toggle}
 							isCollapsed={terminal.isCollapsed}
