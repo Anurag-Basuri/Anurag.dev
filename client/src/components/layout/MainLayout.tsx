@@ -51,8 +51,13 @@ export function MainLayout() {
 		>
 			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 				<div
+					style={{
+						willChange: sidebar.isCollapsed
+							? 'auto'
+							: 'background-color, border-color, box-shadow',
+					}}
 					className={cn(
-						'h-full rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ease-in-out',
+						'h-full rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden transition-[background-color,border-color,box-shadow,backdrop-filter] duration-600 ease-out',
 						sidebar.isCollapsed
 							? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
 							: 'border-border/60 bg-background/70 backdrop-blur-xl',
@@ -111,8 +116,13 @@ export function MainLayout() {
 					<ResizablePanel
 						{...terminal.panelProps}
 						defaultSize={mainVerticalSizes[1]}
+						style={{
+							willChange: terminal.isCollapsed
+								? 'auto'
+								: 'background-color, border-color, box-shadow',
+						}}
 						className={cn(
-							'rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden! transition-[background-color,border-color,box-shadow,backdrop-filter] duration-500 ease-in-out',
+							'rounded-xl border shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden! transition-[background-color,border-color,box-shadow,backdrop-filter] duration-600 ease-out',
 							terminal.isCollapsed
 								? 'bg-transparent border-transparent shadow-none backdrop-blur-none overflow-visible!'
 								: 'border-border/60 bg-background/70 backdrop-blur-xl',

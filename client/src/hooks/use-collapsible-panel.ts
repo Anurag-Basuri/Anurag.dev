@@ -1,11 +1,7 @@
 import { useCallback, useRef, useMemo } from 'react';
 import { useAtom } from 'jotai';
 import { type ImperativePanelHandle } from '@/components/ui/resizable';
-import { 
-	layoutStateAtom, 
-	sidebarCollapsedAtom, 
-	terminalCollapsedAtom,
-} from '@/store/atoms';
+import { layoutStateAtom, sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store/atoms';
 
 export type PanelType = 'sidebar' | 'terminal';
 
@@ -44,7 +40,7 @@ export function useCollapsiblePanel({
 }: CollapsiblePanelConfig): CollapsiblePanelReturn {
 	// Use legacy atoms for now to maintain compatibility
 	const [isCollapsed, setIsCollapsed] = useAtom(
-		type === 'sidebar' ? sidebarCollapsedAtom : terminalCollapsedAtom
+		type === 'sidebar' ? sidebarCollapsedAtom : terminalCollapsedAtom,
 	);
 	const [layoutState] = useAtom(layoutStateAtom);
 	const panelRef = useRef<ImperativePanelHandle>(null!) as React.RefObject<ImperativePanelHandle>;
@@ -88,7 +84,7 @@ export function useCollapsiblePanel({
 	const expand = useCallback(() => {
 		const panel = panelRef.current;
 		if (!panel || !panel.isCollapsed()) return;
-		
+
 		panel.expand();
 		setIsCollapsed(false);
 		onExpand?.();
@@ -97,33 +93,38 @@ export function useCollapsiblePanel({
 	const collapse = useCallback(() => {
 		const panel = panelRef.current;
 		if (!panel || panel.isCollapsed()) return;
-		
+
 		panel.collapse();
 		setIsCollapsed(true);
 		onCollapse?.();
 	}, [setIsCollapsed, onCollapse]);
 
-	const panelProps = useMemo(() => ({
-		ref: panelRef,
-		collapsible: true as const,
-		collapsedSize: panelConfig.collapsedSize,
-		minSize: panelConfig.minSize,
-		maxSize: panelConfig.maxSize,
-		defaultSize: panelConfig.defaultSize,
-		onCollapse: () => {
-			setIsCollapsed(true);
-			onCollapse?.();
-		},
-		onExpand: () => {
-			setIsCollapsed(false);
-			onExpand?.();
-		},
-		className: `transition-all duration-300 ease-in-out ${
-			isCollapsed 
-				? type === 'sidebar' ? 'min-w-[64px]!' : 'min-h-[56px]!'
-				: ''
-		}`,
-	}), [panelConfig, type, isCollapsed, setIsCollapsed, onCollapse, onExpand]);
+	const panelProps = useMemo(
+		() => ({
+			ref: panelRef,
+			collapsible: true as const,
+			collapsedSize: panelConfig.collapsedSize,
+			minSize: panelConfig.minSize,
+			maxSize: panelConfig.maxSize,
+			defaultSize: panelConfig.defaultSize,
+			onCollapse: () => {
+				setIsCollapsed(true);
+				onCollapse?.();
+			},
+			onExpand: () => {
+				setIsCollapsed(false);
+				onExpand?.();
+			},
+			style: {
+				transition:
+					'flex-basis 0.5s cubic-bezier(0.4, 0, 0.2, 1), flex-grow 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+			},
+			className: `${
+				isCollapsed ? (type === 'sidebar' ? 'min-w-[64px]!' : 'min-h-[56px]!') : ''
+			}`,
+		}),
+		[panelConfig, type, isCollapsed, setIsCollapsed, onCollapse, onExpand],
+	);
 
 	return {
 		isCollapsed,
