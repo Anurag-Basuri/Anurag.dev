@@ -74,24 +74,19 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 							/>
 							{/* Visible input display with blinking cursor */}
 							<div
-								className="whitespace-pre-wrap break-all min-h-5 text-foreground font-mono"
+								className="whitespace-pre-wrap break-all min-h-5 text-foreground font-mono leading-5"
 								aria-hidden="true"
 							>
 								{/* Render text with block cursor */}
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block min-w-[0.55em] h-[1.1em] align-middle bg-primary text-primary-foreground select-none text-center',
+										'inline-block w-[0.6em] h-[1em] align-text-bottom bg-emerald-500',
 										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
-								>
-									{/* Use non-breaking space if char is missing or space to ensure block has width */}
-									{input[cursorPos] === ' '
-										? '\u00A0'
-										: input[cursorPos] || '\u00A0'}
-								</span>
-								<span>{input.substring(cursorPos + 1)}</span>
+								/>
+								<span>{input.substring(cursorPos)}</span>
 							</div>
 						</div>
 					</div>
