@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import type { TerminalInputProps } from './types';
 
@@ -24,19 +24,11 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 			onBlur,
 			currentPath,
 		},
-		ref
+		ref,
 	) => {
 		const handleContainerClick = useCallback(() => {
 			(ref as React.RefObject<HTMLInputElement>)?.current?.focus();
 		}, [ref]);
-
-		// Announce content to screen readers
-		useEffect(() => {
-			if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-				// Cancel any ongoing speech
-				window.speechSynthesis.cancel();
-			}
-		}, [input]);
 
 		// Handle reduced motion
 		const shouldReduceMotion = useCallback(() => {
@@ -47,7 +39,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		}, []);
 
 		return (
-			<div 
+			<div
 				className="px-4 py-2.5 border-t border-border/50 bg-gradient-to-t from-muted/20 to-transparent backdrop-blur-sm shrink-0 space-y-2"
 				onClick={handleContainerClick}
 				role="form"
@@ -78,20 +70,18 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 								aria-autocomplete="list"
 								aria-multiline="false"
 								aria-current={isFocused}
-								enterKeyHint="execute"
+								enterKeyHint="enter"
 							/>
-							{/* Visible input display */}
-							<div 
+							{/* Visible input display with blinking cursor */}
+							<div
 								className="whitespace-pre-wrap break-all min-h-[1.25rem] text-foreground"
 								aria-hidden="true"
 							>
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block w-2 h-4 -mb-0.5 rounded-sm',
-										isFocused && !shouldReduceMotion()
-											? 'bg-primary/80 shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)] animate-pulse'
-											: 'bg-primary/60',
+										'inline-block w-[2px] h-4 -mb-0.5 bg-primary',
+										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
 								/>
@@ -102,7 +92,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 				</div>
 			</div>
 		);
-	}
+	},
 );
 
 TerminalInput.displayName = 'TerminalInput';
