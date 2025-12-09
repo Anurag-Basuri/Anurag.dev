@@ -77,15 +77,18 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 								className="whitespace-pre-wrap break-all min-h-[1.25rem] text-foreground"
 								aria-hidden="true"
 							>
+								{/* Render text with block cursor */}
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block w-[2px] h-4 -mb-0.5 bg-primary',
+										'inline-block min-w-[1ch] bg-primary text-primary-foreground',
 										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
-								/>
-								<span>{input.substring(cursorPos)}</span>
+								>
+									{input[cursorPos] || ' '}
+								</span>
+								<span>{input.substring(cursorPos + 1)}</span>
 							</div>
 						</div>
 					</div>
