@@ -1,15 +1,8 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import {
-	mainVerticalSizesAtom,
-	mainHorizontalSizesAtom,
-} from '@/store/atoms';
-import {
-	ResizableHandle,
-	ResizablePanel,
-	ResizablePanelGroup,
-} from '@/components/ui/resizable';
+import { mainVerticalSizesAtom, mainHorizontalSizesAtom } from '@/store/atoms';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
 import { FolderTree } from '@/components/os/file-system/FolderTree';
@@ -26,6 +19,7 @@ import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
+import { cn } from '@/lib/utils';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -54,10 +48,7 @@ export function MainLayout() {
 			onLayout={setMainHorizontalSizes}
 			className="h-full"
 		>
-			<ResizablePanel
-				{...sidebar.panelProps}
-				defaultSize={mainHorizontalSizes[0]}
-			>
+			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 				<div className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden">
 					{sidebar.isCollapsed ? (
 						<CollapsedSidebar onExpand={sidebar.expand} />
@@ -94,7 +85,11 @@ export function MainLayout() {
 					<ResizablePanel
 						{...terminal.panelProps}
 						defaultSize={mainVerticalSizes[1]}
-						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
+						className={cn(
+							'rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden!',
+							terminal.isCollapsed &&
+								'bg-transparent border-none shadow-none backdrop-blur-none overflow-visible!',
+						)}
 					>
 						<CLI
 							onToggleCollapse={terminal.toggle}
