@@ -49,7 +49,13 @@ export function MainLayout() {
 			className="h-full"
 		>
 			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
-				<div className="h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden">
+				<div
+					className={cn(
+						'h-full rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden',
+						sidebar.isCollapsed &&
+							'bg-transparent border-none shadow-none backdrop-blur-none overflow-visible!',
+					)}
+				>
 					{sidebar.isCollapsed ? (
 						<CollapsedSidebar onExpand={sidebar.expand} />
 					) : (
@@ -75,7 +81,7 @@ export function MainLayout() {
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] !overflow-hidden"
+						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-[0_10px_40px_-20px_rgba(0,0,0,0.45)] overflow-hidden!"
 					>
 						<EditorArea />
 					</ResizablePanel>
