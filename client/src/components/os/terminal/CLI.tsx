@@ -33,7 +33,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				return;
 			}
 
-			// Enter: Execute command (always execute, don't apply suggestions)
+			// Enter: Execute command
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				if (terminalState.input.trim()) {
@@ -43,34 +43,41 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				return;
 			}
 
-			// Tab: Apply first suggestion
+			// Tab: Cycle through suggestions or apply first one
 			if (e.key === 'Tab') {
 				e.preventDefault();
 				if (terminalState.suggestions.length > 0) {
-					const suggestion =
-						terminalState.suggestions[terminalState.activeSuggestionIndex];
-					terminalState.applySuggestion(suggestion);
+					if (e.shiftKey) {
+						// Shift+Tab: Previous suggestion
+						const newIndex =
+							terminalState.activeSuggestionIndex > 0
+								? terminalState.activeSuggestionIndex - 1
+								: terminalState.suggestions.length - 1;
+						terminalState.setActiveSuggestionIndex(newIndex);
+						terminalState.applySuggestion(terminalState.suggestions[newIndex]);
+					} else {
+						// Tab: Next suggestion or apply current
+						const newIndex =
+							(terminalState.activeSuggestionIndex + 1) %
+							terminalState.suggestions.length;
+						terminalState.setActiveSuggestionIndex(newIndex);
+						terminalState.applySuggestion(terminalState.suggestions[newIndex]);
+					}
 				}
 				return;
 			}
 
-			// Escape: Clear suggestions
+			// Escape: Clear suggestions and reset
 			if (e.key === 'Escape') {
 				e.preventDefault();
 				terminalState.setActiveSuggestionIndex(0);
 				return;
 			}
 
-			// Arrow Up: Previous command or navigate suggestions
+			// Arrow Up: Always navigate command history
 			if (e.key === 'ArrowUp') {
 				e.preventDefault();
-				if (terminalState.suggestions.length > 0) {
-					const newIndex =
-						terminalState.activeSuggestionIndex > 0
-							? terminalState.activeSuggestionIndex - 1
-							: terminalState.suggestions.length - 1;
-					terminalState.setActiveSuggestionIndex(newIndex);
-				} else if (terminalState.cmdHistory.length > 0) {
+				if (terminalState.cmdHistory.length > 0) {
 					const newIndex =
 						terminalState.historyIndex === -1
 							? terminalState.cmdHistory.length - 1
@@ -83,16 +90,10 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				return;
 			}
 
-			// Arrow Down: Next command
+			// Arrow Down: Always navigate command history
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
-				if (terminalState.suggestions.length > 0) {
-					const newIndex =
-						terminalState.activeSuggestionIndex < terminalState.suggestions.length - 1
-							? terminalState.activeSuggestionIndex + 1
-							: 0;
-					terminalState.setActiveSuggestionIndex(newIndex);
-				} else if (terminalState.historyIndex !== -1) {
+				if (terminalState.historyIndex !== -1) {
 					const newIndex = terminalState.historyIndex + 1;
 					if (newIndex >= terminalState.cmdHistory.length) {
 						terminalState.setHistoryIndex(-1);
@@ -108,7 +109,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				return;
 			}
 
-			// Page Up/Down for history navigation
+			// Page Up: Jump to first command in history
 			if (e.key === 'PageUp') {
 				e.preventDefault();
 				if (terminalState.cmdHistory.length > 0) {
@@ -120,6 +121,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				return;
 			}
 
+			// Page Down: Clear to current input
 			if (e.key === 'PageDown') {
 				e.preventDefault();
 				terminalState.setHistoryIndex(-1);
@@ -166,10 +168,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 						onToggleCollapse={onToggleCollapse}
 					>
 						<TerminalHistory history={terminalState.history} />
-						<TerminalPrompt
-							terminalState={terminalState}
-							onKeyDown={handleKeyDown}
-						/>
+						<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
 					</TerminalLayout>
 				</motion.div>
 			)}
