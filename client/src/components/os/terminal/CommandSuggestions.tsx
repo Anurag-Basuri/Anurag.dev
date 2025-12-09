@@ -17,36 +17,46 @@ export function CommandSuggestions({
 		return false;
 	};
 
-	const handleKeyDown = useCallback((e: React.KeyboardEvent, suggestion: string, index: number) => {
-		switch (e.key) {
-			case 'Enter':
-			case ' ':
-				e.preventDefault();
-				onApplySuggestion(suggestion);
-				break;
-			case 'ArrowRight':
-			case 'Tab':
-				e.preventDefault();
-				onApplySuggestion(suggestion);
-				break;
-			case 'ArrowDown':
-				e.preventDefault();
-				if (index < suggestions.length - 1) {
-					onSetActiveIndex(index + 1);
-				}
-				break;
-			case 'ArrowUp':
-				e.preventDefault();
-				if (index > 0) {
-					onSetActiveIndex(index - 1);
-				}
-				break;
-			case 'Escape':
-				e.preventDefault();
-				// Clear suggestions by returning focus to input
-				break;
-		}
-	}, [suggestions, onApplySuggestion, onSetActiveIndex]);
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent, suggestion: string, index: number) => {
+			switch (e.key) {
+				case 'Enter':
+				case ' ':
+					e.preventDefault();
+					onApplySuggestion(suggestion);
+					break;
+				case 'ArrowRight':
+				case 'Tab':
+					e.preventDefault();
+					onApplySuggestion(suggestion);
+					break;
+				case 'ArrowDown':
+					e.preventDefault();
+					if (index < suggestions.length - 1) {
+						onSetActiveIndex(index + 1);
+					}
+					break;
+				case 'ArrowUp':
+					e.preventDefault();
+					if (index > 0) {
+						onSetActiveIndex(index - 1);
+					}
+					break;
+				case 'Escape':
+					e.preventDefault();
+					// Reset active suggestion and focus the terminal input to dismiss suggestions UX
+					onSetActiveIndex(0);
+					if (typeof document !== 'undefined') {
+						const input = document.querySelector(
+							'input[role="textbox"][aria-autocomplete="list"]',
+						) as HTMLInputElement | null;
+						input?.focus();
+					}
+					break;
+			}
+		},
+		[suggestions, onApplySuggestion, onSetActiveIndex],
+	);
 
 	if (suggestions.length === 0) return null;
 
@@ -68,7 +78,7 @@ export function CommandSuggestions({
 						onApplySuggestion(suggestion);
 					}}
 					onMouseEnter={() => onSetActiveIndex(idx)}
-					onKeyDown={(e) => handleKeyDown(e, suggestion, idx)}
+					onKeyDown={e => handleKeyDown(e, suggestion, idx)}
 					role="option"
 					aria-selected={idx === activeSuggestionIndex}
 					aria-label={`Suggestion ${idx + 1} of ${suggestions.length}: ${suggestion}`}
