@@ -1,4 +1,4 @@
-import type { CommandResponse } from '@/lib/commandSystem';
+import type { CommandResponse } from '@/lib/commands';
 
 export type { CommandResponse };
 

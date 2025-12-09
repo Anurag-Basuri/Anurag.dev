@@ -40,7 +40,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 
 		return (
 			<div
-				className="px-4 py-2.5 border-t border-border/50 bg-gradient-to-t from-muted/20 to-transparent backdrop-blur-sm shrink-0 space-y-2"
+				className="px-4 py-2.5 border-t border-border/50 bg-linear-to-t from-muted/20 to-transparent backdrop-blur-sm shrink-0 space-y-2"
 				onClick={handleContainerClick}
 				role="form"
 				aria-label="Terminal input form"
@@ -74,19 +74,22 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 							/>
 							{/* Visible input display with blinking cursor */}
 							<div
-								className="whitespace-pre-wrap break-all min-h-[1.25rem] text-foreground"
+								className="whitespace-pre-wrap break-all min-h-5 text-foreground"
 								aria-hidden="true"
 							>
 								{/* Render text with block cursor */}
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block min-w-[1ch] bg-primary text-primary-foreground',
+										'inline-block min-w-[0.6em] bg-primary text-primary-foreground select-none',
 										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
 								>
-									{input[cursorPos] || ' '}
+									{/* Use non-breaking space if char is missing or space to ensure block has width */}
+									{input[cursorPos] === ' '
+										? '\u00A0'
+										: input[cursorPos] || '\u00A0'}
 								</span>
 								<span>{input.substring(cursorPos + 1)}</span>
 							</div>
