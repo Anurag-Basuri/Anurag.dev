@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
+import { Download, Linkedin, Github, Mail, FolderOpen, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
@@ -11,91 +12,91 @@ interface SidebarProfileProps {
 
 export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 	return (
-		<div className="bg-sidebar">
-			{/* Header with traffic lights */}
-			<div className="px-3 py-2 border-b border-border/40 flex items-center gap-3 bg-muted/10">
-				<div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
-					<button
-						onClick={onCollapse}
-						className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors shadow-sm"
-						aria-label="Collapse sidebar"
-						title="Collapse"
-					/>
-					<div className="w-3 h-3 rounded-full bg-yellow-500/80 shadow-sm" />
-					<div className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-sm" />
-				</div>
-				<div className="h-4 w-px bg-border/40" />
+		<div className="bg-transparent">
+			{/* Header - matching terminal style (h-6) */}
+			<header className="h-6 px-2 border-b border-white/8 bg-[#161b22] flex items-center justify-between shrink-0 select-none">
+				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2">
-					<FolderOpen className="w-3.5 h-3.5 text-primary" />
-					<span className="text-xs font-semibold text-muted-foreground tracking-wide uppercase">
-						explorer
-					</span>
+					{/* macOS Traffic Lights */}
+					<div className="flex items-center gap-1.5">
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onCollapse}
+							className="w-2.5 h-2.5 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn"
+							aria-label="Collapse sidebar"
+							title="Collapse"
+						>
+							<Minus className="w-1.5 h-1.5 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						</motion.button>
+						<div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+						<div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+					</div>
+
+					{/* Separator */}
+					<div className="h-3 w-px bg-white/8" aria-hidden="true" />
+
+					{/* Explorer Title */}
+					<div className="flex items-center gap-1.5 text-[10px] font-mono">
+						<FolderOpen className="w-3 h-3 text-emerald-500" aria-hidden="true" />
+						<span className="text-white/50">Explorer</span>
+					</div>
 				</div>
-			</div>
+			</header>
 
-			{/* Profile Section */}
-			<div className="p-4 border-b border-border/40 relative overflow-hidden group/profile">
-				{/* Background Pattern */}
-				<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover/profile:opacity-100 transition-opacity duration-500" />
-
-				<div className="flex items-center gap-4 mb-5 relative z-10">
-					<div className="relative shrink-0 group">
-						<div className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/20 group-hover:border-primary/50 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.2)]">
+			{/* Profile Section - compact */}
+			<div className="p-3 border-b border-white/8">
+				<div className="flex items-center gap-3">
+					{/* Avatar */}
+					<div className="relative shrink-0">
+						<div className="w-10 h-10 rounded-full overflow-hidden border border-white/10">
 							<Image
 								src="/profile.png"
 								alt="Profile"
-								width={56}
-								height={56}
+								width={40}
+								height={40}
 								className="w-full h-full object-cover"
 								priority
 							/>
 						</div>
 						{/* Online indicator */}
-						<div className="absolute bottom-0 right-0 flex items-center justify-center">
-							<div className="absolute w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping opacity-75" />
-							<div className="relative w-3 h-3 bg-emerald-500 rounded-full border-2 border-sidebar shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-						</div>
+						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#161b22]" />
 					</div>
-					<div className="overflow-hidden min-w-0 flex-1">
-						<h3 className="font-bold text-base truncate text-foreground tracking-tight leading-tight mb-0.5 group-hover/profile:text-primary transition-colors">
+
+					{/* Info */}
+					<div className="min-w-0 flex-1">
+						<h3 className="font-semibold text-sm text-white/90 truncate leading-tight">
 							Anurag Basuri
 						</h3>
-						<p className="text-[11px] text-muted-foreground truncate font-mono tracking-wide bg-muted/30 inline-block px-1.5 py-0.5 rounded">
+						<p className="text-[10px] text-white/40 font-mono truncate">
 							Full Stack Engineer
 						</p>
 					</div>
 				</div>
 
-				{/* Action Buttons */}
-				<div className="grid gap-2 relative z-10">
+				{/* Action Buttons - minimal */}
+				<div className="mt-3 grid gap-2">
 					<a
 						href="/resume.pdf"
 						target="_blank"
-						className="flex items-center justify-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/15 border border-primary/20 hover:border-primary/30 rounded-md text-xs font-semibold text-primary transition-all duration-200 group/btn"
+						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-colors"
 					>
-						<Download className="w-3.5 h-3.5 group-hover/btn:translate-y-0.5 transition-transform duration-200" />
-						<span className="tracking-wide uppercase text-[10px]">Download Resume</span>
+						<Download className="w-3 h-3" />
+						<span className="uppercase tracking-wider">Resume</span>
 					</a>
 
-					<div className="flex gap-2 justify-between mt-1">
+					<div className="flex gap-1.5">
 						<SocialButton
 							href="https://linkedin.com/in/anurag-basuri"
 							icon={Linkedin}
 							label="LinkedIn"
-							colorClass="hover:text-[#0077b5] hover:bg-[#0077b5]/10 hover:border-[#0077b5]/30"
 						/>
 						<SocialButton
 							href="https://github.com/Anurag-Basuri"
 							icon={Github}
 							label="GitHub"
-							colorClass="hover:text-foreground hover:bg-foreground/10 hover:border-foreground/30"
 						/>
-						<SocialButton
-							href="mailto:contact@anurag.dev"
-							icon={Mail}
-							label="Email"
-							colorClass="hover:text-amber-500 hover:bg-amber-500/10 hover:border-amber-500/30"
-						/>
+						<SocialButton href="mailto:contact@anurag.dev" icon={Mail} label="Email" />
 					</div>
 				</div>
 			</div>
@@ -107,25 +108,20 @@ function SocialButton({
 	href,
 	icon: Icon,
 	label,
-	colorClass,
 }: {
 	href: string;
 	icon: React.ElementType<{ className?: string }>;
 	label: string;
-	colorClass: string;
 }) {
 	return (
 		<a
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-			className={cn(
-				'flex-1 flex items-center justify-center p-2 rounded-md border border-border/40 transition-all duration-200 text-muted-foreground',
-				colorClass,
-			)}
+			className="flex-1 flex items-center justify-center h-7 rounded border border-white/8 bg-white/2 hover:bg-white/5 hover:border-white/15 transition-colors text-white/40 hover:text-white/70"
 			title={label}
 		>
-			<Icon className="w-4 h-4" />
+			<Icon className="w-3.5 h-3.5" />
 		</a>
 	);
 }
