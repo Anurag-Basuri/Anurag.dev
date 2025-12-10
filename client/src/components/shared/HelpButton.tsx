@@ -122,14 +122,14 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						<button
 							onClick={() => setIsOpen(true)}
 							className={cn(
-								'h-8 px-2.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+								'h-8 px-2 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 								className,
 							)}
 							aria-label="Quick Help"
 							ref={triggerRef}
 						>
 							<HelpCircle className="w-4 h-4" />
-							<span className="text-[11px] sm:text-xs">Help</span>
+							<span className="text-xs">Help</span>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="top">Quick Help</TooltipContent>

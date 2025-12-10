@@ -120,15 +120,13 @@ export function Taskbar() {
 									ref={startButtonRef}
 									onClick={() => setIsStartOpen(!isStartOpen)}
 									className={cn(
-										'h-8 px-2.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+										'h-8 px-2 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 										isStartOpen &&
 											'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
 									)}
 								>
 									<Logo />
-									<span className="text-[11px] sm:text-xs font-medium">
-										Start
-									</span>
+									<span className="text-xs font-medium">Start</span>
 								</button>
 							</TooltipTrigger>
 							<TooltipContent side="top" align="center">
