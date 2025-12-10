@@ -11,7 +11,7 @@ import {
 	Wifi,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/os/file-system/FolderTree';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
@@ -92,6 +92,7 @@ export function TopBar({
 								side="left"
 								className="w-[280px] p-0 bg-[#0d1117]/95 backdrop-blur-xl border-r border-white/10"
 							>
+								<SheetTitle className="sr-only">File Explorer</SheetTitle>
 								<div className="flex-1 overflow-hidden h-full">
 									<ScrollArea className="h-full">
 										<div className="p-4">

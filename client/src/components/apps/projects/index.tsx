@@ -9,7 +9,7 @@ import { ExternalLink, Github, Star, GitFork, Sparkles, FolderKanban, Rocket } f
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Skeleton Loading Component
 function ProjectCardSkeleton() {
@@ -296,9 +296,9 @@ export function ProjectsModule() {
 									</div>
 									<div className="absolute inset-0 bg-linear-to-t from-[#0d1117] to-transparent" />
 									<div className="absolute bottom-4 left-6">
-										<h2 className="text-2xl font-bold text-white">
+										<DialogTitle className="text-2xl font-bold text-white">
 											{selectedProject.title}
-										</h2>
+										</DialogTitle>
 									</div>
 								</div>
 
@@ -325,9 +325,9 @@ export function ProjectsModule() {
 										</div>
 									</div>
 
-									<p className="text-muted-foreground leading-relaxed">
+									<DialogDescription className="text-muted-foreground leading-relaxed">
 										{selectedProject.description}
-									</p>
+									</DialogDescription>
 
 									<div className="space-y-2">
 										<h3 className="text-sm font-medium text-white">
