@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 import { useEffect, useState } from 'react';
 import { api, Project } from '@/lib/api';
@@ -8,6 +9,7 @@ import { ExternalLink, Github, Star, GitFork, Sparkles, FolderKanban, Rocket } f
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 // Skeleton Loading Component
 function ProjectCardSkeleton() {
@@ -27,14 +29,89 @@ function ProjectCardSkeleton() {
 	);
 }
 
-// ... imports
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
-} from '@/components/ui/dialog';
+const ProjectCard = React.memo(function ProjectCard({
+	project,
+	index,
+	onClick,
+}: {
+	project: Project;
+	index: number;
+	onClick: () => void;
+}) {
+	return (
+		<motion.div
+			layout
+			initial={{ opacity: 0, scale: 0.9 }}
+			animate={{ opacity: 1, scale: 1 }}
+			exit={{ opacity: 0, scale: 0.9 }}
+			transition={{ duration: 0.2 }}
+			whileHover={{ y: -5 }}
+			onClick={onClick}
+			className="group flex flex-col h-full bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 cursor-pointer"
+		>
+			{/* Thumbnail Section */}
+			<div className="relative h-40 overflow-hidden bg-muted/10">
+				<div>
+					<Image
+						src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
+							project.title,
+						)}`}
+						className="w-full h-full object-cover"
+						alt={project.title}
+						fill
+						sizes="(max-width: 768px) 100vw, 33vw"
+						// Only prioritize the first 3 images (above fold likely)
+						priority={index < 3}
+						loading={index < 3 ? 'eager' : 'lazy'}
+					/>
+				</div>
+				<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/10 to-transparent" />
+				<div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+					<h3 className="font-bold text-foreground group-hover:text-cyan-400 transition-colors truncate pr-2">
+						{project.title}
+					</h3>
+					{project.status && (
+						<span
+							className={cn(
+								'text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase',
+								project.status === 'Completed'
+									? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+									: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+							)}
+						>
+							{project.status === 'Completed' ? 'Done' : 'WIP'}
+						</span>
+					)}
+				</div>
+			</div>
+
+			{/* Content Section */}
+			<div className="p-4 flex flex-col flex-1">
+				<p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
+					{project.description}
+				</p>
+
+				<div className="mt-auto space-y-3">
+					<div className="flex flex-wrap gap-1">
+						{project.techStack.slice(0, 3).map(tech => (
+							<span
+								key={tech}
+								className="px-1.5 py-0.5 text-[10px] bg-muted/30 border border-border/50 rounded font-medium text-muted-foreground"
+							>
+								{tech}
+							</span>
+						))}
+						{project.techStack.length > 3 && (
+							<span className="px-1.5 py-0.5 text-[10px] text-muted-foreground">
+								+{project.techStack.length - 3}
+							</span>
+						)}
+					</div>
+				</div>
+			</div>
+		</motion.div>
+	);
+});
 
 export function ProjectsModule() {
 	const [projects, setProjects] = useState<Project[]>([]);
@@ -187,76 +264,12 @@ export function ProjectsModule() {
 					{filteredProjects
 						.filter(p => filter !== 'all' || p.id !== featuredProject?.id)
 						.map((project, index) => (
-							<motion.div
+							<ProjectCard
 								key={project.id}
-								layout
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9 }}
-								transition={{ duration: 0.2 }}
-								whileHover={{ y: -5 }}
+								project={project}
+								index={index}
 								onClick={() => setSelectedProject(project)}
-								className="group flex flex-col h-full bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 cursor-pointer"
-							>
-								{/* Thumbnail Section */}
-								<div className="relative h-40 overflow-hidden bg-muted/10">
-									<div>
-										<Image
-											src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
-												project.title,
-											)}`}
-											className="w-full h-full object-cover"
-											alt={project.title}
-											fill
-											sizes="(max-width: 768px) 100vw, 50vw"
-											priority
-										/>
-									</div>
-									<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/10 to-transparent" />
-									<div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
-										<h3 className="font-bold text-foreground group-hover:text-cyan-400 transition-colors truncate pr-2">
-											{project.title}
-										</h3>
-										{project.status && (
-											<span
-												className={cn(
-													'text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase',
-													project.status === 'Completed'
-														? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-														: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-												)}
-											>
-												{project.status === 'Completed' ? 'Done' : 'WIP'}
-											</span>
-										)}
-									</div>
-								</div>
-
-								{/* Content Section */}
-								<div className="p-4 flex flex-col flex-1">
-									<p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
-										{project.description}
-									</p>
-
-									<div className="mt-auto space-y-3">
-										<div className="flex flex-wrap gap-1">
-											{project.techStack.slice(0, 3).map(tech => (
-												<span
-													key={tech}
-													className="px-1.5 py-0.5 text-[10px] bg-muted/30 border border-border/50 rounded font-medium text-muted-foreground"
-												>
-													{tech}
-												</span>
-											))}
-											{project.techStack.length > 3 && (
-												<span className="px-1.5 py-0.5 text-[10px] text-muted-foreground">
-													+{project.techStack.length - 3}
-												</span>
-											)}
-										</div>
-									</div>
-								</div>
-							</motion.div>
+							/>
 						))}
 				</div>
 
