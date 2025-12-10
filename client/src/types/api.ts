@@ -13,6 +13,7 @@ export interface Project {
 	commits?: number;
 	createdAt: string;
 	updatedAt: string;
+	featured?: boolean;
 }
 
 export interface JourneyEntry {
@@ -45,6 +46,11 @@ export interface ContactFormData {
 	message: string;
 }
 
+export interface Skill {
+	name: string;
+	level: number; // 0-100
+}
+
 export interface AboutData {
 	name: string;
 	tagline: string;
@@ -53,8 +59,8 @@ export interface AboutData {
 	philosophy: string;
 	callToAction: string;
 	skills: {
-		frontend: string[];
-		backend: string[];
-		ml: string[];
+		frontend: Skill[];
+		backend: Skill[];
+		ml: Skill[];
 	};
 }
