@@ -40,10 +40,30 @@ export function Taskbar() {
 	const { openWindow } = useWindowManager();
 	const stateMenuRef = useRef<HTMLDivElement>(null);
 	const startButtonRef = useRef<HTMLButtonElement>(null);
+	const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
+	// Close with Escape and restore focus to trigger
 	useEffect(() => {
 		if (!isStartOpen) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setIsStartOpen(false);
+				startButtonRef.current?.focus();
+			}
+		};
+		document.addEventListener('keydown', onKey);
+		return () => document.removeEventListener('keydown', onKey);
+	}, [isStartOpen]);
 
+	// Focus the first menu item for immediate keyboard access
+	useEffect(() => {
+		if (!isStartOpen) return;
+		firstMenuItemRef.current?.focus();
+	}, [isStartOpen]);
+
+	// Close panel when clicking outside
+	useEffect(() => {
+		if (!isStartOpen) return;
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Node;
 			const isClickInsideStart =
@@ -61,6 +81,39 @@ export function Taskbar() {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, [isStartOpen]);
+
+	// Trap Tab inside the menu when open
+	const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (!isStartOpen || !stateMenuRef.current) return;
+		if (e.key !== 'Tab') return;
+
+		const focusableSelectors = [
+			'button',
+			'[href]',
+			'input',
+			'select',
+			'textarea',
+			'[tabindex]:not([tabindex="-1"])',
+		].join(',');
+		const focusables = Array.from(
+			stateMenuRef.current.querySelectorAll<HTMLElement>(focusableSelectors),
+		).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+
+		if (focusables.length === 0) return;
+
+		const first = focusables[0];
+		const last = focusables[focusables.length - 1];
+		const active = document.activeElement as HTMLElement | null;
+		const isShift = e.shiftKey;
+
+		if (!isShift && active === last) {
+			e.preventDefault();
+			first.focus();
+		} else if (isShift && active === first) {
+			e.preventDefault();
+			last.focus();
+		}
+	};
 
 	const handleTaskbarClick = (id: string) => {
 		const window = windows.find(w => w.id === id);
@@ -137,106 +190,119 @@ export function Taskbar() {
 						{/* Start Menu */}
 						<AnimatePresence>
 							{isStartOpen && (
-								<motion.div
-									ref={stateMenuRef}
-									initial={{ opacity: 0, y: 10, scale: 0.95 }}
-									animate={{ opacity: 1, y: 0, scale: 1 }}
-									exit={{ opacity: 0, y: 10, scale: 0.95 }}
-									transition={{ duration: 0.15, ease: 'easeOut' }}
-									tabIndex={0}
-									onKeyDown={e => {
-										if (e.key === 'Escape') setIsStartOpen(false);
-									}}
-									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 rounded-xl overflow-hidden"
-								>
-									<div>
-										<div className="flex items-center gap-3 mb-2">
-											<Image
-												src="/me.jpg"
-												alt="Anurag Basuri"
-												width={48}
-												height={48}
-												className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
-												priority
-											/>
-											<div>
-												<div className="font-bold text-white">
-													Anurag Basuri
-												</div>
-												<div className="text-xs text-white/50">
-													Full-Stack Developer
+								<>
+									{/* Backdrop */}
+									<motion.div
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										exit={{ opacity: 0 }}
+										onClick={() => setIsStartOpen(false)}
+										className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-40"
+									/>
+
+									{/* Popover */}
+									<motion.div
+										ref={stateMenuRef}
+										initial={{ opacity: 0, scale: 0.9, y: 20 }}
+										animate={{ opacity: 1, scale: 1, y: 0 }}
+										exit={{ opacity: 0, scale: 0.9, y: 20 }}
+										transition={{ type: 'spring', duration: 0.3 }}
+										tabIndex={0}
+										onKeyDown={handleMenuKeyDown}
+										className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 rounded-xl overflow-hidden"
+									>
+										<div>
+											<div className="flex items-center gap-3 mb-2">
+												<Image
+													src="/me.jpg"
+													alt="Anurag Basuri"
+													width={48}
+													height={48}
+													className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+													priority
+												/>
+												<div>
+													<div className="font-bold text-white">
+														Anurag Basuri
+													</div>
+													<div className="text-xs text-white/50">
+														Full-Stack Developer
+													</div>
 												</div>
 											</div>
-										</div>
 
-										<div className="grid grid-cols-2 gap-1">
-											{menuItems.map(item => (
-												<button
-													key={item.id}
-													onClick={() => handleOpenModule(item.id)}
-													className="w-full text-left px-3 py-2 hover:bg-white/10 hover:text-emerald-400 text-white/60 transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
-												>
-													<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
-													{item.label}
-												</button>
-											))}
-										</div>
-
-										<div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
-											<div className="flex items-center gap-1">
-												{socialLinks.map(link => (
-													<Tooltip key={link.label}>
-														<TooltipTrigger asChild>
-															<a
-																href={link.href}
-																target="_blank"
-																rel="noopener noreferrer"
-																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-emerald-400 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-															>
-																<link.icon className="w-4 h-4" />
-															</a>
-														</TooltipTrigger>
-														<TooltipContent side="top">
-															<p>{link.label}</p>
-														</TooltipContent>
-													</Tooltip>
+											<div className="grid grid-cols-2 gap-1">
+												{menuItems.map((item, index) => (
+													<button
+														key={item.id}
+														ref={index === 0 ? firstMenuItemRef : null}
+														onClick={() => handleOpenModule(item.id)}
+														className="w-full text-left px-3 py-2 hover:bg-white/10 hover:text-emerald-400 text-white/60 transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
+													>
+														<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
+														{item.label}
+													</button>
 												))}
 											</div>
-											<div className="flex items-center">
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<button
-															onClick={() =>
-																toast('Settings coming soon!', {
-																	icon: '⚙️',
-																})
-															}
-															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
-														>
-															<Settings className="w-4 h-4" />
-														</button>
-													</TooltipTrigger>
-													<TooltipContent side="top">
-														<p>Settings</p>
-													</TooltipContent>
-												</Tooltip>
-												<Tooltip>
-													<TooltipTrigger asChild>
-														<button
-															onClick={() => window.location.reload()}
-															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400/40"
-														>
-															<Power className="w-4 h-4" />
-														</button>
-													</TooltipTrigger>
-													<TooltipContent side="top">
-														<p>Restart Session</p>
-													</TooltipContent>
-												</Tooltip>
+
+											<div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
+												<div className="flex items-center gap-1">
+													{socialLinks.map(link => (
+														<Tooltip key={link.label}>
+															<TooltipTrigger asChild>
+																<a
+																	href={link.href}
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-emerald-400 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+																>
+																	<link.icon className="w-4 h-4" />
+																</a>
+															</TooltipTrigger>
+															<TooltipContent side="top">
+																<p>{link.label}</p>
+															</TooltipContent>
+														</Tooltip>
+													))}
+												</div>
+												<div className="flex items-center">
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<button
+																onClick={() =>
+																	toast('Settings coming soon!', {
+																		icon: '⚙️',
+																	})
+																}
+																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+															>
+																<Settings className="w-4 h-4" />
+															</button>
+														</TooltipTrigger>
+														<TooltipContent side="top">
+															<p>Settings</p>
+														</TooltipContent>
+													</Tooltip>
+													<Tooltip>
+														<TooltipTrigger asChild>
+															<button
+																onClick={() =>
+																	window.location.reload()
+																}
+																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400/40"
+															>
+																<Power className="w-4 h-4" />
+															</button>
+														</TooltipTrigger>
+														<TooltipContent side="top">
+															<p>Restart Session</p>
+														</TooltipContent>
+													</Tooltip>
+												</div>
 											</div>
 										</div>
-									</div>
-								</motion.div>
+									</motion.div>
+								</>
 							)}
 						</AnimatePresence>
 					</div>
