@@ -49,7 +49,7 @@ function Stars(props: JSX.IntrinsicElements["group"]) {
 					size={0.002}
 					sizeAttenuation={true}
 					depthWrite={false}
-					opacity={isDark ? 0.8 : 0.6}
+					opacity={isDark ? 0.3 : 0.2}
 				/>
 			</Points>
 		</group>
@@ -67,7 +67,7 @@ function Grid() {
 				color={isDark ? '#00ffcc' : '#4f46e5'}
 				wireframe={true}
 				transparent={true}
-				opacity={isDark ? 0.05 : 0.03}
+				opacity={isDark ? 0.02 : 0.015}
 			/>
 		</mesh>
 	);

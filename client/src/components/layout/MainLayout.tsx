@@ -61,7 +61,7 @@ export function MainLayout() {
 			<ResizablePanelGroup
 				direction="horizontal"
 				onLayout={setMainHorizontalSizes}
-				className="h-full gap-1 transform-style-3d opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]"
+				className="h-full gap-2"
 			>
 				<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 					<AnimatePresence mode="wait">
@@ -101,7 +101,7 @@ export function MainLayout() {
 					<ResizablePanelGroup
 						direction="vertical"
 						onLayout={setMainVerticalSizes}
-						className="gap-1"
+						className="gap-2"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
