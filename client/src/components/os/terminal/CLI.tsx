@@ -180,12 +180,10 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 				>
 					<button
 						onClick={onToggleCollapse}
-						className="flex items-center justify-center w-full h-full cursor-pointer hover:bg-white/2 transition-colors"
+						className="flex items-center justify-center w-full h-full cursor-pointer group"
 						aria-label="Expand Terminal"
 					>
-						<span className="text-white/20 hover:text-white/40 text-lg tracking-[0.3em] transition-colors">
-							•••
-						</span>
+						<div className="h-0.5 w-60 rounded-full bg-white/10 group-hover:bg-emerald-500/50 group-hover:w-24 group-hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] transition-all duration-300" />
 					</button>
 				</motion.div>
 			) : (

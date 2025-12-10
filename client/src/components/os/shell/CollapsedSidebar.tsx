@@ -6,16 +6,12 @@ interface CollapsedSidebarProps {
 
 export function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
 	return (
-		<div className="h-full flex items-center justify-center">
-			<button
-				onClick={onExpand}
-				className="flex items-center justify-center w-full h-full cursor-pointer hover:bg-white/2 transition-colors"
-				aria-label="Expand Sidebar"
-			>
-				<span className="text-white/20 hover:text-white/40 text-lg tracking-[0.3em] transition-colors rotate-90">
-					•••
-				</span>
-			</button>
-		</div>
+		<button
+			onClick={onExpand}
+			className="w-full h-full flex items-center justify-center cursor-pointer group"
+			aria-label="Expand Sidebar"
+		>
+			<div className="w-0.5 h-50 rounded-full bg-white/10 group-hover:bg-emerald-500/50 group-hover:h-24 group-hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] transition-all duration-300" />
+		</button>
 	);
 }
