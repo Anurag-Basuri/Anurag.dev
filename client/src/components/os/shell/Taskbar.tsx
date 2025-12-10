@@ -99,7 +99,7 @@ export function Taskbar() {
 
 	return (
 		<TooltipProvider delayDuration={0}>
-			<div className="h-10 bg-background/40 backdrop-blur-xl border-t border-border/60 flex items-center justify-between z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] px-2 sm:px-3">
+			<div className="h-10 bg-[#0d1117]/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-40 shadow-[0_-2px_20px_rgba(0,0,0,0.3)] px-2 sm:px-3">
 				{/* Left side: Start and Window Icons */}
 				<div className="flex items-center gap-2 overflow-hidden">
 					{/* Start Button */}
@@ -109,9 +109,9 @@ export function Taskbar() {
 								<button
 									onClick={() => setIsStartOpen(!isStartOpen)}
 									className={cn(
-										'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/40',
-										'hover:bg-primary/10 hover:text-primary',
-										isStartOpen && 'bg-primary/15 text-primary',
+										'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/40 text-white/70',
+										'hover:bg-white/10 hover:text-emerald-400',
+										isStartOpen && 'bg-emerald-500/15 text-emerald-400',
 									)}
 								>
 									<Logo />
@@ -134,7 +134,7 @@ export function Taskbar() {
 									onKeyDown={e => {
 										if (e.key === 'Escape') setIsStartOpen(false);
 									}}
-									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-background/75 supports-[backdrop-filter:blur(0)]:bg-background/90 backdrop-blur-xl backdrop-saturate-150 border border-border/50 shadow-[0_0_40px_rgba(0,0,0,0.4)] p-2 rounded-lg overflow-hidden"
+									className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 rounded-xl overflow-hidden"
 								>
 									<div>
 										<div className="flex items-center gap-3 mb-2">
@@ -143,14 +143,14 @@ export function Taskbar() {
 												alt="Anurag Basuri"
 												width={48}
 												height={48}
-												className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-primary/50 shadow-[0_0_10px_rgba(var(--primary-rgb),0.4)]"
+												className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
 												priority
 											/>
 											<div>
-												<div className="font-bold text-primary drop-shadow-[0_0_5px_rgba(var(--primary-rgb),0.3)]">
+												<div className="font-bold text-white">
 													Anurag Basuri
 												</div>
-												<div className="text-xs text-muted-foreground">
+												<div className="text-xs text-white/50">
 													Full-Stack Developer
 												</div>
 											</div>
@@ -161,7 +161,7 @@ export function Taskbar() {
 												<button
 													key={item.id}
 													onClick={() => handleOpenModule(item.id)}
-													className="w-full text-left px-3 py-2 hover:bg-primary/10 hover:text-primary text-muted-foreground transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
+													className="w-full text-left px-3 py-2 hover:bg-white/10 hover:text-emerald-400 text-white/60 transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
 												>
 													<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
 													{item.label}
@@ -169,7 +169,7 @@ export function Taskbar() {
 											))}
 										</div>
 
-										<div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
+										<div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
 											<div className="flex items-center gap-1">
 												{socialLinks.map(link => (
 													<Tooltip key={link.label}>
@@ -178,7 +178,7 @@ export function Taskbar() {
 																href={link.href}
 																target="_blank"
 																rel="noopener noreferrer"
-																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-emerald-400 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
 															>
 																<link.icon className="w-4 h-4" />
 															</a>
@@ -211,7 +211,7 @@ export function Taskbar() {
 													<TooltipTrigger asChild>
 														<button
 															onClick={() => window.location.reload()}
-															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors focus:outline-none focus:ring-2 focus:ring-destructive/40"
+															className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400/40"
 														>
 															<Power className="w-4 h-4" />
 														</button>
