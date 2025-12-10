@@ -23,6 +23,8 @@ import { toast } from 'react-hot-toast';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/shared/HelpButton';
+import { WindowState } from '@/types/window';
+import React, { memo } from 'react';
 
 // A simple logo component
 const Logo = () => (
@@ -32,6 +34,95 @@ const Logo = () => (
 		</div>
 	</div>
 );
+
+const TaskbarItem = memo(function TaskbarItem({
+	window,
+	isActive,
+	onClick,
+	onClose,
+}: {
+	window: WindowState;
+	isActive: boolean;
+	onClick: () => void;
+	onClose: (e: React.MouseEvent) => void;
+}) {
+	const Icon = getModuleIcon(window.id);
+
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<motion.button
+					layout
+					initial={{ opacity: 0, scale: 0.01, y: 20 }}
+					animate={{ opacity: 1, scale: 1, y: 0 }}
+					exit={{ opacity: 0, scale: 0.01, y: 20 }}
+					transition={{
+						type: 'spring',
+						stiffness: 500,
+						damping: 30,
+						mass: 0.8,
+					}}
+					whileHover={{
+						scale: 1.1,
+						y: -3,
+						backgroundColor: 'rgba(255,255,255,0.08)',
+						borderColor: 'rgba(255,255,255,0.1)',
+					}}
+					whileTap={{ scale: 0.95 }}
+					onClick={onClick}
+					className={cn(
+						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform',
+						isActive
+							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
+							: 'bg-transparent border-transparent',
+					)}
+				>
+					<Icon
+						className={cn(
+							'w-3.5 h-3.5 transition-colors duration-300',
+							isActive
+								? 'text-emerald-400'
+								: 'text-white/60 group-hover:text-emerald-400',
+						)}
+					/>
+
+					<span
+						className={cn(
+							'text-[10px] font-medium transition-colors max-w-[100px] truncate',
+							isActive ? 'text-white/90' : 'text-white/50 group-hover:text-white',
+						)}
+					>
+						{window.title}
+					</span>
+
+					{/* Active Indicator (Glowing Pill Underneath) */}
+					{isActive && (
+						<motion.div
+							layoutId="active-pill"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							className="absolute -bottom-[2px] left-3 right-3 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+						/>
+					)}
+
+					{/* Close Button on Hover */}
+					<motion.div
+						initial={{ opacity: 1, scale: 1 }}
+						className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400"
+					>
+						<div role="button" onClick={onClose}>
+							<X className="w-2.5 h-2.5" />
+						</div>
+					</motion.div>
+				</motion.button>
+			</TooltipTrigger>
+			<TooltipContent side="top" className="text-xs font-medium">
+				{window.title}
+			</TooltipContent>
+		</Tooltip>
+	);
+});
 
 export function Taskbar() {
 	const [windows, setWindows] = useAtom(windowsAtom);
@@ -359,93 +450,19 @@ export function Taskbar() {
 					{/* Window Icons (Mac Dock Style) */}
 					<div className="flex items-center gap-1.5 h-full pl-1">
 						<AnimatePresence mode="popLayout">
-							{windows.map(window => {
-								const Icon = getModuleIcon(window.id);
-								const isActive =
-									window.id === activeWindowId && !window.isMinimized;
-
-								return (
-									<Tooltip key={window.id}>
-										<TooltipTrigger asChild>
-											<motion.button
-												layout
-												initial={{ opacity: 0, scale: 0.01, y: 20 }}
-												animate={{ opacity: 1, scale: 1, y: 0 }}
-												exit={{ opacity: 0, scale: 0.01, y: 20 }}
-												transition={{
-													type: 'spring',
-													stiffness: 500,
-													damping: 30,
-													mass: 0.8,
-												}}
-												whileHover={{
-													scale: 1.1,
-													y: -3,
-													backgroundColor: 'rgba(255,255,255,0.08)',
-													borderColor: 'rgba(255,255,255,0.1)',
-												}}
-												whileTap={{ scale: 0.95 }}
-												onClick={() => handleTaskbarClick(window.id)}
-												className={cn(
-													'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform',
-													isActive
-														? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
-														: 'bg-transparent border-transparent',
-												)}
-											>
-												<Icon
-													className={cn(
-														'w-3.5 h-3.5 transition-colors duration-300',
-														isActive
-															? 'text-emerald-400'
-															: 'text-white/60 group-hover:text-emerald-400',
-													)}
-												/>
-
-												<span
-													className={cn(
-														'text-[10px] font-medium transition-colors max-w-[100px] truncate',
-														isActive
-															? 'text-white/90'
-															: 'text-white/50 group-hover:text-white',
-													)}
-												>
-													{window.title}
-												</span>
-
-												{/* Active Indicator (Glowing Pill Underneath) */}
-												{isActive && (
-													<motion.div
-														layoutId="active-pill"
-														initial={{ opacity: 0 }}
-														animate={{ opacity: 1 }}
-														exit={{ opacity: 0 }}
-														className="absolute -bottom-[2px] left-3 right-3 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
-													/>
-												)}
-
-												{/* Close Button on Hover */}
-												<motion.div
-													initial={{ opacity: 1, scale: 1 }}
-													className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400"
-												>
-													<div
-														role="button"
-														onClick={e =>
-															handleCloseWindow(window.id, e)
-														}
-													>
-														<X className="w-2.5 h-2.5" />
-													</div>
-												</motion.div>
-											</motion.button>
-										</TooltipTrigger>
-										<TooltipContent side="top" className="text-xs font-medium">
-											{window.title}
-										</TooltipContent>
-									</Tooltip>
-								);
-							})}
+							<AnimatePresence mode="popLayout">
+								{windows.map(window => (
+									<TaskbarItem
+										key={window.id}
+										window={window}
+										isActive={
+											window.id === activeWindowId && !window.isMinimized
+										}
+										onClick={() => handleTaskbarClick(window.id)}
+										onClose={e => handleCloseWindow(window.id, e)}
+									/>
+								))}
+							</AnimatePresence>
 						</AnimatePresence>
 					</div>
 				</div>
