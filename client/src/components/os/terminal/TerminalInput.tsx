@@ -36,16 +36,16 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 				role="form"
 				aria-label="Terminal input form"
 			>
-				<div className="flex items-center gap-2 text-[13px] font-mono text-white/90">
+				<div className="flex items-center gap-2 text-[13px] font-mono text-foreground font-medium">
 					<span className="select-none shrink-0 py-1.5" aria-hidden="true">
-						<span className="text-emerald-400 font-semibold">root@anuragos</span>
-						<span className="text-white/40">:</span>
-						<span className="text-sky-400">{currentPath}</span>
-						<span className="text-emerald-300 pl-1">$</span>
+						<span className="text-primary font-bold">root@anuragos</span>
+						<span className="text-muted-foreground/50">:</span>
+						<span className="text-blue-400">{currentPath}</span>
+						<span className="text-primary/80 pl-1">$</span>
 					</span>
 
 					<div className="relative flex-1 min-w-0">
-						<div className="bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 shadow-inner">
+						<div className="bg-muted/10 px-2.5 py-1.5 rounded-lg border border-border/20 shadow-inner group-focus-within:border-primary/30 group-focus-within:bg-muted/20 transition-all">
 							{/* Hidden input for text capture */}
 							<input
 								ref={ref}
@@ -76,7 +76,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 								<span>{input.substring(0, cursorPos)}</span>
 								<span
 									className={cn(
-										'inline-block w-[2px] h-4 align-[-0.2em] bg-emerald-400 rounded-sm',
+										'inline-block w-[2px] h-4 align-[-0.2em] bg-primary rounded-sm',
 										isFocused && !shouldReduceMotion() && 'animate-blink',
 									)}
 									aria-hidden="true"
