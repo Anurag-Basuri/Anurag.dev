@@ -63,7 +63,11 @@ export function BlogModule() {
 					{filteredPosts.map((post, index) => {
 						const publishedDate = post.publishedAt
 							? new Date(post.publishedAt)
-							: new Date(posts.length > 0 && posts[0].publishedAt ? posts[0].publishedAt : 0);
+							: new Date(
+									posts.length > 0 && posts[0].publishedAt
+										? posts[0].publishedAt
+										: 0,
+							  );
 
 						return (
 							<motion.article
@@ -81,47 +85,48 @@ export function BlogModule() {
 										{publishedDate.getDate()}
 									</span>
 									<span className="text-xs uppercase tracking-wider font-medium">
-										{publishedDate.toLocaleString(
-											'default',
-											{ month: 'short', year: 'numeric' },
-										)}
+										{publishedDate.toLocaleString('default', {
+											month: 'short',
+											year: 'numeric',
+										})}
 									</span>
 								</div>
 
-							<div className="flex-1 space-y-3 z-10">
-								<div className="flex items-start justify-between gap-4">
-									<h2 className="text-xl font-bold text-foreground group-hover:text-emerald-400 transition-colors leading-tight">
-										{post.title}
-									</h2>
-									<ArrowUpRight className="w-5 h-5 text-muted-foreground opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" />
-								</div>
-
-								<p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed">
-									{post.content}
-								</p>
-
-								<div className="flex items-center gap-4 pt-2">
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
-										<Clock className="w-3.5 h-3.5" />
-										<span>5 min read</span>
+								<div className="flex-1 space-y-3 z-10">
+									<div className="flex items-start justify-between gap-4">
+										<h2 className="text-xl font-bold text-foreground group-hover:text-emerald-400 transition-colors leading-tight">
+											{post.title}
+										</h2>
+										<ArrowUpRight className="w-5 h-5 text-muted-foreground opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" />
 									</div>
 
-									{post.tags.length > 0 && (
-										<div className="flex flex-wrap gap-2">
-											{post.tags.map(tag => (
-												<span
-													key={tag}
-													className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/10"
-												>
-													#{tag}
-												</span>
-											))}
+									<p className="text-muted-foreground line-clamp-2 md:line-clamp-3 leading-relaxed">
+										{post.content}
+									</p>
+
+									<div className="flex items-center gap-4 pt-2">
+										<div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+											<Clock className="w-3.5 h-3.5" />
+											<span>5 min read</span>
 										</div>
-									)}
+
+										{post.tags.length > 0 && (
+											<div className="flex flex-wrap gap-2">
+												{post.tags.map(tag => (
+													<span
+														key={tag}
+														className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/10"
+													>
+														#{tag}
+													</span>
+												))}
+											</div>
+										)}
+									</div>
 								</div>
-							</div>
-						</motion.article>
-					)})}
+							</motion.article>
+						);
+					})}
 				</div>
 
 				{filteredPosts.length === 0 && (
