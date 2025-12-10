@@ -70,7 +70,7 @@ export function useCollapsiblePanel({
 		const panel = panelRef.current;
 		if (!panel) return;
 
-		if (panel.isCollapsed()) {
+		if (isCollapsed) {
 			panel.expand();
 			setIsCollapsed(false);
 			onExpand?.();
@@ -79,11 +79,11 @@ export function useCollapsiblePanel({
 			setIsCollapsed(true);
 			onCollapse?.();
 		}
-	}, [setIsCollapsed, onCollapse, onExpand]);
+	}, [isCollapsed, setIsCollapsed, onCollapse, onExpand]);
 
 	const expand = useCallback(() => {
 		const panel = panelRef.current;
-		if (!panel || !panel.isCollapsed()) return;
+		if (!panel) return;
 
 		panel.expand();
 		setIsCollapsed(false);
@@ -92,7 +92,7 @@ export function useCollapsiblePanel({
 
 	const collapse = useCallback(() => {
 		const panel = panelRef.current;
-		if (!panel || panel.isCollapsed()) return;
+		if (!panel) return;
 
 		panel.collapse();
 		setIsCollapsed(true);
