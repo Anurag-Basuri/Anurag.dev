@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
 	devIndicators: {
 		position: 'bottom-right',
 	},
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'placehold.co',
+			},
+		],
+	},
 };
 
 export default nextConfig;
