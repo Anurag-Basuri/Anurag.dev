@@ -83,7 +83,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.2 }}
-								className="h-full rounded-sm border border-border/60 bg-sidebar/80 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] flex flex-col"
+								className="h-full rounded-sm border border-border/60 bg-sidebar/20 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] flex flex-col"
 							>
 								<SidebarProfile onCollapse={sidebar.collapse} />
 
