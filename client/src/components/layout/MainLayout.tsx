@@ -61,7 +61,7 @@ export function MainLayout() {
 			<ResizablePanelGroup
 				direction="horizontal"
 				onLayout={setMainHorizontalSizes}
-				className="h-full gap-2"
+				className="h-full gap-1"
 			>
 				<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 					<AnimatePresence mode="wait">
@@ -101,7 +101,7 @@ export function MainLayout() {
 					<ResizablePanelGroup
 						direction="vertical"
 						onLayout={setMainVerticalSizes}
-						className="gap-2"
+						className="gap-1"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
@@ -159,7 +159,7 @@ export function MainLayout() {
 					onFileSelect={handleFileSelect}
 				/>
 
-				<div className="flex-1 overflow-hidden p-2">
+				<div className="flex-1 overflow-hidden p-1">
 					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
 				</div>
 
