@@ -41,21 +41,23 @@ export function Taskbar() {
 	const startMenuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (!isStartOpen) return;
-
 		const handleClickOutside = (event: MouseEvent) => {
-			if (startMenuRef.current && !startMenuRef.current.contains(event.target as Node)) {
+			const target = event.target as Node;
+			if (startMenuRef.current && !startMenuRef.current.contains(target)) {
 				setIsStartOpen(false);
 			}
 		};
-		// Use setTimeout to avoid the click that opened the menu from immediately closing it
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('mousedown', handleClickOutside);
-		}, 0);
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
+
+		if (isStartOpen) {
+			// Delay adding the listener to prevent immediate closure
+			const timer = requestAnimationFrame(() => {
+				document.addEventListener('click', handleClickOutside);
+			});
+			return () => {
+				cancelAnimationFrame(timer);
+				document.removeEventListener('click', handleClickOutside);
+			};
+		}
 	}, [isStartOpen]);
 
 	const handleTaskbarClick = (id: string) => {
