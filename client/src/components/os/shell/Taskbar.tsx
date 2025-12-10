@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
 import { getModuleIcon } from '@/lib/moduleRegistry';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import {
@@ -52,7 +52,7 @@ const TaskbarItem = memo(function TaskbarItem({
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<motion.button
+				<motion.div
 					layout
 					initial={{ opacity: 0, scale: 0.5, y: 10 }}
 					animate={{
@@ -89,7 +89,7 @@ const TaskbarItem = memo(function TaskbarItem({
 					whileTap={{ scale: 0.95 }}
 					onClick={onClick}
 					className={cn(
-						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform',
+						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform cursor-pointer',
 						isActive
 							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
 							: 'bg-transparent border-transparent',
@@ -133,7 +133,7 @@ const TaskbarItem = memo(function TaskbarItem({
 							<X className="w-2.5 h-2.5" />
 						</div>
 					</motion.div>
-				</motion.button>
+				</motion.div>
 			</TooltipTrigger>
 			<TooltipContent side="top" className="text-xs font-medium">
 				{window.title}
@@ -262,6 +262,11 @@ export function Taskbar() {
 	const handleOpenModule = (id: string) => {
 		setIsStartOpen(false);
 		openWindow(id);
+	};
+
+	const handleReorder = (newOrder: WindowState[]) => {
+		setWindows(newOrder);
+		setWindowStack(newOrder.map(w => w.id));
 	};
 
 	const handleCloseWindow = (id: string, e: React.MouseEvent) => {
@@ -500,19 +505,30 @@ export function Taskbar() {
 					{windows.length > 0 && <div className="h-4 w-px bg-white/10" />}
 
 					{/* Window Icons (Mac Dock Style) */}
-					<div className="flex items-center gap-1.5 h-full pl-1">
-						<AnimatePresence mode="popLayout">
-							{windows.map(window => (
+					<Reorder.Group
+						axis="x"
+						values={windows}
+						onReorder={handleReorder}
+						className="flex items-center gap-1.5 h-full pl-1"
+						as="div"
+					>
+						{windows.map(window => (
+							<Reorder.Item
+								key={window.id}
+								value={window}
+								as="div"
+								initial={false}
+								className="flex"
+							>
 								<TaskbarItem
-									key={window.id}
 									window={window}
 									isActive={window.id === activeWindowId && !window.isMinimized}
 									onClick={() => handleTaskbarClick(window.id)}
 									onClose={e => handleCloseWindow(window.id, e)}
 								/>
-							))}
-						</AnimatePresence>
-					</div>
+							</Reorder.Item>
+						))}
+					</Reorder.Group>
 				</div>
 
 				{/* Right Side Actions */}
