@@ -6,6 +6,7 @@ import { useTerminalState } from './useTerminalState';
 import { TerminalLayout } from './TerminalLayout';
 import { TerminalHistory } from './TerminalHistory';
 import { TerminalPrompt } from './TerminalPrompt';
+import { Terminal } from 'lucide-react';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
@@ -133,32 +134,69 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 		[terminalState],
 	);
 
+	// Animation variants for smooth spring-based transitions
+	const expandedVariants = {
+		initial: { opacity: 0, y: 20, scale: 0.98 },
+		animate: {
+			opacity: 1,
+			y: 0,
+			scale: 1,
+			transition: {
+				type: 'spring',
+				stiffness: 300,
+				damping: 25,
+			},
+		},
+		exit: {
+			opacity: 0,
+			y: 10,
+			scale: 0.98,
+			transition: { duration: 0.15 },
+		},
+	} as const;
+
+	const collapsedVariants = {
+		initial: { opacity: 0 },
+		animate: {
+			opacity: 1,
+			transition: { duration: 0.15 },
+		},
+		exit: {
+			opacity: 0,
+			transition: { duration: 0.1 },
+		},
+	} as const;
+
 	return (
 		<AnimatePresence mode="wait">
 			{externalIsCollapsed ? (
 				<motion.div
 					key="collapsed"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.15 }}
-					className="h-full flex items-center justify-center"
+					variants={collapsedVariants}
+					initial="initial"
+					animate="animate"
+					exit="exit"
+					className="h-full flex items-center justify-center bg-[#0d1117]/20 backdrop-blur-sm rounded-sm border border-white/5"
 				>
 					<button
 						onClick={onToggleCollapse}
-						className="group flex items-center justify-center w-full h-full cursor-pointer hover:bg-primary/5 transition-colors duration-200"
+						className="group flex items-center justify-center gap-3 w-full h-full cursor-pointer hover:bg-white/5 transition-all duration-200 rounded-sm"
 						aria-label="Expand Terminal"
 					>
-						<div className="w-64 h-1 rounded-full bg-white/20 group-hover:bg-primary/50 transition-all duration-200 shadow-[0_0_8px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_16px_var(--primary)]" />
+						<Terminal className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors" />
+						<div className="w-32 h-0.5 rounded-full bg-white/10 group-hover:bg-emerald-400/50 transition-all duration-200" />
+						<span className="text-[10px] text-white/30 group-hover:text-white/60 uppercase tracking-wider transition-colors">
+							Expand
+						</span>
 					</button>
 				</motion.div>
 			) : (
 				<motion.div
 					key="expanded"
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.2 }}
+					variants={expandedVariants}
+					initial="initial"
+					animate="animate"
+					exit="exit"
 					className="h-full w-full rounded-sm border border-white/10 bg-[#0d1117]/20 backdrop-blur-xl shadow-2xl overflow-hidden"
 				>
 					<TerminalLayout
