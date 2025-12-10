@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function ThemeToggle() {
 	const { theme, setTheme } = useTheme();
@@ -15,85 +16,57 @@ export function ThemeToggle() {
 	}, []);
 
 	if (!mounted) {
-		return <div className="w-9 h-9" />; // Placeholder to prevent layout shift
+		return <div className="w-8 h-8" />;
 	}
 
 	const isDark = theme === 'dark';
 
 	return (
 		<div className="relative">
-			<motion.button
-				whileHover={{ scale: 1.08 }}
-				whileTap={{ scale: 0.92 }}
-				onClick={() => setTheme(isDark ? 'light' : 'dark')}
-				onMouseEnter={() => setShowTooltip(true)}
-				onMouseLeave={() => setShowTooltip(false)}
-				className="relative p-2 rounded-lg bg-linear-to-br from-muted/40 to-muted/20 hover:from-muted/60 hover:to-muted/30 border border-border/50 hover:border-primary/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm hover:shadow-md group overflow-hidden"
-				aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-			>
-				{/* Background glow effect */}
-				<motion.div
-					className="absolute inset-0 bg-linear-to-r from-primary/0 via-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-					animate={{
-						x: ['-100%', '100%'],
-					}}
-					transition={{
-						duration: 2,
-						repeat: Infinity,
-						ease: 'linear',
-					}}
-				/>
+			<TooltipProvider delayDuration={0}>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={() => setTheme(isDark ? 'light' : 'dark')}
+							className="relative h-8 w-8 rounded-md bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+							aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+						>
+							{/* Sun icon */}
+							<motion.div
+								className="absolute inset-0 flex items-center justify-center"
+								initial={false}
+								animate={{
+									rotate: isDark ? -90 : 0,
+									scale: isDark ? 0 : 1,
+									opacity: isDark ? 0 : 1,
+								}}
+								transition={{ duration: 0.2 }}
+							>
+								<Sun className="h-4 w-4 text-orange-400" />
+							</motion.div>
 
-				{/* Sun icon */}
-				<motion.div
-					className="relative z-10"
-					initial={false}
-					animate={{
-						rotate: isDark ? -90 : 0,
-						scale: isDark ? 0 : 1,
-						opacity: isDark ? 0 : 1,
-					}}
-					transition={{
-						duration: 0.5,
-						ease: [0.34, 1.56, 0.64, 1],
-					}}
-				>
-					<Sun className="h-[1.1rem] w-[1.1rem] text-orange-500 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]" />
-				</motion.div>
-
-				{/* Moon icon */}
-				<motion.div
-					className="absolute top-2 left-2 z-10"
-					initial={false}
-					animate={{
-						rotate: isDark ? 0 : 90,
-						scale: isDark ? 1 : 0,
-						opacity: isDark ? 1 : 0,
-					}}
-					transition={{
-						duration: 0.5,
-						ease: [0.34, 1.56, 0.64, 1],
-					}}
-				>
-					<Moon className="h-[1.1rem] w-[1.1rem] text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
-				</motion.div>
-			</motion.button>
-
-			{/* Tooltip */}
-			<AnimatePresence>
-				{showTooltip && (
-					<motion.div
-						initial={{ opacity: 0, y: 5, scale: 0.9 }}
-						animate={{ opacity: 1, y: 0, scale: 1 }}
-						exit={{ opacity: 0, y: 5, scale: 0.9 }}
-						transition={{ duration: 0.15 }}
-						className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-popover/95 backdrop-blur-md border border-border rounded text-xs text-popover-foreground whitespace-nowrap shadow-lg z-50"
-					>
+							{/* Moon icon */}
+							<motion.div
+								className="absolute inset-0 flex items-center justify-center"
+								initial={false}
+								animate={{
+									rotate: isDark ? 0 : 90,
+									scale: isDark ? 1 : 0,
+									opacity: isDark ? 1 : 0,
+								}}
+								transition={{ duration: 0.2 }}
+							>
+								<Moon className="h-4 w-4 text-emerald-400" />
+							</motion.div>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
 						{isDark ? 'Light mode' : 'Dark mode'}
-						<div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-popover border-l border-t border-border rotate-45" />
-					</motion.div>
-				)}
-			</AnimatePresence>
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
 		</div>
 	);
 }
