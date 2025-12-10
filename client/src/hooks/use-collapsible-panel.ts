@@ -50,14 +50,14 @@ export function useCollapsiblePanel({
 			case 'sidebar':
 				return {
 					defaultSize: layoutState.sidebar.size,
-					collapsedSize: 4, // 64px
+					collapsedSize: 2, // Equal for both - minimal
 					minSize: 15,
 					maxSize: 25,
 				};
 			case 'terminal':
 				return {
 					defaultSize: layoutState.terminal.size,
-					collapsedSize: 3.5, // 56px
+					collapsedSize: 2, // Equal for both - minimal
 					minSize: 10,
 					maxSize: 50,
 				};
