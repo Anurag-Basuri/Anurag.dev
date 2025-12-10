@@ -1,11 +1,4 @@
-import React from 'react';
-import { AboutModule } from '@/components/apps/about';
-import { ProjectsModule } from '@/components/apps/projects';
-import { JourneyModule } from '@/components/apps/journey';
-import { BlogModule } from '@/components/apps/blog';
-import { ContactModule } from '@/components/apps/contact';
-import { SecretModule } from '@/components/apps/secret';
-import CodingStatsModule from '@/components/apps/coding-stats';
+import React, { lazy, Suspense } from 'react';
 import {
 	Info,
 	LayoutDashboard,
@@ -18,15 +11,53 @@ import {
 	type LucideIcon,
 } from 'lucide-react';
 
+// Lazy load all app modules for better performance
+const AboutModule = lazy(() =>
+	import('@/components/apps/about').then(m => ({ default: m.AboutModule })),
+);
+const ProjectsModule = lazy(() =>
+	import('@/components/apps/projects').then(m => ({ default: m.ProjectsModule })),
+);
+const JourneyModule = lazy(() =>
+	import('@/components/apps/journey').then(m => ({ default: m.JourneyModule })),
+);
+const BlogModule = lazy(() =>
+	import('@/components/apps/blog').then(m => ({ default: m.BlogModule })),
+);
+const ContactModule = lazy(() =>
+	import('@/components/apps/contact').then(m => ({ default: m.ContactModule })),
+);
+const SecretModule = lazy(() =>
+	import('@/components/apps/secret').then(m => ({ default: m.SecretModule })),
+);
+const CodingStatsModule = lazy(() => import('@/components/apps/coding-stats'));
+
+// Loading fallback component
+const ModuleLoader = () => (
+	<div className="flex items-center justify-center h-full w-full">
+		<div className="flex flex-col items-center gap-4">
+			<div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+			<div className="text-sm text-muted-foreground font-mono">Loading module...</div>
+		</div>
+	</div>
+);
+
+// Wrapper to add Suspense boundary
+const withSuspense = (Component: React.LazyExoticComponent<() => JSX.Element>) => (
+	<Suspense fallback={<ModuleLoader />}>
+		<Component />
+	</Suspense>
+);
+
 export const moduleRegistry: Record<string, React.ReactNode> = {
-	about: <AboutModule />,
-	projects: <ProjectsModule />,
-	journey: <JourneyModule />,
-	blog: <BlogModule />,
-	contact: <ContactModule />,
+	about: withSuspense(AboutModule),
+	projects: withSuspense(ProjectsModule),
+	journey: withSuspense(JourneyModule),
+	blog: withSuspense(BlogModule),
+	contact: withSuspense(ContactModule),
 	'ai-lab': <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
-	secret: <SecretModule />,
-	'stats.exe': <CodingStatsModule />,
+	secret: withSuspense(SecretModule),
+	'stats.exe': withSuspense(CodingStatsModule),
 };
 
 const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { FileSystemItem } from '@/lib/data';
 import { Folder, FolderOpen, File, ChevronRight, FileCode, FileJson, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,14 +69,17 @@ function FolderTreeItem({
 		return () => window.removeEventListener('collapse-all-folders', handleCollapse);
 	}, [isFolder]);
 
-	const handleToggle = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		if (isFolder) {
-			setIsOpen(prev => !prev);
-		} else {
-			onSelect?.(item);
-		}
-	};
+	const handleToggle = useCallback(
+		(e: React.MouseEvent) => {
+			e.stopPropagation();
+			if (isFolder) {
+				setIsOpen(prev => !prev);
+			} else {
+				onSelect?.(item);
+			}
+		},
+		[isFolder, item, onSelect],
+	);
 
 	return (
 		<div className="relative">
