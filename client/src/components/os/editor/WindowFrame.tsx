@@ -5,9 +5,9 @@ import { Rnd } from 'react-rnd';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
-import { X, Minus, Square, ChevronsLeft } from 'lucide-react';
+import { X } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface WindowFrameProps {
 	windowState: WindowState;
@@ -22,12 +22,6 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 	const { id, title, component, position, size, isMinimized, isMaximized } = windowState;
 	const zIndex = windowStack.indexOf(id) + 10;
 	const isActive = activeWindowId === id;
-
-	// Store pre-maximized state
-	const [preMaximizeState, setPreMaximizeState] = useState({
-		position,
-		size,
-	});
 
 	const bringToFront = () => {
 		if (windowStack.at(-1) !== id) {
@@ -54,48 +48,13 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 		}
 	};
 
-	const handleMinimize = () => {
-		setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-		if (activeWindowId === id) {
-			setActiveWindowId(windowStack.at(-2) || null);
-		}
+	// Force maximized state
+	const maximizedProps = {
+		size: { width: '100%', height: '100%' },
+		position: { x: 0, y: 0 },
+		disableDragging: true,
+		enableResizing: false,
 	};
-
-	const handleMaximizeToggle = () => {
-		if (isMaximized) {
-			// Restore
-			setWindows(
-				windows.map(w =>
-					w.id === id
-						? {
-								...w,
-								isMaximized: false,
-								position: preMaximizeState.position,
-								size: preMaximizeState.size,
-						  }
-						: w,
-				),
-			);
-		} else {
-			// Maximize
-			setPreMaximizeState({ position, size });
-			setWindows(windows.map(w => (w.id === id ? { ...w, isMaximized: true } : w)));
-		}
-	};
-
-	const maximizedProps = isMaximized
-		? {
-				size: { width: '100%', height: '100%' },
-				position: { x: 0, y: 0 },
-				disableDragging: true,
-				enableResizing: false,
-		  }
-		: {
-				size,
-				position,
-				disableDragging: false,
-				enableResizing: true,
-		  };
 
 	return (
 		<AnimatePresence>
@@ -103,75 +62,37 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 				<Rnd
 					{...maximizedProps}
 					onDragStart={handleFocus}
-					onDragStop={(e, d) => {
-						setWindows(
-							windows.map(w =>
-								w.id === id ? { ...w, position: { x: d.x, y: d.y } } : w,
-							),
-						);
-					}}
-					onResizeStart={handleFocus}
-					onResizeStop={(e, direction, ref, delta, newPosition) => {
-						setWindows(
-							windows.map(w =>
-								w.id === id
-									? {
-											...w,
-											size: {
-												width: ref.style.width,
-												height: ref.style.height,
-											},
-											position: newPosition,
-									  }
-									: w,
-							),
-						);
-					}}
-					minWidth={300}
-					minHeight={200}
-					dragHandleClassName="handle"
-					bounds={bounds}
+					// Even though dragging is disabled, active state management remains
 					style={{ zIndex }}
 					className={cn(
-						'bg-background/70 backdrop-blur-xl border rounded-lg shadow-2xl overflow-hidden flex flex-col transition-colors',
-						isActive ? 'border-primary/50' : 'border-border/60',
+						'bg-background/90 backdrop-blur-3xl overflow-hidden flex flex-col transition-all duration-300',
+						// Removed border/shadow for seamless full-screen look
 					)}
 					onMouseDown={handleFocus}
 				>
 					{/* Title Bar */}
 					<div
 						className={cn(
-							'handle h-8 flex items-center justify-between px-3 border-b flex-shrink-0 transition-colors',
-							isActive
-								? 'bg-primary/20 border-primary/40'
-								: 'bg-black/10 border-border/60',
+							'h-9 flex items-center justify-between px-4 border-b border-white/5 shrink-0 transition-colors select-none',
+							'bg-[#0d1117]/50', // darker, subtle header
 						)}
-						onDoubleClick={handleMaximizeToggle}
 					>
-						<span className="text-xs font-medium truncate">{title}</span>
+						<span className="text-[13px] font-medium tracking-wide text-white/80 flex items-center gap-2">
+							{/* We could add an icon here if available in windowState */}
+							{title}
+						</span>
 						<div className="flex items-center gap-2">
 							<button
-								onClick={handleMinimize}
-								className="w-4 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground"
-							>
-								<Minus size={14} />
-							</button>
-							<button
-								onClick={handleMaximizeToggle}
-								className="w-4 h-4 flex items-center justify-center text-muted-foreground hover:text-foreground"
-							>
-								{isMaximized ? <ChevronsLeft size={12} /> : <Square size={12} />}
-							</button>
-							<button
 								onClick={handleClose}
-								className="w-4 h-4 flex items-center justify-center text-muted-foreground hover:bg-destructive hover:text-destructive-foreground rounded-sm"
+								className="w-6 h-6 flex items-center justify-center text-white/40 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-all"
+								title="Close"
 							>
 								<X size={14} />
 							</button>
 						</div>
 					</div>
 					{/* Content */}
-					<div className="flex-grow overflow-auto">{component}</div>
+					<div className="grow overflow-auto bg-background/50 relative">{component}</div>
 				</Rnd>
 			)}
 		</AnimatePresence>
