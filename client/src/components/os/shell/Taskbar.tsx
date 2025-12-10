@@ -17,6 +17,7 @@ import {
 	Github,
 	Linkedin,
 	Twitter,
+	X,
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -133,6 +134,25 @@ export function Taskbar() {
 	const handleOpenModule = (id: string) => {
 		setIsStartOpen(false);
 		openWindow(id);
+	};
+
+	const handleCloseWindow = (id: string, e: React.MouseEvent) => {
+		e.stopPropagation(); // Prevent tab click
+		const windowToClose = windows.find(w => w.id === id);
+		if (!windowToClose) return;
+
+		// Remove from windows
+		setWindows(windows.filter(w => w.id !== id));
+		
+		// Update active window if we closed the active one
+		if (id === activeWindowId) {
+			const remainingStack = windowStack.filter(wid => wid !== id);
+			const nextActiveId = remainingStack[remainingStack.length - 1] || null;
+			setActiveWindowId(nextActiveId);
+			setWindowStack(remainingStack);
+		} else {
+			setWindowStack(windowStack.filter(wid => wid !== id));
+		}
 	};
 
 	const menuItems = [
@@ -308,20 +328,28 @@ export function Taskbar() {
 					</div>
 
 					{/* Window Icons */}
-					<div className="flex items-center gap-1.5">
-						{windows.map(window => {
-							const Icon = getModuleIcon(window.id);
-							const isActive = window.id === activeWindowId && !window.isMinimized;
-							return (
-								<Tooltip key={window.id}>
+				<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+					{windows.map(window => {
+						const Icon = getModuleIcon(window.id);
+						const isActive = window.id === activeWindowId && !window.isMinimized;
+						return (
+							<motion.div
+								key={window.id}
+								layout
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								className="group relative"
+							>
+								<Tooltip>
 									<TooltipTrigger asChild>
-										<motion.button
-											layout
+										<button
 											onClick={() => handleTaskbarClick(window.id)}
-											title={window.title}
 											aria-pressed={isActive}
+											aria-label={`${window.title} window`}
 											className={cn(
-												'h-8 flex items-center gap-2 px-2.5 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40 max-w-[150px] min-w-0',
+												'h-8 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 pr-7 sm:pr-8 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40',
+												'max-w-[120px] sm:max-w-[150px] min-w-0',
 												'hover:bg-primary/10',
 												isActive ? 'bg-primary/20' : 'bg-transparent',
 											)}
@@ -330,6 +358,7 @@ export function Taskbar() {
 											<span className="text-xs truncate hidden sm:inline">
 												{window.title}
 											</span>
+											{/* Active indicator */}
 											<motion.div
 												layoutId={`taskbar-active-indicator-${window.id}`}
 												className={cn(
@@ -337,15 +366,35 @@ export function Taskbar() {
 													isActive ? 'bg-primary' : 'bg-transparent',
 												)}
 											/>
-										</motion.button>
+										</button>
 									</TooltipTrigger>
 									<TooltipContent side="top">
 										<p>{window.title}</p>
 									</TooltipContent>
 								</Tooltip>
-							);
-						})}
-					</div>
+
+								{/* Close button */}
+								<button
+									onClick={(e) => handleCloseWindow(window.id, e)}
+									aria-label={`Close ${window.title}`}
+									className={cn(
+										'absolute right-0.5 top-1/2 -translate-y-1/2',
+										'h-6 w-6 flex items-center justify-center rounded',
+										'text-white/40 hover:text-white hover:bg-red-500/20',
+										'transition-all duration-200',
+										'focus:outline-none focus:ring-2 focus:ring-red-400/40',
+										// Desktop: show on group hover
+										'opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
+										// Mobile: always visible
+										'max-sm:opacity-100'
+									)}
+								>
+									<X className="h-3 w-3" />
+								</button>
+							</motion.div>
+						);
+					})}
+				</div>
 				</div>
 
 				{/* Right side: Actions */}
