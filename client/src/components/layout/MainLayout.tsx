@@ -13,12 +13,12 @@ import { TopBar } from '@/components/os/shell/TopBar';
 import { Background3D } from '@/components/os/shell/Background3D';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
-import { AnimatePresence, motion } from 'framer-motion';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -41,85 +41,92 @@ export function MainLayout() {
 		}
 	};
 
-	const renderDesktopLayout = () => (
-		<ResizablePanelGroup
-			direction="horizontal"
-			onLayout={setMainHorizontalSizes}
-			className="h-full gap-1"
-		>
-			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
-				<AnimatePresence mode="wait">
-					{sidebar.isCollapsed ? (
-						<motion.div
-							key="collapsed-sidebar"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{ duration: 0.15 }}
-							className="h-full"
-						>
-							<CollapsedSidebar onExpand={sidebar.expand} />
-						</motion.div>
-					) : (
-						<motion.div
-							key="expanded-sidebar"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{ duration: 0.2 }}
-							className="h-full rounded-sm border border-white/10 bg-[#0d1117] shadow-2xl overflow-hidden flex flex-col"
-						>
-							<SidebarProfile onCollapse={sidebar.collapse} />
+	const renderDesktopLayout = () => {
+		if (isMobile) return null;
 
-							<div className="px-3 py-2 border-b border-white/5 text-[10px] uppercase tracking-[0.22em] text-white/40">
-								Files
-							</div>
+		if (!isLayoutReady) {
+			return (
+				<div className="h-full w-full flex items-center justify-center text-muted-foreground bg-background">
+					<div className="flex flex-col items-center gap-4">
+						<div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+						<div className="text-sm font-mono tracking-widest animate-pulse">
+							SYSTEM INITIALIZING...
+						</div>
+					</div>
+				</div>
+			);
+		}
 
-							<div
-								className="flex-1 overflow-auto px-2 pb-3"
-								style={{
-									scrollbarWidth: 'thin',
-									scrollbarColor: 'rgba(255,255,255,0.1) transparent',
-								}}
+		return (
+			<ResizablePanelGroup
+				direction="horizontal"
+				onLayout={setMainHorizontalSizes}
+				className="h-full gap-1 transform-style-3d opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]"
+			>
+				<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
+					<AnimatePresence mode="wait">
+						{sidebar.isCollapsed ? (
+							<motion.div
+								key="collapsed-sidebar"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.15 }}
+								className="h-full"
 							>
-								<FolderTree items={fileSystem} onSelect={handleFileSelect} />
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</ResizablePanel>
+								<CollapsedSidebar onExpand={sidebar.expand} />
+							</motion.div>
+						) : (
+							<motion.div
+								key="expanded-sidebar"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{ duration: 0.2 }}
+								className="h-full rounded-sm border border-border/60 bg-sidebar/80 backdrop-blur-xl shadow-[inset_-1px_0_0_0_rgba(255,255,255,0.05)] flex flex-col"
+							>
+								<SidebarProfile onCollapse={sidebar.collapse} />
 
-			<ResizableHandle withHandle className="hover:border-emerald-400/40 transition-colors" />
+								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</ResizablePanel>
 
-			<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
-				<ResizablePanelGroup
-					direction="vertical"
-					onLayout={setMainVerticalSizes}
-					className="gap-1"
-				>
-					<ResizablePanel
-						defaultSize={mainVerticalSizes[0]}
-						minSize={40}
-						className="rounded-sm border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+				<ResizableHandle withHandle className="hover:border-primary/40 transition-colors" />
+
+				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
+					<ResizablePanelGroup
+						direction="vertical"
+						onLayout={setMainVerticalSizes}
+						className="gap-1"
 					>
-						<EditorArea />
-					</ResizablePanel>
+						<ResizablePanel
+							defaultSize={mainVerticalSizes[0]}
+							minSize={40}
+							className="rounded-sm border border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl overflow-hidden"
+						>
+							<EditorArea />
+						</ResizablePanel>
 
-					<ResizableHandle
-						withHandle
-						className="hover:border-emerald-400/40 transition-colors"
-					/>
-
-					<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
-						<CLI
-							onToggleCollapse={terminal.toggle}
-							isCollapsed={terminal.isCollapsed}
+						<ResizableHandle
+							withHandle
+							className="hover:border-primary/40 transition-colors"
 						/>
-					</ResizablePanel>
-				</ResizablePanelGroup>
-			</ResizablePanel>
-		</ResizablePanelGroup>
-	);
+
+						<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
+							<CLI
+								onToggleCollapse={terminal.toggle}
+								isCollapsed={terminal.isCollapsed}
+							/>
+						</ResizablePanel>
+					</ResizablePanelGroup>
+				</ResizablePanel>
+			</ResizablePanelGroup>
+		);
+	};
 
 	const renderMobileLayout = () => (
 		<div className="h-full w-full rounded-sm border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
