@@ -15,12 +15,12 @@ export function TerminalHeader({
 }: TerminalHeaderProps) {
 	return (
 		<header
-			className="px-2.5 py-1.5 border-b border-white/10 bg-white/5 backdrop-blur-sm flex items-center justify-between shrink-0 text-[11px] font-mono text-white/80"
+			className="px-2 py-1 border-b border-white/10 bg-white/5 backdrop-blur-sm flex items-center justify-between shrink-0 text-[11px] font-mono text-white/80"
 			role="banner"
 			aria-label="Terminal header"
 		>
-			<div className="flex items-center gap-2.5">
-				<div className="flex items-center gap-1.25">
+			<div className="flex items-center gap-2">
+				<div className="flex items-center gap-1">
 					<button
 						onClick={onToggleCollapse}
 						className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors shadow-[0_0_4px_rgba(239,68,68,0.5)]"
