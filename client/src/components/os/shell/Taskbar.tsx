@@ -219,32 +219,37 @@ export function Taskbar() {
 	};
 
 	const handleTaskbarClick = (id: string) => {
-		const window = windows.find(w => w.id === id);
-		if (!window) return;
+		setWindows(prev => {
+			const window = prev.find(w => w.id === id);
+			if (!window) return prev;
 
-		if (id === activeWindowId && !window.isMinimized) {
-			// If clicking the active window, minimize it
-			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-			const nextActiveId = windowStack.filter(wid => wid !== id).pop();
-			setActiveWindowId(nextActiveId || null);
-		} else {
-			// Show loading briefly, then open window
-			setWindows(
-				windows.map(w => ({
+			if (id === activeWindowId && !window.isMinimized) {
+				// If clicking the active window, minimize it
+				setWindowStack(stack => stack.filter(wid => wid !== id));
+				setWindowStack(stack => {
+					const nextActiveId = stack.at(-1) || null;
+					setActiveWindowId(nextActiveId);
+					return stack;
+				});
+				return prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w));
+			} else {
+				// Show loading briefly, then open window
+				const updated = prev.map(w => ({
 					...w,
 					isMinimized: w.id !== id,
 					isLoading: w.id === id ? true : false,
-				})),
-			);
+				}));
 
-			// Clear loading after transition
-			setTimeout(() => {
-				setWindows(prev => prev.map(w => ({ ...w, isLoading: false })));
-			}, 250);
+				// Clear loading after transition
+				setTimeout(() => {
+					setWindows(current => current.map(w => ({ ...w, isLoading: false })));
+				}, 250);
 
-			setActiveWindowId(id);
-			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
-		}
+				setActiveWindowId(id);
+				setWindowStack(stack => [...stack.filter(wid => wid !== id), id]);
+				return updated;
+			}
+		});
 	};
 
 	const handleOpenModule = (id: string) => {
@@ -254,38 +259,43 @@ export function Taskbar() {
 
 	const handleCloseWindow = (id: string, e: React.MouseEvent) => {
 		e.stopPropagation();
-		const windowToClose = windows.find(w => w.id === id);
-		if (!windowToClose) return;
 
-		const remainingStack = windowStack.filter(wid => wid !== id);
-		const nextActiveId = remainingStack.at(-1) || null;
+		setWindows(prev => {
+			const windowToClose = prev.find(w => w.id === id);
+			if (!windowToClose) return prev;
 
-		// Smooth close sequence
-		if (id === activeWindowId && nextActiveId) {
-			// First: Mark next window as loading
-			setWindows(prev =>
-				prev.map(w => (w.id === nextActiveId ? { ...w, isLoading: true } : w)),
-			);
+			setWindowStack(stack => {
+				const remainingStack = stack.filter(wid => wid !== id);
+				const nextActiveId = remainingStack.at(-1) || null;
 
-			// Second: After brief delay, remove current and show next
-			setTimeout(() => {
-				setWindows(prev =>
-					prev
-						.map(w =>
-							w.id === nextActiveId
-								? { ...w, isMinimized: false, isLoading: false }
-								: w,
-						)
-						.filter(w => w.id !== id),
-				);
-			}, 200);
-		} else {
-			// Just remove the window
-			setWindows(windows.filter(w => w.id !== id));
-		}
+				// Smooth close sequence
+				if (id === activeWindowId && nextActiveId) {
+					// First: Mark next window as loading
+					setWindows(current =>
+						current.map(w => (w.id === nextActiveId ? { ...w, isLoading: true } : w)),
+					);
 
-		setActiveWindowId(nextActiveId);
-		setWindowStack(remainingStack);
+					// Second: After brief delay, remove current and show next
+					setTimeout(() => {
+						setWindows(current =>
+							current
+								.map(w =>
+									w.id === nextActiveId
+										? { ...w, isMinimized: false, isLoading: false }
+										: w,
+								)
+								.filter(w => w.id !== id),
+						);
+					}, 200);
+				}
+
+				setActiveWindowId(nextActiveId);
+				return remainingStack;
+			});
+
+			// Return filtered windows immediately if not active, or wait for setTimeout if active
+			return id !== activeWindowId ? prev.filter(w => w.id !== id) : prev;
+		});
 	};
 
 	const menuItems = [
