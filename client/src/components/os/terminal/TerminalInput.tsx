@@ -1,8 +1,8 @@
 'use client';
 
-import { forwardRef, useCallback, useState } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronRight, Command } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { TerminalInputProps } from './types';
 
 export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
@@ -24,7 +24,6 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 			(ref as React.RefObject<HTMLInputElement | null>)?.current?.focus();
 		}, [ref]);
 
-		// Handle reduced motion preference
 		const shouldReduceMotion = useCallback(() => {
 			if (typeof window !== 'undefined') {
 				return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -35,36 +34,30 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'h-6 px-2 border-t bg-[#161b22] shrink-0 flex items-center gap-3 transition-all duration-200 cursor-text',
-					isFocused ? 'border-emerald-500/30' : 'border-white/6',
+					'h-6 px-2 border-t bg-[#161b22] shrink-0 flex items-center gap-2 cursor-text transition-colors',
+					isFocused ? 'border-emerald-500/20' : 'border-white/8',
 				)}
 				onClick={handleContainerClick}
 				role="form"
-				aria-label="Terminal input form"
+				aria-label="Terminal input"
 			>
-				{/* Prompt */}
-				<div className="flex items-center gap-2 shrink-0">
-					<div
-						className={cn(
-							'flex items-center justify-center w-5 h-5 rounded transition-colors',
-							isFocused ? 'bg-emerald-500/20' : 'bg-white/4',
-						)}
-					>
-						<ChevronRight
-							className={cn(
-								'w-3 h-3 transition-colors',
-								isFocused ? 'text-emerald-400' : 'text-white/30',
-							)}
-						/>
-					</div>
-					<div className="flex items-center gap-1 text-[11px] font-mono">
-						<span className="text-emerald-400 font-medium">~{currentPath}</span>
-					</div>
-				</div>
+				{/* Prompt Icon */}
+				<ChevronRight
+					className={cn(
+						'w-3 h-3 shrink-0 transition-colors',
+						isFocused ? 'text-emerald-400' : 'text-white/20',
+					)}
+				/>
+
+				{/* Path */}
+				<span className="text-[10px] font-mono text-emerald-400/70 shrink-0">
+					{currentPath}
+				</span>
+
+				<span className="text-[10px] text-white/20 shrink-0">$</span>
 
 				{/* Input Area */}
 				<div className="relative flex-1 min-w-0">
-					{/* Hidden input for text capture */}
 					<input
 						ref={ref}
 						type="text"
@@ -80,36 +73,23 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 						autoCapitalize="off"
 						spellCheck="false"
 						role="textbox"
-						aria-label={`Terminal input at ${currentPath}`}
-						aria-describedby="terminal-suggestions"
-						aria-autocomplete="list"
-						aria-multiline="false"
+						aria-label="Command input"
 						enterKeyHint="enter"
 					/>
-
-					{/* Visible text with cursor */}
 					<div
-						className="whitespace-pre break-all text-[12px] font-mono leading-tight"
+						className="whitespace-pre text-[11px] font-mono text-white/90 leading-tight"
 						aria-hidden="true"
 					>
-						<span className="text-white/90">{input.substring(0, cursorPos)}</span>
+						<span>{input.substring(0, cursorPos)}</span>
 						<span
 							className={cn(
-								'inline-block w-[2px] h-4 align-[-0.15em] rounded-full transition-opacity',
-								isFocused ? 'bg-emerald-400' : 'bg-white/20',
+								'inline-block w-[1.5px] h-3 align-[-0.1em] rounded-full',
+								isFocused ? 'bg-emerald-400' : 'bg-white/15',
 								isFocused && !shouldReduceMotion() && 'animate-blink',
 							)}
-							aria-hidden="true"
 						/>
-						<span className="text-white/90">{input.substring(cursorPos)}</span>
+						<span>{input.substring(cursorPos)}</span>
 					</div>
-				</div>
-
-				{/* Keyboard shortcut hint */}
-				<div className="hidden sm:flex items-center gap-1 shrink-0 opacity-40 hover:opacity-70 transition-opacity">
-					<kbd className="h-4 px-1 rounded bg-white/6 border border-white/8 text-[9px] font-mono text-white/40 flex items-center">
-						<Command className="w-2 h-2 mr-0.5" />K
-					</kbd>
 				</div>
 			</div>
 		);
