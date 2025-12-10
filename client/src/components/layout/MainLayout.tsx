@@ -45,7 +45,7 @@ export function MainLayout() {
 		<ResizablePanelGroup
 			direction="horizontal"
 			onLayout={setMainHorizontalSizes}
-			className="h-full"
+			className="h-full gap-1"
 		>
 			<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
 				<AnimatePresence mode="wait">
@@ -89,19 +89,26 @@ export function MainLayout() {
 				</AnimatePresence>
 			</ResizablePanel>
 
-			<ResizableHandle withHandle />
+			<ResizableHandle withHandle className="hover:border-emerald-400/40 transition-colors" />
 
 			<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
-				<ResizablePanelGroup direction="vertical" onLayout={setMainVerticalSizes}>
+				<ResizablePanelGroup
+					direction="vertical"
+					onLayout={setMainVerticalSizes}
+					className="gap-1"
+				>
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="rounded-xl border border-border/60 bg-background/70 backdrop-blur-xl shadow-lg overflow-hidden"
+						className="rounded-xl border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
 					>
 						<EditorArea />
 					</ResizablePanel>
 
-					<ResizableHandle withHandle />
+					<ResizableHandle
+						withHandle
+						className="hover:border-emerald-400/40 transition-colors"
+					/>
 
 					<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
 						<CLI
@@ -115,7 +122,7 @@ export function MainLayout() {
 	);
 
 	const renderMobileLayout = () => (
-		<div className="h-full w-full rounded-2xl border border-border/70 bg-card/60 backdrop-blur-xl shadow-lg overflow-hidden">
+		<div className="h-full w-full rounded-xl border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
 			<EditorArea />
 		</div>
 	);
@@ -127,9 +134,9 @@ export function MainLayout() {
 					position="bottom-right"
 					toastOptions={{
 						style: {
-							background: 'var(--popover)',
-							color: 'var(--popover-foreground)',
-							border: '1px solid var(--border)',
+							background: 'rgba(13, 17, 23, 0.95)',
+							color: 'rgba(255, 255, 255, 0.9)',
+							border: '1px solid rgba(255, 255, 255, 0.1)',
 							backdropFilter: 'blur(10px)',
 						},
 					}}
@@ -145,7 +152,7 @@ export function MainLayout() {
 					onFileSelect={handleFileSelect}
 				/>
 
-				<div className="flex-1 overflow-hidden p-3">
+				<div className="flex-1 overflow-hidden p-2">
 					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
 				</div>
 
