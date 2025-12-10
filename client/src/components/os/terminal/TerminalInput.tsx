@@ -31,7 +31,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 
 		return (
 			<div
-				className="px-3 py-2 border-t border-white/10 bg-[#0d1117]/40 backdrop-blur-md shrink-0"
+				className="px-2 py-1 border-t border-white/10 bg-[#0d1117] shrink-0"
 				onClick={handleContainerClick}
 				role="form"
 				aria-label="Terminal input form"
@@ -70,7 +70,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 								enterKeyHint="enter"
 							/>
 							<div
-								className="whitespace-pre-wrap break-all min-h-[1.2rem] leading-5"
+								className="whitespace-pre-wrap break-all min-h-[1rem] leading-5"
 								aria-hidden="true"
 							>
 								<span>{input.substring(0, cursorPos)}</span>
