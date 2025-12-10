@@ -31,7 +31,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 
 		return (
 			<div
-				className="px-4 py-3 border-t border-white/5 bg-black/20 shrink-0"
+				className="px-2 py-1 border-t border-white/5 bg-black/20 shrink-0"
 				onClick={handleContainerClick}
 				role="form"
 				aria-label="Terminal input form"

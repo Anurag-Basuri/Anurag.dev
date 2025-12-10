@@ -15,7 +15,7 @@ export function TerminalHeader({
 }: TerminalHeaderProps) {
 	return (
 		<header
-			className="px-3 py-2 border-b border-white/5 bg-black/20 backdrop-blur-sm flex items-center justify-between shrink-0"
+			className="px-2 py-1 border-b border-white/5 bg-black/20 backdrop-blur-sm flex items-center justify-between shrink-0"
 			role="banner"
 			aria-label="Terminal header"
 		>

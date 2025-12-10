@@ -18,10 +18,6 @@ export function TerminalPrompt({ terminalState, onKeyDown }: TerminalPromptProps
 		inputRef.current?.focus();
 	}, []);
 
-	// Keep focus when clicking anywhere in the prompt area involves parent usually
-	// but here we expose the ref or handle it via props if needed.
-	// For now, simple component.
-
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		terminalState.setInput(e.target.value);
 		terminalState.setCursorPos(e.target.selectionStart || 0);
