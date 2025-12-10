@@ -14,6 +14,7 @@ export const mockProjects: Project[] = [
 		forks: 2,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
+		featured: true,
 	},
 	{
 		id: '2',
@@ -48,9 +49,27 @@ export const mockAbout: AboutData = {
 	philosophy: 'Build things that matter, and make them look good while doing it.',
 	callToAction: 'Check out my projects or say hello!',
 	skills: {
-		frontend: ['React', 'TypeScript', 'TailwindCSS', 'Framer Motion', 'MERN Stack'],
-		backend: ['Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'RESTful APIs'],
-		ml: ['Machine Learning', 'NLP', 'LLMs', 'Deep Learning', 'AI Systems'],
+		frontend: [
+			{ name: 'React', level: 95 },
+			{ name: 'TypeScript', level: 90 },
+			{ name: 'TailwindCSS', level: 95 },
+			{ name: 'Framer Motion', level: 85 },
+			{ name: 'Next.js', level: 92 },
+		],
+		backend: [
+			{ name: 'Node.js', level: 88 },
+			{ name: 'Express', level: 90 },
+			{ name: 'PostgreSQL', level: 85 },
+			{ name: 'MongoDB', level: 88 },
+			{ name: 'Supabase', level: 82 },
+		],
+		ml: [
+			{ name: 'Python', level: 90 },
+			{ name: 'PyTorch', level: 80 },
+			{ name: 'Transformers', level: 75 },
+			{ name: 'RAG Systems', level: 85 },
+			{ name: 'LangChain', level: 82 },
+		],
 	},
 };
 
