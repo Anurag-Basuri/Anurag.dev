@@ -367,7 +367,13 @@
 
 /* Enhanced Card Styles */
 .card-premium {
-	@apply bg-card/60 backdrop-blur-md border border-border/50 rounded-xl transition-all duration-300;
+	background-color: color-mix(in oklch, var(--card) 60%, transparent);
+	backdrop-filter: blur(12px);
+	border: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
+	border-radius: 0.75rem;
+	transition-property: background-color, border-color, box-shadow, transform;
+	transition-duration: 300ms;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	box-shadow: var(--shadow-sm);
 }
 
@@ -387,10 +393,18 @@
 
 /* Text Gradient Utilities */
 .text-gradient-primary {
-	@apply bg-clip-text text-transparent bg-linear-to-r from-primary to-accent;
+	background: linear-gradient(to right, var(--primary), var(--accent));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent;
 }
 .text-gradient-cyan {
-	@apply bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-blue-500;
+	background: linear-gradient(to right, #22d3ee, #3b82f6); /* cyan-400 to blue-500 */
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent;
 }
 
 /* Border Glow Animation */
