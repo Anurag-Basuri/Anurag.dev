@@ -121,11 +121,18 @@ export function Taskbar() {
 		if (!window) return;
 
 		if (id === activeWindowId && !window.isMinimized) {
+			// If clicking the active window, minimize it
 			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
 			const nextActiveId = windowStack.filter(wid => wid !== id).pop();
 			setActiveWindowId(nextActiveId || null);
 		} else {
-			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: false } : w)));
+			// Open this window and minimize all others (VS Code-like behavior)
+			setWindows(
+				windows.map(w => ({
+					...w,
+					isMinimized: w.id !== id,
+				})),
+			);
 			setActiveWindowId(id);
 			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
 		}

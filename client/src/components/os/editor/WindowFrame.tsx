@@ -5,7 +5,7 @@ import { Rnd } from 'react-rnd';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
-import { X } from 'lucide-react';
+import { X, Minus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 
@@ -48,6 +48,15 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 		}
 	};
 
+	const handleMinimize = () => {
+		setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
+		if (activeWindowId === id) {
+			// Find the next non-minimized window to activate
+			const nextWindow = windows.find(w => w.id !== id && !w.isMinimized);
+			setActiveWindowId(nextWindow?.id || null);
+		}
+	};
+
 	// Force maximized state
 	const maximizedProps = {
 		size: { width: '100%', height: '100%' },
@@ -81,7 +90,14 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 							{/* We could add an icon here if available in windowState */}
 							{title}
 						</span>
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-1">
+							<button
+								onClick={handleMinimize}
+								className="w-6 h-6 flex items-center justify-center text-white/40 hover:bg-yellow-500/20 hover:text-yellow-400 rounded-md transition-all"
+								title="Minimize"
+							>
+								<Minus size={14} />
+							</button>
 							<button
 								onClick={handleClose}
 								className="w-6 h-6 flex items-center justify-center text-white/40 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-all"

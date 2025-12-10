@@ -12,28 +12,32 @@ export function useWindowManager() {
 		const existingWindow = windows.find(w => w.id === id);
 
 		if (existingWindow) {
-			// If window exists, bring it to front and un-minimize
-			setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: false } : w)));
+			// If window exists, bring it to front, un-minimize it, and MINIMIZE all others
+			setWindows(
+				windows.map(w => ({
+					...w,
+					isMinimized: w.id !== id, // Only the target window is open
+				})),
+			);
 			setActiveWindowId(id);
 			if (windowStack.at(-1) !== id) {
 				setWindowStack([...windowStack.filter(wid => wid !== id), id]);
 			}
 		} else {
-			// Add new window
+			// Add new window and MINIMIZE all existing ones
 			const newWindow: WindowState = {
 				id,
 				title: getModuleTitle(id),
 				component: getModuleComponent(id),
 				isOpen: true,
 				isMinimized: false,
-				isMaximized: false,
-				position: {
-					x: 150 + windows.length * 20,
-					y: 100 + windows.length * 20,
-				},
-				size: { width: 720, height: 480 },
+				isMaximized: false, // We force this in WindowFrame anyway
+				position: { x: 0, y: 0 },
+				size: { width: 0, height: 0 },
 			};
-			setWindows(prev => [...prev, newWindow]);
+
+			// Update state: Add new window (active) and minimize all previous windows
+			setWindows(prev => [...prev.map(w => ({ ...w, isMinimized: true })), newWindow]);
 			setActiveWindowId(id);
 			setWindowStack(prev => [...prev, id]);
 		}
