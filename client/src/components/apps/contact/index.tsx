@@ -1,9 +1,20 @@
-'use client';
-
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, CheckCircle } from 'lucide-react';
+import {
+	Send,
+	CheckCircle,
+	Mail,
+	MapPin,
+	Github,
+	Twitter,
+	Linkedin,
+	Copy,
+	Check,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { toast } from 'react-hot-toast';
 
 export function ContactModule() {
 	const [formData, setFormData] = useState({
@@ -15,6 +26,7 @@ export function ContactModule() {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [copied, setCopied] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -26,8 +38,12 @@ export function ContactModule() {
 			await api.submitContact(formData);
 			setSuccess(true);
 			setFormData({ name: '', email: '', subject: '', message: '' });
-		} catch (err: any) {
-			setError(err.message || 'Failed to send message');
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError('Failed to send message');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -40,116 +56,232 @@ export function ContactModule() {
 		}));
 	};
 
+	const copyEmail = () => {
+		navigator.clipboard.writeText('contact@anuragos.dev'); // Replace with actual email
+		setCopied(true);
+		toast.success('Email copied to clipboard');
+		setTimeout(() => setCopied(false), 2000);
+	};
+
 	return (
 		<ScrollArea className="h-full">
-			<div className="p-6 space-y-6 font-mono">
-				<div>
-					<h1 className="text-2xl font-bold text-green-500 mb-2">
-						$ cat contact/form.txt
-					</h1>
-					<p className="text-muted-foreground">Get in touch with me</p>
-				</div>
-
-				{success && (
-					<div className="border border-green-500 bg-green-500/10 rounded-lg p-4 flex items-center gap-3">
-						<CheckCircle className="w-5 h-5 text-green-500" />
+			<div className="p-6 md:p-10 max-w-6xl mx-auto pb-20">
+				<div className="flex flex-col md:flex-row gap-12">
+					{/* Left Column: Info */}
+					<motion.div
+						initial={{ opacity: 0, x: -20 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.5 }}
+						className="flex-1 space-y-8"
+					>
 						<div>
-							<p className="text-green-400 font-semibold">
-								Message sent successfully!
-							</p>
-							<p className="text-sm text-muted-foreground">
-								I'll get back to you soon.
+							<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-400 to-emerald-600 mb-4 flex items-center gap-2">
+								<span className="text-emerald-500">$</span> ./contact-info.sh
+							</h1>
+							<p className="text-muted-foreground text-lg leading-relaxed">
+								I&apos;m always open to discussing new projects, creative ideas, or
+								opportunities to be part of your visions.
 							</p>
 						</div>
-					</div>
-				)}
 
-				{error && (
-					<div className="border border-red-500 bg-red-500/10 rounded-lg p-4">
-						<p className="text-red-400">Error: {error}</p>
-					</div>
-				)}
+						<div className="space-y-6">
+							<div className="p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+								<div className="flex items-start gap-4">
+									<div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+										<Mail className="w-6 h-6" />
+									</div>
+									<div className="flex-1">
+										<h3 className="text-foreground font-semibold mb-1">
+											Email Me
+										</h3>
+										<div className="flex items-center gap-2">
+											<span className="text-muted-foreground font-mono">
+												contact@anuragos.dev
+											</span>
+											<button
+												onClick={copyEmail}
+												className="p-1.5 rounded hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
+												title="Copy Email"
+											>
+												{copied ? (
+													<Check className="w-3.5 h-3.5 text-green-400" />
+												) : (
+													<Copy className="w-3.5 h-3.5" />
+												)}
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
 
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div>
-						<label className="block text-sm font-semibold text-green-400 mb-2">
-							Name *
-						</label>
-						<input
-							type="text"
-							name="name"
-							value={formData.name}
-							onChange={handleChange}
-							required
-							className="w-full bg-background border border-muted rounded px-3 py-2 text-foreground focus:border-green-500 focus:outline-none transition-colors"
-							placeholder="Your name"
-						/>
-					</div>
+							<div className="p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-purple-500/30 transition-all group">
+								<div className="flex items-start gap-4">
+									<div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
+										<MapPin className="w-6 h-6" />
+									</div>
+									<div>
+										<h3 className="text-foreground font-semibold mb-1">
+											Location
+										</h3>
+										<p className="text-muted-foreground">
+											San Francisco Bay Area, CA
+										</p>
+										<p className="text-xs text-muted-foreground mt-1">
+											Remote Available
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
 
-					<div>
-						<label className="block text-sm font-semibold text-green-400 mb-2">
-							Email *
-						</label>
-						<input
-							type="email"
-							name="email"
-							value={formData.email}
-							onChange={handleChange}
-							required
-							className="w-full bg-background border border-muted rounded px-3 py-2 text-foreground focus:border-green-500 focus:outline-none transition-colors"
-							placeholder="your.email@example.com"
-						/>
-					</div>
+						<div className="space-y-4">
+							<h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+								Social Protocols
+							</h3>
+							<div className="flex gap-3">
+								<a
+									href="#"
+									target="_blank"
+									className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group"
+								>
+									<Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
+								</a>
+								<a
+									href="#"
+									target="_blank"
+									className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 hover:border-blue-500/20 transition-all text-muted-foreground hover:text-blue-400 group"
+								>
+									<Twitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
+								</a>
+								<a
+									href="#"
+									target="_blank"
+									className="p-3 rounded-xl bg-blue-600/5 border border-blue-600/10 hover:bg-blue-600/10 hover:border-blue-600/20 transition-all text-muted-foreground hover:text-blue-500 group"
+								>
+									<Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
+								</a>
+							</div>
+						</div>
+					</motion.div>
 
-					<div>
-						<label className="block text-sm font-semibold text-green-400 mb-2">
-							Subject
-						</label>
-						<input
-							type="text"
-							name="subject"
-							value={formData.subject}
-							onChange={handleChange}
-							className="w-full bg-background border border-muted rounded px-3 py-2 text-foreground focus:border-green-500 focus:outline-none transition-colors"
-							placeholder="What's this about?"
-						/>
-					</div>
-
-					<div>
-						<label className="block text-sm font-semibold text-green-400 mb-2">
-							Message *
-						</label>
-						<textarea
-							name="message"
-							value={formData.message}
-							onChange={handleChange}
-							required
-							rows={6}
-							className="w-full bg-background border border-muted rounded px-3 py-2 text-foreground focus:border-green-500 focus:outline-none transition-colors resize-none"
-							placeholder="Your message..."
-						/>
-					</div>
-
-					<button
-						type="submit"
-						disabled={loading}
-						className="w-full bg-green-500 hover:bg-green-600 disabled:bg-muted disabled:text-muted-foreground text-black font-semibold py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+					{/* Right Column: Form */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5, delay: 0.2 }}
+						className="flex-1"
 					>
-						{loading ? (
-							'Sending...'
-						) : (
-							<>
-								<Send className="w-4 h-4" />
-								Send Message
-							</>
-						)}
-					</button>
-				</form>
+						<div className="p-8 rounded-3xl bg-card/40 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
+							<div className="absolute inset-0 bg-linear-to-br from-green-500/5 to-transparent pointer-events-none" />
 
-				<div className="pt-4 border-t border-muted text-xs text-muted-foreground space-y-1">
-					<p>• Messages are stored securely</p>
-					<p>• I typically respond within 24-48 hours</p>
-					<p>• Rate limited to prevent spam</p>
+							<h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 relative z-10">
+								<span className="w-2 h-8 rounded-full bg-green-500" />
+								Send Message
+							</h2>
+
+							<form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+								<div className="grid grid-cols-2 gap-4">
+									<div className="space-y-2">
+										<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Name
+										</label>
+										<input
+											type="text"
+											name="name"
+											value={formData.name}
+											onChange={handleChange}
+											required
+											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											placeholder="John Doe"
+										/>
+									</div>
+									<div className="space-y-2">
+										<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+											Email
+										</label>
+										<input
+											type="email"
+											name="email"
+											value={formData.email}
+											onChange={handleChange}
+											required
+											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											placeholder="john@example.com"
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-2">
+									<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+										Subject
+									</label>
+									<input
+										type="text"
+										name="subject"
+										value={formData.subject}
+										onChange={handleChange}
+										className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+										placeholder="Project Inquiry"
+									/>
+								</div>
+
+								<div className="space-y-2">
+									<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+										Message
+									</label>
+									<textarea
+										name="message"
+										value={formData.message}
+										onChange={handleChange}
+										required
+										rows={5}
+										className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all resize-none placeholder:text-muted-foreground/30"
+										placeholder="Tell me about your project..."
+									/>
+								</div>
+
+								<div className="pt-2">
+									<button
+										type="submit"
+										disabled={loading || success}
+										className={cn(
+											'w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg',
+											success
+												? 'bg-green-500 text-black cursor-default'
+												: 'bg-white text-black hover:bg-gray-200 hover:scale-[1.02]',
+										)}
+									>
+										{loading ? (
+											<span className="animate-pulse">Sending...</span>
+										) : success ? (
+											<>
+												<CheckCircle className="w-5 h-5" />
+												<span>Message Sent</span>
+											</>
+										) : (
+											<>
+												<span>Send Message</span>
+												<Send className="w-4 h-4" />
+											</>
+										)}
+									</button>
+								</div>
+
+								<AnimatePresence>
+									{error && (
+										<motion.div
+											initial={{ opacity: 0, height: 0 }}
+											animate={{ opacity: 1, height: 'auto' }}
+											exit={{ opacity: 0, height: 0 }}
+											className="text-red-400 text-sm text-center bg-red-500/10 p-2 rounded-lg border border-red-500/20"
+										>
+											{error}
+										</motion.div>
+									)}
+								</AnimatePresence>
+							</form>
+						</div>
+					</motion.div>
 				</div>
 			</div>
 		</ScrollArea>
