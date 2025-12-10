@@ -66,13 +66,20 @@ const TaskbarItem = memo(function TaskbarItem({
 						y: 8,
 						filter: 'blur(4px)',
 					}}
-					transition={{
-						type: 'spring',
-						stiffness: 400,
-						damping: 25,
-						duration: isLoading ? 0.6 : 0.3,
-						repeat: isLoading ? Infinity : 0,
-					}}
+					transition={
+						isLoading
+							? {
+									type: 'tween',
+									duration: 0.6,
+									repeat: Infinity,
+									ease: 'easeInOut',
+							  }
+							: {
+									type: 'spring',
+									stiffness: 400,
+									damping: 25,
+							  }
+					}
 					whileHover={{
 						scale: 1.1,
 						y: -3,
