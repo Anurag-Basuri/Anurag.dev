@@ -11,7 +11,6 @@ import { initialFileSystem as fileSystem, type FileSystemItem } from '@/lib/data
 import { Taskbar } from '@/components/os/shell/Taskbar';
 import { TopBar } from '@/components/os/shell/TopBar';
 import { Background3D } from '@/components/os/shell/Background3D';
-import { WelcomeDialog } from '@/components/shared/WelcomeDialog';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -145,8 +144,6 @@ export function MainLayout() {
 					onToggleTerminal={terminal.toggle}
 					onFileSelect={handleFileSelect}
 				/>
-
-				<WelcomeDialog />
 
 				<div className="flex-1 overflow-hidden p-3">
 					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
