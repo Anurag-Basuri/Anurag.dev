@@ -67,7 +67,7 @@ export function MainLayout() {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.2 }}
-							className="h-full rounded-xl border border-white/10 bg-[#0d1117] shadow-2xl overflow-hidden flex flex-col"
+							className="h-full rounded-sm border border-white/10 bg-[#0d1117] shadow-2xl overflow-hidden flex flex-col"
 						>
 							<SidebarProfile onCollapse={sidebar.collapse} />
 
@@ -100,7 +100,7 @@ export function MainLayout() {
 					<ResizablePanel
 						defaultSize={mainVerticalSizes[0]}
 						minSize={40}
-						className="rounded-xl border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+						className="rounded-sm border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden"
 					>
 						<EditorArea />
 					</ResizablePanel>
@@ -122,7 +122,7 @@ export function MainLayout() {
 	);
 
 	const renderMobileLayout = () => (
-		<div className="h-full w-full rounded-xl border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+		<div className="h-full w-full rounded-sm border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
 			<EditorArea />
 		</div>
 	);
