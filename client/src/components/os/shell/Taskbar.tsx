@@ -54,45 +54,28 @@ const TaskbarItem = memo(function TaskbarItem({
 			<TooltipTrigger asChild>
 				<motion.div
 					layout
-					initial={{ opacity: 0, scale: 0.5, y: 10 }}
+					initial={{ opacity: 0, scale: 0.9, y: 5 }}
 					animate={{
 						opacity: 1,
-						scale: isLoading ? [1, 1.05, 1] : 1,
+						scale: 1,
 						y: 0,
 					}}
 					exit={{
 						opacity: 0,
-						scale: 0.8,
-						y: 8,
-						filter: 'blur(4px)',
+						scale: 0.9,
+						y: 5,
 					}}
-					transition={
-						isLoading
-							? {
-									type: 'tween',
-									duration: 0.6,
-									repeat: Infinity,
-									ease: 'easeInOut',
-							  }
-							: {
-									type: 'spring',
-									stiffness: 400,
-									damping: 25,
-							  }
-					}
-					whileHover={{
-						scale: 1.1,
-						y: -3,
-						backgroundColor: 'rgba(255,255,255,0.08)',
-						borderColor: 'rgba(255,255,255,0.1)',
+					transition={{
+						type: 'spring',
+						stiffness: 400,
+						damping: 30,
 					}}
-					whileTap={{ scale: 0.95 }}
 					onClick={onClick}
 					className={cn(
-						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform cursor-pointer',
+						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
 						isActive
 							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
-							: 'bg-transparent border-transparent',
+							: 'bg-transparent border-transparent hover:bg-white/5',
 					)}
 				>
 					<Icon
@@ -125,14 +108,14 @@ const TaskbarItem = memo(function TaskbarItem({
 					)}
 
 					{/* Close Button on Hover */}
-					<motion.div
-						initial={{ opacity: 1, scale: 1 }}
-						className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400"
+					<button
+						onClick={onClose}
+						className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/30 text-red-400 transition-all"
+						aria-label="Close window"
+						type="button"
 					>
-						<div role="button" onClick={onClose}>
-							<X className="w-2.5 h-2.5" />
-						</div>
-					</motion.div>
+						<X className="w-2.5 h-2.5" />
+					</button>
 				</motion.div>
 			</TooltipTrigger>
 			<TooltipContent side="top" className="text-xs font-medium">
