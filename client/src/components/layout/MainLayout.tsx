@@ -16,15 +16,17 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
+import { windowsAtom } from '@/store/atoms';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 
 	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
+	const [windows] = useAtom(windowsAtom);
 
 	const [isLayoutReady] = useState(true);
 
@@ -33,6 +35,13 @@ export function MainLayout() {
 	// Use the new collapsible panel hooks
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
+
+	// Auto-open About module on first load if no windows are open
+	useEffect(() => {
+		if (windows.length === 0) {
+			openWindow('about');
+		}
+	}, []); // Empty deps - run once on mount
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
