@@ -1,21 +1,21 @@
 'use client';
 
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { Rnd } from 'react-rnd';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
 import { X, Minus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 
 interface WindowFrameProps {
 	windowState: WindowState;
 	bounds: string;
 }
 
-export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
-	const [windows, setWindows] = useAtom(windowsAtom);
+export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: WindowFrameProps) {
+	const setWindows = useSetAtom(windowsAtom);
 	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
 
@@ -40,20 +40,22 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 		bringToFront();
 	};
 
-	const handleClose = () => {
-		setWindows(windows.filter(w => w.id !== id));
+	const handleClose = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		setWindows(prev => prev.filter(w => w.id !== id));
 		setWindowStack(windowStack.filter(wid => wid !== id));
 		if (activeWindowId === id) {
-			setActiveWindowId(windowStack.at(-2) || null);
+			const remainingStack = windowStack.filter(wid => wid !== id);
+			setActiveWindowId(remainingStack.at(-1) || null);
 		}
 	};
 
-	const handleMinimize = () => {
-		setWindows(windows.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
+	const handleMinimize = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
 		if (activeWindowId === id) {
-			// Find the next non-minimized window to activate
-			const nextWindow = windows.find(w => w.id !== id && !w.isMinimized);
-			setActiveWindowId(nextWindow?.id || null);
+			const remainingStack = windowStack.filter(wid => wid !== id);
+			setActiveWindowId(remainingStack.at(-1) || null);
 		}
 	};
 
@@ -115,4 +117,4 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 			)}
 		</AnimatePresence>
 	);
-}
+});
