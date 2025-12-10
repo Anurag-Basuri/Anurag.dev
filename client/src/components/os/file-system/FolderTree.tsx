@@ -13,23 +13,30 @@ interface FolderTreeProps {
 }
 
 const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-amber-500/90" />;
+	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-yellow-500/90" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 text-sky-500/90" />;
+		return <FileText className="w-4 h-4 text-blue-400/90" />;
 	if (
 		name.endsWith('.py') ||
 		name.endsWith('.js') ||
 		name.endsWith('.tsx') ||
-		name.endsWith('.exe')
+		name.endsWith('.ts')
 	)
-		return <FileCode className="w-4 h-4 text-emerald-500/90" />;
-	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-500/90" />;
-	return <File className="w-4 h-4 text-muted-foreground/40" />;
+		return <FileCode className="w-4 h-4 text-emerald-400/90" />;
+	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-400/90" />;
+	return <File className="w-4 h-4 text-slate-400/60" />;
 };
 
 export function FolderTree({ items, level = 0, onSelect }: FolderTreeProps) {
 	return (
-		<div className="w-full font-mono">
+		<div className="w-full font-mono relative">
+			{/* Connector line for nested levels */}
+			{level > 0 && (
+				<div
+					className="absolute left-[13px] top-0 bottom-0 w-px bg-white/5"
+					aria-hidden="true"
+				/>
+			)}
 			{items.map(item => (
 				<FolderTreeItem key={item.id} item={item} level={level} onSelect={onSelect} />
 			))}
@@ -47,13 +54,17 @@ function FolderTreeItem({
 	onSelect?: (item: FileSystemItem) => void;
 }) {
 	const isFolder = item.type === 'folder';
-	const [isOpen, setIsOpen] = useState(isFolder && level < 1);
+	// Auto-expand root level folders by default
+	const [isOpen, setIsOpen] = useState(
+		isFolder && (level === 0 || item.name === 'src' || item.name === 'components'),
+	);
 	const [isHovered, setIsHovered] = useState(false);
 
 	React.useEffect(() => {
 		const handleCollapse = () => {
 			if (isFolder) setIsOpen(false);
 		};
+		// Custom event to collapse all
 		window.addEventListener('collapse-all-folders', handleCollapse);
 		return () => window.removeEventListener('collapse-all-folders', handleCollapse);
 	}, [isFolder]);
@@ -68,33 +79,34 @@ function FolderTreeItem({
 	};
 
 	return (
-		<div>
+		<div className="relative">
 			<div
 				className={cn(
-					'flex items-center py-1.5 px-2.5 cursor-pointer select-none text-xs transition-all duration-200 rounded-md group relative',
-					'hover:bg-accent/10 hover:text-accent-foreground',
-					isHovered && 'bg-accent/5',
-					level > 0 && 'ml-2',
-					// Selected state visualization
-					isHovered && !isFolder && 'transform translate-x-1',
+					'flex items-center py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
+					'hover:bg-white/5',
+					isHovered && !isFolder && 'text-emerald-400',
+					level > 0 && 'ml-4', // Indentation
 				)}
-				style={{ paddingLeft: `${level * 14 + 10}px` }}
 				onClick={handleToggle}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
 			>
-				{/* Tree Guide Line */}
-				{level > 0 && (
-					<div
-						className="absolute left-0 top-0 bottom-0 w-px bg-border/20 group-hover:bg-border/40 transition-colors"
-						style={{ left: `${(level - 1) * 14 + 14}px` }}
+				{/* Hover Background Indicator */}
+				{isHovered && (
+					<motion.div
+						layoutId="folder-hover"
+						className="absolute inset-0 bg-white/4 rounded-sm pointer-events-none"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.15 }}
 					/>
 				)}
 
 				<motion.span
 					animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
 					transition={{ duration: 0.2, ease: 'easeOut' }}
-					className="mr-1.5 text-muted-foreground group-hover:text-foreground flex items-center justify-center transition-colors"
+					className="mr-2 text-white/40 group-hover:text-white/80 transition-colors"
 				>
 					{isFolder ? (
 						<ChevronRight className="w-3.5 h-3.5" />
@@ -103,12 +115,12 @@ function FolderTreeItem({
 					)}
 				</motion.span>
 
-				<span className="mr-2">
+				<span className="mr-2.5 relative z-10">
 					{isFolder ? (
 						isOpen ? (
-							<FolderOpen className="w-4 h-4 text-primary drop-shadow-sm" />
+							<FolderOpen className="w-4 h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)] transition-colors" />
 						) : (
-							<Folder className="w-4 h-4 text-primary/70 group-hover:text-primary transition-colors" />
+							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-400 transition-colors" />
 						)
 					) : (
 						<FileIcon name={item.name} />
@@ -117,11 +129,11 @@ function FolderTreeItem({
 
 				<span
 					className={cn(
-						'truncate transition-colors font-medium',
+						'truncate transition-colors duration-200 relative z-10',
 						isFolder
-							? 'text-foreground/90 group-hover:text-foreground'
-							: 'text-muted-foreground group-hover:text-foreground',
-						item.name === 'secret' && 'text-muted-foreground/50 italic',
+							? 'text-white/90 font-semibold tracking-wide group-hover:text-white'
+							: 'text-white/70 group-hover:text-white',
+						item.name === 'secret' && 'text-white/30 italic',
 					)}
 				>
 					{item.name}
@@ -134,8 +146,8 @@ function FolderTreeItem({
 						initial={{ height: 0, opacity: 0 }}
 						animate={{ height: 'auto', opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-						style={{ overflow: 'hidden' }}
+						transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+						className="overflow-hidden"
 					>
 						<FolderTree items={item.children} level={level + 1} onSelect={onSelect} />
 					</motion.div>
