@@ -46,6 +46,7 @@ const TaskbarItem = memo(function TaskbarItem({
 	onClick: () => void;
 	onClose: (e: React.MouseEvent) => void;
 }) {
+	const isLoading = window.isLoading || false;
 	const Icon = getModuleIcon(window.id);
 
 	return (
@@ -53,14 +54,24 @@ const TaskbarItem = memo(function TaskbarItem({
 			<TooltipTrigger asChild>
 				<motion.button
 					layout
-					initial={{ opacity: 0, scale: 0.01, y: 20 }}
-					animate={{ opacity: 1, scale: 1, y: 0 }}
-					exit={{ opacity: 0, scale: 0.01, y: 20 }}
+					initial={{ opacity: 0, scale: 0.5, y: 10 }}
+					animate={{
+						opacity: 1,
+						scale: isLoading ? [1, 1.05, 1] : 1,
+						y: 0,
+					}}
+					exit={{
+						opacity: 0,
+						scale: 0.8,
+						y: 8,
+						filter: 'blur(4px)',
+					}}
 					transition={{
 						type: 'spring',
-						stiffness: 500,
-						damping: 30,
-						mass: 0.8,
+						stiffness: 400,
+						damping: 25,
+						duration: isLoading ? 0.6 : 0.3,
+						repeat: isLoading ? Infinity : 0,
 					}}
 					whileHover={{
 						scale: 1.1,
@@ -217,13 +228,20 @@ export function Taskbar() {
 			const nextActiveId = windowStack.filter(wid => wid !== id).pop();
 			setActiveWindowId(nextActiveId || null);
 		} else {
-			// Open this window and minimize all others (VS Code-like behavior)
+			// Show loading briefly, then open window
 			setWindows(
 				windows.map(w => ({
 					...w,
 					isMinimized: w.id !== id,
+					isLoading: w.id === id ? true : false,
 				})),
 			);
+
+			// Clear loading after transition
+			setTimeout(() => {
+				setWindows(prev => prev.map(w => ({ ...w, isLoading: false })));
+			}, 250);
+
 			setActiveWindowId(id);
 			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
 		}
@@ -235,22 +253,39 @@ export function Taskbar() {
 	};
 
 	const handleCloseWindow = (id: string, e: React.MouseEvent) => {
-		e.stopPropagation(); // Prevent tab click
+		e.stopPropagation();
 		const windowToClose = windows.find(w => w.id === id);
 		if (!windowToClose) return;
 
-		// Remove from windows
-		setWindows(windows.filter(w => w.id !== id));
+		const remainingStack = windowStack.filter(wid => wid !== id);
+		const nextActiveId = remainingStack.at(-1) || null;
 
-		// Update active window if we closed the active one
-		if (id === activeWindowId) {
-			const remainingStack = windowStack.filter(wid => wid !== id);
-			const nextActiveId = remainingStack[remainingStack.length - 1] || null;
-			setActiveWindowId(nextActiveId);
-			setWindowStack(remainingStack);
+		// Smooth close sequence
+		if (id === activeWindowId && nextActiveId) {
+			// First: Mark next window as loading
+			setWindows(prev =>
+				prev.map(w => (w.id === nextActiveId ? { ...w, isLoading: true } : w)),
+			);
+
+			// Second: After brief delay, remove current and show next
+			setTimeout(() => {
+				setWindows(prev =>
+					prev
+						.map(w =>
+							w.id === nextActiveId
+								? { ...w, isMinimized: false, isLoading: false }
+								: w,
+						)
+						.filter(w => w.id !== id),
+				);
+			}, 200);
 		} else {
-			setWindowStack(windowStack.filter(wid => wid !== id));
+			// Just remove the window
+			setWindows(windows.filter(w => w.id !== id));
 		}
+
+		setActiveWindowId(nextActiveId);
+		setWindowStack(remainingStack);
 	};
 
 	const menuItems = [
@@ -450,19 +485,15 @@ export function Taskbar() {
 					{/* Window Icons (Mac Dock Style) */}
 					<div className="flex items-center gap-1.5 h-full pl-1">
 						<AnimatePresence mode="popLayout">
-							<AnimatePresence mode="popLayout">
-								{windows.map(window => (
-									<TaskbarItem
-										key={window.id}
-										window={window}
-										isActive={
-											window.id === activeWindowId && !window.isMinimized
-										}
-										onClick={() => handleTaskbarClick(window.id)}
-										onClose={e => handleCloseWindow(window.id, e)}
-									/>
-								))}
-							</AnimatePresence>
+							{windows.map(window => (
+								<TaskbarItem
+									key={window.id}
+									window={window}
+									isActive={window.id === activeWindowId && !window.isMinimized}
+									onClick={() => handleTaskbarClick(window.id)}
+									onClose={e => handleCloseWindow(window.id, e)}
+								/>
+							))}
 						</AnimatePresence>
 					</div>
 				</div>
