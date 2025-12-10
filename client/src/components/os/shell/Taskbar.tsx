@@ -38,26 +38,28 @@ export function Taskbar() {
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 	const { openWindow } = useWindowManager();
-	const startMenuRef = useRef<HTMLDivElement>(null);
+	const stateMenuRef = useRef<HTMLDivElement>(null);
+	const startButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
+		if (!isStartOpen) return;
+
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Node;
-			if (startMenuRef.current && !startMenuRef.current.contains(target)) {
+			const isClickInsideStart =
+				stateMenuRef.current && stateMenuRef.current.contains(target);
+			const isClickOnButton =
+				startButtonRef.current && startButtonRef.current.contains(target);
+
+			if (!isClickInsideStart && !isClickOnButton) {
 				setIsStartOpen(false);
 			}
 		};
 
-		if (isStartOpen) {
-			// Delay adding the listener to prevent immediate closure
-			const timer = requestAnimationFrame(() => {
-				document.addEventListener('click', handleClickOutside);
-			});
-			return () => {
-				cancelAnimationFrame(timer);
-				document.removeEventListener('click', handleClickOutside);
-			};
-		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
 	}, [isStartOpen]);
 
 	const handleTaskbarClick = (id: string) => {
@@ -109,24 +111,28 @@ export function Taskbar() {
 		<TooltipProvider delayDuration={0}>
 			<div className="h-10 bg-[#0d1117]/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-40 shadow-[0_-2px_20px_rgba(0,0,0,0.3)] px-2 sm:px-3">
 				{/* Left side: Start and Window Icons */}
-				<div className="flex items-center gap-2 overflow-hidden">
+				<div className="flex items-center gap-2 overflow-visible">
 					{/* Start Button */}
-					<div className="relative" ref={startMenuRef}>
+					<div className="relative">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<button
+									ref={startButtonRef}
 									onClick={() => setIsStartOpen(!isStartOpen)}
 									className={cn(
-										'h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/40 text-white/70',
-										'hover:bg-white/10 hover:text-emerald-400',
-										isStartOpen && 'bg-emerald-500/15 text-emerald-400',
+										'h-8 px-2.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+										isStartOpen &&
+											'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
 									)}
 								>
 									<Logo />
+									<span className="text-[11px] sm:text-xs font-medium">
+										Start
+									</span>
 								</button>
 							</TooltipTrigger>
 							<TooltipContent side="top" align="center">
-								<p>Start</p>
+								<p>Start Menu</p>
 							</TooltipContent>
 						</Tooltip>
 
@@ -134,6 +140,7 @@ export function Taskbar() {
 						<AnimatePresence>
 							{isStartOpen && (
 								<motion.div
+									ref={stateMenuRef}
 									initial={{ opacity: 0, y: 10, scale: 0.95 }}
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: 10, scale: 0.95 }}
