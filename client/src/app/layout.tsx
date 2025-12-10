@@ -5,7 +5,7 @@ import './globals.css';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 import ClientToaster from '@/components/shared/ClientToaster';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
