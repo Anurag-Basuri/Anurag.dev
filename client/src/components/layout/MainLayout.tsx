@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { mainVerticalSizesAtom, mainHorizontalSizesAtom } from '@/store/atoms';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -16,7 +17,6 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
-import { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom } from '@/store/atoms';
@@ -37,11 +37,18 @@ export function MainLayout() {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 
 	// Auto-open About module on first load if no windows are open
+	const hasInitialized = React.useRef(false);
 	useEffect(() => {
-		if (windows.length === 0) {
-			openWindow('about');
+		// Only run once, and only if there's no 'about' window already
+		if (!hasInitialized.current) {
+			hasInitialized.current = true;
+			const aboutExists = windows.some(w => w.id === 'about');
+			if (!aboutExists && windows.length === 0) {
+				// Small delay to ensure localStorage has hydrated
+				setTimeout(() => openWindow('about'), 0);
+			}
 		}
-	}, []); // Empty deps - run once on mount
+	}, [windows, openWindow]);
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
