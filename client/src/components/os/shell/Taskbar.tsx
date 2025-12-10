@@ -27,8 +27,8 @@ import { HelpButton } from '@/components/shared/HelpButton';
 // A simple logo component
 const Logo = () => (
 	<div className="w-5 h-5 flex items-center justify-center">
-		<div className="w-full h-full border-2 border-current rounded-full flex items-center justify-center">
-			<div className="w-1/2 h-1/2 bg-current rounded-full" />
+		<div className="w-full h-full border-2 border-emerald-500 rounded-sm rotate-45 flex items-center justify-center">
+			<div className="w-2 h-2 bg-emerald-400 rounded-full" />
 		</div>
 	</div>
 );
@@ -182,226 +182,229 @@ export function Taskbar() {
 
 	return (
 		<TooltipProvider delayDuration={0}>
-			<div className="h-8 bg-[#0d1117]/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-40 shadow-[0_-2px_20px_rgba(0,0,0,0.3)] px-2 sm:px-3">
-				{/* Left side: Start and Window Icons */}
-				<div className="flex items-center gap-2 overflow-visible">
-					{/* Start Button */}
-					<div className="relative">
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									ref={startButtonRef}
-									onClick={() => setIsStartOpen(!isStartOpen)}
-									className={cn(
-										'h-8 px-2 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
-										isStartOpen &&
-											'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-									)}
-								>
-									<Logo />
-									<span className="text-xs font-medium">Start</span>
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="top" align="center">
-								<p>Start Menu</p>
-							</TooltipContent>
-						</Tooltip>
+			{/* Start Menu Overlay */}
+			<AnimatePresence>
+				{isStartOpen && (
+					<>
+						{/* Backdrop */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							onClick={() => setIsStartOpen(false)}
+							className="fixed inset-0 bg-transparent z-40"
+						/>
 
-						{/* Start Menu */}
-						<AnimatePresence>
-							{isStartOpen && (
-								<>
-									{/* Backdrop */}
-									<motion.div
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										onClick={() => setIsStartOpen(false)}
-										className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-40"
-									/>
+						{/* Popover */}
+						<motion.div
+							ref={stateMenuRef}
+							initial={{ opacity: 0, scale: 0.9, y: 10, filter: 'blur(10px)' }}
+							animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+							exit={{ opacity: 0, scale: 0.9, y: 10, filter: 'blur(10px)' }}
+							transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+							tabIndex={0}
+							onKeyDown={handleMenuKeyDown}
+							className="absolute bottom-14 left-2 w-[20rem] sm:w-80 z-50 bg-[#0d1117]/80 backdrop-blur-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
+						>
+							<div className="absolute inset-x-0 top-0 h-[100px] bg-linear-to-b from-emerald-500/10 to-transparent pointer-events-none" />
 
-									{/* Popover */}
-									<motion.div
-										ref={stateMenuRef}
-										initial={{ opacity: 0, scale: 0.9, y: 20 }}
-										animate={{ opacity: 1, scale: 1, y: 0 }}
-										exit={{ opacity: 0, scale: 0.9, y: 20 }}
-										transition={{ type: 'spring', duration: 0.3 }}
-										tabIndex={0}
-										onKeyDown={handleMenuKeyDown}
-										className="absolute bottom-12 left-0 w-[18rem] sm:w-80 z-50 bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 rounded-xl overflow-hidden"
-									>
-										<div>
-											<div className="flex items-center gap-3 mb-2">
-												<Image
-													src="/me.jpg"
-													alt="Anurag Basuri"
-													width={48}
-													height={48}
-													className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.4)]"
-													priority
-												/>
-												<div>
-													<div className="font-bold text-white">
-														Anurag Basuri
-													</div>
-													<div className="text-xs text-white/50">
-														Full-Stack Developer
-													</div>
-												</div>
-											</div>
-
-											<div className="grid grid-cols-2 gap-1">
-												{menuItems.map((item, index) => (
-													<button
-														key={item.id}
-														ref={index === 0 ? firstMenuItemRef : null}
-														onClick={() => handleOpenModule(item.id)}
-														className="w-full text-left px-3 py-2 hover:bg-white/10 hover:text-emerald-400 text-white/60 transition-all duration-200 text-sm flex items-center gap-3 group rounded-md"
-													>
-														<item.icon className="w-4 h-4 opacity-80 group-hover:opacity-100 transition-opacity" />
-														{item.label}
-													</button>
-												))}
-											</div>
-
-											<div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between">
-												<div className="flex items-center gap-1">
-													{socialLinks.map(link => (
-														<Tooltip key={link.label}>
-															<TooltipTrigger asChild>
-																<a
-																	href={link.href}
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-emerald-400 hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-																>
-																	<link.icon className="w-4 h-4" />
-																</a>
-															</TooltipTrigger>
-															<TooltipContent side="top">
-																<p>{link.label}</p>
-															</TooltipContent>
-														</Tooltip>
-													))}
-												</div>
-												<div className="flex items-center">
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<button
-																onClick={() =>
-																	toast('Settings coming soon!', {
-																		icon: '⚙️',
-																	})
-																}
-																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
-															>
-																<Settings className="w-4 h-4" />
-															</button>
-														</TooltipTrigger>
-														<TooltipContent side="top">
-															<p>Settings</p>
-														</TooltipContent>
-													</Tooltip>
-													<Tooltip>
-														<TooltipTrigger asChild>
-															<button
-																onClick={() =>
-																	window.location.reload()
-																}
-																className="h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded-md text-white/50 hover:text-red-400 hover:bg-red-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400/40"
-															>
-																<Power className="w-4 h-4" />
-															</button>
-														</TooltipTrigger>
-														<TooltipContent side="top">
-															<p>Restart Session</p>
-														</TooltipContent>
-													</Tooltip>
-												</div>
-											</div>
+							<div className="relative">
+								<div className="flex items-center gap-4 mb-6">
+									<div className="relative">
+										<div className="absolute inset-0 bg-emerald-500 blur-md opacity-40 rounded-full" />
+										<Image
+											src="/me.jpg"
+											alt="Anurag Basuri"
+											width={48}
+											height={48}
+											className="w-12 h-12 rounded-full border-2 border-white/10 relative z-10"
+											priority
+										/>
+									</div>
+									<div>
+										<div className="font-bold text-base text-white tracking-wide">
+											Anurag Basuri
 										</div>
-									</motion.div>
-								</>
-							)}
-						</AnimatePresence>
-					</div>
+										<div className="text-xs text-white/50 font-mono mt-0.5">
+											Full-Stack Engineer
+										</div>
+									</div>
+								</div>
 
-					{/* Window Icons */}
-					<div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-						{windows.map(window => {
-							const Icon = getModuleIcon(window.id);
-							const isActive = window.id === activeWindowId && !window.isMinimized;
-							return (
-								<motion.div
-									key={window.id}
-									layout
-									initial={{ opacity: 0, scale: 0.8 }}
-									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.8 }}
-									className="group relative"
-								>
-									<Tooltip>
+								<div className="grid gap-1 mb-4">
+									{menuItems.map((item, index) => (
+										<motion.button
+											whileHover={{
+												x: 4,
+												backgroundColor: 'rgba(255,255,255,0.05)',
+											}}
+											key={item.id}
+											ref={index === 0 ? firstMenuItemRef : null}
+											onClick={() => handleOpenModule(item.id)}
+											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 transition-colors text-sm flex items-center gap-3 group"
+										>
+											<div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors">
+												<item.icon className="w-4 h-4" />
+											</div>
+											<span className="font-medium">{item.label}</span>
+										</motion.button>
+									))}
+								</div>
+
+								<div className="pt-4 border-t border-white/10 flex items-center justify-between">
+									<div className="flex items-center gap-2">
+										{socialLinks.map(link => (
+											<Tooltip key={link.label}>
+												<TooltipTrigger asChild>
+													<a
+														href={link.href}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="h-8 w-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200"
+													>
+														<link.icon className="w-4 h-4" />
+													</a>
+												</TooltipTrigger>
+												<TooltipContent side="top">
+													<p>{link.label}</p>
+												</TooltipContent>
+											</Tooltip>
+										))}
+									</div>
+									<div className="flex items-center gap-1">
+										<button
+											onClick={() => window.location.reload()}
+											className="h-8 px-3 flex items-center gap-2 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors text-xs font-medium uppercase tracking-wider"
+										>
+											<Power className="w-3.5 h-3.5" />
+											<span>Restart</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</motion.div>
+					</>
+				)}
+			</AnimatePresence>
+
+			{/* Main Bar */}
+			<motion.div
+				initial={{ y: 100, opacity: 0 }}
+				animate={{ y: 0, opacity: 1 }}
+				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+				className="h-8 bg-[#0d1117]/60 backdrop-blur-2xl border-t border-white/8 flex items-center justify-between z-40 px-2 sm:px-3 relative"
+			>
+				{/* Ambient Glow */}
+				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/20 to-transparent opacity-50" />
+
+				<div className="flex items-center gap-4 h-full">
+					{/* Start Button */}
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<motion.button
+								ref={startButtonRef}
+								whileHover={{ scale: 1.05 }}
+								whileTap={{ scale: 0.95 }}
+								onClick={() => setIsStartOpen(!isStartOpen)}
+								className={cn(
+									'h-6 px-3 rounded-md flex items-center gap-2 transition-all duration-300',
+									isStartOpen
+										? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+										: 'bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 hover:border-white/10',
+								)}
+							>
+								<Logo />
+								<span className="text-[11px] font-bold tracking-wider uppercase">
+									Start
+								</span>
+							</motion.button>
+						</TooltipTrigger>
+						<TooltipContent side="top">
+							System Menu
+						</TooltipContent>
+					</Tooltip>
+
+					{/* Divider */}
+					{windows.length > 0 && <div className="h-4 w-px bg-white/10" />}
+
+					{/* Window Icons (Dock Style) */}
+					<div className="flex items-center gap-2 h-full">
+						<AnimatePresence mode="popLayout">
+							{windows.map(window => {
+								const Icon = getModuleIcon(window.id);
+								const isActive =
+									window.id === activeWindowId && !window.isMinimized;
+
+								return (
+									<Tooltip key={window.id}>
 										<TooltipTrigger asChild>
-											<button
+											<motion.button
+												layout
+												initial={{ opacity: 0, scale: 0.5, y: 10 }}
+												animate={{ opacity: 1, scale: 1, y: 0 }}
+												exit={{ opacity: 0, scale: 0.5, y: 10 }}
+												whileHover={{ scale: 1.05, y: -2 }}
+												whileTap={{ scale: 0.95 }}
 												onClick={() => handleTaskbarClick(window.id)}
-												aria-pressed={isActive}
-												aria-label={`${window.title} window`}
 												className={cn(
-													'h-8 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 pr-7 sm:pr-8 rounded-md transition-colors duration-200 relative focus:outline-none focus:ring-2 focus:ring-primary/40',
-													'max-w-[120px] sm:max-w-[150px] min-w-0',
-													'hover:bg-primary/10',
-													isActive ? 'bg-primary/20' : 'bg-transparent',
+													'relative h-7 px-3 rounded-md flex items-center gap-2 transition-all duration-300 group border',
+													isActive
+														? 'bg-white/[0.08] border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
+														: 'bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/5',
 												)}
 											>
-												<Icon className="h-4 w-4 shrink-0" />
-												<span className="text-xs truncate hidden sm:inline">
-													{window.title}
-												</span>
-												{/* Active indicator */}
-												<motion.div
-													layoutId={`taskbar-active-indicator-${window.id}`}
+												<Icon
 													className={cn(
-														'absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4 rounded-full',
-														isActive ? 'bg-primary' : 'bg-transparent',
+														'w-3.5 h-3.5 transition-colors',
+														isActive
+															? 'text-emerald-400'
+															: 'text-white/60 group-hover:text-white/80',
 													)}
 												/>
-											</button>
+
+												<span
+													className={cn(
+														'text-[10px] font-medium transition-colors max-w-[100px] truncate',
+														isActive
+															? 'text-white/90'
+															: 'text-white/50 group-hover:text-white/70',
+													)}
+												>
+													{window.title}
+												</span>
+
+												{/* Active Indicator & Close Button */}
+												{isActive && (
+													<motion.div
+														layoutId="active-pill"
+														className="absolute -bottom-[1px] left-2 right-2 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+													/>
+												)}
+
+												<div
+													role="button"
+													onClick={e => handleCloseWindow(window.id, e)}
+													className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full hover:bg-white/10 text-white/40 hover:text-red-400 transition-all"
+												>
+													<X className="w-3 h-3" />
+												</div>
+											</motion.button>
 										</TooltipTrigger>
 										<TooltipContent side="top">
-											<p>{window.title}</p>
+											{window.title}
 										</TooltipContent>
 									</Tooltip>
-
-									{/* Close button */}
-									<button
-										onClick={e => handleCloseWindow(window.id, e)}
-										aria-label={`Close ${window.title}`}
-										className={cn(
-											'absolute right-0.5 top-1/2 -translate-y-1/2',
-											'h-6 w-6 flex items-center justify-center rounded',
-											'text-white/40 hover:text-white hover:bg-red-500/20',
-											'transition-all duration-200',
-											'focus:outline-none focus:ring-2 focus:ring-red-400/40',
-											// Desktop: show on group hover
-											'opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100',
-											// Mobile: always visible
-											'max-sm:opacity-100',
-										)}
-									>
-										<X className="h-3 w-3" />
-									</button>
-								</motion.div>
-							);
-						})}
+								);
+							})}
+						</AnimatePresence>
 					</div>
 				</div>
 
-				{/* Right side: Actions */}
+				{/* Right Side Actions */}
 				<div className="flex items-center gap-2">
 					<HelpButton placement="taskbar" />
 				</div>
-			</div>
+			</motion.div>
 		</TooltipProvider>
 	);
 }
