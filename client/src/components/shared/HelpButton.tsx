@@ -122,7 +122,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						<button
 							onClick={() => setIsOpen(true)}
 							className={cn(
-								'h-8 px-2 rounded-md border border-border/50 bg-background/60 hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary/40',
+								'h-8 px-2.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 								className,
 							)}
 							aria-label="Quick Help"
@@ -170,19 +170,19 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						>
 							<div
 								className={cn(
-									'bg-background/75 supports-[backdrop-filter:blur(0)]:bg-background/90 backdrop-blur-xl backdrop-saturate-150 border border-border/60 shadow-2xl overflow-hidden',
+									'bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden',
 									'rounded-t-2xl sm:rounded-2xl',
 								)}
 							>
 								{/* Header */}
-								<div className="p-4 border-b border-border/50 bg-muted/20 flex justify-between items-center">
-									<h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base">
-										<Terminal className="w-4 h-4" />
+								<div className="p-4 border-b border-white/10 flex justify-between items-center">
+									<h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base text-white">
+										<Terminal className="w-4 h-4 text-emerald-400" />
 										<span>Quick Help</span>
 									</h3>
 									<button
 										onClick={() => setIsOpen(false)}
-										className="p-2 sm:p-1 hover:bg-muted/50 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40"
+										className="p-2 sm:p-1 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
 										aria-label="Close help"
 										ref={closeBtnRef}
 									>
@@ -190,22 +190,21 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									</button>
 								</div>
 
-								{/* Content */}
 								<div className="p-4 space-y-4 text-sm sm:text-[13px]">
 									<div>
-										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+										<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
 											Common Commands
 										</h4>
 										<div className="space-y-1">
 											{commands.map((item, i) => (
 												<div
 													key={i}
-													className="grid grid-cols-[1fr_auto] items-center gap-4 p-2 rounded-md hover:bg-muted/40 transition-colors"
+													className="grid grid-cols-[1fr_auto] items-center gap-4 p-2 rounded-md hover:bg-white/5 transition-colors"
 												>
-													<span className="text-muted-foreground group-hover:text-foreground transition-colors text-xs sm:text-[13px]">
+													<span className="text-white/60 text-xs sm:text-[13px]">
 														{item.desc}
 													</span>
-													<code className="text-xs sm:text-[11px] bg-muted px-2 py-1 rounded font-mono text-primary shrink-0 justify-self-end">
+													<code className="text-xs sm:text-[11px] bg-white/10 px-2 py-1 rounded font-mono text-emerald-400 shrink-0 justify-self-end">
 														{item.cmd}
 													</code>
 												</div>
@@ -213,26 +212,26 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 										</div>
 									</div>
 
-									<Separator className="bg-border/50" />
+									<Separator className="bg-white/10" />
 
 									<div>
-										<h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+										<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
 											Tips
 										</h4>
-										<ul className="space-y-3 text-xs sm:text-[13px] text-muted-foreground">
+										<ul className="space-y-3 text-xs sm:text-[13px] text-white/60">
 											<li className="flex items-center gap-3">
-												<Folder className="w-4 h-4 text-primary/80 shrink-0" />
+												<Folder className="w-4 h-4 text-emerald-400/80 shrink-0" />
 												<span>Click files in Explorer to open them.</span>
 											</li>
 											<li className="flex items-center gap-3">
-												<Key className="w-4 h-4 text-primary/80 shrink-0" />
+												<Key className="w-4 h-4 text-emerald-400/80 shrink-0" />
 												<span>
 													Press <kbd className="kbd">Tab</kbd> to
 													autocomplete.
 												</span>
 											</li>
 											<li className="flex items-center gap-3">
-												<Terminal className="w-4 h-4 text-primary/80 shrink-0" />
+												<Terminal className="w-4 h-4 text-emerald-400/80 shrink-0" />
 												<span>
 													Use <kbd className="kbd">↑</kbd> /{' '}
 													<kbd className="kbd">↓</kbd> for command
