@@ -14,7 +14,7 @@ export function EditorArea() {
 		<div id="editor-boundary" className="h-full w-full relative group">
 			{/* Grid Pattern Background */}
 			<div
-				className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
+				className="absolute inset-0 pointer-events-none hidden"
 				style={{
 					backgroundImage:
 						'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',

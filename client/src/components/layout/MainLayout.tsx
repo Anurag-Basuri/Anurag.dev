@@ -106,7 +106,7 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="rounded-sm border border-border/40 bg-background/60 backdrop-blur-xl shadow-2xl overflow-hidden"
+							className="rounded-sm border-none shadow-none overflow-hidden"
 						>
 							<EditorArea />
 						</ResizablePanel>

@@ -65,16 +65,16 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 					// Even though dragging is disabled, active state management remains
 					style={{ zIndex }}
 					className={cn(
-						'bg-background/90 backdrop-blur-3xl overflow-hidden flex flex-col transition-all duration-300',
+						'bg-transparent overflow-hidden flex flex-col transition-all duration-300',
 						// Removed border/shadow for seamless full-screen look
 					)}
 					onMouseDown={handleFocus}
 				>
-					{/* Title Bar */}
+					{/* Title Bar - Minimalist and Transparent */}
 					<div
 						className={cn(
-							'h-9 flex items-center justify-between px-4 border-b border-white/5 shrink-0 transition-colors select-none',
-							'bg-[#0d1117]/50', // darker, subtle header
+							'h-9 flex items-center justify-between px-4 shrink-0 transition-colors select-none',
+							'bg-transparent', // Completely transparent header
 						)}
 					>
 						<span className="text-[13px] font-medium tracking-wide text-white/80 flex items-center gap-2">
@@ -92,7 +92,9 @@ export function WindowFrame({ windowState, bounds }: WindowFrameProps) {
 						</div>
 					</div>
 					{/* Content */}
-					<div className="grow overflow-auto bg-background/50 relative">{component}</div>
+					<div className="grow overflow-auto bg-transparent relative w-full h-full">
+						{component}
+					</div>
 				</Rnd>
 			)}
 		</AnimatePresence>
