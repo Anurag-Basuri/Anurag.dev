@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { CommandSuggestionsProps } from './types';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export function CommandSuggestions({
 	suggestions,
@@ -10,12 +10,12 @@ export function CommandSuggestions({
 	onSetActiveIndex,
 }: CommandSuggestionsProps) {
 	// Handle reduced motion
-	const shouldReduceMotion = () => {
+	const shouldReduceMotion = useMemo(() => {
 		if (typeof window !== 'undefined') {
 			return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		}
 		return false;
-	};
+	}, []);
 
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent, suggestion: string, index: number) => {
@@ -44,7 +44,6 @@ export function CommandSuggestions({
 					break;
 				case 'Escape':
 					e.preventDefault();
-					// Reset active suggestion and focus the terminal input to dismiss suggestions UX
 					onSetActiveIndex(0);
 					if (typeof document !== 'undefined') {
 						const input = document.querySelector(
@@ -65,37 +64,47 @@ export function CommandSuggestions({
 			id="terminal-suggestions"
 			role="listbox"
 			aria-label="Command suggestions"
-			className="flex flex-wrap gap-1.5 text-xs pl-2"
+			className="flex flex-wrap gap-1.5 px-3 py-2 bg-[#0d1117]/30 backdrop-blur-sm border-t border-white/5"
 		>
-			{suggestions.map((suggestion, idx) => (
-				<motion.button
-					key={`${suggestion}-${idx}`}
-					type="button"
-					tabIndex={idx === activeSuggestionIndex ? 0 : -1}
-					onMouseDown={e => e.preventDefault()}
-					onClick={e => {
-						e.stopPropagation();
-						onApplySuggestion(suggestion);
-					}}
-					onMouseEnter={() => onSetActiveIndex(idx)}
-					onKeyDown={e => handleKeyDown(e, suggestion, idx)}
-					role="option"
-					aria-selected={idx === activeSuggestionIndex}
-					aria-label={`Suggestion ${idx + 1} of ${suggestions.length}: ${suggestion}`}
-					initial={shouldReduceMotion() ? undefined : { opacity: 0, y: -4 }}
-					animate={shouldReduceMotion() ? undefined : { opacity: 1, y: 0 }}
-					exit={shouldReduceMotion() ? undefined : { opacity: 0, y: -4 }}
-					transition={{ duration: shouldReduceMotion() ? 0 : 0.15 }}
-					className={cn(
-						'px-2.5 py-1 rounded-md border transition-all duration-200 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50',
-						idx === activeSuggestionIndex
-							? 'border-primary/60 text-primary bg-primary/15 shadow-[0_0_8px_rgba(var(--primary-rgb),0.2)]'
-							: 'border-border/50 hover:border-border/80 text-muted-foreground hover:text-foreground bg-background/40 hover:bg-muted/40',
-					)}
-				>
-					{suggestion}
-				</motion.button>
-			))}
+			<span className="text-[10px] text-white/30 uppercase tracking-wider mr-1 self-center">
+				Tab:
+			</span>
+			<AnimatePresence mode="popLayout">
+				{suggestions.map((suggestion, idx) => (
+					<motion.button
+						key={`${suggestion}-${idx}`}
+						type="button"
+						tabIndex={idx === activeSuggestionIndex ? 0 : -1}
+						onMouseDown={e => e.preventDefault()}
+						onClick={e => {
+							e.stopPropagation();
+							onApplySuggestion(suggestion);
+						}}
+						onMouseEnter={() => onSetActiveIndex(idx)}
+						onKeyDown={e => handleKeyDown(e, suggestion, idx)}
+						role="option"
+						aria-selected={idx === activeSuggestionIndex}
+						aria-label={`Suggestion ${idx + 1} of ${suggestions.length}: ${suggestion}`}
+						initial={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
+						animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
+						exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
+						transition={{
+							duration: shouldReduceMotion ? 0 : 0.12,
+							type: 'spring',
+							stiffness: 500,
+							damping: 30,
+						}}
+						className={cn(
+							'px-2.5 py-1 rounded-md border text-xs font-mono transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400/50',
+							idx === activeSuggestionIndex
+								? 'border-emerald-400/60 text-emerald-400 bg-emerald-400/10 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+								: 'border-white/10 text-white/60 hover:text-white/90 bg-white/5 hover:bg-white/10 hover:border-white/20',
+						)}
+					>
+						{suggestion}
+					</motion.button>
+				))}
+			</AnimatePresence>
 		</div>
 	);
 }
