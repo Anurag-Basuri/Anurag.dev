@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api, Project } from '@/lib/api';
+import Image from 'next/image';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ExternalLink, Github, Star, GitFork, Sparkles, FolderKanban, Rocket } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -26,10 +27,21 @@ function ProjectCardSkeleton() {
 	);
 }
 
+// ... imports
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+} from '@/components/ui/dialog';
+
 export function ProjectsModule() {
 	const [projects, setProjects] = useState<Project[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [filter, setFilter] = useState('all');
+	const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 	useEffect(() => {
 		api.getProjects()
@@ -38,7 +50,22 @@ export function ProjectsModule() {
 			.finally(() => setLoading(false));
 	}, []);
 
+	const filteredProjects = projects.filter(p => {
+		if (filter === 'all') return true;
+		if (filter === 'featured') return p.featured;
+		if (filter === 'web')
+			return p.techStack.some(t =>
+				['React', 'Next.js', 'Node.js', 'Web'].some(k => t.includes(k)),
+			);
+		if (filter === 'ai')
+			return p.techStack.some(t => ['Python', 'AI', 'ML', 'model'].some(k => t.includes(k)));
+		return true;
+	});
+
+	const featuredProject = projects.find(p => p.featured);
+
 	if (loading) {
+		// ... (Keep existing skeleton logic or use a simplified one)
 		return (
 			<ScrollArea className="h-full">
 				<div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
@@ -48,7 +75,6 @@ export function ProjectsModule() {
 							<div className="h-8 w-64 bg-muted/30 rounded animate-pulse" />
 						</div>
 					</div>
-
 					<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
 						{[1, 2, 3, 4, 5, 6].map(i => (
 							<ProjectCardSkeleton key={i} />
@@ -77,9 +103,9 @@ export function ProjectsModule() {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="p-6 space-y-8 max-w-7xl mx-auto">
-				{/* 1. Standardized System Header - PROJECT REGISTRY */}
-				<div className="flex items-end justify-between border-b border-border/40 pb-4">
+			<div className="p-6 space-y-8 max-w-7xl mx-auto pb-20">
+				{/* Header */}
+				<div className="flex flex-col md:flex-row md:items-end justify-between border-b border-border/40 pb-4 gap-4">
 					<div>
 						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-cyan-400 to-blue-500">
 							DEPLOYMENT REGISTRY
@@ -88,149 +114,253 @@ export function ProjectsModule() {
 							Project Archive & Live Systems
 						</p>
 					</div>
-					<div className="flex items-center gap-2 text-xs font-mono text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded border border-cyan-500/20">
-						<FolderKanban className="w-3 h-3" />
-						<span>COUNT: {projects.length}</span>
+
+					{/* Filters */}
+					<div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+						{['all', 'featured', 'web', 'ai'].map(f => (
+							<button
+								key={f}
+								onClick={() => setFilter(f)}
+								className={cn(
+									'px-3 py-1 rounded-full text-xs font-medium border transition-all capitalize whitespace-nowrap',
+									filter === f
+										? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+										: 'bg-muted/10 border-border/50 text-muted-foreground hover:bg-muted/20 hover:text-foreground',
+								)}
+							>
+								{f}
+							</button>
+						))}
 					</div>
 				</div>
 
+				{/* Featured Project (Only show on 'all' tab) */}
+				{filter === 'all' && featuredProject && (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						className="relative rounded-2xl overflow-hidden border border-cyan-500/30 group cursor-pointer"
+						onClick={() => setSelectedProject(featuredProject)}
+					>
+						<div className="absolute inset-0 bg-linear-to-r from-cyan-500/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+						<div className="grid md:grid-cols-2 gap-6 p-6 md:p-8 bg-card/20 backdrop-blur-sm">
+							<div className="space-y-4">
+								<div className="inline-flex items-center gap-2 px-2 py-1 rounded bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">
+									<Sparkles className="w-3 h-3" />
+									<span>Featured Project</span>
+								</div>
+								<h2 className="text-3xl font-bold text-foreground group-hover:text-cyan-400 transition-colors">
+									{featuredProject.title}
+								</h2>
+								<p className="text-muted-foreground leading-relaxed">
+									{featuredProject.description}
+								</p>
+								<div className="flex flex-wrap gap-2 pt-2">
+									{featuredProject.techStack.map(t => (
+										<span
+											key={t}
+											className="px-2 py-1 rounded bg-background/50 border border-border/50 text-xs text-muted-foreground"
+										>
+											{t}
+										</span>
+									))}
+								</div>
+							</div>
+							<div>
+								<Image
+									src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
+										featuredProject.title,
+									)}`}
+									className="w-full h-full object-cover"
+									alt={featuredProject.title}
+									fill
+									sizes="(max-width: 768px) 100vw, 50vw"
+									priority
+								/>
+							</div>
+						</div>
+					</motion.div>
+				)}
+
 				{/* Projects Grid */}
 				<div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-					{projects.map((project, index) => (
-						<motion.div
-							key={project.id}
-							initial={{ opacity: 0, y: 30 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.4, delay: index * 0.1 }}
-							whileHover={{ y: -6 }}
-							className="group flex flex-col h-full bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300"
-						>
-							{/* Thumbnail Section */}
-							<div className="relative h-48 overflow-hidden bg-muted/10">
-								<img
-									src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
-										project.title,
-									)}`}
-									alt={project.title}
-									className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"
-								/>
-								<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/20 to-transparent" />
-
-								{/* Top Right Actions */}
-								<div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
-									{project.githubUrl && (
-										<a
-											href={project.githubUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2 bg-background/80 backdrop-blur-md rounded-full text-foreground hover:text-cyan-400 hover:bg-background transition-colors border border-border shadow-sm"
-											title="View Code"
-											onClick={e => e.stopPropagation()}
-										>
-											<Github className="w-4 h-4" />
-										</a>
-									)}
-									{project.liveUrl && (
-										<a
-											href={project.liveUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2 bg-background/80 backdrop-blur-md rounded-full text-foreground hover:text-cyan-400 hover:bg-background transition-colors border border-border shadow-sm"
-											title="View Live"
-											onClick={e => e.stopPropagation()}
-										>
-											<ExternalLink className="w-4 h-4" />
-										</a>
-									)}
-								</div>
-
-								{/* Status Badge */}
-								{project.status && (
-									<div className="absolute top-3 left-3">
-										<span
-											className={cn(
-												'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border shadow-sm',
-												project.status.toLowerCase() === 'completed'
-													? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
-													: 'bg-blue-500/20 border-blue-500/30 text-blue-400',
-											)}
-										>
-											{project.status}
-										</span>
+					{filteredProjects
+						.filter(p => filter !== 'all' || p.id !== featuredProject?.id)
+						.map((project, index) => (
+							<motion.div
+								key={project.id}
+								layout
+								initial={{ opacity: 0, scale: 0.9 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.9 }}
+								transition={{ duration: 0.2 }}
+								whileHover={{ y: -5 }}
+								onClick={() => setSelectedProject(project)}
+								className="group flex flex-col h-full bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl overflow-hidden hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 cursor-pointer"
+							>
+								{/* Thumbnail Section */}
+								<div className="relative h-40 overflow-hidden bg-muted/10">
+									<div>
+										<Image
+											src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
+												project.title,
+											)}`}
+											className="w-full h-full object-cover"
+											alt={project.title}
+											fill
+											sizes="(max-width: 768px) 100vw, 50vw"
+											priority
+										/>
 									</div>
-								)}
-							</div>
-
-							{/* Content Section */}
-							<div className="p-5 flex flex-col flex-1">
-								<div className="mb-4">
-									<h2 className="text-xl font-bold text-foreground mb-2 group-hover:text-cyan-400 transition-colors line-clamp-1">
-										{project.title}
-									</h2>
-									<p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-										{project.description}
-									</p>
-								</div>
-
-								<div className="mt-auto space-y-4">
-									{/* Tech Stack */}
-									<div className="flex flex-wrap gap-1.5">
-										{project.techStack.slice(0, 3).map(tech => (
+									<div className="absolute inset-0 bg-linear-to-t from-background/90 via-background/10 to-transparent" />
+									<div className="absolute bottom-3 left-3 right-3 flex justify-between items-end">
+										<h3 className="font-bold text-foreground group-hover:text-cyan-400 transition-colors truncate pr-2">
+											{project.title}
+										</h3>
+										{project.status && (
 											<span
-												key={tech}
-												className="px-2 py-1 text-[10px] bg-muted/30 border border-border/50 rounded font-medium text-muted-foreground"
+												className={cn(
+													'text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase',
+													project.status === 'Completed'
+														? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+														: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+												)}
 											>
-												{tech}
-											</span>
-										))}
-										{project.techStack.length > 3 && (
-											<span className="px-2 py-1 text-[10px] text-muted-foreground">
-												+{project.techStack.length - 3}
+												{project.status === 'Completed' ? 'Done' : 'WIP'}
 											</span>
 										)}
 									</div>
+								</div>
 
-									{/* Stats Footer */}
-									{(project.stars !== undefined ||
-										project.forks !== undefined) && (
-										<div className="flex gap-4 pt-3 border-t border-border/30 text-xs text-muted-foreground font-mono">
-											{project.stars !== undefined && (
-												<div className="flex items-center gap-1.5">
-													<Star className="w-3.5 h-3.5 text-yellow-500/80" />
-													<span>{project.stars}</span>
-												</div>
-											)}
-											{project.forks !== undefined && (
-												<div className="flex items-center gap-1.5">
-													<GitFork className="w-3.5 h-3.5" />
-													<span>{project.forks}</span>
-												</div>
+								{/* Content Section */}
+								<div className="p-4 flex flex-col flex-1">
+									<p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
+										{project.description}
+									</p>
+
+									<div className="mt-auto space-y-3">
+										<div className="flex flex-wrap gap-1">
+											{project.techStack.slice(0, 3).map(tech => (
+												<span
+													key={tech}
+													className="px-1.5 py-0.5 text-[10px] bg-muted/30 border border-border/50 rounded font-medium text-muted-foreground"
+												>
+													{tech}
+												</span>
+											))}
+											{project.techStack.length > 3 && (
+												<span className="px-1.5 py-0.5 text-[10px] text-muted-foreground">
+													+{project.techStack.length - 3}
+												</span>
 											)}
 										</div>
-									)}
+									</div>
 								</div>
-							</div>
-						</motion.div>
-					))}
+							</motion.div>
+						))}
 				</div>
 
-				{/* Empty State */}
-				{projects.length === 0 && (
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						className="flex flex-col items-center justify-center py-20 text-center"
-					>
-						<div className="w-20 h-20 bg-muted/20 rounded-full flex items-center justify-center mb-4">
-							<Rocket className="w-8 h-8 text-muted-foreground" />
-						</div>
-						<h3 className="text-lg font-bold text-foreground">No Projects Deployed</h3>
-						<p className="text-sm text-muted-foreground max-w-xs mt-2">
-							System scan returned 0 artifacts. Check back later or deploy a new
-							module.
-						</p>
-					</motion.div>
-				)}
+				{/* Details Modal */}
+				<Dialog
+					open={!!selectedProject}
+					onOpenChange={open => !open && setSelectedProject(null)}
+				>
+					<DialogContent className="max-w-2xl bg-[#0d1117]/95 backdrop-blur-xl border-white/10 p-0 overflow-hidden">
+						{selectedProject && (
+							<>
+								<div className="relative h-48 bg-muted/20">
+									<div>
+										<Image
+											src={`https://placehold.co/800x600/0f172a/38bdf8?text=${encodeURIComponent(
+												selectedProject.title,
+											)}`}
+											className="w-full h-full object-cover"
+											alt={selectedProject.title}
+											fill
+											sizes="(max-width: 768px) 100vw, 50vw"
+											priority
+										/>
+									</div>
+									<div className="absolute inset-0 bg-linear-to-t from-[#0d1117] to-transparent" />
+									<div className="absolute bottom-4 left-6">
+										<h2 className="text-2xl font-bold text-white">
+											{selectedProject.title}
+										</h2>
+									</div>
+								</div>
+
+								<div className="p-6 space-y-6">
+									<div className="flex items-center gap-2 text-xs">
+										<span
+											className={cn(
+												'px-2 py-1 rounded-full border',
+												selectedProject.status === 'Completed'
+													? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+													: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+											)}
+										>
+											{selectedProject.status}
+										</span>
+										<span className="text-muted-foreground px-2">•</span>
+										<div className="flex items-center gap-1 text-yellow-400">
+											<Star className="w-3 h-3 fill-current" />
+											<span>{selectedProject.stars || 0}</span>
+										</div>
+										<div className="flex items-center gap-1 text-muted-foreground ml-2">
+											<GitFork className="w-3 h-3" />
+											<span>{selectedProject.forks || 0}</span>
+										</div>
+									</div>
+
+									<p className="text-muted-foreground leading-relaxed">
+										{selectedProject.description}
+									</p>
+
+									<div className="space-y-2">
+										<h3 className="text-sm font-medium text-white">
+											Technologes Used
+										</h3>
+										<div className="flex flex-wrap gap-2">
+											{selectedProject.techStack.map(tech => (
+												<span
+													key={tech}
+													className="px-2 py-1 rounded bg-white/5 border border-white/10 text-xs text-blue-200"
+												>
+													{tech}
+												</span>
+											))}
+										</div>
+									</div>
+
+									<div className="flex gap-3 pt-2">
+										{selectedProject.githubUrl && (
+											<a
+												href={selectedProject.githubUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-sm font-medium"
+											>
+												<Github className="w-4 h-4" />
+												View Code
+											</a>
+										)}
+										{selectedProject.liveUrl && (
+											<a
+												href={selectedProject.liveUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 text-cyan-400 transition-colors text-sm font-medium"
+											>
+												<ExternalLink className="w-4 h-4" />
+												Live Demo
+											</a>
+										)}
+									</div>
+								</div>
+							</>
+						)}
+					</DialogContent>
+				</Dialog>
 			</div>
 		</ScrollArea>
 	);
