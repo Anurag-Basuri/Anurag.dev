@@ -28,7 +28,7 @@ import { HelpButton } from '@/components/shared/HelpButton';
 const Logo = () => (
 	<div className="w-5 h-5 flex items-center justify-center">
 		<div className="w-full h-full border-2 border-emerald-500 rounded-sm rotate-45 flex items-center justify-center">
-			<div className="w-2 h-2 bg-emerald-400 rounded-full" />
+			<div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
 		</div>
 	</div>
 );
@@ -198,55 +198,63 @@ export function Taskbar() {
 						{/* Popover */}
 						<motion.div
 							ref={stateMenuRef}
-							initial={{ opacity: 0, scale: 0.9, y: 10, filter: 'blur(10px)' }}
+							initial={{ opacity: 0, scale: 0.9, y: 15, filter: 'blur(10px)' }}
 							animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-							exit={{ opacity: 0, scale: 0.9, y: 10, filter: 'blur(10px)' }}
-							transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+							exit={{ opacity: 0, scale: 0.9, y: 15, filter: 'blur(10px)' }}
+							transition={{ type: 'spring', damping: 25, stiffness: 350 }}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							className="absolute bottom-14 left-2 w-[20rem] sm:w-80 z-50 bg-[#0d1117]/80 backdrop-blur-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
+							className="absolute bottom-14 left-2 w-88 sm:w-80 z-50 bg-[#0d1117]/85 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
 						>
-							<div className="absolute inset-x-0 top-0 h-[100px] bg-linear-to-b from-emerald-500/10 to-transparent pointer-events-none" />
+							<div className="absolute inset-x-0 top-0 h-[120px] bg-linear-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
 
-							<div className="relative">
+							<div className="relative z-10">
 								<div className="flex items-center gap-4 mb-6">
-									<div className="relative">
-										<div className="absolute inset-0 bg-emerald-500 blur-md opacity-40 rounded-full" />
+									<div className="relative group">
+										<div className="absolute inset-0 bg-emerald-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full" />
 										<Image
 											src="/me.jpg"
 											alt="Anurag Basuri"
-											width={48}
-											height={48}
-											className="w-12 h-12 rounded-full border-2 border-white/10 relative z-10"
+											width={52}
+											height={52}
+											className="w-13 h-13 rounded-full border-2 border-white/10 relative z-10 shadow-lg group-hover:scale-105 transition-transform duration-300"
 											priority
 										/>
 									</div>
 									<div>
-										<div className="font-bold text-base text-white tracking-wide">
+										<div className="font-bold text-lg text-white tracking-wide">
 											Anurag Basuri
 										</div>
-										<div className="text-xs text-white/50 font-mono mt-0.5">
+										<div className="text-xs text-white/50 font-mono mt-0.5 flex items-center gap-1.5">
+											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
 											Full-Stack Engineer
 										</div>
 									</div>
 								</div>
 
-								<div className="grid gap-1 mb-4">
+								<div className="grid gap-1.5 mb-5">
 									{menuItems.map((item, index) => (
 										<motion.button
+											layout
 											whileHover={{
-												x: 4,
-												backgroundColor: 'rgba(255,255,255,0.05)',
+												x: 6,
+												backgroundColor: 'rgba(255,255,255,0.06)',
 											}}
+											whileTap={{ scale: 0.98 }}
 											key={item.id}
 											ref={index === 0 ? firstMenuItemRef : null}
 											onClick={() => handleOpenModule(item.id)}
-											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 transition-colors text-sm flex items-center gap-3 group"
+											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 transition-colors text-sm flex items-center gap-3 group relative overflow-hidden"
 										>
-											<div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors">
+											<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors shadow-sm">
 												<item.icon className="w-4 h-4" />
 											</div>
-											<span className="font-medium">{item.label}</span>
+											<span className="font-medium tracking-wide">
+												{item.label}
+											</span>
+
+											{/* Hover sheen */}
+											<motion.div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
 										</motion.button>
 									))}
 								</div>
@@ -256,14 +264,16 @@ export function Taskbar() {
 										{socialLinks.map(link => (
 											<Tooltip key={link.label}>
 												<TooltipTrigger asChild>
-													<a
+													<motion.a
+														whileHover={{ y: -2, scale: 1.1 }}
+														whileTap={{ scale: 0.9 }}
 														href={link.href}
 														target="_blank"
 														rel="noopener noreferrer"
-														className="h-8 w-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all duration-200"
+														className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/30 border border-transparent transition-all duration-200"
 													>
 														<link.icon className="w-4 h-4" />
-													</a>
+													</motion.a>
 												</TooltipTrigger>
 												<TooltipContent side="top">
 													<p>{link.label}</p>
@@ -272,13 +282,22 @@ export function Taskbar() {
 										))}
 									</div>
 									<div className="flex items-center gap-1">
-										<button
-											onClick={() => window.location.reload()}
-											className="h-8 px-3 flex items-center gap-2 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors text-xs font-medium uppercase tracking-wider"
-										>
-											<Power className="w-3.5 h-3.5" />
-											<span>Restart</span>
-										</button>
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<motion.button
+													whileHover={{ scale: 1.05 }}
+													whileTap={{ scale: 0.95 }}
+													onClick={() => window.location.reload()}
+													className="h-9 px-4 flex items-center gap-2 rounded-xl text-white/40 hover:text-white hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider group"
+												>
+													<Power className="w-3.5 h-3.5 group-hover:text-red-400 transition-colors" />
+													<span>Restart</span>
+												</motion.button>
+											</TooltipTrigger>
+											<TooltipContent side="top">
+												Restart Session
+											</TooltipContent>
+										</Tooltip>
 									</div>
 								</div>
 							</div>
@@ -292,10 +311,10 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="h-8 bg-[#0d1117]/60 backdrop-blur-2xl border-t border-white/8 flex items-center justify-between z-40 px-2 sm:px-3 relative"
+				className="h-8 bg-[#0d1117]/70 backdrop-blur-2xl border-t border-white/8 flex items-center justify-between z-40 px-2 sm:px-3 relative shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
 			>
 				{/* Ambient Glow */}
-				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/20 to-transparent opacity-50" />
+				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />
 
 				<div className="flex items-center gap-4 h-full">
 					{/* Start Button */}
@@ -307,28 +326,31 @@ export function Taskbar() {
 								whileTap={{ scale: 0.95 }}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-6 px-3 rounded-md flex items-center gap-2 transition-all duration-300',
+									'h-6 px-3 rounded-lg flex items-center gap-2 transition-all duration-300 relative group',
 									isStartOpen
-										? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+										? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]'
 										: 'bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 hover:border-white/10',
 								)}
 							>
 								<Logo />
-								<span className="text-[11px] font-bold tracking-wider uppercase">
+								<span className="text-[10px] font-bold tracking-widest uppercase">
 									Start
 								</span>
+
+								{/* Bottom glow on hover */}
+								{!isStartOpen && (
+									<div className="absolute -bottom-1 left-2 right-2 h-1 bg-emerald-500/50 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+								)}
 							</motion.button>
 						</TooltipTrigger>
-						<TooltipContent side="top">
-							System Menu
-						</TooltipContent>
+						<TooltipContent side="top">System Menu</TooltipContent>
 					</Tooltip>
 
 					{/* Divider */}
 					{windows.length > 0 && <div className="h-4 w-px bg-white/10" />}
 
-					{/* Window Icons (Dock Style) */}
-					<div className="flex items-center gap-2 h-full">
+					{/* Window Icons (Mac Dock Style) */}
+					<div className="flex items-center gap-1.5 h-full pl-1">
 						<AnimatePresence mode="popLayout">
 							{windows.map(window => {
 								const Icon = getModuleIcon(window.id);
@@ -340,25 +362,36 @@ export function Taskbar() {
 										<TooltipTrigger asChild>
 											<motion.button
 												layout
-												initial={{ opacity: 0, scale: 0.5, y: 10 }}
+												initial={{ opacity: 0, scale: 0.01, y: 20 }}
 												animate={{ opacity: 1, scale: 1, y: 0 }}
-												exit={{ opacity: 0, scale: 0.5, y: 10 }}
-												whileHover={{ scale: 1.05, y: -2 }}
+												exit={{ opacity: 0, scale: 0.01, y: 20 }}
+												transition={{
+													type: 'spring',
+													stiffness: 500,
+													damping: 30,
+													mass: 0.8,
+												}}
+												whileHover={{
+													scale: 1.1,
+													y: -3,
+													backgroundColor: 'rgba(255,255,255,0.08)',
+													borderColor: 'rgba(255,255,255,0.1)',
+												}}
 												whileTap={{ scale: 0.95 }}
 												onClick={() => handleTaskbarClick(window.id)}
 												className={cn(
-													'relative h-7 px-3 rounded-md flex items-center gap-2 transition-all duration-300 group border',
+													'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border will-change-transform',
 													isActive
-														? 'bg-white/[0.08] border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
-														: 'bg-transparent border-transparent hover:bg-white/[0.04] hover:border-white/5',
+														? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
+														: 'bg-transparent border-transparent',
 												)}
 											>
 												<Icon
 													className={cn(
-														'w-3.5 h-3.5 transition-colors',
+														'w-3.5 h-3.5 transition-colors duration-300',
 														isActive
 															? 'text-emerald-400'
-															: 'text-white/60 group-hover:text-white/80',
+															: 'text-white/60 group-hover:text-emerald-400',
 													)}
 												/>
 
@@ -367,30 +400,40 @@ export function Taskbar() {
 														'text-[10px] font-medium transition-colors max-w-[100px] truncate',
 														isActive
 															? 'text-white/90'
-															: 'text-white/50 group-hover:text-white/70',
+															: 'text-white/50 group-hover:text-white',
 													)}
 												>
 													{window.title}
 												</span>
 
-												{/* Active Indicator & Close Button */}
+												{/* Active Indicator (Glowing Pill Underneath) */}
 												{isActive && (
 													<motion.div
 														layoutId="active-pill"
-														className="absolute -bottom-[1px] left-2 right-2 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+														initial={{ opacity: 0 }}
+														animate={{ opacity: 1 }}
+														exit={{ opacity: 0 }}
+														className="absolute -bottom-[2px] left-3 right-3 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
 													/>
 												)}
 
-												<div
-													role="button"
-													onClick={e => handleCloseWindow(window.id, e)}
-													className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full hover:bg-white/10 text-white/40 hover:text-red-400 transition-all"
+												{/* Close Button on Hover */}
+												<motion.div
+													initial={{ opacity: 1, scale: 1 }}
+													className="ml-1 opacity-0 group-hover:opacity-100 p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400"
 												>
-													<X className="w-3 h-3" />
-												</div>
+													<div
+														role="button"
+														onClick={e =>
+															handleCloseWindow(window.id, e)
+														}
+													>
+														<X className="w-2.5 h-2.5" />
+													</div>
+												</motion.div>
 											</motion.button>
 										</TooltipTrigger>
-										<TooltipContent side="top">
+										<TooltipContent side="top" className="text-xs font-medium">
 											{window.title}
 										</TooltipContent>
 									</Tooltip>

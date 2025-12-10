@@ -70,7 +70,7 @@ export function TopBar({
 				initial={{ y: -100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-				className="h-8 bg-[#0d1117]/60 backdrop-blur-2xl border-b border-white/8 flex items-center justify-between z-50 px-2 sm:px-3 select-none relative"
+				className="h-8 bg-[#0d1117]/70 backdrop-blur-2xl border-b border-white/8 flex items-center justify-between z-50 px-2 sm:px-3 select-none relative shadow-[0_5px_20px_-5px_rgba(0,0,0,0.3)]"
 			>
 				{/* Ambient Glow Line */}
 				<div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/20 to-transparent opacity-50" />
