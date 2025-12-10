@@ -119,16 +119,28 @@ export function AboutModule() {
 							<p className="text-sm text-primary font-mono mb-4 px-3 py-1 bg-primary/10 rounded-full">
 								{about.tagline}
 							</p>
+						</motion.div>
 
-							<div className="w-full grid grid-cols-2 gap-2 mt-2">
-								<div className="p-3 bg-muted/30 rounded-lg border border-border/50 flex flex-col items-center">
-									<MapPin className="w-4 h-4 text-muted-foreground mb-1" />
-									<span className="text-xs font-medium">Remote</span>
-								</div>
-								<div className="p-3 bg-muted/30 rounded-lg border border-border/50 flex flex-col items-center">
-									<Calendar className="w-4 h-4 text-muted-foreground mb-1" />
-									<span className="text-xs font-medium">EST Zone</span>
-								</div>
+						{/* Stats Row */}
+						<motion.div
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.15 }}
+							className="grid grid-cols-2 gap-3"
+						>
+							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+								<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+								<span className="text-3xl font-bold text-foreground">2+</span>
+								<span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
+									Years Exp.
+								</span>
+							</div>
+							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+								<div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+								<span className="text-3xl font-bold text-foreground">15+</span>
+								<span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
+									Projects
+								</span>
 							</div>
 						</motion.div>
 
@@ -162,63 +174,108 @@ export function AboutModule() {
 								</h3>
 							</div>
 
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							<div className="grid grid-cols-1 gap-4">
 								{/* Frontend */}
 								<div className="p-5 rounded-xl bg-linear-to-br from-indigo-500/10 to-indigo-600/5 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors group">
-									<div className="flex items-center gap-2 mb-3 text-indigo-400">
+									<div className="flex items-center gap-2 mb-4 text-indigo-400">
 										<Layers className="w-4 h-4" />
-										<span className="font-bold text-xs uppercase">
+										<span className="font-bold text-xs uppercase tracking-wider">
 											Frontend Architecture
 										</span>
 									</div>
-									<div className="flex flex-wrap gap-1.5">
-										{about.skills.frontend.map(skill => (
-											<span
-												key={skill}
-												className="px-2 py-1 text-[11px] font-medium bg-indigo-500/10 text-indigo-300 rounded border border-indigo-500/20"
-											>
-												{skill}
-											</span>
+									<div className="space-y-3">
+										{about.skills.frontend.map((skill: any) => (
+											<div key={skill.name} className="space-y-1.5">
+												<div className="flex justify-between text-xs">
+													<span className="text-indigo-200 font-medium">
+														{skill.name}
+													</span>
+													<span className="text-indigo-400/60 font-mono">
+														{skill.level}%
+													</span>
+												</div>
+												<div className="h-1.5 w-full bg-indigo-950/40 rounded-full overflow-hidden">
+													<motion.div
+														initial={{ width: 0 }}
+														whileInView={{ width: `${skill.level}%` }}
+														transition={{
+															duration: 1,
+															ease: 'easeOut',
+														}}
+														className="h-full bg-indigo-500 rounded-full"
+													/>
+												</div>
+											</div>
 										))}
 									</div>
 								</div>
 
 								{/* Backend */}
 								<div className="p-5 rounded-xl bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group">
-									<div className="flex items-center gap-2 mb-3 text-emerald-400">
+									<div className="flex items-center gap-2 mb-4 text-emerald-400">
 										<Cpu className="w-4 h-4" />
-										<span className="font-bold text-xs uppercase">
+										<span className="font-bold text-xs uppercase tracking-wider">
 											Backend Systems
 										</span>
 									</div>
-									<div className="flex flex-wrap gap-1.5">
-										{about.skills.backend.map(skill => (
-											<span
-												key={skill}
-												className="px-2 py-1 text-[11px] font-medium bg-emerald-500/10 text-emerald-300 rounded border border-emerald-500/20"
-											>
-												{skill}
-											</span>
+									<div className="space-y-3">
+										{about.skills.backend.map((skill: any) => (
+											<div key={skill.name} className="space-y-1.5">
+												<div className="flex justify-between text-xs">
+													<span className="text-emerald-200 font-medium">
+														{skill.name}
+													</span>
+													<span className="text-emerald-400/60 font-mono">
+														{skill.level}%
+													</span>
+												</div>
+												<div className="h-1.5 w-full bg-emerald-950/40 rounded-full overflow-hidden">
+													<motion.div
+														initial={{ width: 0 }}
+														whileInView={{ width: `${skill.level}%` }}
+														transition={{
+															duration: 1,
+															ease: 'easeOut',
+														}}
+														className="h-full bg-emerald-500 rounded-full"
+													/>
+												</div>
+											</div>
 										))}
 									</div>
 								</div>
 
-								{/* ML/AI (Full Width) */}
-								<div className="sm:col-span-2 p-5 rounded-xl bg-linear-to-br from-purple-500/10 to-pink-600/5 border border-purple-500/20 hover:border-purple-500/40 transition-colors group">
-									<div className="flex items-center gap-2 mb-3 text-purple-400">
+								{/* ML/AI */}
+								<div className="p-5 rounded-xl bg-linear-to-br from-purple-500/10 to-pink-600/5 border border-purple-500/20 hover:border-purple-500/40 transition-colors group">
+									<div className="flex items-center gap-2 mb-4 text-purple-400">
 										<Box className="w-4 h-4" />
-										<span className="font-bold text-xs uppercase">
+										<span className="font-bold text-xs uppercase tracking-wider">
 											Artificial Intelligence & ML
 										</span>
 									</div>
-									<div className="flex flex-wrap gap-1.5">
-										{about.skills.ml.map(skill => (
-											<span
-												key={skill}
-												className="px-2 py-1 text-[11px] font-medium bg-purple-500/10 text-purple-300 rounded border border-purple-500/20"
-											>
-												{skill}
-											</span>
+									<div className="space-y-3">
+										{about.skills.ml.map((skill: any) => (
+											<div key={skill.name} className="space-y-1.5">
+												<div className="flex justify-between text-xs">
+													<span className="text-purple-200 font-medium">
+														{skill.name}
+													</span>
+													<span className="text-purple-400/60 font-mono">
+														{skill.level}%
+													</span>
+												</div>
+												<div className="h-1.5 w-full bg-purple-950/40 rounded-full overflow-hidden">
+													<motion.div
+														initial={{ width: 0 }}
+														whileInView={{ width: `${skill.level}%` }}
+														transition={{
+															duration: 1,
+															ease: 'easeOut',
+														}}
+														className="h-full bg-purple-500 rounded-full"
+													/>
+												</div>
+											</div>
 										))}
 									</div>
 								</div>
