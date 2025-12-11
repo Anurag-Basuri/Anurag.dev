@@ -141,7 +141,7 @@ export function TopBar({
 				{/* Right Section */}
 				<div className="flex items-center gap-1.5 sm:gap-3">
 					{/* Status Indicators */}
-					<div className="flex items-center gap-3 px-3 border-r border-white/10 mr-1">
+					<div className="hidden sm:flex items-center gap-3 px-3 border-r border-white/10 mr-1">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className="flex items-center gap-1.5 cursor-help">

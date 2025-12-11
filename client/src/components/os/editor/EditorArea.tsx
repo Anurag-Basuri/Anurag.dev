@@ -19,20 +19,20 @@ export function EditorArea() {
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-8"
+					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-4 md:p-8"
 				>
-					<div className="relative mb-8">
+					<div className="relative mb-6 md:mb-8">
 						<div className="absolute -inset-8 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
-						<div className="relative bg-[#0d1117]/50 p-6 rounded-2xl border border-white/5 ring-1 ring-white/10 shadow-2xl">
-							<Command className="w-12 h-12 text-emerald-500/80" />
+						<div className="relative bg-[#0d1117]/50 p-5 md:p-6 rounded-2xl border border-white/5 ring-1 ring-white/10 shadow-2xl">
+							<Command className="w-10 h-10 md:w-12 md:h-12 text-emerald-500/80" />
 						</div>
 					</div>
 
-					<h3 className="text-2xl font-semibold text-white/90 mb-3 tracking-tight">
+					<h3 className="text-xl md:text-2xl font-semibold text-white/90 mb-2 md:mb-3 tracking-tight text-center">
 						Welcome to Anurag's Portfolio
 					</h3>
 
-					<p className="text-sm text-white/40 max-w-md text-center leading-relaxed mb-10">
+					<p className="text-xs md:text-sm text-white/40 max-w-sm md:max-w-md text-center leading-relaxed mb-8 md:mb-10 px-4">
 						A developer-first portfolio experience. Navigate using the file explorer,
 						terminal, or keyboard shortcuts.
 					</p>

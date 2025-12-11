@@ -145,7 +145,7 @@ export function MainLayout() {
 	};
 
 	const renderMobileLayout = () => (
-		<div className="h-full w-full rounded-sm border border-white/10 bg-[#0d1117]/95 backdrop-blur-xl shadow-2xl overflow-hidden">
+		<div className="h-full w-full rounded-none border-none bg-[#0d1117]/95 backdrop-blur-xl shadow-none overflow-hidden">
 			<EditorArea />
 		</div>
 	);
@@ -175,7 +175,7 @@ export function MainLayout() {
 					onFileSelect={handleFileSelect}
 				/>
 
-				<div className="flex-1 overflow-hidden p-1">
+				<div className="flex-1 overflow-hidden p-0 sm:p-1">
 					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
 				</div>
 
