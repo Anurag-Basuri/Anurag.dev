@@ -12,41 +12,46 @@ export function EditorArea() {
 
 	return (
 		<div id="editor-boundary" className="h-full w-full relative group">
-			{/* Grid Pattern Background */}
 			<div
-				className="absolute inset-0 pointer-events-none hidden"
-				style={{
-					backgroundImage:
-						'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
-					backgroundSize: '24px 24px',
-				}}
+				className="absolute inset-0 pointer-events-none opacity-[1]"
 			/>
 
 			{windows.length === 0 ? (
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
-					transition={{ duration: 0.3 }}
-					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none"
+					transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none"
 				>
-					<div className="relative">
-						<div className="absolute -inset-4 bg-primary/10 rounded-full blur-xl animate-pulse" />
-						<Command className="w-16 h-16 mb-6 text-muted-foreground/50 relative z-10" />
+					<div className="relative mb-8">
+						<div className="absolute -inset-8 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+						<div className="relative bg-[#0d1117]/50 p-6 rounded-2xl border border-white/5 ring-1 ring-white/10 shadow-2xl">
+							<Command className="w-12 h-12 text-emerald-500/80" />
+						</div>
 					</div>
-					<h3 className="text-xl font-medium text-foreground/80 mb-2">No Files Open</h3>
-					<p className="text-sm text-muted-foreground/60 max-w-xs text-center leading-relaxed">
-						Select a file from the explorer or use the terminal to navigate.
+
+					<h3 className="text-2xl font-semibold text-white/90 mb-3 tracking-tight">
+						No Files Open
+					</h3>
+
+					<p className="text-sm text-white/40 max-w-xs text-center leading-relaxed mb-8">
+						Select a file from the explorer on the left or use the terminal below to
+						navigate.
 					</p>
-					<div className="mt-8 flex gap-4 text-xs font-mono text-muted-foreground/40">
-						<div className="flex items-center gap-2">
-							<span className="px-1.5 py-1 rounded bg-muted/50 border border-border/50">
-								⌘
-							</span>
-							<span>+</span>
-							<span className="px-1.5 py-1 rounded bg-muted/50 border border-border/50">
-								P
-							</span>
-							<span>to search</span>
+
+					<div className="flex flex-col gap-3">
+						<div className="flex items-center gap-3 text-xs font-mono text-white/30 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+							<div className="flex items-center gap-1.5">
+								<span className="px-1.5 py-0.5 rounded bg-white/10 min-w-[20px] text-center text-white/70">
+									⌘
+								</span>
+								<span>+</span>
+								<span className="px-1.5 py-0.5 rounded bg-white/10 min-w-[20px] text-center text-white/70">
+									P
+								</span>
+							</div>
+							<span className="text-white/20">|</span>
+							<span>Quick Search</span>
 						</div>
 					</div>
 				</motion.div>
