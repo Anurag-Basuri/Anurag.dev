@@ -13,18 +13,19 @@ interface FolderTreeProps {
 }
 
 const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-yellow-500/90" />;
+	if (name.endsWith('.json'))
+		return <FileJson className="w-4 h-4 md:w-4 md:h-4 text-yellow-500/90" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 text-blue-400/90" />;
+		return <FileText className="w-4 h-4 md:w-4 md:h-4 text-blue-400/90" />;
 	if (
 		name.endsWith('.py') ||
 		name.endsWith('.js') ||
 		name.endsWith('.tsx') ||
 		name.endsWith('.ts')
 	)
-		return <FileCode className="w-4 h-4 text-emerald-400/90" />;
-	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-400/90" />;
-	return <File className="w-4 h-4 text-slate-400/60" />;
+		return <FileCode className="w-4 h-4 md:w-4 md:h-4 text-emerald-400/90" />;
+	if (name.endsWith('.pdf')) return <File className="w-4 h-4 md:w-4 md:h-4 text-red-400/90" />;
+	return <File className="w-4 h-4 md:w-4 md:h-4 text-slate-400/60" />;
 };
 
 export function FolderTree({ items, level = 0, onSelect }: FolderTreeProps) {
@@ -85,7 +86,7 @@ function FolderTreeItem({
 		<div className="relative">
 			<div
 				className={cn(
-					'flex items-center py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
+					'flex items-center py-3 md:py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
 					'hover:bg-white/5',
 					isHovered && !isFolder && 'text-emerald-400',
 					level > 0 && 'ml-4', // Indentation

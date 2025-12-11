@@ -17,8 +17,8 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 			<header className="h-6 px-2 border-b border-white/8 bg-[#161b22] flex items-center justify-between shrink-0 select-none">
 				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2">
-					{/* macOS Traffic Lights */}
-					<div className="flex items-center gap-1.5">
+					{/* macOS Traffic Lights - Hidden on mobile */}
+					<div className="hidden md:flex items-center gap-1.5">
 						<motion.button
 							whileHover={{ scale: 1.15 }}
 							whileTap={{ scale: 0.95 }}
