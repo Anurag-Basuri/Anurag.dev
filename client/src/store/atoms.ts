@@ -90,3 +90,4 @@ export const sidebarCollapsedAtom = atomWithStorage('layout:sidebar-collapsed', 
 export const terminalCollapsedAtom = atomWithStorage('layout:terminal-collapsed', false);
 
 export const activeWindowIdAtom = atom<string | null>(null);
+export const mobileSidebarOpenAtom = atom(false);

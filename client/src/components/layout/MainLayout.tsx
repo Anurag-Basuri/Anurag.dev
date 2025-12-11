@@ -19,7 +19,7 @@ import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
-import { windowsAtom } from '@/store/atoms';
+import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -144,10 +144,24 @@ export function MainLayout() {
 		);
 	};
 
+	const [, setIsMobileSidebarOpen] = useAtom(mobileSidebarOpenAtom);
+
+	// Simple swipe detection
+	const handlePanEnd = (event: any, info: any) => {
+		if (info.offset.x > 100) {
+			setIsMobileSidebarOpen(true);
+		}
+	};
+
 	const renderMobileLayout = () => (
-		<div className="h-full w-full rounded-none border-none bg-[#0d1117]/95 backdrop-blur-xl shadow-none overflow-hidden">
+		<motion.div
+			className="h-full w-full rounded-none border-none bg-[#0d1117]/60 backdrop-blur-sm shadow-none overflow-hidden relative"
+			onPanEnd={handlePanEnd}
+		>
 			<EditorArea />
-		</div>
+			{/* Edge swipe target area */}
+			<div className="absolute top-0 bottom-0 left-0 w-8 z-50" />
+		</motion.div>
 	);
 
 	return (
