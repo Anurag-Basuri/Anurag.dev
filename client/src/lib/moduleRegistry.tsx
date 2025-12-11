@@ -24,6 +24,9 @@ const JourneyModule = lazy(() =>
 const CertificationModule = lazy(() =>
 	import('@/components/apps/certification').then(m => ({ default: m.CertificationModule })),
 );
+const AILabModule = lazy(() =>
+	import('@/components/apps/ai-lab').then(m => ({ default: m.AILabModule })),
+);
 const BlogModule = lazy(() =>
 	import('@/components/apps/blog').then(m => ({ default: m.BlogModule })),
 );
@@ -56,7 +59,7 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	certifications: withSuspense(CertificationModule),
 	blog: withSuspense(BlogModule),
 	contact: withSuspense(ContactModule),
-	'ai-lab': <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
+	ailab: withSuspense(AILabModule),
 	'stats.exe': withSuspense(CodingStatsModule),
 };
 
@@ -68,7 +71,7 @@ const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
 	certifications: { title: 'Certifications', icon: ShieldQuestion },
 	blog: { title: 'Blog', icon: Book },
 	contact: { title: 'Contact', icon: Contact },
-	'ai-lab': { title: 'AI Lab', icon: Code },
+	ailab: { title: 'AI Lab', icon: Code },
 	'coding-stats': { title: 'Coding Stats', icon: Code },
 	'stats.exe': { title: 'Coding Stats', icon: Code },
 	terminal: { title: 'Terminal', icon: Terminal },
