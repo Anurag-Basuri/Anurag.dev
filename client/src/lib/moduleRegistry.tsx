@@ -22,7 +22,7 @@ const JourneyModule = lazy(() =>
 	import('@/components/apps/journey').then(m => ({ default: m.JourneyModule })),
 );
 const CertificationModule = lazy(() =>
-	import('@/components/apps/certification').then(m => ({ default: m.CertificationModule })),
+	import('@/components/apps/certifications').then(m => ({ default: m.CertificationModule })),
 );
 const AILabModule = lazy(() =>
 	import('@/components/apps/ai-lab').then(m => ({ default: m.AILabModule })),

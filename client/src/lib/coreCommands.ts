@@ -272,6 +272,18 @@ const blogCommand = createCommand({
 	}),
 });
 
+const ailabCommand = createCommand({
+	name: 'ailab',
+	aliases: ['ai'],
+	description: 'Opens the AI Lab section.',
+	usage: 'ailab',
+	category: 'Development',
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'ailab' },
+	}),
+});
+
 // File Commands
 const lsCommand = createCommand({
 	name: 'ls',
@@ -352,6 +364,7 @@ const catCommand = createCommand({
 			'blog/README.md': '# Blog\n\nThoughts on development, AI, and technology.',
 			'certifications/README.md':
 				'# Certifications\n\nProfessional certifications and achievements.',
+			'ailab/README.md': '# AI Lab\n\nExperimental AI projects and research.',
 		};
 
 		return {
@@ -383,7 +396,8 @@ const openCommand = createCommand({
 			contact: 'contact',
 			blog: 'blog',
 			certifications: 'certifications',
-			'ai-lab': 'ai-lab',
+			ailab: 'ailab',
+			'ai-lab': 'ailab',
 			tools: 'tools',
 		};
 
@@ -472,6 +486,7 @@ export function registerCoreCommands() {
 		coffeeCommand,
 		statsCommand,
 		blogCommand,
+		ailabCommand,
 		lsCommand,
 		cdCommand,
 		catCommand,
