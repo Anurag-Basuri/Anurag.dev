@@ -14,6 +14,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/os/file-system/FolderTree';
+import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
 import { initialFileSystem, FileSystemItem } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -90,10 +91,17 @@ export function TopBar({
 							</SheetTrigger>
 							<SheetContent
 								side="left"
-								className="w-[280px] p-0 bg-[#0d1117]/95 backdrop-blur-xl border-r border-white/10"
+								className="w-[280px] p-0 bg-[#0d1117]/95 backdrop-blur-xl border-r border-white/10 flex flex-col"
 							>
 								<SheetTitle className="sr-only">File Explorer</SheetTitle>
-								<div className="flex-1 overflow-hidden h-full">
+
+								{/* Profile Section */}
+								<div className="shrink-0">
+									<SidebarProfile />
+								</div>
+
+								{/* Folder Tree */}
+								<div className="flex-1 overflow-hidden">
 									<ScrollArea className="h-full">
 										<div className="p-4">
 											<FolderTree
