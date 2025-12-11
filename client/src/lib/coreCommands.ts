@@ -1,4 +1,65 @@
 import { createCommand, registerCommands, commandRegistry } from './commandSystem';
+import { initialFileSystem, FileSystemItem } from './data';
+
+// File System Helper - Dynamic Path Resolution
+const resolvePath = (
+	path: string,
+	currentPath: string,
+): { item: FileSystemItem | undefined; absolutePath: string } => {
+	// Resolve path parts
+	let parts: string[] = [];
+
+	if (path === '/' || path === '~' || path === '') {
+		parts = [];
+	} else if (path.startsWith('/') || path.startsWith('~')) {
+		parts = path
+			.replace(/^[~/]+/, '')
+			.split('/')
+			.filter(Boolean);
+	} else {
+		// Relative path
+		const currentParts = currentPath === '~' ? [] : currentPath.split('/').filter(Boolean);
+		const targetParts = path.split('/').filter(Boolean);
+
+		parts = [...currentParts];
+		for (const part of targetParts) {
+			if (part === '.' || part === '') continue;
+			if (part === '..') {
+				parts.pop();
+			} else {
+				parts.push(part);
+			}
+		}
+	}
+
+	// Root directory
+	if (parts.length === 0) {
+		return {
+			item: { name: '~', type: 'folder', id: 'root', children: initialFileSystem },
+			absolutePath: '~',
+		};
+	}
+
+	// Walk the tree
+	let currentItems = initialFileSystem;
+	let currentItem: FileSystemItem | undefined;
+
+	for (let i = 0; i < parts.length; i++) {
+		const part = parts[i];
+		currentItem = currentItems.find(item => item.name === part);
+
+		if (!currentItem) return { item: undefined, absolutePath: '' };
+
+		if (currentItem.type === 'folder') {
+			currentItems = currentItem.children || [];
+		} else if (i < parts.length - 1) {
+			return { item: undefined, absolutePath: '' };
+		}
+	}
+
+	const absolutePath = parts.join('/');
+	return { item: currentItem, absolutePath };
+};
 
 // Navigation Commands
 const helpCommand = createCommand({
@@ -219,30 +280,163 @@ const lsCommand = createCommand({
 const cdCommand = createCommand({
 	name: 'cd',
 	description: 'Change directory.',
-	usage: 'cd <path>',
+	usage: 'cd [path]',
 	category: 'Files',
-	validate: args => {
-		if (args.length === 0) {
-			return 'Path required';
-		}
-		return null;
-	},
 	execute: ctx => {
-		const newPath = ctx.args[0];
-		// Simple path validation
-		if (newPath === '..') {
-			return { ok: true, data: { type: 'change_directory', newPath: '~' } };
+		const targetPath = ctx.args[0] || '~';
+		const { item, absolutePath } = resolvePath(targetPath, ctx.currentPath);
+
+		if (!item) {
+			return { ok: false, error: `cd: ${targetPath}: No such file or directory` };
 		}
-		if (newPath === '~' || newPath === '/') {
-			return { ok: true, data: { type: 'change_directory', newPath: '~' } };
+
+		if (item.type !== 'folder') {
+			return { ok: false, error: `cd: ${targetPath}: Not a directory` };
 		}
-		// For demo, allow navigation to known directories
-		const validDirs = ['about', 'projects', 'contact', 'blog'];
-		if (validDirs.includes(newPath)) {
-			return { ok: true, data: { type: 'change_directory', newPath } };
-		}
-		return { ok: false, error: `Directory not found: ${newPath}` };
+
+		return {
+			ok: true,
+			data: {
+				type: 'change_directory',
+				newPath: absolutePath || '~',
+			},
+		};
 	},
+});
+
+const catCommand = createCommand({
+	name: 'cat',
+	description: 'Display file contents.',
+	usage: 'cat <file>',
+	category: 'Files',
+	execute: ctx => {
+		if (!ctx.args[0]) return { ok: false, error: 'Usage: cat <filename>' };
+
+		const { item } = resolvePath(ctx.args[0], ctx.currentPath);
+
+		if (!item) {
+			return { ok: false, error: `cat: ${ctx.args[0]}: No such file or directory` };
+		}
+
+		if (item.type === 'folder') {
+			return { ok: false, error: `cat: ${ctx.args[0]}: Is a directory` };
+		}
+
+		if (item.name.endsWith('.pdf')) {
+			return { ok: true, data: '[Binary PDF Data] (Use "open" to view)' };
+		}
+
+		if (item.name === 'stats.exe') {
+			return { ok: true, data: '[Binary Executable] (Use "stats" or "open" to run)' };
+		}
+
+		const contentMap: Record<string, string> = {
+			'about/README.md':
+				"# About Me\n\nHi, I'm Anurag Basuri - a Full Stack Engineer passionate about building elegant solutions.",
+			'projects/README.md':
+				'# Projects\n\n- AnuragOS Portfolio\n- AI Lab Experiments\n- Dynamic Web Apps',
+			'journey/README.md': '# My Journey\n\nFrom curious beginner to Full Stack Engineer...',
+			'contact/README.md': '# Contact\n\nEmail: contact@anurag.dev\nGitHub: @Anurag-Basuri',
+			'blog/README.md': '# Blog\n\nThoughts on development, AI, and technology.',
+		};
+
+		return {
+			ok: true,
+			data: contentMap[item.id] || `# ${item.name}\n\nContent preview...`,
+		};
+	},
+});
+
+const openCommand = createCommand({
+	name: 'open',
+	aliases: ['start'],
+	description: 'Open a file or module.',
+	usage: 'open <file>',
+	category: 'System',
+	execute: ctx => {
+		if (!ctx.args[0]) return { ok: false, error: 'Usage: open <filename>' };
+
+		const { item } = resolvePath(ctx.args[0], ctx.currentPath);
+
+		if (!item) {
+			return { ok: false, error: `open: ${ctx.args[0]}: No such file or directory` };
+		}
+
+		const moduleMap: Record<string, string> = {
+			about: 'about',
+			projects: 'projects',
+			journey: 'journey',
+			contact: 'contact',
+			blog: 'blog',
+			'ai-lab': 'ai-lab',
+			tools: 'tools',
+		};
+
+		if (moduleMap[item.id] || moduleMap[item.name]) {
+			return {
+				ok: true,
+				data: { type: 'open_module', moduleId: moduleMap[item.id] || moduleMap[item.name] },
+			};
+		}
+
+		if (item.name === 'resume.pdf') {
+			if (typeof window !== 'undefined') window.open('/resume.pdf', '_blank');
+			return { ok: true, data: 'Opening resume...' };
+		}
+
+		if (item.name === 'stats.exe') {
+			return { ok: true, data: { type: 'open_module', moduleId: 'coding-stats' } };
+		}
+
+		return { ok: true, data: `Opened ${item.name}` };
+	},
+});
+
+const sudoCommand = createCommand({
+	name: 'sudo',
+	description: 'Execute command with elevated privileges.',
+	usage: 'sudo <command>',
+	category: 'System',
+	hidden: true,
+	execute: () => ({
+		ok: false,
+		error: 'User is not in the sudoers file. This incident will be reported.',
+	}),
+});
+
+const mkdirCommand = createCommand({
+	name: 'mkdir',
+	description: 'Create directory.',
+	usage: 'mkdir <name>',
+	category: 'Files',
+	hidden: true,
+	execute: () => ({ ok: false, error: 'mkdir: Permission denied (read-only file system)' }),
+});
+
+const touchCommand = createCommand({
+	name: 'touch',
+	description: 'Create or update file.',
+	usage: 'touch <file>',
+	category: 'Files',
+	hidden: true,
+	execute: () => ({ ok: false, error: 'touch: Permission denied (read-only file system)' }),
+});
+
+const rmCommand = createCommand({
+	name: 'rm',
+	description: 'Remove files.',
+	usage: 'rm <file>',
+	category: 'Files',
+	hidden: true,
+	execute: () => ({ ok: false, error: 'rm: Permission denied (read-only file system)' }),
+});
+
+const pwdCommand = createCommand({
+	name: 'pwd',
+	description: 'Print working directory.',
+	usage: 'pwd',
+	category: 'Files',
+	execute: ctx => ({ ok: true, data: ctx.currentPath === '~' ? '/' : `/${ctx.currentPath}` }),
 });
 
 // Register all commands
@@ -264,5 +458,12 @@ export function registerCoreCommands() {
 		blogCommand,
 		lsCommand,
 		cdCommand,
+		catCommand,
+		openCommand,
+		pwdCommand,
+		sudoCommand,
+		mkdirCommand,
+		touchCommand,
+		rmCommand,
 	]);
 }
