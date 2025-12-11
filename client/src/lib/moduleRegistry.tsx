@@ -61,17 +61,17 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 };
 
 const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
+	default: { title: 'Untitled', icon: ShieldQuestion },
 	about: { title: 'About Me', icon: Info },
 	projects: { title: 'Projects', icon: LayoutDashboard },
 	journey: { title: 'My Journey', icon: GitBranch },
-	terminal: { title: 'Terminal', icon: Terminal },
 	certifications: { title: 'Certifications', icon: ShieldQuestion },
 	blog: { title: 'Blog', icon: Book },
 	contact: { title: 'Contact', icon: Contact },
-	default: { title: 'Untitled', icon: ShieldQuestion },
 	'ai-lab': { title: 'AI Lab', icon: Code },
 	'coding-stats': { title: 'Coding Stats', icon: Code },
 	'stats.exe': { title: 'Coding Stats', icon: Code },
+	terminal: { title: 'Terminal', icon: Terminal },
 };
 
 export const getModuleComponent = (id: string): React.ReactNode => {
