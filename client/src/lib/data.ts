@@ -29,8 +29,8 @@ export const initialFileSystem: FileSystemItem[] = [
 	{
 		name: 'ai-lab',
 		type: 'folder',
-		id: 'ai-lab',
-		children: [{ name: 'README.md', type: 'file', id: 'ai-lab/README.md' }],
+		id: 'ailab',
+		children: [{ name: 'README.md', type: 'file', id: 'ailab/README.md' }],
 	},
 	{
 		name: 'blog',

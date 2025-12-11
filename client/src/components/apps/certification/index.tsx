@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export const CertificationModule = () => {
+export function CertificationModule() {
 	useEffect(() => {
 		console.log('CertificationModule mounted');
 	}, []);
