@@ -21,6 +21,9 @@ const ProjectsModule = lazy(() =>
 const JourneyModule = lazy(() =>
 	import('@/components/apps/journey').then(m => ({ default: m.JourneyModule })),
 );
+const CertificationModule = lazy(() =>
+	import('@/components/apps/certification').then(m => ({ default: m.CertificationModule })),
+);
 const BlogModule = lazy(() =>
 	import('@/components/apps/blog').then(m => ({ default: m.BlogModule })),
 );
@@ -50,6 +53,7 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	about: withSuspense(AboutModule),
 	projects: withSuspense(ProjectsModule),
 	journey: withSuspense(JourneyModule),
+	certifications: withSuspense(CertificationModule),
 	blog: withSuspense(BlogModule),
 	contact: withSuspense(ContactModule),
 	'ai-lab': <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
@@ -59,15 +63,15 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
 	about: { title: 'About Me', icon: Info },
 	projects: { title: 'Projects', icon: LayoutDashboard },
-	terminal: { title: 'Terminal', icon: Terminal },
-	'coding-stats': { title: 'Coding Stats', icon: Code },
-	contact: { title: 'Contact', icon: Contact },
 	journey: { title: 'My Journey', icon: GitBranch },
+	terminal: { title: 'Terminal', icon: Terminal },
+	certifications: { title: 'Certifications', icon: ShieldQuestion },
 	blog: { title: 'Blog', icon: Book },
-	secret: { title: 'Secret', icon: ShieldQuestion },
-	'ai-lab': { title: 'AI Lab', icon: Code },
-	'stats.exe': { title: 'Coding Stats', icon: Code },
+	contact: { title: 'Contact', icon: Contact },
 	default: { title: 'Untitled', icon: ShieldQuestion },
+	'ai-lab': { title: 'AI Lab', icon: Code },
+	'coding-stats': { title: 'Coding Stats', icon: Code },
+	'stats.exe': { title: 'Coding Stats', icon: Code },
 };
 
 export const getModuleComponent = (id: string): React.ReactNode => {
