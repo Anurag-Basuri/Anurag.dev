@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'AnuragOS - Developer Portfolio',
+	title: 'Anurag - Developer Portfolio',
 	description: 'A terminal-style portfolio showcasing projects, journey, and skills',
 	icons: [{ rel: 'icon', url: '/favicon.ico' }],
 	metadataBase: typeof window === 'undefined' ? new URL('http://localhost:3000') : undefined,

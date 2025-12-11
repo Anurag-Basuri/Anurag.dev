@@ -1,13 +1,6 @@
 'use client';
 
-import { GitBranch, AlertCircle, Check, Wifi, Bell } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { getBranchName } from '@/lib/editorUtils';
-
-interface StatusBarProps {
-	language: string;
-	className?: string;
-}
+import { GitBranch, Check, Wifi, Bell } from 'lucide-react';
 
 export function StatusBar() {
 	return (
