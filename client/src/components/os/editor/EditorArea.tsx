@@ -12,16 +12,14 @@ export function EditorArea() {
 
 	return (
 		<div id="editor-boundary" className="h-full w-full relative group">
-			<div
-				className="absolute inset-0 pointer-events-none opacity-[1]"
-			/>
+			<div className="absolute inset-0 pointer-events-none opacity-[1]" />
 
 			{windows.length === 0 ? (
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none"
+					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-8"
 				>
 					<div className="relative mb-8">
 						<div className="absolute -inset-8 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
@@ -31,27 +29,43 @@ export function EditorArea() {
 					</div>
 
 					<h3 className="text-2xl font-semibold text-white/90 mb-3 tracking-tight">
-						No Files Open
+						Welcome to Anurag's Portfolio
 					</h3>
 
-					<p className="text-sm text-white/40 max-w-xs text-center leading-relaxed mb-8">
-						Select a file from the explorer on the left or use the terminal below to
-						navigate.
+					<p className="text-sm text-white/40 max-w-md text-center leading-relaxed mb-10">
+						A developer-first portfolio experience. Navigate using the file explorer,
+						terminal, or keyboard shortcuts.
 					</p>
 
-					<div className="flex flex-col gap-3">
-						<div className="flex items-center gap-3 text-xs font-mono text-white/30 bg-white/5 px-4 py-2 rounded-full border border-white/5">
-							<div className="flex items-center gap-1.5">
-								<span className="px-1.5 py-0.5 rounded bg-white/10 min-w-[20px] text-center text-white/70">
-									⌘
-								</span>
-								<span>+</span>
-								<span className="px-1.5 py-0.5 rounded bg-white/10 min-w-[20px] text-center text-white/70">
-									P
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
+						{/* Quick Action Cards */}
+						<div className="flex flex-col gap-1 p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
+							<div className="flex items-center gap-2 text-emerald-400 mb-1">
+								<MousePointer2 className="w-4 h-4" />
+								<span className="text-xs font-medium uppercase tracking-wider">
+									Explore
 								</span>
 							</div>
-							<span className="text-white/20">|</span>
-							<span>Quick Search</span>
+							<p className="text-sm text-white/70">
+								Click on <span className="text-white font-medium">projects</span>{' '}
+								folder to see my work
+							</p>
+						</div>
+
+						<div className="flex flex-col gap-1 p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
+							<div className="flex items-center gap-2 text-blue-400 mb-1">
+								<Command className="w-4 h-4" />
+								<span className="text-xs font-medium uppercase tracking-wider">
+									Terminal
+								</span>
+							</div>
+							<p className="text-sm text-white/70">
+								Type{' '}
+								<span className="font-mono text-xs bg-white/10 px-1 py-0.5 rounded">
+									help
+								</span>{' '}
+								to see available commands
+							</p>
 						</div>
 					</div>
 				</motion.div>
