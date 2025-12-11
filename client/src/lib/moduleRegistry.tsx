@@ -27,9 +27,6 @@ const BlogModule = lazy(() =>
 const ContactModule = lazy(() =>
 	import('@/components/apps/contact').then(m => ({ default: m.ContactModule })),
 );
-const SecretModule = lazy(() =>
-	import('@/components/apps/secret').then(m => ({ default: m.SecretModule })),
-);
 const CodingStatsModule = lazy(() => import('@/components/apps/coding-stats'));
 
 // Loading fallback component
@@ -56,7 +53,6 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	blog: withSuspense(BlogModule),
 	contact: withSuspense(ContactModule),
 	'ai-lab': <div className="p-4 text-muted-foreground">AI Lab coming soon...</div>,
-	secret: withSuspense(SecretModule),
 	'stats.exe': withSuspense(CodingStatsModule),
 };
 
