@@ -143,6 +143,18 @@ const contactCommand = createCommand({
 	}),
 });
 
+const certificationsCommand = createCommand({
+	name: 'certifications',
+	aliases: ['certs'],
+	description: 'View my certifications and achievements.',
+	usage: 'certifications',
+	category: 'Navigation',
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'certifications' },
+	}),
+});
+
 const socialsCommand = createCommand({
 	name: 'socials',
 	aliases: ['links'],
@@ -338,6 +350,8 @@ const catCommand = createCommand({
 			'journey/README.md': '# My Journey\n\nFrom curious beginner to Full Stack Engineer...',
 			'contact/README.md': '# Contact\n\nEmail: contact@anurag.dev\nGitHub: @Anurag-Basuri',
 			'blog/README.md': '# Blog\n\nThoughts on development, AI, and technology.',
+			'certifications/README.md':
+				'# Certifications\n\nProfessional certifications and achievements.',
 		};
 
 		return {
@@ -368,6 +382,7 @@ const openCommand = createCommand({
 			journey: 'journey',
 			contact: 'contact',
 			blog: 'blog',
+			certifications: 'certifications',
 			'ai-lab': 'ai-lab',
 			tools: 'tools',
 		};
@@ -447,6 +462,7 @@ export function registerCoreCommands() {
 		projectsCommand,
 		journeyCommand,
 		contactCommand,
+		certificationsCommand,
 		socialsCommand,
 		resumeCommand,
 		clearCommand,
