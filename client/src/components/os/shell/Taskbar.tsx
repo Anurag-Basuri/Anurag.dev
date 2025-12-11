@@ -450,7 +450,7 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="fixed bottom-0 left-0 right-0 w-full h-12 sm:h-8 bg-[#0d1117]/80 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
+				className="w-full shrink-0 h-12 sm:h-8 bg-[#0d1117]/80 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
 			>
 				{/* Ambient Glow */}
 				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />
