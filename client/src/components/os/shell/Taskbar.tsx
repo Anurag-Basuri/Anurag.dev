@@ -449,12 +449,12 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="h-8 bg-[#0d1117]/70 backdrop-blur-2xl border-t border-white/8 flex items-center justify-between z-40 px-2 sm:px-3 relative shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
+				className="h-12 sm:h-8 bg-[#0d1117]/80 backdrop-blur-2xl border-t border-white/10 sm:border flex items-center justify-between z-40 px-2 sm:px-3 relative shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)] bottom-4 left-1/2 -translate-x-1/2 rounded-2xl w-[95%] sm:w-auto overflow-hidden sm:overflow-visible"
 			>
 				{/* Ambient Glow */}
 				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />
 
-				<div className="flex items-center gap-4 h-full">
+				<div className="flex items-center gap-2 sm:gap-4 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide px-2">
 					{/* Start Button */}
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -464,14 +464,14 @@ export function Taskbar() {
 								whileTap={{ scale: 0.95 }}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-6 px-3 rounded-lg flex items-center gap-2 transition-all duration-300 relative group',
+									'h-8 sm:h-6 px-3 rounded-lg flex items-center gap-2 transition-all duration-300 relative group shrink-0',
 									isStartOpen
 										? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]'
 										: 'bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 hover:border-white/10',
 								)}
 							>
 								<Logo />
-								<span className="text-[10px] font-bold tracking-widest uppercase">
+								<span className="text-[10px] font-bold tracking-widest uppercase hidden sm:block">
 									Start
 								</span>
 
@@ -485,7 +485,7 @@ export function Taskbar() {
 					</Tooltip>
 
 					{/* Divider */}
-					{windows.length > 0 && <div className="h-4 w-px bg-white/10" />}
+					{windows.length > 0 && <div className="h-4 w-px bg-white/10 shrink-0" />}
 
 					{/* Window Icons (Mac Dock Style) */}
 					<Reorder.Group
@@ -501,7 +501,7 @@ export function Taskbar() {
 								value={window}
 								as="div"
 								initial={false}
-								className="flex"
+								className="flex shrink-0"
 							>
 								<TaskbarItem
 									window={window}
@@ -514,8 +514,8 @@ export function Taskbar() {
 					</Reorder.Group>
 				</div>
 
-				{/* Right Side Actions */}
-				<div className="flex items-center gap-2">
+				{/* Right Side Actions - Hidden on mobile to save space, redundant with TopBar */}
+				<div className="hidden sm:flex items-center gap-2">
 					<HelpButton placement="taskbar" />
 				</div>
 			</motion.div>

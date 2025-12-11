@@ -1,5 +1,7 @@
 'use client';
 
+import { useAtom } from 'jotai';
+import { mobileSidebarOpenAtom } from '@/store/atoms';
 import { motion } from 'framer-motion';
 import {
 	Menu,
@@ -37,7 +39,7 @@ export function TopBar({
 	onToggleTerminal,
 	onFileSelect,
 }: TopBarProps) {
-	const [isExplorerOpen, setIsExplorerOpen] = useState(false);
+	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 
 	useEffect(() => {
