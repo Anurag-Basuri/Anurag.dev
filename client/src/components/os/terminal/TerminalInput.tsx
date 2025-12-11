@@ -34,7 +34,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'h-6 px-2 border-t bg-[#161b22] shrink-0 flex items-center gap-2 cursor-text transition-colors',
+					'h-7 px-2 border-t bg-[#161b22] shrink-0 flex items-center gap-2 cursor-text transition-colors',
 					isFocused ? 'border-emerald-500/20' : 'border-white/8',
 				)}
 				onClick={handleContainerClick}
@@ -77,7 +77,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 						enterKeyHint="enter"
 					/>
 					<div
-						className="whitespace-pre text-[11px] font-mono text-white/90 leading-tight"
+						className="whitespace-pre text-[12px] font-mono text-white/90 leading-tight"
 						aria-hidden="true"
 					>
 						<span>{input.substring(0, cursorPos)}</span>
