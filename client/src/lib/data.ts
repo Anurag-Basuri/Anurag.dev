@@ -21,16 +21,10 @@ export const initialFileSystem: FileSystemItem[] = [
 		children: [{ name: 'README.md', type: 'file', id: 'journey/README.md' }],
 	},
 	{
-		name: 'contact',
+		name: 'certifications',
 		type: 'folder',
-		id: 'contact',
-		children: [{ name: 'README.md', type: 'file', id: 'contact/README.md' }],
-	},
-	{
-		name: 'blog',
-		type: 'folder',
-		id: 'blog',
-		children: [{ name: 'README.md', type: 'file', id: 'blog/README.md' }],
+		id: 'certifications',
+		children: [{ name: 'README.md', type: 'file', id: 'certifications/README.md' }],
 	},
 	{
 		name: 'ai-lab',
@@ -39,10 +33,16 @@ export const initialFileSystem: FileSystemItem[] = [
 		children: [{ name: 'README.md', type: 'file', id: 'ai-lab/README.md' }],
 	},
 	{
-		name: 'certifications',
+		name: 'blog',
 		type: 'folder',
-		id: 'certifications',
-		children: [{ name: 'README.md', type: 'file', id: 'certifications/README.md' }],
+		id: 'blog',
+		children: [{ name: 'README.md', type: 'file', id: 'blog/README.md' }],
+	},
+	{
+		name: 'contact',
+		type: 'folder',
+		id: 'contact',
+		children: [{ name: 'README.md', type: 'file', id: 'contact/README.md' }],
 	},
 	{
 		name: 'tools',
