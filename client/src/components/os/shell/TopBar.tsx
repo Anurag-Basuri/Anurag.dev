@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/components/os/file-system/FolderTree';
 import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
-import { initialFileSystem, FileSystemItem } from '@/lib/data';
+import { INITIAL_FILE_SYSTEM, FileSystemItem } from '@/data/filesystem';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -107,7 +107,7 @@ export function TopBar({
 									<ScrollArea className="h-full">
 										<div className="p-4">
 											<FolderTree
-												items={initialFileSystem}
+												items={INITIAL_FILE_SYSTEM}
 												onSelect={item => {
 													onFileSelect(item);
 													setIsExplorerOpen(false);

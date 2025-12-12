@@ -8,7 +8,7 @@ import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
 import { FolderTree } from '@/components/os/file-system/FolderTree';
 import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
-import { initialFileSystem as fileSystem, type FileSystemItem } from '@/lib/data';
+import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { Taskbar } from '@/components/os/shell/Taskbar';
 import { TopBar } from '@/components/os/shell/TopBar';
 import { Background3D } from '@/components/os/shell/Background3D';
