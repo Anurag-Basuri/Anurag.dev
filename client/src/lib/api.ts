@@ -12,7 +12,7 @@ import { JOURNEY } from '@/data/journey';
 import { BLOG_POSTS } from '@/data/blog';
 import { PROFILE } from '@/data/profile';
 import { CERTIFICATIONS } from '@/data/certifications';
-import { CODING_STATS } from '@/data/coding-stats';
+import { CODING_PROFILES } from '@/data/coding-profiles';
 
 export type {
 	Project,
@@ -75,7 +75,7 @@ class ApiService {
 	}
 
 	async getCodingStats(): Promise<CodingStats> {
-		return this.fetchWithFallback<CodingStats>('/coding-stats', CODING_STATS);
+		return this.fetchWithFallback<CodingStats>('/coding-stats', CODING_PROFILES);
 	}
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {

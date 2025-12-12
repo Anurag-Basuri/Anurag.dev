@@ -1,6 +1,6 @@
 import { CodingStats } from '@/types/schema';
 
-export const CODING_STATS: CodingStats = {
+export const CODING_PROFILES: CodingStats = {
 	leetcode: {
 		username: 'anurag_dev',
 		url: 'https://leetcode.com/anurag_dev',
