@@ -16,10 +16,12 @@ import {
 	Github,
 	Code,
 	Trophy,
+	ArrowRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
+import { useWindowManager } from '@/hooks/use-window-manager';
 
 // Skeleton loader component
 function AboutSkeleton() {
@@ -51,6 +53,7 @@ export function AboutModule() {
 	const [codingStats, setCodingStats] = useState<CodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const { openWindow } = useWindowManager();
 
 	const fetchData = async () => {
 		try {
@@ -255,6 +258,30 @@ export function AboutModule() {
 									</a>
 								)}
 							</motion.div>
+						)}
+
+						{/* View All Profiles Button */}
+						{codingStats && (
+							<motion.button
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: 0.4 }}
+								onClick={() => openWindow('profiles')}
+								className="w-full p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all group flex items-center justify-between"
+							>
+								<div className="flex items-center gap-3">
+									<Code className="w-5 h-5 text-emerald-400" />
+									<div className="text-left">
+										<div className="text-sm font-bold text-foreground group-hover:text-emerald-400 transition-colors">
+											View All Coding Profiles
+										</div>
+										<div className="text-xs text-muted-foreground">
+											Detailed stats from GitHub, LeetCode, Codeforces & more
+										</div>
+									</div>
+								</div>
+								<ArrowRight className="w-5 h-5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+							</motion.button>
 						)}
 
 						{/* "About" Quick Summary */}
