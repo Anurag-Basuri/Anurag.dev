@@ -1,17 +1,20 @@
 import { z } from 'zod';
 
+// --- Common Schemas ---
 export const SkillSchema = z.object({
 	category: z.string(),
 	name: z.string(),
 	level: z.number().min(0).max(100),
 });
 
+// --- Social Link Schema ---
 export const SocialLinkSchema = z.object({
 	platform: z.string(),
 	url: z.string().url(),
 	icon: z.string().optional(),
 });
 
+// --- About Schema ---
 export const AboutSchema = z.object({
 	id: z.string().optional(),
 	name: z.string(),
@@ -35,6 +38,7 @@ export const AboutSchema = z.object({
 	socials: z.array(SocialLinkSchema).optional(),
 });
 
+// --- Project Schema ---
 export const ProjectSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(2, 'Title is required'),
@@ -64,6 +68,7 @@ export const ProjectSchema = z.object({
 	updatedAt: z.string().datetime().optional(),
 });
 
+// --- Journey Item Schema ---
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
 	type: z.enum(['work', 'education', 'project', 'achievement', 'other']), // Replaces generalized 'category' string for better type safety
@@ -83,6 +88,7 @@ export const JourneyItemSchema = z.object({
 	order: z.number().default(0),
 });
 
+// --- Certification Schema ---
 export const CertificationSchema = z.object({
 	id: z.string().optional(),
 	title: z.string(),
@@ -96,6 +102,7 @@ export const CertificationSchema = z.object({
 	image: z.string().url().optional(),
 });
 
+// --- Blog Post Schema ---
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(5),
@@ -112,6 +119,7 @@ export const BlogPostSchema = z.object({
 	readingTime: z.number().optional(), // In minutes
 });
 
+// --- Contact Schema ---
 export const ContactSchema = z.object({
 	name: z.string().min(2),
 	email: z.string().email(),
@@ -120,42 +128,26 @@ export const ContactSchema = z.object({
 });
 
 // --- Coding Stats Schemas ---
-export const CodingLanguageSchema = z.object({
-	name: z.string(),
-	percentage: z.number(),
-	color: z.string(),
-});
-
 export const LeetCodeStatsSchema = z.object({
-	totalSolved: z.number(),
-	easy: z.number(),
-	medium: z.number(),
-	hard: z.number(),
-	globalPercentile: z.number(),
+	username: z.string(),
+	url: z.string().url(),
 });
 
+// --- Codeforces Stats Schema ---
 export const CodeforcesStatsSchema = z.object({
-	rating: z.number(),
-	rank: z.string(),
-	maxRating: z.number(),
-	maxRank: z.string(),
+	username: z.string(),
+	url: z.string().url(),
 });
 
+// --- GitHub Stats Schema ---
 export const GitHubStatsSchema = z.object({
-	totalCommits: z.number(),
-	stars: z.number(),
-	followers: z.number(),
-	percentile: z.number(),
+	username: z.string(),
+	url: z.string().url(),
 });
 
+// --- Coding Stats Schema ---
 export const CodingStatsSchema = z.object({
 	id: z.string().optional(),
-	identity: z.object({
-		yearsActive: z.number(),
-		totalCommits: z.number(),
-		mostUsedLanguage: z.string(),
-	}),
-	languages: z.array(CodingLanguageSchema),
 	leetcode: LeetCodeStatsSchema,
 	codeforces: CodeforcesStatsSchema,
 	github: GitHubStatsSchema,
