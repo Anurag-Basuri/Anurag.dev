@@ -119,6 +119,49 @@ export const ContactSchema = z.object({
 	message: z.string().min(10),
 });
 
+// --- Coding Stats Schemas ---
+export const CodingLanguageSchema = z.object({
+	name: z.string(),
+	percentage: z.number(),
+	color: z.string(),
+});
+
+export const LeetCodeStatsSchema = z.object({
+	totalSolved: z.number(),
+	easy: z.number(),
+	medium: z.number(),
+	hard: z.number(),
+	globalPercentile: z.number(),
+});
+
+export const CodeforcesStatsSchema = z.object({
+	rating: z.number(),
+	rank: z.string(),
+	maxRating: z.number(),
+	maxRank: z.string(),
+});
+
+export const GitHubStatsSchema = z.object({
+	totalCommits: z.number(),
+	stars: z.number(),
+	followers: z.number(),
+	percentile: z.number(),
+});
+
+export const CodingStatsSchema = z.object({
+	id: z.string().optional(),
+	identity: z.object({
+		yearsActive: z.number(),
+		totalCommits: z.number(),
+		mostUsedLanguage: z.string(),
+	}),
+	languages: z.array(CodingLanguageSchema),
+	leetcode: LeetCodeStatsSchema,
+	codeforces: CodeforcesStatsSchema,
+	github: GitHubStatsSchema,
+	updatedAt: z.string().datetime().optional(),
+});
+
 // Types inferred from Zod schemas
 export type About = z.infer<typeof AboutSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
@@ -126,3 +169,4 @@ export type JourneyItem = z.infer<typeof JourneyItemSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;
+export type CodingStats = z.infer<typeof CodingStatsSchema>;

@@ -59,6 +59,23 @@ model Profile {
   updatedAt       DateTime @updatedAt
 }
 
+model CodingStats {
+  id              String   @id @default(uuid())
+  
+  // Identity
+  yearsActive     Int      @default(0)
+  totalCommits    Int      @default(0)
+  mostUsedLanguage String
+  
+  // JSON Blobs for structured sub-objects
+  languages       Json     // [{ name, percentage, color }]
+  leetcode        Json     // { totalSolved, easy, medium, hard, globalPercentile }
+  codeforces      Json     // { rating, rank, maxRating, maxRank }
+  github          Json     // { totalCommits, stars, followers, percentile }
+  
+  updatedAt       DateTime @updatedAt
+}
+
 model Project {
   id          String    @id @default(uuid())
   title       String
