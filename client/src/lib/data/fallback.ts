@@ -1,4 +1,4 @@
-import { Project, JourneyEntry, BlogPost } from '@/types/schema';
+import { Project, JourneyEntry, BlogPost, AboutData, Certification } from '@/types/schema';
 
 export const FALLBACK_PROJECTS: Project[] = [
 	{
@@ -9,9 +9,10 @@ export const FALLBACK_PROJECTS: Project[] = [
 		techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
 		githubUrl: 'https://github.com/Anurag-Basuri/personal_portfolio',
 		liveUrl: 'https://anurag.dev',
-		status: 'published',
+		status: 'Completed',
 		stars: 120,
 		forks: 45,
+		featured: true,
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	},
@@ -76,5 +77,58 @@ export const FALLBACK_BLOGS: BlogPost[] = [
 		publishedAt: new Date().toISOString(),
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
+	},
+];
+
+export const FALLBACK_ABOUT: AboutData = {
+	name: 'Anurag Basuri',
+	tagline: 'Full Stack Engineer & AI Enthusiast',
+	short: 'I specialize in building scalable web applications and exploring the frontiers of artificial intelligence. With a passion for clean code and intuitive design, I create digital experiences that perform as beautiful as they look.',
+	skills: {
+		frontend: [
+			{ name: 'React/Next.js', level: 95 },
+			{ name: 'TypeScript', level: 90 },
+			{ name: 'Tailwind CSS', level: 98 },
+			{ name: 'Framer Motion', level: 85 },
+		],
+		backend: [
+			{ name: 'Node.js', level: 88 },
+			{ name: 'PostgreSQL', level: 85 },
+			{ name: 'Prisma', level: 90 },
+			{ name: 'Serverless', level: 80 },
+		],
+		ml: [
+			{ name: 'Python', level: 85 },
+			{ name: 'LangChain', level: 75 },
+			{ name: 'LLM Integration', level: 80 },
+			{ name: 'TensorFlow', level: 60 },
+		],
+	},
+};
+
+export const FALLBACK_CERTIFICATIONS: Certification[] = [
+	{
+		id: '1',
+		title: 'AWS Certified Solutions Architect',
+		issuer: 'Amazon Web Services',
+		date: '2024-01-15',
+		credentialUrl: 'https://aws.amazon.com',
+		skills: ['Cloud Computing', 'AWS', 'System Design'],
+	},
+	{
+		id: '2',
+		title: 'Meta Frontend Developer Certificate',
+		issuer: 'Meta / Coursera',
+		date: '2023-08-20',
+		credentialUrl: 'https://coursera.org',
+		skills: ['React', 'UI/UX', 'JavaScript'],
+	},
+	{
+		id: '3',
+		title: 'TensorFlow Developer Certificate',
+		issuer: 'Google',
+		date: '2023-05-10',
+		credentialUrl: 'https://tensorflow.org',
+		skills: ['Machine Learning', 'Deep Learning', 'Python'],
 	},
 ];

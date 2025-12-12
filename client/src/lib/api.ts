@@ -1,7 +1,20 @@
-import { Project, JourneyEntry, BlogPost, ContactMessage } from '@/types/schema';
-import { FALLBACK_PROJECTS, FALLBACK_JOURNEY, FALLBACK_BLOGS } from '@/lib/data/fallback';
+import {
+	Project,
+	JourneyEntry,
+	BlogPost,
+	ContactMessage,
+	AboutData,
+	Certification,
+} from '@/types/schema';
+import {
+	FALLBACK_PROJECTS,
+	FALLBACK_JOURNEY,
+	FALLBACK_BLOGS,
+	FALLBACK_ABOUT,
+	FALLBACK_CERTIFICATIONS,
+} from '@/lib/data/fallback';
 
-export type { Project, JourneyEntry, BlogPost, ContactMessage };
+export type { Project, JourneyEntry, BlogPost, ContactMessage, AboutData, Certification };
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -45,7 +58,15 @@ class ApiService {
 		return this.fetchWithFallback<BlogPost[]>('/blog', FALLBACK_BLOGS);
 	}
 
-	async submitContactForm(data: ContactMessage): Promise<{ success: boolean; message: string }> {
+	async getAbout(): Promise<AboutData> {
+		return this.fetchWithFallback<AboutData>('/about', FALLBACK_ABOUT);
+	}
+
+	async getCertifications(): Promise<Certification[]> {
+		return this.fetchWithFallback<Certification[]>('/certifications', FALLBACK_CERTIFICATIONS);
+	}
+
+	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {
 		try {
 			const response = await fetch(`${API_BASE_URL}/contact`, {
 				method: 'POST',
@@ -60,7 +81,6 @@ class ApiService {
 			return { success: true, message: 'Message sent successfully!' };
 		} catch (error) {
 			console.warn('[API] Failed to submit contact form.', error);
-			// In a real scenario, we might queue this for later or just tell the user
 			return { success: false, message: 'Offline mode: Message logged (simulated).' };
 		}
 	}
