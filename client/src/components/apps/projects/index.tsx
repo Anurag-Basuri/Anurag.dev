@@ -74,12 +74,12 @@ const ProjectCard = React.memo(function ProjectCard({
 						<span
 							className={cn(
 								'text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase',
-								project.status === 'Completed'
+								project.status === 'completed'
 									? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
 									: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
 							)}
 						>
-							{project.status === 'Completed' ? 'Done' : 'WIP'}
+							{project.status === 'completed' ? 'Done' : 'WIP'}
 						</span>
 					)}
 				</div>
@@ -307,7 +307,7 @@ export function ProjectsModule() {
 										<span
 											className={cn(
 												'px-2 py-1 rounded-full border',
-												selectedProject.status === 'Completed'
+												selectedProject.status === 'completed'
 													? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
 													: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
 											)}
