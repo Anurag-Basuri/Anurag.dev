@@ -122,7 +122,7 @@ export function ProjectsModule() {
 
 	useEffect(() => {
 		api.getProjects()
-			.then(data => setProjects(data.projects))
+			.then(data => setProjects(data))
 			.catch(err => setError(err.message))
 			.finally(() => setLoading(false));
 	}, []);

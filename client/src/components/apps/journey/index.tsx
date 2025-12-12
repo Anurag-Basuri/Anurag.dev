@@ -15,7 +15,10 @@ import { useRef } from 'react';
 import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
-const categoryConfig: Record<string, { color: string; icon: React.ComponentType<{ className?: string }>; bg: string }> = {
+const categoryConfig: Record<
+	string,
+	{ color: string; icon: React.ComponentType<{ className?: string }>; bg: string }
+> = {
 	education: {
 		color: 'text-blue-400',
 		icon: GraduationCap,
@@ -42,7 +45,7 @@ export function JourneyModule() {
 
 	useEffect(() => {
 		api.getJourney()
-			.then(data => setJourney(data.items.sort((a, b) => b.year - a.year))) // Sort descending
+			.then(data => setJourney(data.sort((a, b) => b.year - a.year))) // Sort descending
 			.catch(err => setError(err.message))
 			.finally(() => setLoading(false));
 	}, []);

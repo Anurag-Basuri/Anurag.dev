@@ -12,7 +12,7 @@ export function BlogModule() {
 
 	useEffect(() => {
 		api.getBlogPosts()
-			.then(data => setPosts(data.posts))
+			.then(data => setPosts(data))
 			.catch(err => setError(err.message))
 			.finally(() => setLoading(false));
 	}, []);
