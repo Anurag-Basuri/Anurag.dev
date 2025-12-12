@@ -45,7 +45,7 @@ export function JourneyModule() {
 
 	useEffect(() => {
 		api.getJourney()
-			.then(data => setJourney(data.sort((a, b) => b.year - a.year))) // Sort descending
+			.then(data => setJourney(data.sort((a, b) => a.order - b.order))) // Sort by order
 			.catch(err => setError(err.message))
 			.finally(() => setLoading(false));
 	}, []);
@@ -76,7 +76,7 @@ export function JourneyModule() {
 					<div className="absolute left-[3px] md:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-primary/50 via-primary/20 to-transparent md:-translate-x-1/2 rounded-full" />
 
 					{journey.map((entry, index) => {
-						const config = categoryConfig[entry.category] || categoryConfig.work;
+						const config = categoryConfig[entry.type] || categoryConfig.work; // Use 'type' property as per schema
 						const Icon = config.icon;
 						const isLeft = index % 2 === 0;
 
@@ -104,13 +104,11 @@ export function JourneyModule() {
 												className={`flex items-center gap-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${config.bg} bg-background/50`}
 											>
 												<Icon className={`w-3 h-3 ${config.color}`} />
-												<span className={config.color}>
-													{entry.category}
-												</span>
+												<span className={config.color}>{entry.type}</span>
 											</div>
 											<div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
 												<Calendar className="w-3.5 h-3.5" />
-												<span>{entry.year}</span>
+												<span>{entry.date}</span>
 											</div>
 										</div>
 

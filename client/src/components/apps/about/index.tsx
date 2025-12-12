@@ -7,6 +7,7 @@ import { Code2, Terminal, User, MapPin, Calendar, Sparkles, Cpu, Layers, Box } f
 import { motion } from 'framer-motion';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
+import { config } from 'process';
 
 // Skeleton loader component
 function AboutSkeleton() {

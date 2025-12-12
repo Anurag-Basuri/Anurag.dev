@@ -170,7 +170,7 @@ export function ProjectsModule() {
 					setLoading(true);
 					setError(null);
 					api.getProjects()
-						.then(data => setProjects(data.projects))
+						.then(data => setProjects(data))
 						.catch(err => setError(err.message))
 						.finally(() => setLoading(false));
 				}}
