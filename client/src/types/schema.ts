@@ -131,5 +131,9 @@ export interface CodingStats {
 		username: string;
 		url: string;
 	};
+	codechef?: {
+		username: string;
+		url: string;
+	};
 	updatedAt?: string;
 }
