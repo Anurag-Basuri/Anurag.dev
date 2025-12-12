@@ -15,6 +15,12 @@ export const PROJECTS: Project[] = [
 		status: 'completed',
 		featured: true,
 		priority: 10,
+		features: [
+			'Hexagonal Grid Boot Animation',
+			'Functional File System & CLI',
+			'Glassmorphism & 3D Backgrounds',
+			'Full Keyboard Navigation',
+		],
 		stars: 120,
 		forks: 45,
 		createdAt: new Date().toISOString(),
@@ -26,8 +32,10 @@ export const PROJECTS: Project[] = [
 		slug: 'ai-lab-experiments',
 		description:
 			'Experimental AI playground for testing LLM interactions and agent functionalities.',
+		content: 'Full case study of AI Lab...',
 		techStack: ['Python', 'LangChain', 'OpenAI', 'React'],
 		tags: ['AI', 'LLM', 'Agents'],
+		features: ['Agentic Workflows', 'RAG Implementation', 'Prompt Engineering Playground'],
 		status: 'draft',
 		featured: false,
 		priority: 5,
