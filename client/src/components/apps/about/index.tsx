@@ -149,7 +149,7 @@ export function AboutModule() {
 						</motion.div>
 
 						{/* Coding Profiles Mini-Block */}
-						{stats && (
+						{stats && config && (
 							<motion.div
 								initial={{ opacity: 0, scale: 0.95 }}
 								animate={{ opacity: 1, scale: 1 }}
@@ -157,7 +157,7 @@ export function AboutModule() {
 								className="grid grid-cols-2 gap-3"
 							>
 								<a
-									href={stats.github.url}
+									href={config.github.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-between group"
@@ -167,7 +167,7 @@ export function AboutModule() {
 											GitHub
 										</span>
 										<span className="text-sm font-bold group-hover:text-white transition-colors">
-											@{stats.github.username}
+											@{config.github.username}
 										</span>
 									</div>
 									<div className="text-xs font-mono text-muted-foreground">
@@ -175,7 +175,7 @@ export function AboutModule() {
 									</div>
 								</a>
 								<a
-									href={stats.leetcode.url}
+									href={config.leetcode.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10 hover:bg-yellow-500/10 hover:border-yellow-500/20 transition-all flex items-center justify-between group"

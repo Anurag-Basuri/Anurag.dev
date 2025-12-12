@@ -16,15 +16,33 @@ import {
 import { Loader2, Database, Code, Globe, Trophy, GitCommit, User, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { fetchLiveStats, LiveCodingStats } from '@/lib/fetchers';
+
 export default function CodingStatsModule() {
-	const [stats, setStats] = useState<CodingStats | null>(null);
+	const [config, setConfig] = useState<CodingStats | null>(null);
+	const [stats, setStats] = useState<LiveCodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		api.getCodingStats().then(data => {
-			setStats(data);
-			setLoading(false);
-		});
+		const loadData = async () => {
+			try {
+				const configData = await api.getCodingStats();
+				setConfig(configData);
+
+				const liveData = await fetchLiveStats({
+					github: configData.github.username,
+					leetcode: configData.leetcode.username,
+					codeforces: configData.codeforces.username,
+				});
+				setStats(liveData);
+			} catch (error) {
+				console.error('Failed to load stats:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadData();
 	}, []);
 
 	if (loading) {
@@ -38,7 +56,7 @@ export default function CodingStatsModule() {
 		);
 	}
 
-	if (!stats) return null;
+	if (!stats || !config) return null;
 
 	// Persona Logic
 	const getPersona = () => {
@@ -231,12 +249,12 @@ export default function CodingStatsModule() {
 									<div>
 										<h3 className="text-lg font-bold leading-none">LeetCode</h3>
 										<a
-											href={stats.leetcode.url}
+											href={config.leetcode.url}
 											target="_blank"
 											rel="noopener noreferrer"
 											className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline"
 										>
-											@{stats.leetcode.username}
+											@{config.leetcode.username}
 										</a>
 									</div>
 									<span className="ml-auto text-xs font-mono py-1 px-2 bg-muted rounded text-muted-foreground">
@@ -281,12 +299,12 @@ export default function CodingStatsModule() {
 								<div>
 									<h3 className="font-bold leading-none">Codeforces</h3>
 									<a
-										href={stats.codeforces.url}
+										href={config.codeforces.url}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-[10px] text-muted-foreground uppercase hover:text-blue-400 transition-colors"
 									>
-										@{stats.codeforces.username}
+										@{config.codeforces.username}
 									</a>
 								</div>
 							</div>
@@ -300,6 +318,7 @@ export default function CodingStatsModule() {
 							</div>
 						</div>
 
+						{/* ... Radar Chart ... */}
 						<div className="flex-1 min-h-[140px] w-full relative">
 							<ResponsiveContainer width="100%" height="100%">
 								<RadarChart cx="50%" cy="50%" outerRadius="70%" data={cfData}>
@@ -343,12 +362,12 @@ export default function CodingStatsModule() {
 								<div>
 									<h3 className="font-bold leading-none">GitHub Activity</h3>
 									<a
-										href={stats.github.url}
+										href={config.github.url}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="text-xs text-muted-foreground hover:text-white transition-colors hover:underline"
 									>
-										@{stats.github.username}
+										@{config.github.username}
 									</a>
 								</div>
 							</div>
