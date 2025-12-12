@@ -117,23 +117,24 @@ export interface AboutData {
 	socials?: SocialLink[];
 }
 
+export interface PlatformStats {
+	username: string;
+	url: string;
+	stats?: {
+		rating?: number;
+		globalRank?: string | number;
+		solved?: number;
+		stars?: number;
+		commits?: number;
+		followers?: number;
+	};
+}
+
 export interface CodingStats {
 	id?: string;
-	leetcode: {
-		username: string;
-		url: string;
-	};
-	codeforces: {
-		username: string;
-		url: string;
-	};
-	github: {
-		username: string;
-		url: string;
-	};
-	codechef?: {
-		username: string;
-		url: string;
-	};
+	leetcode: PlatformStats;
+	codeforces: PlatformStats;
+	codechef?: PlatformStats;
+	github: PlatformStats;
 	updatedAt?: string;
 }

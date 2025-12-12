@@ -75,7 +75,7 @@ class ApiService {
 	}
 
 	async getCodingStats(): Promise<CodingStats> {
-		return this.fetchWithFallback<CodingStats>('/coding-stats', CODING_PROFILES);
+		return this.fetchWithFallback<CodingStats>('/stats', CODING_PROFILES);
 	}
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {
