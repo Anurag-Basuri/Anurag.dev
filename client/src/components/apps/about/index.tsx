@@ -3,7 +3,20 @@
 import { useEffect, useState } from 'react';
 import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Code2, Terminal, User, MapPin, Calendar, Sparkles, Cpu, Layers, Box } from 'lucide-react';
+import {
+	Code2,
+	Terminal,
+	User,
+	MapPin,
+	Calendar,
+	Sparkles,
+	Cpu,
+	Layers,
+	Box,
+	Github,
+	Code,
+	Trophy,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
@@ -170,11 +183,13 @@ export function AboutModule() {
 											GitHub
 										</span>
 										<span className="text-sm font-bold group-hover:text-white transition-colors">
-											@{codingStats.github.username}
+											{codingStats.github.stats?.stars !== undefined
+												? `${codingStats.github.stats.stars} ★`
+												: `@${codingStats.github.username}`}
 										</span>
 									</div>
 									<div className="text-xs font-mono text-muted-foreground">
-										Repo
+										<Github className="w-4 h-4" />
 									</div>
 								</a>
 								<a
@@ -188,13 +203,57 @@ export function AboutModule() {
 											LeetCode
 										</span>
 										<span className="text-sm font-bold group-hover:text-yellow-400 transition-colors">
-											@{codingStats.leetcode.username}
+											{codingStats.leetcode.stats?.solved !== undefined
+												? `${codingStats.leetcode.stats.solved} Solved`
+												: `@${codingStats.leetcode.username}`}
 										</span>
 									</div>
 									<div className="text-[10px] uppercase text-muted-foreground">
-										Code
+										<Code className="w-4 h-4" />
 									</div>
 								</a>
+								<a
+									href={codingStats.codeforces.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-3 rounded-xl bg-red-500/5 border border-red-500/10 hover:bg-red-500/10 hover:border-red-500/20 transition-all flex items-center justify-between group"
+								>
+									<div className="flex flex-col">
+										<span className="text-[10px] text-muted-foreground uppercase">
+											Codeforces
+										</span>
+										<span className="text-sm font-bold group-hover:text-red-400 transition-colors">
+											{codingStats.codeforces.stats?.rating !== undefined
+												? `${codingStats.codeforces.stats.rating} Rating`
+												: `@${codingStats.codeforces.username}`}
+										</span>
+									</div>
+									<div className="text-[10px] uppercase text-muted-foreground">
+										<Trophy className="w-4 h-4" />
+									</div>
+								</a>
+								{codingStats.codechef && (
+									<a
+										href={codingStats.codechef.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="p-3 rounded-xl bg-orange-500/5 border border-orange-500/10 hover:bg-orange-500/10 hover:border-orange-500/20 transition-all flex items-center justify-between group"
+									>
+										<div className="flex flex-col">
+											<span className="text-[10px] text-muted-foreground uppercase">
+												CodeChef
+											</span>
+											<span className="text-sm font-bold group-hover:text-orange-400 transition-colors">
+												{codingStats.codechef.stats?.rating !== undefined
+													? `${codingStats.codechef.stats.rating} Rating`
+													: `@${codingStats.codechef.username}`}
+											</span>
+										</div>
+										<div className="text-[10px] uppercase text-muted-foreground">
+											<Terminal className="w-4 h-4" />
+										</div>
+									</a>
+								)}
 							</motion.div>
 						)}
 
