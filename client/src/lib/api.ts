@@ -6,13 +6,11 @@ import {
 	AboutData,
 	Certification,
 } from '@/types/schema';
-import {
-	FALLBACK_PROJECTS,
-	FALLBACK_JOURNEY,
-	FALLBACK_BLOGS,
-	FALLBACK_ABOUT,
-	FALLBACK_CERTIFICATIONS,
-} from '@/lib/data/fallback';
+import { PROJECTS } from '@/data/projects';
+import { JOURNEY } from '@/data/journey';
+import { BLOG_POSTS } from '@/data/blog';
+import { PROFILE } from '@/data/profile';
+import { CERTIFICATIONS } from '@/data/certifications';
 
 export type { Project, JourneyEntry, BlogPost, ContactMessage, AboutData, Certification };
 
@@ -47,23 +45,23 @@ class ApiService {
 	}
 
 	async getProjects(): Promise<Project[]> {
-		return this.fetchWithFallback<Project[]>('/projects', FALLBACK_PROJECTS);
+		return this.fetchWithFallback<Project[]>('/projects', PROJECTS);
 	}
 
 	async getJourney(): Promise<JourneyEntry[]> {
-		return this.fetchWithFallback<JourneyEntry[]>('/journey', FALLBACK_JOURNEY);
+		return this.fetchWithFallback<JourneyEntry[]>('/journey', JOURNEY);
 	}
 
 	async getBlogPosts(): Promise<BlogPost[]> {
-		return this.fetchWithFallback<BlogPost[]>('/blog', FALLBACK_BLOGS);
+		return this.fetchWithFallback<BlogPost[]>('/blog', BLOG_POSTS);
 	}
 
 	async getAbout(): Promise<AboutData> {
-		return this.fetchWithFallback<AboutData>('/about', FALLBACK_ABOUT);
+		return this.fetchWithFallback<AboutData>('/about', PROFILE);
 	}
 
 	async getCertifications(): Promise<Certification[]> {
-		return this.fetchWithFallback<Certification[]>('/certifications', FALLBACK_CERTIFICATIONS);
+		return this.fetchWithFallback<Certification[]>('/certifications', CERTIFICATIONS);
 	}
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {

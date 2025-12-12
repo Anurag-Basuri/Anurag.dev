@@ -1,5 +1,5 @@
 import { createCommand, registerCommands, commandRegistry } from './commandSystem';
-import { initialFileSystem, FileSystemItem } from './data';
+import { INITIAL_FILE_SYSTEM, FileSystemItem } from '@/data/filesystem';
 
 // File System Helper - Dynamic Path Resolution
 const resolvePath = (
@@ -35,13 +35,13 @@ const resolvePath = (
 	// Root directory
 	if (parts.length === 0) {
 		return {
-			item: { name: '~', type: 'folder', id: 'root', children: initialFileSystem },
+			item: { name: '~', type: 'folder', id: 'root', children: INITIAL_FILE_SYSTEM },
 			absolutePath: '~',
 		};
 	}
 
 	// Walk the tree
-	let currentItems = initialFileSystem;
+	let currentItems = INITIAL_FILE_SYSTEM;
 	let currentItem: FileSystemItem | undefined;
 
 	for (let i = 0; i < parts.length; i++) {
