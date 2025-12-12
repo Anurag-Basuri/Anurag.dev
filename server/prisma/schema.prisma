@@ -38,48 +38,117 @@ model RefreshToken {
   @@index([token])
 }
 
+// Singleton model for user profile/about
+model Profile {
+  id              String   @id @default(uuid())
+  name            String
+  role            String
+  tagline         String?
+  summary         String   @db.Text
+  bio             String   @db.Text
+  location        String?
+  avatarUrl       String?
+  resumeUrl       String?
+  experienceYears Int      @default(0)
+  projectsCount   Int      @default(0)
+  
+  // Stored as JSON for flexibility
+  skills          Json     // { frontend: [], backend: [], ml: [] }
+  socials         Json?    // [{ platform: 'github', url: '...' }]
+  
+  updatedAt       DateTime @updatedAt
+}
+
 model Project {
   id          String    @id @default(uuid())
   title       String
+  slug        String    @unique
   description String    @db.Text
+  content     String?   @db.Text
+  
   techStack   String[]
+  tags        String[]
+  
+  thumbnail   String?
+  images      String[]  // Allow multiple images
+  
   githubUrl   String?
   liveUrl     String?
-  status      String    @default("draft")
+  
+  status      String    @default("draft") // draft, published, archived, completed
+  featured    Boolean   @default(false)
+  priority    Int       @default(0)
+  
   stars       Int?
   forks       Int?
-  commits     Int?
-  deletedAt   DateTime?
+  
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
   versions    Version[] @relation("ProjectVersions")
   
   @@index([status])
-  @@index([deletedAt])
+  @@index([featured])
+  @@index([slug])
 }
 
 model JourneyEntry {
   id          String   @id @default(uuid())
-  year        Int
-  title       String
+  type        String   // work, education, project, etc.
+  title       String   // Role/Degree
+  company     String?  // Company/University
+  location    String?
+  
+  date        String   // Display string e.g. "2023 - Present"
+  startDate   DateTime?
+  endDate     DateTime?
+  
   description String   @db.Text
-  category    String
-  order       Int
+  skills      String[]
+  url         String?
+  
+  order       Int      @default(0)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  @@index([year, order])
+  @@index([type])
+  @@index([order])
+}
+
+model Certification {
+  id             String   @id @default(uuid())
+  title          String
+  issuer         String
+  date           DateTime
+  expirationDate DateTime?
+  credentialId   String?
+  credentialUrl  String?
+  
+  skills         String[]
+  image          String?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@index([date])
 }
 
 model BlogPost {
   id          String    @id @default(uuid())
   title       String
   slug        String    @unique
+  summary     String    @db.Text
   content     String    @db.Text
+  coverImage  String?
+  
   tags        String[]
+  
   status      String    @default("draft")
+  featured    Boolean   @default(false)
   publishedAt DateTime?
+  readingTime Int?      // Estimated minutes
+  
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   
@@ -89,27 +158,16 @@ model BlogPost {
   @@index([slug])
 }
 
-model Media {
-  id           String   @id @default(uuid())
-  filename     String
-  fileKey      String   @unique
-  size         Int
-  mimeType     String
-  storageUrl   String
-  thumbnailUrl String?
-  createdAt    DateTime @default(now())
-  
-  @@index([fileKey])
-}
-
 model ContactMessage {
   id        String   @id @default(uuid())
   name      String
   email     String
   subject   String
   message   String   @db.Text
-  ipAddress String
+  
+  ipAddress String?
   isRead    Boolean  @default(false)
+  
   createdAt DateTime @default(now())
   
   @@index([createdAt])
@@ -137,8 +195,8 @@ model Version {
   resourceId    String
   versionNumber Int
   data          Json
-  changeSummary String
-  createdBy     String
+  changeSummary String?
+  createdBy     String?
   createdAt     DateTime @default(now())
   
   project       Project?  @relation("ProjectVersions", fields: [projectId], references: [id])
@@ -150,17 +208,3 @@ model Version {
   @@index([createdAt])
 }
 
-model Job {
-  id          String    @id @default(uuid())
-  type        String
-  payload     Json
-  status      String    @default("pending")
-  attempts    Int       @default(0)
-  error       String?   @db.Text
-  completedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  @@index([status])
-  @@index([type])
-}
