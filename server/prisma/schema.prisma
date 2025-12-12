@@ -59,13 +59,11 @@ model Profile {
   updatedAt       DateTime @updatedAt
 }
 
-model CodingStats {
+model CodingProfile {
   id              String   @id @default(uuid())
-  
-  // JSON Blobs for structured sub-objects
-  languages       Json     // [{ name, percentage, color }]
   leetcode        Json     // { username, url }
   codeforces      Json     // { username, url }
+  codechef        Json     // { username, url }
   github          Json     // { username, url }
   
   updatedAt       DateTime @updatedAt
