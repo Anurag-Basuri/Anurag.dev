@@ -127,30 +127,18 @@ export const ContactSchema = z.object({
 	message: z.string().min(10),
 });
 
-// --- Coding Stats Schemas ---
-export const LeetCodeStatsSchema = z.object({
+const profileSchema = z.object({
 	username: z.string(),
 	url: z.string().url(),
 });
 
-// --- Codeforces Stats Schema ---
-export const CodeforcesStatsSchema = z.object({
-	username: z.string(),
-	url: z.string().url(),
-});
-
-// --- GitHub Stats Schema ---
-export const GitHubStatsSchema = z.object({
-	username: z.string(),
-	url: z.string().url(),
-});
-
-// --- Coding Stats Schema ---
-export const CodingStatsSchema = z.object({
+// --- Coding Profile Schema ---
+export const CodingProfileSchema = z.object({
 	id: z.string().optional(),
-	leetcode: LeetCodeStatsSchema,
-	codeforces: CodeforcesStatsSchema,
-	github: GitHubStatsSchema,
+	leetcode: profileSchema,
+	codeforces: profileSchema,
+	codechef: profileSchema,
+	github: profileSchema,
 	updatedAt: z.string().datetime().optional(),
 });
 
@@ -161,4 +149,4 @@ export type JourneyItem = z.infer<typeof JourneyItemSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;
-export type CodingStats = z.infer<typeof CodingStatsSchema>;
+export type CodingProfile = z.infer<typeof CodingProfileSchema>;
