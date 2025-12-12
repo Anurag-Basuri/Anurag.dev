@@ -2,12 +2,16 @@ import { CodingStats } from '@/types/schema';
 
 export const CODING_PROFILES: CodingStats = {
 	leetcode: {
-		username: 'anurag_dev',
-		url: 'https://leetcode.com/anurag_dev',
+		username: 'Anurag_Basuri',
+		url: 'https://leetcode.com/u/Anurag_Basuri',
 	},
 	codeforces: {
-		username: 'anurag.cp',
-		url: 'https://codeforces.com/profile/anurag.cp',
+		username: 'Anurag_Basuri',
+		url: 'https://codeforces.com/profile/Anurag_Basuri',
+	},
+	codechef: {
+		username: 'Anurag_Basuri',
+		url: 'https://www.codechef.com/users/anurag_basuri',
 	},
 	github: {
 		username: 'Anurag-Basuri',
