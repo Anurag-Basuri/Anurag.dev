@@ -116,3 +116,39 @@ export interface AboutData {
 
 	socials?: SocialLink[];
 }
+
+export interface CodingLanguage {
+	name: string;
+	percentage: number;
+	color: string;
+}
+
+export interface CodingStats {
+	id?: string;
+	identity: {
+		yearsActive: number;
+		totalCommits: number;
+		mostUsedLanguage: string;
+	};
+	languages: CodingLanguage[];
+	leetcode: {
+		totalSolved: number;
+		easy: number;
+		medium: number;
+		hard: number;
+		globalPercentile: number;
+	};
+	codeforces: {
+		rating: number;
+		rank: string;
+		maxRating: number;
+		maxRank: string;
+	};
+	github: {
+		totalCommits: number;
+		stars: number;
+		followers: number;
+		percentile: number;
+	};
+	updatedAt?: string;
+}

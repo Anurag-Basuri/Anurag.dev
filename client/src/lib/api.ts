@@ -5,14 +5,24 @@ import {
 	ContactMessage,
 	AboutData,
 	Certification,
+	CodingStats,
 } from '@/types/schema';
 import { PROJECTS } from '@/data/projects';
 import { JOURNEY } from '@/data/journey';
 import { BLOG_POSTS } from '@/data/blog';
 import { PROFILE } from '@/data/profile';
 import { CERTIFICATIONS } from '@/data/certifications';
+import { CODING_STATS } from '@/data/coding-stats';
 
-export type { Project, JourneyEntry, BlogPost, ContactMessage, AboutData, Certification };
+export type {
+	Project,
+	JourneyEntry,
+	BlogPost,
+	ContactMessage,
+	AboutData,
+	Certification,
+	CodingStats,
+};
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -62,6 +72,10 @@ class ApiService {
 
 	async getCertifications(): Promise<Certification[]> {
 		return this.fetchWithFallback<Certification[]>('/certifications', CERTIFICATIONS);
+	}
+
+	async getCodingStats(): Promise<CodingStats> {
+		return this.fetchWithFallback<CodingStats>('/coding-stats', CODING_STATS);
 	}
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {
