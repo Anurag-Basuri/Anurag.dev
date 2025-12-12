@@ -130,19 +130,70 @@ export function AboutModule() {
 						>
 							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
 								<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-								<span className="text-3xl font-bold text-foreground">2+</span>
+								<span className="text-3xl font-bold text-foreground">
+									{Stats?.identity.yearsActive}+
+								</span>
 								<span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
 									Years Exp.
 								</span>
 							</div>
 							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
 								<div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-								<span className="text-3xl font-bold text-foreground">15+</span>
+								<span className="text-3xl font-bold text-foreground">
+									{about.projectsCount}+
+								</span>
 								<span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
 									Projects
 								</span>
 							</div>
 						</motion.div>
+
+						{/* Coding Profiles Mini-Block */}
+						{stats && (
+							<motion.div
+								initial={{ opacity: 0, scale: 0.95 }}
+								animate={{ opacity: 1, scale: 1 }}
+								transition={{ delay: 0.2 }}
+								className="grid grid-cols-2 gap-3"
+							>
+								<a
+									href={stats.github.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-between group"
+								>
+									<div className="flex flex-col">
+										<span className="text-[10px] text-muted-foreground uppercase">
+											GitHub
+										</span>
+										<span className="text-sm font-bold group-hover:text-white transition-colors">
+											@{stats.github.username}
+										</span>
+									</div>
+									<div className="text-xs font-mono text-muted-foreground">
+										{stats.github.totalCommits}c
+									</div>
+								</a>
+								<a
+									href={stats.leetcode.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10 hover:bg-yellow-500/10 hover:border-yellow-500/20 transition-all flex items-center justify-between group"
+								>
+									<div className="flex flex-col">
+										<span className="text-[10px] text-muted-foreground uppercase">
+											LeetCode
+										</span>
+										<span className="text-sm font-bold group-hover:text-yellow-400 transition-colors">
+											{stats.leetcode.totalSolved}
+										</span>
+									</div>
+									<div className="text-[10px] uppercase text-muted-foreground">
+										Solved
+									</div>
+								</a>
+							</motion.div>
+						)}
 
 						{/* "About" Quick Summary */}
 						<motion.div

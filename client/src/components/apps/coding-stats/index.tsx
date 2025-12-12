@@ -228,7 +228,17 @@ export default function CodingStatsModule() {
 									<div className="p-1.5 bg-yellow-500/10 rounded-md">
 										<Database className="w-4 h-4 text-yellow-500" />
 									</div>
-									<h3 className="text-lg font-bold">LeetCode Mastery</h3>
+									<div>
+										<h3 className="text-lg font-bold leading-none">LeetCode</h3>
+										<a
+											href={stats.leetcode.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-xs text-muted-foreground hover:text-primary transition-colors hover:underline"
+										>
+											@{stats.leetcode.username}
+										</a>
+									</div>
 									<span className="ml-auto text-xs font-mono py-1 px-2 bg-muted rounded text-muted-foreground">
 										Top {stats.leetcode.globalPercentile}%
 									</span>
@@ -269,15 +279,23 @@ export default function CodingStatsModule() {
 									<Trophy className="w-4 h-4 text-blue-500" />
 								</div>
 								<div>
-									<h3 className="font-bold leading-none">Competitive</h3>
-									<span className="text-[10px] text-muted-foreground uppercase">
-										{stats.codeforces.rank}
-									</span>
+									<h3 className="font-bold leading-none">Codeforces</h3>
+									<a
+										href={stats.codeforces.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-[10px] text-muted-foreground uppercase hover:text-blue-400 transition-colors"
+									>
+										@{stats.codeforces.username}
+									</a>
 								</div>
 							</div>
 							<div className="text-right">
 								<div className="text-2xl font-bold text-blue-400 font-mono">
 									{stats.codeforces.rating}
+								</div>
+								<div className="text-[10px] uppercase text-muted-foreground tracking-wider">
+									{stats.codeforces.rank}
 								</div>
 							</div>
 						</div>
@@ -310,7 +328,63 @@ export default function CodingStatsModule() {
 						</div>
 					</motion.div>
 
-					{/* GitHub Activity Block (Full Width Bottom) - FUTURE */}
+					{/* GitHub Activity Block (Full Width Bottom) */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.4 }}
+						className="col-span-1 md:col-span-2 lg:col-span-3 bg-card/40 border border-border/50 rounded-2xl p-6 relative overflow-hidden"
+					>
+						<div className="flex items-center justify-between mb-6">
+							<div className="flex items-center gap-3">
+								<div className="p-1.5 bg-white/10 rounded-md">
+									<GitCommit className="w-4 h-4 text-white" />
+								</div>
+								<div>
+									<h3 className="font-bold leading-none">GitHub Activity</h3>
+									<a
+										href={stats.github.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="text-xs text-muted-foreground hover:text-white transition-colors hover:underline"
+									>
+										@{stats.github.username}
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+							<div className="p-4 rounded-xl bg-background/30 border border-white/5">
+								<div className="text-2xl font-bold">
+									{stats.github.totalCommits.toLocaleString()}
+								</div>
+								<div className="text-xs text-muted-foreground uppercase tracking-wider">
+									Yearly Commits
+								</div>
+							</div>
+							<div className="p-4 rounded-xl bg-background/30 border border-white/5">
+								<div className="text-2xl font-bold">{stats.github.stars}</div>
+								<div className="text-xs text-muted-foreground uppercase tracking-wider">
+									Stars Earned
+								</div>
+							</div>
+							<div className="p-4 rounded-xl bg-background/30 border border-white/5">
+								<div className="text-2xl font-bold">{stats.github.followers}</div>
+								<div className="text-xs text-muted-foreground uppercase tracking-wider">
+									Followers
+								</div>
+							</div>
+							<div className="p-4 rounded-xl bg-background/30 border border-white/5">
+								<div className="text-2xl font-bold">
+									Top {100 - stats.github.percentile}%
+								</div>
+								<div className="text-xs text-muted-foreground uppercase tracking-wider">
+									Global Rank
+								</div>
+							</div>
+						</div>
+					</motion.div>
 				</div>
 			</div>
 		</div>
