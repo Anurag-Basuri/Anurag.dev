@@ -51,8 +51,8 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 					<div className="relative shrink-0">
 						<div className="w-10 h-10 rounded-full overflow-hidden border border-white/10">
 							<Image
-								src="/profile.png"
-								alt="Profile"
+								src="/logo.png"
+								alt="AnuragOS Logo"
 								width={40}
 								height={40}
 								className="w-full h-full object-cover"

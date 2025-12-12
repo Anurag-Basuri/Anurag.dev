@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: 'Anurag - Developer Portfolio',
 	description: 'A terminal-style portfolio showcasing projects, journey, and skills',
-	icons: [{ rel: 'icon', url: '/favicon.ico' }],
+	icons: [{ rel: 'icon', url: '/logo.png' }],
 	metadataBase: typeof window === 'undefined' ? new URL('http://localhost:3000') : undefined,
 	openGraph: {
 		title: 'Personal Portfolio',
