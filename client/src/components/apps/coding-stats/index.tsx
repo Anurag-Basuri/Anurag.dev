@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchCodingStats, CodingStats } from '@/lib/api/codingProfiles';
+import { api, CodingStats } from '@/lib/api';
 import { motion } from 'framer-motion';
 import {
 	PieChart,
@@ -21,7 +21,7 @@ export default function CodingStatsModule() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		fetchCodingStats().then(data => {
+		api.getCodingStats().then(data => {
 			setStats(data);
 			setLoading(false);
 		});
