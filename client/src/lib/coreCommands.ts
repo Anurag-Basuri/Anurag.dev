@@ -165,7 +165,7 @@ const socialsCommand = createCommand({
 		ok: true,
 		data: `You can find me here:
  - GitHub:   https://github.com/Anurag-Basuri
- - LinkedIn: https://www.linkedin.com/in/anurag-basuri-941546214/
+ - LinkedIn: https://www.linkedin.com/in/anuragbasuri/
  - Twitter:  https://twitter.com/AnuragBasuri`,
 	}),
 });
@@ -287,7 +287,7 @@ const ailabCommand = createCommand({
 // File Commands
 const lsCommand = createCommand({
 	name: 'ls',
-	aliases: ['dir'],
+	aliases: ['dir', 'll'],
 	description: 'List directory contents.',
 	usage: 'ls [path]',
 	category: 'Files',
