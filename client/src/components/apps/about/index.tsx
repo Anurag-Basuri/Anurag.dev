@@ -1,13 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, AboutData } from '@/lib/api';
+import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Code2, Terminal, User, MapPin, Calendar, Sparkles, Cpu, Layers, Box } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
-import { config } from 'process';
 
 // Skeleton loader component
 function AboutSkeleton() {
@@ -36,32 +35,35 @@ function AboutSkeleton() {
 
 export function AboutModule() {
 	const [about, setAbout] = useState<AboutData | null>(null);
+	const [codingStats, setCodingStats] = useState<CodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const fetchData = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const [aboutData, statsData] = await Promise.all([
+				api.getAbout(),
+				api.getCodingStats(),
+			]);
+			setAbout(aboutData);
+			setCodingStats(statsData);
+		} catch (err: any) {
+			setError(err.message || 'Failed to load data');
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		api.getAbout()
-			.then(setAbout)
-			.catch(err => setError(err.message))
-			.finally(() => setLoading(false));
+		fetchData();
 	}, []);
 
 	if (loading) return <AboutSkeleton />;
 
 	if (error) {
-		return (
-			<ModuleError
-				message={error}
-				onRetry={() => {
-					setLoading(true);
-					setError(null);
-					api.getAbout()
-						.then(setAbout)
-						.catch(err => setError(err.message))
-						.finally(() => setLoading(false));
-				}}
-			/>
-		);
+		return <ModuleError message={error} onRetry={fetchData} />;
 	}
 
 	if (!about) return null;
@@ -105,7 +107,7 @@ export function AboutModule() {
 								<div className="absolute inset-0 rounded-full border-2 border-dashed border-primary/30 animate-[spin_10s_linear_infinite]" />
 								<div className="absolute inset-2 rounded-full border border-primary/20" />
 								<img
-									src="/profile.png"
+									src={about.avatarUrl || '/profile.png'}
 									alt="Profile"
 									className="w-full h-full object-cover rounded-full p-1.5"
 								/>
@@ -132,7 +134,7 @@ export function AboutModule() {
 							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
 								<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 								<span className="text-3xl font-bold text-foreground">
-									{Stats?.identity.yearsActive}+
+									{about.experienceYears}+
 								</span>
 								<span className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
 									Years Exp.
@@ -150,7 +152,7 @@ export function AboutModule() {
 						</motion.div>
 
 						{/* Coding Profiles Mini-Block */}
-						{stats && config && (
+						{codingStats && (
 							<motion.div
 								initial={{ opacity: 0, scale: 0.95 }}
 								animate={{ opacity: 1, scale: 1 }}
@@ -158,7 +160,7 @@ export function AboutModule() {
 								className="grid grid-cols-2 gap-3"
 							>
 								<a
-									href={config.github.url}
+									href={codingStats.github.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-between group"
@@ -168,15 +170,15 @@ export function AboutModule() {
 											GitHub
 										</span>
 										<span className="text-sm font-bold group-hover:text-white transition-colors">
-											@{config.github.username}
+											@{codingStats.github.username}
 										</span>
 									</div>
 									<div className="text-xs font-mono text-muted-foreground">
-										{stats.github.totalCommits}c
+										Repo
 									</div>
 								</a>
 								<a
-									href={config.leetcode.url}
+									href={codingStats.leetcode.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/10 hover:bg-yellow-500/10 hover:border-yellow-500/20 transition-all flex items-center justify-between group"
@@ -186,11 +188,11 @@ export function AboutModule() {
 											LeetCode
 										</span>
 										<span className="text-sm font-bold group-hover:text-yellow-400 transition-colors">
-											{stats.leetcode.totalSolved}
+											@{codingStats.leetcode.username}
 										</span>
 									</div>
 									<div className="text-[10px] uppercase text-muted-foreground">
-										Solved
+										Code
 									</div>
 								</a>
 							</motion.div>
@@ -205,7 +207,7 @@ export function AboutModule() {
 						>
 							<p>
 								<span className="text-primary font-bold mr-2">&gt;</span>
-								{about.short}
+								{about.summary}
 							</p>
 						</motion.div>
 					</div>

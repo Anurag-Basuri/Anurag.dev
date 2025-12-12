@@ -35,9 +35,30 @@ export function ContactModule() {
 		setSuccess(false);
 
 		try {
-			await api.submitContact(formData);
-			setSuccess(true);
-			setFormData({ name: '', email: '', subject: '', message: '' });
+			const result = await api.submitContact(formData);
+			if (result.success) {
+				setSuccess(true);
+				setFormData({ name: '', email: '', subject: '', message: '' });
+				if (result.message) {
+					toast.success(result.message);
+				}
+			} else {
+				// Handle offline success or specific server errors that aren't exceptions
+				if (result.message.includes('Offline')) {
+					setSuccess(true); // Still treat as success for UI flow
+					setFormData({ name: '', email: '', subject: '', message: '' });
+					toast(result.message, {
+						icon: '⚠️',
+						style: {
+							borderRadius: '10px',
+							background: '#333',
+							color: '#fff',
+						},
+					});
+				} else {
+					setError(result.message);
+				}
+			}
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message);
