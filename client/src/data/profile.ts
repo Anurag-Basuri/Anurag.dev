@@ -11,6 +11,11 @@ export const PROFILE: AboutData = {
 	avatarUrl: '/logo.png',
 	experienceYears: 2,
 	projectsCount: 15,
+	status: 'Building the future of web',
+	availability: 'Open to opportunities',
+	coverUrl: '/about-cover.jpg',
+	languages: ['English (Native)', 'Hindi (Native)', 'Japanese (Elementary)'],
+	hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
 	skills: {
 		frontend: [
 			{ category: 'Frontend', name: 'React/Next.js', level: 95 },

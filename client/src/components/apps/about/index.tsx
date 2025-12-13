@@ -131,6 +131,22 @@ export function AboutModule() {
 							<p className="text-sm text-primary font-mono mb-4 px-3 py-1 bg-primary/10 rounded-full">
 								{about.tagline}
 							</p>
+
+							{/* Status & Availability */}
+							<div className="flex flex-col gap-2 w-full mt-2">
+								{about.status && (
+									<div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-black/20 py-1.5 px-3 rounded-lg border border-white/5">
+										<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+										{about.status}
+									</div>
+								)}
+								{about.availability && (
+									<div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-wider font-bold text-emerald-400/80">
+										<div className="w-1 h-1 rounded-full bg-emerald-400" />
+										{about.availability}
+									</div>
+								)}
+							</div>
 						</motion.div>
 
 						{/* Stats Row */}
@@ -428,6 +444,57 @@ export function AboutModule() {
 								<span>echo "Checking capability matrix... STATUS: OPTIMIZED"</span>
 							</div>
 						</motion.div>
+
+						{/* Personal Interests & Languages */}
+						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+							{about.languages && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									transition={{ delay: 0.35 }}
+									className="bg-card/20 border border-border/40 rounded-2xl p-6"
+								>
+									<h3 className="font-bold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
+										<Sparkles className="w-4 h-4 text-primary" />
+										Languages
+									</h3>
+									<div className="flex flex-wrap gap-2">
+										{about.languages.map((lang: string) => (
+											<span
+												key={lang}
+												className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium border border-primary/20"
+											>
+												{lang}
+											</span>
+										))}
+									</div>
+								</motion.div>
+							)}
+
+							{about.hobbies && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									transition={{ delay: 0.4 }}
+									className="bg-card/20 border border-border/40 rounded-2xl p-6"
+								>
+									<h3 className="font-bold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
+										<User className="w-4 h-4 text-primary" />
+										Interests
+									</h3>
+									<div className="flex flex-wrap gap-2">
+										{about.hobbies.map((hobby: string) => (
+											<span
+												key={hobby}
+												className="px-3 py-1.5 rounded-lg bg-surface-200/50 text-muted-foreground text-xs border border-white/5 hover:bg-white/5 transition-colors"
+											>
+												{hobby}
+											</span>
+										))}
+									</div>
+								</motion.div>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>
