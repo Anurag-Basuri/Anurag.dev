@@ -78,13 +78,13 @@ export function CertificationModule() {
 					</div>
 				</div>
 
-				<motion.div 
+				<motion.div
 					className="grid gap-6 md:grid-cols-2"
 					variants={staggerContainer}
 					initial="hidden"
 					animate="visible"
 				>
-					{certs.map((cert) => (
+					{certs.map(cert => (
 						<motion.div
 							key={cert.id}
 							variants={staggerItem}
@@ -130,6 +130,9 @@ export function CertificationModule() {
 										</span>
 									))}
 								</div>
+							</div>
+						</motion.div>
+					))}
 				</motion.div>
 			</div>
 		</ScrollArea>
