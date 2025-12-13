@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 
@@ -79,41 +80,40 @@ export function ProjectsModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-7xl mx-auto pb-24">
 				{/* Header & Filters */}
-				<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border/40 pb-6">
-					<div>
-						<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
-							<Box className="w-4 h-4" />
-							<span>Portfolio</span>
+				<ModuleHeader
+					icon={Box}
+					label="Portfolio"
+					title="Project Directory"
+					actions={
+						<div className="flex p-1 bg-black/20 backdrop-blur-md rounded-xl border border-white/5">
+							{['All', 'Web', 'App', 'AI'].map(tab => (
+								<button
+									key={tab}
+									onClick={() => setFilter(tab as any)}
+									className={cn(
+										'relative px-4 py-1.5 text-xs font-medium rounded-lg transition-colors z-10',
+										filter === tab
+											? 'text-white'
+											: 'text-muted-foreground hover:text-white',
+									)}
+								>
+									{filter === tab && (
+										<motion.div
+											layoutId="activeTab"
+											className="absolute inset-0 bg-white/10 rounded-lg -z-10 border border-white/10"
+											transition={{
+												type: 'spring',
+												bounce: 0.2,
+												duration: 0.6,
+											}}
+										/>
+									)}
+									{tab}
+								</button>
+							))}
 						</div>
-						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
-							Project Directory
-						</h1>
-					</div>
-
-					<div className="flex p-1 bg-black/20 backdrop-blur-md rounded-xl border border-white/5">
-						{['All', 'Web', 'App', 'AI'].map(tab => (
-							<button
-								key={tab}
-								onClick={() => setFilter(tab as any)}
-								className={cn(
-									'relative px-4 py-1.5 text-xs font-medium rounded-lg transition-colors z-10',
-									filter === tab
-										? 'text-white'
-										: 'text-muted-foreground hover:text-white',
-								)}
-							>
-								{filter === tab && (
-									<motion.div
-										layoutId="activeTab"
-										className="absolute inset-0 bg-white/10 rounded-lg -z-10 border border-white/10"
-										transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-									/>
-								)}
-								{tab}
-							</button>
-						))}
-					</div>
-				</div>
+					}
+				/>
 
 				{/* Grid */}
 				<motion.div
