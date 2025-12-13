@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Terminal, Github, Code, Trophy, GitCommit, GitBranch } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 
 function StatsSkeleton() {
@@ -58,17 +59,11 @@ export default function CodingStatsModule() {
 	return (
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-5xl mx-auto pb-20">
-				<div className="flex items-center gap-3 mb-8 border-b border-border/40 pb-4">
-					<Terminal className="w-6 h-6 text-primary" />
-					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
-							coding_stats.exe
-						</h1>
-						<p className="text-xs text-muted-foreground font-mono">
-							Real-time performance metrics
-						</p>
-					</div>
-				</div>
+				<ModuleHeader
+					icon={Terminal}
+					label="Profiles"
+					title="Coding Profiles"
+				/>
 
 				<motion.div
 					variants={staggerContainer}
