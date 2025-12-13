@@ -72,7 +72,7 @@ const TaskbarItem = memo(function TaskbarItem({
 					}}
 					onClick={onClick}
 					className={cn(
-						'relative h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
+						'relative h-9 sm:h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
 						isActive
 							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
 							: 'bg-transparent border-transparent hover:bg-white/5',

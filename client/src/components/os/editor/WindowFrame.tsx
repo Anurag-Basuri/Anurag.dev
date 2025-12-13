@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { X, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useEffect, memo } from 'react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface WindowFrameProps {
 	windowState: WindowState;
@@ -17,7 +18,20 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
 
-	const { id, title, component, position, size, isMinimized, isMaximized } = windowState;
+	const {
+		id,
+		title,
+		component,
+		position,
+		size,
+		isMinimized,
+		isMaximized: stateIsMaximized,
+	} = windowState;
+	const isMobile = useMediaQuery('(max-width: 768px)');
+
+	// Force maximization on mobile, otherwise respect state
+	const isMaximized = isMobile || stateIsMaximized;
+
 	const zIndex = windowStack.indexOf(id) + 10;
 	const isActive = activeWindowId === id;
 
@@ -103,17 +117,26 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 							<div className="flex items-center gap-1.5">
 								<button
 									onClick={handleMinimize}
-									className="group/min w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors"
+									className={cn(
+										'group/min w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors',
+										isMobile && 'hidden',
+									)}
 									title="Minimize"
 								>
-									<Minus size={14} className="text-white/40 group-hover/min:text-white transition-colors" />
+									<Minus
+										size={14}
+										className="text-white/40 group-hover/min:text-white transition-colors"
+									/>
 								</button>
 								<button
 									onClick={handleClose}
 									className="group/close w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-500/20 transition-colors"
 									title="Close"
 								>
-									<X size={14} className="text-white/40 group-hover/close:text-red-400 transition-colors" />
+									<X
+										size={14}
+										className="text-white/40 group-hover/close:text-red-400 transition-colors"
+									/>
 								</button>
 							</div>
 						</div>
