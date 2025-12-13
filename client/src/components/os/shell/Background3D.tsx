@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -235,6 +235,92 @@ function buildHaloBitsGeometry(count: number, isDark: boolean) {
 	return geometry;
 }
 
+// Techy: Digital Grid Floor/Ceiling
+function CyberGrid({ isDark }: { isDark: boolean }) {
+	const groupRef = useRef<THREE.Group>(null);
+
+	useFrame(state => {
+		if (groupRef.current) {
+			groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
+		}
+	});
+
+	return (
+		<group ref={groupRef}>
+			<gridHelper
+				args={[30, 30, isDark ? '#3b82f6' : '#6366f1', isDark ? '#1e3a8a' : '#c7d2fe']}
+				position={[0, -2, 0]}
+				rotation={[0, 0, 0]}
+			/>
+			<gridHelper
+				args={[30, 30, isDark ? '#3b82f6' : '#6366f1', isDark ? '#1e3a8a' : '#c7d2fe']}
+				position={[0, 2, 0]}
+				rotation={[0, 0, 0]}
+			/>
+		</group>
+	);
+}
+
+// Techy: Fast moving data streams
+function DataStreams({ isDark }: { isDark: boolean }) {
+	const ref = useRef<ThreePoints>(null);
+	const count = 200;
+
+	const [positions, speeds] = useMemo(() => {
+		const pos = new Float32Array(count * 3);
+		const spd = new Float32Array(count);
+
+		for (let i = 0; i < count; i++) {
+			pos[i * 3] = (Math.random() - 0.5) * 10;
+			pos[i * 3 + 1] = (Math.random() - 0.5) * 10;
+			pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+			spd[i] = 2 + Math.random() * 3;
+		}
+
+		return [pos, spd];
+	}, []);
+
+	useFrame((state, delta) => {
+		if (ref.current) {
+			const positions = ref.current.geometry.attributes.position.array as Float32Array;
+
+			for (let i = 0; i < count; i++) {
+				// Move along Z axis (into screen)
+				positions[i * 3 + 2] += speeds[i] * delta;
+
+				// Reset if too close
+				if (positions[i * 3 + 2] > 5) {
+					positions[i * 3 + 2] = -10;
+					positions[i * 3] = (Math.random() - 0.5) * 10;
+					positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+				}
+			}
+			ref.current.geometry.attributes.position.needsUpdate = true;
+		}
+	});
+
+	return (
+		<points ref={ref}>
+			<bufferGeometry>
+				<bufferAttribute
+					attach="attributes-position"
+					count={count}
+					array={positions}
+					itemSize={3}
+				/>
+			</bufferGeometry>
+			<pointsMaterial
+				transparent
+				color={isDark ? '#00ffcc' : '#0891b2'}
+				size={0.03}
+				sizeAttenuation
+				opacity={0.6}
+				blending={THREE.AdditiveBlending}
+			/>
+		</points>
+	);
+}
+
 function CameraRig() {
 	const targetPos = useRef(new THREE.Vector3());
 	useFrame(state => {
@@ -443,6 +529,8 @@ export function Background3D() {
 					<CameraRig />
 					<BackgroundBits isDark={isDark} />
 					<CodeNebulaGalaxy isDark={isDark} />
+					<CyberGrid isDark={isDark} />
+					<DataStreams isDark={isDark} />
 				</Canvas>
 			</ErrorBoundary>
 		</div>
