@@ -19,81 +19,113 @@ export function EditorArea() {
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-4 sm:p-6 md:p-12"
+					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none p-4 sm:p-6 md:p-12 overflow-auto"
 				>
 					{/* Hero Section */}
-					<div className="relative mb-8 md:mb-12 group">
+					<div className="relative mb-6 md:mb-8 group">
 						<div className="absolute -inset-10 bg-emerald-500/20 rounded-full blur-3xl animate-pulse opacity-50 group-hover:opacity-80 transition-opacity duration-1000" />
-						<div className="relative bg-[#0d1117]/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_-10px_rgba(16,185,129,0.3)] ring-1 ring-white/5">
-							<Command className="w-16 h-16 md:w-20 md:h-20 text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+						<div className="relative bg-[#0d1117]/80 backdrop-blur-xl p-6 md:p-8 rounded-3xl border border-white/10 shadow-[0_0_50px_-10px_rgba(16,185,129,0.3)] ring-1 ring-white/5">
+							<Command className="w-12 h-12 md:w-16 md:h-16 text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
 						</div>
 					</div>
 
-					<h3 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-4 tracking-tight text-center">
-						AnuragOS{' '}
-						<span className="text-white/20 text-sm sm:text-lg md:text-2xl font-mono align-top">
-							v2.0
-						</span>
-					</h3>
+					{/* Welcome Message */}
+					<div className="text-center mb-6 md:mb-8 max-w-2xl">
+						<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4">
+							<span className="bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
+								Hi, I'm Anurag
+							</span>
+						</h1>
+						<p className="text-lg sm:text-xl md:text-2xl font-semibold text-white/80 mb-2 md:mb-3">
+							Full Stack Engineer
+						</p>
+						<p className="text-sm sm:text-base md:text-lg text-white/50 font-mono">
+							Building the Future with Code & AI
+						</p>
+					</div>
 
-					<p className="text-xs sm:text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed mb-6 sm:mb-8 md:mb-12 px-4 font-mono">
-						Secure Environment • System Active • Awaiting Input
-					</p>
-
-					{/* Quick Actions Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 w-full max-w-2xl pointer-events-auto">
-						<div className="flex flex-col gap-3 p-4 sm:p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300 group cursor-default">
-							<div className="flex items-center gap-3 text-emerald-400 mb-1">
+					{/* Key Info Cards */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 w-full max-w-4xl mb-6 md:mb-8 pointer-events-auto">
+						{/* About Card */}
+						<div className="flex flex-col gap-2 p-4 sm:p-5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300 group cursor-default">
+							<div className="flex items-center gap-2 text-emerald-400 mb-1">
 								<div className="p-2 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-									<MousePointer2 className="w-5 h-5" />
+									<MousePointer2 className="w-4 h-4" />
 								</div>
-								<span className="text-sm font-bold uppercase tracking-widest">
-									Explore
+								<span className="text-xs sm:text-sm font-bold uppercase tracking-widest">
+									About Me
 								</span>
 							</div>
-							<p className="text-sm text-white/60 leading-relaxed">
-								Navigate the system using the{' '}
-								<span className="text-emerald-400 font-medium">
-									Project Directory
-								</span>{' '}
-								to view portfolio artifacts.
+							<p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+								Learn about my background, skills, and interests. Click{' '}
+								<span className="text-emerald-400 font-medium">About</span> in the
+								sidebar.
 							</p>
 						</div>
 
-						{/* Hide Terminal card on very small screens since CLI isn't visible */}
-						<div className="hidden sm:flex flex-col gap-3 p-4 sm:p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
-							<div className="flex items-center gap-3 text-blue-400 mb-1">
+						{/* Projects Card */}
+						<div className="flex flex-col gap-2 p-4 sm:p-5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
+							<div className="flex items-center gap-2 text-blue-400 mb-1">
 								<div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
-									<Command className="w-5 h-5" />
+									<Command className="w-4 h-4" />
 								</div>
-								<span className="text-sm font-bold uppercase tracking-widest">
-									Terminal
+								<span className="text-xs sm:text-sm font-bold uppercase tracking-widest">
+									My Work
 								</span>
 							</div>
-							<p className="text-sm text-white/60 leading-relaxed">
-								Execute commands via the{' '}
-								<span className="text-blue-400 font-mono text-xs bg-blue-500/10 px-1 py-0.5 rounded border border-blue-500/20">
-									CLI
-								</span>{' '}
-								for deeper system access. Type{' '}
-								<span className="text-white">help</span> to begin.
+							<p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+								Explore my portfolio of projects. Find{' '}
+								<span className="text-blue-400 font-medium">Projects</span> and{' '}
+								<span className="text-blue-400 font-medium">Journey</span> in the
+								sidebar.
+							</p>
+						</div>
+
+						{/* Contact Card */}
+						<div className="flex flex-col gap-2 p-4 sm:p-5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-purple-500/30 transition-all duration-300 group cursor-default sm:col-span-2 lg:col-span-1">
+							<div className="flex items-center gap-2 text-purple-400 mb-1">
+								<div className="p-2 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
+									<MousePointer2 className="w-4 h-4" />
+								</div>
+								<span className="text-xs sm:text-sm font-bold uppercase tracking-widest">
+									Get In Touch
+								</span>
+							</div>
+							<p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+								Ready to collaborate? Open{' '}
+								<span className="text-purple-400 font-medium">Contact</span> to
+								reach out.
 							</p>
 						</div>
 					</div>
 
-					{/* System Status Footer - Stack on mobile */}
-					<div className="mt-6 sm:mt-8 md:mt-16 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
+					{/* Navigation Hint */}
+					<div className="text-center max-w-md mb-4 md:mb-6">
+						<p className="text-xs sm:text-sm text-white/40 leading-relaxed">
+							<span className="text-emerald-400 font-semibold">💡 Tip:</span> Use the{' '}
+							<span className="text-white/60 font-medium">sidebar</span> on the left
+							to navigate, or try the{' '}
+							<span className="text-white/60 font-medium">terminal</span> below (type{' '}
+							<span className="font-mono text-white/80 bg-white/5 px-1 rounded">
+								help
+							</span>
+							).
+						</p>
+					</div>
+
+					{/* System Status Footer */}
+					<div className="mt-auto flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
 						<div className="flex items-center gap-2">
 							<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-							<span>Kernel: Stable</span>
+							<span>AnuragOS v2.0</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-							<span>Uptime: 99.9%</span>
+							<span>System Ready</span>
 						</div>
 						<div className="flex items-center gap-2">
 							<div className="w-1.5 h-1.5 rounded-full bg-white/50" />
-							<span>Mem: Optimal</span>
+							<span>All Systems Operational</span>
 						</div>
 					</div>
 				</motion.div>
