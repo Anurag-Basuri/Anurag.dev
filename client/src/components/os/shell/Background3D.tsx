@@ -2,10 +2,10 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Points as DreiPoints, PointMaterial, Trail } from '@react-three/drei';
+import { Points as DreiPoints, PointMaterial } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import type { Mesh, Points as ThreePoints } from 'three';
+import type { Points as ThreePoints } from 'three';
 import * as THREE from 'three';
 
 function randn() {
@@ -16,7 +16,6 @@ function randn() {
 	return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-// Generate random positions in a sphere (background stars)
 function generateSpherePoints(count: number, radius: number) {
 	const points = new Float32Array(count * 3);
 	for (let i = 0; i < count; i++) {
@@ -25,12 +24,9 @@ function generateSpherePoints(count: number, radius: number) {
 		const theta = 2 * Math.PI * u;
 		const phi = Math.acos(2 * v - 1);
 		const r = Math.cbrt(Math.random()) * radius;
-		const x = r * Math.sin(phi) * Math.cos(theta);
-		const y = r * Math.sin(phi) * Math.sin(theta);
-		const z = r * Math.cos(phi);
-		points[i * 3] = x;
-		points[i * 3 + 1] = y;
-		points[i * 3 + 2] = z;
+		points[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+		points[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+		points[i * 3 + 2] = r * Math.cos(phi);
 	}
 	return points;
 }
@@ -40,10 +36,10 @@ type GalaxyLayerParams = {
 	arms: number;
 	radius: number;
 	coreRadius: number;
-	twist: number; // controls how tightly arms wind
-	armSpread: number; // gaussian spread around arms
-	thickness: number; // y thickness
-	jitter: number; // random positional jitter
+	twist: number;
+	armSpread: number;
+	thickness: number;
+	jitter: number;
 };
 
 function buildGalaxyGeometry(params: GalaxyLayerParams, isDark: boolean) {
@@ -54,30 +50,25 @@ function buildGalaxyGeometry(params: GalaxyLayerParams, isDark: boolean) {
 	const midBlue = new THREE.Color(isDark ? '#93c5fd' : '#4f46e5');
 	const outerPurple = new THREE.Color(isDark ? '#a78bfa' : '#6366f1');
 
-	const tmpColorA = new THREE.Color();
-	const tmpColorB = new THREE.Color();
-	const tmpColor = new THREE.Color();
+	const tmpA = new THREE.Color();
+	const tmpB = new THREE.Color();
+	const tmp = new THREE.Color();
 
 	for (let i = 0; i < params.count; i++) {
-		// Bias towards center but keep arms populated
-		const r01 = Math.pow(Math.random(), 0.55);
+		const r01 = Math.pow(Math.random(), 0.58);
 		const r = r01 * params.radius;
 
 		const arm = i % params.arms;
 		const armAngle = (arm / params.arms) * Math.PI * 2;
 
-		// Spiral: angle grows with radius (log-ish feel)
 		const spiral = r * params.twist;
-
-		// Spread around arm centerline (gaussian looks more natural)
 		const spread = randn() * params.armSpread * (0.35 + 0.65 * (r / params.radius));
 		const angle = armAngle + spiral + spread;
 
-		const jitter = params.jitter * (0.4 + 0.6 * (1 - r01));
+		const jitter = params.jitter * (0.35 + 0.65 * (1 - r01));
 		const x = Math.cos(angle) * r + randn() * jitter;
 		const z = Math.sin(angle) * r + randn() * jitter;
 
-		// Thicker core, thinner outer disc
 		const thickness = params.thickness * (0.25 + 0.75 * (1 - r01));
 		const y = randn() * thickness;
 
@@ -85,7 +76,6 @@ function buildGalaxyGeometry(params: GalaxyLayerParams, isDark: boolean) {
 		positions[i * 3 + 1] = y;
 		positions[i * 3 + 2] = z;
 
-		// Color gradient: warm core -> blue -> purple outer
 		const coreT = THREE.MathUtils.clamp(r / params.coreRadius, 0, 1);
 		const outerT = THREE.MathUtils.clamp(
 			(r - params.coreRadius) / (params.radius - params.coreRadius),
@@ -93,17 +83,16 @@ function buildGalaxyGeometry(params: GalaxyLayerParams, isDark: boolean) {
 			1,
 		);
 
-		tmpColorA.lerpColors(warmCore, midBlue, coreT);
-		tmpColorB.lerpColors(midBlue, outerPurple, outerT);
-		tmpColor.lerpColors(tmpColorA, tmpColorB, outerT);
+		tmpA.lerpColors(warmCore, midBlue, coreT);
+		tmpB.lerpColors(midBlue, outerPurple, outerT);
+		tmp.lerpColors(tmpA, tmpB, outerT);
 
-		// Brightness variation (sparkle without animation)
-		const brightness = 0.55 + Math.random() * 0.65;
-		tmpColor.multiplyScalar(brightness);
+		const brightness = 0.55 + Math.random() * 0.55;
+		tmp.multiplyScalar(brightness);
 
-		colors[i * 3] = tmpColor.r;
-		colors[i * 3 + 1] = tmpColor.g;
-		colors[i * 3 + 2] = tmpColor.b;
+		colors[i * 3] = tmp.r;
+		colors[i * 3 + 1] = tmp.g;
+		colors[i * 3 + 2] = tmp.b;
 	}
 
 	const geometry = new THREE.BufferGeometry();
@@ -125,7 +114,7 @@ function makeRadialTexture(inner: string, outer: string) {
 
 	const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
 	g.addColorStop(0, inner);
-	g.addColorStop(0.35, inner);
+	g.addColorStop(0.28, inner);
 	g.addColorStop(1, outer);
 
 	ctx.fillStyle = g;
@@ -140,28 +129,28 @@ function makeRadialTexture(inner: string, outer: string) {
 }
 
 function CameraRig() {
+	const targetPos = useRef(new THREE.Vector3());
 	useFrame(state => {
 		const t = state.clock.elapsedTime;
 
-		// Slow cinematic drift around the disc
-		const orbit = 2.15;
-		state.camera.position.x = Math.sin(t * 0.06) * 0.35;
-		state.camera.position.z = orbit + Math.cos(t * 0.06) * 0.35;
-		state.camera.position.y = Math.sin(t * 0.04) * 0.12;
+		targetPos.current.set(
+			Math.sin(t * 0.06) * 0.32,
+			Math.sin(t * 0.045) * 0.1,
+			2.2 + Math.cos(t * 0.06) * 0.28,
+		);
 
+		state.camera.position.lerp(targetPos.current, 0.03);
 		state.camera.lookAt(0, 0, 0);
 	});
 	return null;
 }
 
-function DistantStars() {
+function DistantStars({ isDark }: { isDark: boolean }) {
 	const ref = useRef<ThreePoints>(null);
-	const [sphere] = useState(() => generateSpherePoints(2600, 6));
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
+	const [sphere] = useState(() => generateSpherePoints(2200, 7));
 
 	useFrame((_, delta) => {
-		if (ref.current) ref.current.rotation.y -= delta * 0.01;
+		if (ref.current) ref.current.rotation.y -= delta * 0.006;
 	});
 
 	return (
@@ -169,24 +158,22 @@ function DistantStars() {
 			<PointMaterial
 				transparent
 				color={isDark ? '#ffffff' : '#4f46e5'}
-				size={0.00125}
+				size={0.00115}
 				sizeAttenuation
 				depthWrite={false}
-				opacity={isDark ? 0.5 : 0.22}
+				opacity={isDark ? 0.45 : 0.18}
 			/>
 		</DreiPoints>
 	);
 }
 
-function Galaxy() {
+function Galaxy({ isDark }: { isDark: boolean }) {
 	const groupRef = useRef<THREE.Group>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
 
 	const coreTex = useMemo(
 		() =>
 			makeRadialTexture(
-				isDark ? 'rgba(255, 247, 237, 0.95)' : 'rgba(99, 102, 241, 0.35)',
+				isDark ? 'rgba(255, 247, 237, 0.92)' : 'rgba(99, 102, 241, 0.28)',
 				'rgba(0,0,0,0)',
 			),
 		[isDark],
@@ -195,22 +182,46 @@ function Galaxy() {
 	const nebulaTex = useMemo(
 		() =>
 			makeRadialTexture(
-				isDark ? 'rgba(167, 139, 250, 0.16)' : 'rgba(99, 102, 241, 0.10)',
+				isDark ? 'rgba(167, 139, 250, 0.14)' : 'rgba(99, 102, 241, 0.08)',
 				'rgba(0,0,0,0)',
 			),
 		[isDark],
 	);
 
+	const haloGeometry = useMemo(() => {
+		// A faint spheroidal halo around the disc for depth
+		const count = 3500;
+		const positions = new Float32Array(count * 3);
+		for (let i = 0; i < count; i++) {
+			const r = Math.pow(Math.random(), 0.9) * 5.5;
+			const theta = Math.random() * Math.PI * 2;
+			const phi = Math.acos(2 * Math.random() - 1);
+
+			// Squash halo slightly along Y to stay galaxy-like
+			const x = Math.sin(phi) * Math.cos(theta) * r;
+			const y = Math.cos(phi) * r * 0.45;
+			const z = Math.sin(phi) * Math.sin(theta) * r;
+
+			positions[i * 3] = x;
+			positions[i * 3 + 1] = y;
+			positions[i * 3 + 2] = z;
+		}
+		const g = new THREE.BufferGeometry();
+		g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		g.computeBoundingSphere();
+		return g;
+	}, []);
+
 	const coreGeometry = useMemo(
 		() =>
 			buildGalaxyGeometry(
 				{
-					count: 5200,
+					count: 4200,
 					arms: 1,
-					radius: 0.75,
-					coreRadius: 0.6,
+					radius: 0.8,
+					coreRadius: 0.65,
 					twist: 0.0,
-					armSpread: 1.2,
+					armSpread: 1.1,
 					thickness: 0.14,
 					jitter: 0.02,
 				},
@@ -219,16 +230,16 @@ function Galaxy() {
 		[isDark],
 	);
 
-	const armGeometry = useMemo(
+	const armsGeometry = useMemo(
 		() =>
 			buildGalaxyGeometry(
 				{
-					count: 14000,
+					count: 10500,
 					arms: 4,
-					radius: 3.25,
-					coreRadius: 0.8,
-					twist: 1.55,
-					armSpread: 0.24,
+					radius: 3.4,
+					coreRadius: 0.85,
+					twist: 1.7,
+					armSpread: 0.23,
 					thickness: 0.12,
 					jitter: 0.02,
 				},
@@ -241,12 +252,12 @@ function Galaxy() {
 		() =>
 			buildGalaxyGeometry(
 				{
-					count: 11000,
+					count: 8200,
 					arms: 4,
-					radius: 3.4,
-					coreRadius: 0.9,
-					twist: 1.45,
-					armSpread: 0.45,
+					radius: 3.8,
+					coreRadius: 1.0,
+					twist: 1.55,
+					armSpread: 0.48,
 					thickness: 0.18,
 					jitter: 0.03,
 				},
@@ -255,22 +266,25 @@ function Galaxy() {
 		[isDark],
 	);
 
-	useFrame((_, delta) => {
+	useFrame(state => {
 		if (!groupRef.current) return;
-		groupRef.current.rotation.y += delta * 0.03;
-		groupRef.current.rotation.z = Math.sin(performance.now() * 0.00008) * 0.02;
+		const t = state.clock.elapsedTime;
+
+		groupRef.current.rotation.y = t * 0.03;
+		groupRef.current.rotation.x = -0.35 + Math.sin(t * 0.05) * 0.01;
+		groupRef.current.rotation.z = 0.15 + Math.sin(t * 0.04) * 0.008;
 	});
 
 	return (
 		<group ref={groupRef} rotation={[-0.35, 0, 0.15]}>
-			{/* Nebula disc (soft glow) */}
+			{/* Soft nebula disc */}
 			{nebulaTex && (
 				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-					<planeGeometry args={[8.2, 8.2, 1, 1]} />
+					<planeGeometry args={[8.6, 8.6, 1, 1]} />
 					<meshBasicMaterial
 						map={nebulaTex}
 						transparent
-						opacity={isDark ? 0.55 : 0.25}
+						opacity={isDark ? 0.5 : 0.22}
 						blending={THREE.AdditiveBlending}
 						depthWrite={false}
 					/>
@@ -280,51 +294,64 @@ function Galaxy() {
 			{/* Core glow */}
 			{coreTex && (
 				<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-					<planeGeometry args={[2.2, 2.2, 1, 1]} />
+					<planeGeometry args={[2.4, 2.4, 1, 1]} />
 					<meshBasicMaterial
 						map={coreTex}
 						transparent
-						opacity={isDark ? 0.85 : 0.28}
+						opacity={isDark ? 0.82 : 0.25}
 						blending={THREE.AdditiveBlending}
 						depthWrite={false}
 					/>
 				</mesh>
 			)}
 
-			{/* Dust layer */}
+			{/* Faint halo points */}
+			<points geometry={haloGeometry} frustumCulled={false}>
+				<pointsMaterial
+					transparent
+					color={isDark ? '#ffffff' : '#4f46e5'}
+					size={0.006}
+					sizeAttenuation
+					opacity={isDark ? 0.06 : 0.035}
+					depthWrite={false}
+					blending={THREE.AdditiveBlending}
+				/>
+			</points>
+
+			{/* Dust */}
 			<points geometry={dustGeometry} frustumCulled={false}>
 				<pointsMaterial
 					transparent
 					vertexColors
 					size={0.008}
 					sizeAttenuation
-					opacity={isDark ? 0.22 : 0.12}
+					opacity={isDark ? 0.18 : 0.1}
 					depthWrite={false}
 					blending={THREE.AdditiveBlending}
 				/>
 			</points>
 
-			{/* Main spiral arms */}
-			<points geometry={armGeometry} frustumCulled={false}>
+			{/* Spiral arms */}
+			<points geometry={armsGeometry} frustumCulled={false}>
 				<pointsMaterial
 					transparent
 					vertexColors
-					size={0.012}
+					size={0.011}
 					sizeAttenuation
-					opacity={isDark ? 0.85 : 0.45}
+					opacity={isDark ? 0.78 : 0.4}
 					depthWrite={false}
 					blending={THREE.AdditiveBlending}
 				/>
 			</points>
 
-			{/* Dense core stars */}
+			{/* Core stars */}
 			<points geometry={coreGeometry} frustumCulled={false}>
 				<pointsMaterial
 					transparent
 					vertexColors
-					size={0.016}
+					size={0.014}
 					sizeAttenuation
-					opacity={isDark ? 0.95 : 0.35}
+					opacity={isDark ? 0.9 : 0.3}
 					depthWrite={false}
 					blending={THREE.AdditiveBlending}
 				/>
@@ -333,47 +360,10 @@ function Galaxy() {
 	);
 }
 
-function ShootingStar() {
-	const ref = useRef<Mesh>(null);
-	const [resetKey, setResetKey] = useState(0);
-
-	useFrame(() => {
-		if (!ref.current) return;
-
-		ref.current.position.x -= 0.12;
-		ref.current.position.y -= 0.04;
-
-		if (ref.current.position.x < -5) {
-			const startX = 4 + Math.random() * 2.5;
-			const startY = 1.2 + Math.random() * 1.2;
-			const startZ = -1.5 + Math.random() * 3;
-			ref.current.position.set(startX, startY, startZ);
-			setResetKey(prev => prev + 1);
-		}
-	});
-
-	return (
-		<mesh ref={ref} position={[4, 2.4, 0]}>
-			<sphereGeometry args={[0.02, 8, 8]} />
-			<meshBasicMaterial color="#ffffff" transparent opacity={0} />
-			<Trail
-				key={resetKey}
-				width={1}
-				length={10}
-				color={new THREE.Color('#a78bfa')}
-				attenuation={t => t * t}
-			>
-				<mesh>
-					<sphereGeometry args={[0.01, 8, 8]} />
-					<meshBasicMaterial color="#ffffff" />
-				</mesh>
-			</Trail>
-		</mesh>
-	);
-}
-
 export function Background3D() {
 	const [hasWebGLError, setHasWebGLError] = useState(false);
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
 
 	useEffect(() => {
 		try {
@@ -393,7 +383,7 @@ export function Background3D() {
 				<Canvas
 					dpr={[1, 1.5]}
 					gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
-					camera={{ position: [0, 0, 2.3], fov: 55, near: 0.1, far: 50 }}
+					camera={{ position: [0, 0, 2.2], fov: 55, near: 0.1, far: 60 }}
 					onCreated={({ gl }) => {
 						if (!gl) setHasWebGLError(true);
 					}}
@@ -402,9 +392,8 @@ export function Background3D() {
 					<pointLight position={[6, 6, 6]} intensity={1.1} />
 
 					<CameraRig />
-					<DistantStars />
-					<Galaxy />
-					<ShootingStar />
+					<DistantStars isDark={isDark} />
+					<Galaxy isDark={isDark} />
 				</Canvas>
 			</ErrorBoundary>
 		</div>
