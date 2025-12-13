@@ -162,8 +162,9 @@ export function AILabModule() {
 					{/* Typing Indicator */}
 					{isTyping && (
 						<motion.div
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
+							variants={fadeInUp}
+							initial="hidden"
+							animate="visible"
 							className="flex gap-4 self-start max-w-[85%]"
 						>
 							<div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border bg-purple-500/10 border-purple-500/20 text-purple-400">

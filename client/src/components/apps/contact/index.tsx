@@ -246,7 +246,7 @@ export function ContactModule() {
 											value={formData.name}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 min-h-[44px] text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 min-h-[44px] text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
 											placeholder="John Doe"
 										/>
 									</div>
@@ -260,7 +260,7 @@ export function ContactModule() {
 											value={formData.email}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
 											placeholder="john@example.com"
 										/>
 									</div>
@@ -275,7 +275,7 @@ export function ContactModule() {
 										name="subject"
 										value={formData.subject}
 										onChange={handleChange}
-										className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
 										placeholder="Project Inquiry"
 									/>
 								</div>
@@ -290,7 +290,7 @@ export function ContactModule() {
 										onChange={handleChange}
 										required
 										rows={5}
-										className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all resize-none placeholder:text-muted-foreground/30"
+										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all resize-none placeholder:text-muted-foreground/30"
 										placeholder="Tell me about your project..."
 									/>
 								</div>
