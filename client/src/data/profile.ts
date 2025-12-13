@@ -11,11 +11,30 @@ export const PROFILE: AboutData = {
 	avatarUrl: '/logo.png',
 	experienceYears: 2,
 	projectsCount: 15,
-	status: 'Building the future of web',
-	availability: 'Open to opportunities',
+	currentStatus: {
+		label: 'Building the future of web',
+		description: 'Currently focused on scalable architectures and AI integration',
+	},
 	coverUrl: '/about-cover.jpg',
+	focusAreas: [
+		'Full-Stack Development',
+		'AI/ML Integration',
+		'System Architecture',
+		'Developer Experience',
+	],
+	highlights: [
+		{ label: 'Code Quality', value: '98%', icon: 'Code2' },
+		{ label: 'Projects Delivered', value: '15+', icon: 'CheckCircle' },
+		{ label: 'Client Satisfaction', value: '100%', icon: 'Star' },
+	],
 	languages: ['English (Native)', 'Hindi (Native)', 'Japanese (Elementary)'],
 	hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
+	workPreferences: {
+		remote: true,
+		hybrid: true,
+		onsite: false,
+		timezone: 'PST (UTC-8)',
+	},
 	skills: {
 		frontend: [
 			{ category: 'Frontend', name: 'React/Next.js', level: 95 },
