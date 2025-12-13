@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
+import { fadeInUp, viewportSettings } from '@/lib/animations';
 
 const categoryConfig: Record<
 	string,
@@ -113,13 +114,15 @@ export function JourneyModule() {
 							const Icon = config.icon;
 							const isLeft = index % 2 === 0;
 
+							// ... (existing code)
+
 							return (
 								<motion.div
 									key={entry.id}
-									initial={{ opacity: 0, y: 50 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									viewport={{ once: true, margin: '-50px' }}
-									transition={{ duration: 0.5, delay: index * 0.1 }}
+									variants={fadeInUp}
+									initial="hidden"
+									whileInView="visible"
+									viewport={viewportSettings}
 									className={cn(
 										'relative flex flex-col md:flex-row gap-8 md:gap-16 items-center',
 										isLeft ? 'md:flex-row-reverse' : '',

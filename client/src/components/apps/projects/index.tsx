@@ -17,7 +17,7 @@ import {
 	Layers,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { staggerContainer, staggerItem } from '@/lib/animations';
+import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/lib/animations';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
@@ -196,16 +196,18 @@ export function ProjectsModule() {
 					{selectedProject && (
 						<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 							<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
+								variants={fadeIn}
+								initial="hidden"
+								animate="visible"
+								exit="hidden"
 								onClick={() => setSelectedProject(null)}
 								className="absolute inset-0 bg-black/60 backdrop-blur-md"
 							/>
 							<motion.div
-								initial={{ opacity: 0, scale: 0.95, y: 20 }}
-								animate={{ opacity: 1, scale: 1, y: 0 }}
-								exit={{ opacity: 0, scale: 0.95, y: 20 }}
+								variants={scaleIn}
+								initial="hidden"
+								animate="visible"
+								exit="hidden"
 								className="relative w-full max-w-3xl bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
 							>
 								{/* Modal Header Image */}

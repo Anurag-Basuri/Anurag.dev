@@ -148,6 +148,13 @@ export interface AboutData {
 export interface PlatformStats {
 	username: string;
 	url: string;
+	stats?: {
+		rating?: number;
+		globalRank?: string | number;
+		stars?: number;
+		followers?: number;
+		solved?: number;
+	};
 }
 
 export interface CodingStats {
