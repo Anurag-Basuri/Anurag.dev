@@ -62,11 +62,23 @@ export function MainLayout() {
 
 		if (!isLayoutReady) {
 			return (
-				<div className="h-full w-full flex items-center justify-center text-muted-foreground bg-background">
-					<div className="flex flex-col items-center gap-4">
-						<div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-						<div className="text-sm font-mono tracking-widest animate-pulse">
-							SYSTEM INITIALIZING...
+				<div className="h-full w-full flex items-center justify-center bg-[#0d1117] relative overflow-hidden">
+					<div className="absolute inset-0 bg-linear-to-b from-blue-500/5 to-transparent pointer-events-none" />
+					<div className="flex flex-col items-center gap-6 relative z-10">
+						<div className="relative">
+							<div className="absolute inset-0 bg-emerald-500/30 blur-2xl rounded-full animate-pulse" />
+							<div className="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin relative z-10" />
+							<div className="absolute inset-0 flex items-center justify-center">
+								<div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+							</div>
+						</div>
+						<div className="flex flex-col items-center gap-1">
+							<div className="text-sm font-bold tracking-[0.2em] text-emerald-400 animate-pulse uppercase">
+								System Initializing
+							</div>
+							<div className="text-[10px] text-emerald-500/50 font-mono tracking-widest">
+								LOADING MODULES...
+							</div>
 						</div>
 					</div>
 				</div>
@@ -111,7 +123,10 @@ export function MainLayout() {
 					</AnimatePresence>
 				</ResizablePanel>
 
-				<ResizableHandle withHandle className="hover:border-primary/40 transition-colors" />
+				<ResizableHandle
+					withHandle
+					className="w-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[state=hover]:bg-emerald-500/50 data-[state=active]:bg-emerald-500 border-x border-white/5"
+				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
 					<ResizablePanelGroup
@@ -129,7 +144,7 @@ export function MainLayout() {
 
 						<ResizableHandle
 							withHandle
-							className="hover:border-primary/40 transition-colors"
+							className="h-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[resize-handle-state=hover]:bg-emerald-500/50 data-resize-handle-active:bg-emerald-500 border-y border-white/5"
 						/>
 
 						<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
