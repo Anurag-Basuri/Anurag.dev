@@ -27,6 +27,11 @@ export const AboutSchema = z.object({
 	resumeUrl: z.string().url().optional(),
 	experienceYears: z.number().default(0),
 	projectsCount: z.number().default(0),
+	status: z.string().optional(),
+	availability: z.string().optional(),
+	coverUrl: z.string().url().optional(),
+	languages: z.array(z.string()).optional(),
+	hobbies: z.array(z.string()).optional(),
 
 	skills: z.object({
 		frontend: z.array(SkillSchema),

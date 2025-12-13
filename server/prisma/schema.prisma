@@ -51,6 +51,11 @@ model Profile {
   resumeUrl       String?
   experienceYears Int      @default(0)
   projectsCount   Int      @default(0)
+  status          String?
+  availability    String?
+  coverUrl        String?
+  languages       String[]
+  hobbies         String[]
   
   // Stored as JSON for flexibility
   skills          Json     // { frontend: [], backend: [], ml: [] }
