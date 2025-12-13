@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 
 function ContactSkeleton() {
 	return (
@@ -119,15 +120,11 @@ export function ContactModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-6xl mx-auto pb-20">
 				{/* Standardized Header */}
-				<div className="mb-8 border-b border-border/40 pb-6">
-					<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
-						<MessageSquare className="w-4 h-4" />
-						<span>Communication Channel</span>
-					</div>
-					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
-						Get In Touch
-					</h1>
-				</div>
+				<ModuleHeader
+					icon={MessageSquare}
+					label="Communication Channel"
+					title="Get In Touch"
+				/>
 
 				<div className="flex flex-col md:flex-row gap-12">
 					{/* Left Column: Info */}

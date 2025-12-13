@@ -7,6 +7,7 @@ import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 
 const categoryConfig: Record<
 	string,
@@ -92,17 +93,12 @@ export function JourneyModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-12 max-w-5xl mx-auto pb-24 relative">
 				{/* Header */}
-				<div className="mb-16 text-center md:text-left">
-					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-3 flex items-center justify-center md:justify-start gap-3">
-						<span className="text-emerald-500 font-mono text-2xl">~/journey</span>
-						<span className="h-8 w-[2px] bg-emerald-500/50 rotate-12" />
-						<span>Timeline</span>
-					</h1>
-					<p className="text-muted-foreground max-w-lg mx-auto md:mx-0">
-						A chronological record of professional developments, academic milestones,
-						and key achievements.
-					</p>
-				</div>
+				<ModuleHeader
+					icon={Briefcase}
+					label="Timeline"
+					title="journey"
+					description="A chronological record of professional developments, academic milestones, and key achievements."
+				/>
 
 				<div className="relative">
 					{/* Static Central Line - Simple gradient without scroll animation */}
