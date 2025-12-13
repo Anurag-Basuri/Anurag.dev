@@ -108,6 +108,11 @@ export interface AboutData {
 	resumeUrl?: string;
 	experienceYears: number;
 	projectsCount: number;
+	status?: string;
+	availability?: string;
+	coverUrl?: string;
+	languages?: string[];
+	hobbies?: string[];
 
 	skills: {
 		frontend: Skill[];
