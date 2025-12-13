@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { api, JourneyEntry } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Briefcase, GraduationCap, Award, Star, Calendar, ArrowRight } from 'lucide-react';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 
@@ -64,17 +64,17 @@ export function JourneyModule() {
 	const [journey, setJourney] = useState<JourneyEntry[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const containerRef = useRef<HTMLDivElement>(null);
 	const [isMounted, setIsMounted] = useState(false);
+	const ref = useRef<HTMLDivElement>(null);
 
 	// Defer scroll tracking until after hydration
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
 
-	// Scroll progress for the central line - only initialize after mount
+	// Scroll progress for the central line - only track if mounted
 	const { scrollYProgress } = useScroll({
-		container: containerRef,
+		container: isMounted ? ref : undefined,
 		offset: ['start start', 'end end'],
 	});
 
@@ -108,7 +108,7 @@ export function JourneyModule() {
 	}
 
 	return (
-		<ScrollArea className="h-full" ref={containerRef}>
+		<div className="h-full overflow-y-auto relative custom-scrollbar" ref={ref}>
 			<div className="p-6 md:p-12 max-w-5xl mx-auto pb-24 relative">
 				{/* Header */}
 				<div className="mb-16 text-center md:text-left">
@@ -260,6 +260,6 @@ export function JourneyModule() {
 					</div>
 				)}
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }
