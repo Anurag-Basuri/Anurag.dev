@@ -14,7 +14,8 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 	return (
 		<div className="bg-transparent">
 			{/* Header - matching terminal style (h-7) */}
-			<header className="h-7 px-2 border-b border-white/8 bg-[#161b22] flex items-center justify-between shrink-0 select-none">
+			{/* Header - matching terminal style (h-7) */}
+			<header className="h-7 px-2 border-b border-white/5 bg-black/20 backdrop-blur-md flex items-center justify-between shrink-0 select-none">
 				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2">
 					{/* macOS Traffic Lights - Hidden on mobile */}
@@ -45,7 +46,7 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 			</header>
 
 			{/* Profile Section - compact */}
-			<div className="p-3 border-b border-white/8">
+			<div className="p-3 border-b border-white/5 bg-black/10 backdrop-blur-sm">
 				<div className="flex items-center gap-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">

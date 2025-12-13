@@ -343,7 +343,7 @@ export function Taskbar() {
 							transition={{ type: 'spring', damping: 25, stiffness: 350 }}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							className="absolute bottom-14 left-2 w-88 sm:w-80 z-50 bg-[#0d1117]/85 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
+							className="absolute bottom-14 left-2 w-88 sm:w-80 z-50 bg-black/60 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
 						>
 							<div className="absolute inset-x-0 top-0 h-[120px] bg-linear-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
 
@@ -450,7 +450,7 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="w-full shrink-0 h-12 sm:h-8 bg-[#0d1117]/80 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
+				className="w-full shrink-0 h-12 sm:h-8 bg-black/40 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
 			>
 				{/* Ambient Glow */}
 				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />

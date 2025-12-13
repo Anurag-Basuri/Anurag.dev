@@ -94,26 +94,26 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 						<div
 							className={cn(
 								'h-9 flex items-center justify-between px-4 shrink-0 transition-colors select-none',
-								'bg-transparent',
+								'bg-black/40 backdrop-blur-md border-b border-white/5',
 							)}
 						>
 							<span className="text-[13px] font-medium tracking-wide text-white/80 flex items-center gap-2">
 								{title}
 							</span>
-							<div className="flex items-center gap-1">
+							<div className="flex items-center gap-1.5">
 								<button
 									onClick={handleMinimize}
-									className="w-6 h-6 flex items-center justify-center text-white/40 hover:bg-yellow-500/20 hover:text-yellow-400 rounded-md transition-all"
+									className="group/min w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors"
 									title="Minimize"
 								>
-									<Minus size={14} />
+									<Minus size={14} className="text-white/40 group-hover/min:text-white transition-colors" />
 								</button>
 								<button
 									onClick={handleClose}
-									className="w-6 h-6 flex items-center justify-center text-white/40 hover:bg-red-500/20 hover:text-red-400 rounded-md transition-all"
+									className="group/close w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-500/20 transition-colors"
 									title="Close"
 								>
-									<X size={14} />
+									<X size={14} className="text-white/40 group-hover/close:text-red-400 transition-colors" />
 								</button>
 							</div>
 						</div>
