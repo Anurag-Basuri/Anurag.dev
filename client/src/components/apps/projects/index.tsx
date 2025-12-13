@@ -17,6 +17,7 @@ import {
 	Layers,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { staggerContainer, staggerItem } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 
@@ -115,18 +116,24 @@ export function ProjectsModule() {
 				</div>
 
 				{/* Grid */}
-				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<motion.div
+					layout
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+					variants={staggerContainer}
+					initial="hidden"
+					animate="visible"
+				>
 					<AnimatePresence mode="popLayout">
 						{filteredProjects.map(project => (
 							<motion.div
 								layout
 								key={project.id}
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
+								variants={staggerItem}
+								initial="hidden"
+								animate="visible"
 								exit={{ opacity: 0, scale: 0.9 }}
-								transition={{ duration: 0.3 }}
 								onClick={() => setSelectedProject(project)}
-								className="group relative bg-card/20 backdrop-blur-sm border border-border/40 rounded-2xl overflow-hidden hover:border-emerald-500/40 hover:bg-card/30 transition-all cursor-pointer hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full"
+								className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:border-emerald-500/40 hover:bg-card/40 transition-all cursor-pointer hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full"
 							>
 								{/* Image / Preview Area */}
 								<div className="aspect-video w-full bg-black/40 overflow-hidden relative">

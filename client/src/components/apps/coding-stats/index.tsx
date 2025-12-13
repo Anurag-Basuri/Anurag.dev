@@ -5,6 +5,7 @@ import { api, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Terminal, Github, Code, Trophy, GitCommit, GitBranch } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { staggerContainer, staggerItem } from '@/lib/animations';
 import { ModuleError } from '@/components/ui/module-error';
 
 function StatsSkeleton() {
@@ -52,20 +53,7 @@ export default function CodingStatsModule() {
 
 	if (!stats) return null;
 
-	const container = {
-		hidden: { opacity: 0 },
-		show: {
-			opacity: 1,
-			transition: {
-				staggerChildren: 0.1,
-			},
-		},
-	};
-
-	const item = {
-		hidden: { opacity: 0, y: 20 },
-		show: { opacity: 1, y: 0 },
-	};
+	// Using shared variants from @/lib/animations
 
 	return (
 		<ScrollArea className="h-full">
@@ -73,7 +61,7 @@ export default function CodingStatsModule() {
 				<div className="flex items-center gap-3 mb-8 border-b border-border/40 pb-4">
 					<Terminal className="w-6 h-6 text-primary" />
 					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-primary to-blue-500">
+						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
 							coding_stats.exe
 						</h1>
 						<p className="text-xs text-muted-foreground font-mono">
@@ -83,14 +71,14 @@ export default function CodingStatsModule() {
 				</div>
 
 				<motion.div
-					variants={container}
+					variants={staggerContainer}
 					initial="hidden"
-					animate="show"
+					animate="visible"
 					className="grid grid-cols-1 md:grid-cols-2 gap-6"
 				>
 					{/* GitHub Card */}
 					<motion.div
-						variants={item}
+						variants={staggerItem}
 						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-white/20 transition-all"
 					>
 						<div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -135,7 +123,7 @@ export default function CodingStatsModule() {
 
 					{/* LeetCode Card */}
 					<motion.div
-						variants={item}
+						variants={staggerItem}
 						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-yellow-500/30 transition-all"
 					>
 						<div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -180,7 +168,7 @@ export default function CodingStatsModule() {
 
 					{/* Codeforces Card */}
 					<motion.div
-						variants={item}
+						variants={staggerItem}
 						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-red-500/30 transition-all"
 					>
 						<div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -228,7 +216,7 @@ export default function CodingStatsModule() {
 					{/* CodeChef Card */}
 					{stats.codechef && (
 						<motion.div
-							variants={item}
+							variants={staggerItem}
 							className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-orange-500/30 transition-all"
 						>
 							<div className="absolute inset-0 bg-linear-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
