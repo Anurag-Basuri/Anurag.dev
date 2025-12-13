@@ -125,7 +125,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[state=hover]:bg-emerald-500/50 data-[state=active]:bg-emerald-500 border-x border-white/5"
+					className="w-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[resize-handle-state=hover]:bg-emerald-500/50 data-resize-handle-active:bg-emerald-500 border-x border-white/5"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>

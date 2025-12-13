@@ -76,11 +76,11 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 				</div>
 
 				{/* Action Buttons - minimal */}
-				<div className="mt-3 grid gap-2">
+				<div className="mt-3 grid gap-2 relative z-10" onClick={e => e.stopPropagation()}>
 					<a
 						href="/resume.pdf"
 						target="_blank"
-						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-colors"
+						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-colors cursor-pointer"
 					>
 						<Download className="w-3 h-3" />
 						<span className="uppercase tracking-wider">Resume</span>

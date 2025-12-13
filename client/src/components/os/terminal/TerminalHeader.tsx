@@ -26,20 +26,22 @@ export function TerminalHeader({
 						whileHover={{ scale: 1.15 }}
 						whileTap={{ scale: 0.95 }}
 						onClick={onToggleCollapse}
-						className="w-2.5 h-2.5 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn"
+						className="relative w-2.5 h-2.5 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn"
 						aria-label="Minimize terminal"
 						title="Minimize"
 					>
+						<div className="absolute -inset-2" /> {/* Increase hit area */}
 						<Minus className="w-1.5 h-1.5 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 					</motion.button>
 					<motion.button
 						whileHover={{ scale: 1.15 }}
 						whileTap={{ scale: 0.95 }}
 						onClick={onClearHistory}
-						className="w-2.5 h-2.5 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn"
+						className="relative w-2.5 h-2.5 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn"
 						aria-label="Clear history"
 						title="Clear"
 					>
+						<div className="absolute -inset-2" /> {/* Increase hit area */}
 						<Trash2 className="w-1.5 h-1.5 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 					</motion.button>
 					<div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
