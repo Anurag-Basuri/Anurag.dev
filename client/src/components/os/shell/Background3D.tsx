@@ -8,6 +8,7 @@ import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import type { Points as ThreePoints } from 'three';
 import * as THREE from 'three';
+import { useThemeColor } from '@/hooks/use-theme-colors';
 
 // --- Utilities ---
 
@@ -66,8 +67,11 @@ function MovingGrid({ reducedMotion }: { reducedMotion: boolean }) {
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
-	// Colors - slightly boosted for more "glow"
-	const gridColor = isDark ? '#10b981' : '#6366f1';
+	// Use theme bridge
+	const gridColorPrimary = useThemeColor('--primary', '#10b981');
+	const gridColorSecondary = useThemeColor('--accent', '#6366f1');
+	
+	const gridColor = isDark ? gridColorPrimary : gridColorSecondary;
 	const opacity = isDark ? 0.25 : 0.18;
 
 	useFrame((state, delta) => {
@@ -130,6 +134,8 @@ function SpaceDust({ reducedMotion }: { reducedMotion: boolean }) {
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
+	const dustColor = useThemeColor('--accent', '#34d399');
+
 	useFrame((state, delta) => {
 		if (reducedMotion || !ref.current) return;
 
@@ -147,7 +153,7 @@ function SpaceDust({ reducedMotion }: { reducedMotion: boolean }) {
 			<Points ref={ref} positions={dust} stride={3} frustumCulled={false}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#34d399' : '#818cf8'} // Tinted dust
+					color={dustColor}
 					size={0.03}
 					sizeAttenuation
 					depthWrite={false}

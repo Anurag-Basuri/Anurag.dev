@@ -35,22 +35,22 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 					</div>
 
 					{/* Separator */}
-					<div className="h-3 w-px bg-white/8" aria-hidden="true" />
+					<div className="h-3 w-px bg-border/40" aria-hidden="true" />
 
 					{/* Explorer Title */}
 					<div className="flex items-center gap-1.5 text-[10px] font-mono">
 						<FolderOpen className="w-3 h-3 text-emerald-500" aria-hidden="true" />
-						<span className="text-white/50">Explorer</span>
+						<span className="text-muted-foreground">Explorer</span>
 					</div>
 				</div>
 			</header>
 
 			{/* Profile Section - compact */}
-			<div className="p-3 border-b border-white/5 bg-black/10 backdrop-blur-sm">
+			<div className="p-3 border-b border-border/40 bg-card/40 backdrop-blur-sm">
 				<div className="flex items-center gap-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full overflow-hidden border border-white/10">
+						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/60">
 							<Image
 								src="/logo.png"
 								alt="AnuragOS Logo"
@@ -61,7 +61,7 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 							/>
 						</div>
 						{/* Online indicator */}
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#161b22]" />
+						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
 					</div>
 
 					{/* Info */}
@@ -119,7 +119,7 @@ function SocialButton({
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="flex-1 flex items-center justify-center h-7 rounded border border-white/8 bg-white/2 hover:bg-white/5 hover:border-white/15 transition-colors text-white/40 hover:text-white/70"
+			className="flex-1 flex items-center justify-center h-7 rounded border border-border/40 bg-card/50 hover:bg-card/80 hover:border-border/60 transition-colors text-muted-foreground hover:text-foreground"
 			title={label}
 		>
 			<Icon className="w-3.5 h-3.5" />
