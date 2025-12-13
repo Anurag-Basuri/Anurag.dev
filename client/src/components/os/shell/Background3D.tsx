@@ -149,7 +149,7 @@ function DistantStars({
 	...props
 }: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
 	const ref = useRef<ThreePoints>(null);
-	const sphere = useMemo(() => generateSpherePoints(2600, 3.2), []);
+	const sphere = useMemo(() => generateSpherePoints(700, 3.2), []);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -183,7 +183,7 @@ function GalaxyStars({
 	...props
 }: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
 	const ref = useRef<ThreePoints>(null);
-	const galaxy = useMemo(() => generateGalaxyPoints(3800), []);
+	const galaxy = useMemo(() => generateGalaxyPoints(1000), []);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -216,7 +216,7 @@ function NebulaParticles({
 	...props
 }: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
 	const ref = useRef<ThreePoints>(null);
-	const nebula = useMemo(() => generateSpherePoints(650, 2.2), []);
+	const nebula = useMemo(() => generateSpherePoints(200, 2.2), []);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -252,7 +252,7 @@ function TwinklingStars({
 }: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
 	const pointsRef = useRef<ThreePoints>(null);
 	const materialRef = useRef<import('@react-three/drei').PointMaterialImpl | null>(null);
-	const stars = useMemo(() => generateSpherePoints(1300, 2.8), []);
+	const stars = useMemo(() => generateSpherePoints(300, 2.8), []);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -345,10 +345,10 @@ function CyberMatrix({
 	const isDark = theme === 'dark';
 
 	const ring1Ref = useRef<THREE.Mesh>(null);
-	const ring2Ref = useRef<THREE.Mesh>(null);
+	// Ring 2 removed for simplification
 	const ring3Ref = useRef<THREE.Mesh>(null);
 	const coreRef = useRef<THREE.Mesh>(null);
-	const satellitesRef = useRef<THREE.Group>(null);
+	// Satellites removed for simplification
 
 	const primary = isDark ? '#10b981' : '#64748b';
 	const secondary = isDark ? '#3b82f6' : '#94a3b8';
@@ -366,33 +366,25 @@ function CyberMatrix({
 		}
 
 		if (ring1Ref.current) {
-			ring1Ref.current.rotation.x = t * 0.18;
-			ring1Ref.current.rotation.y = t * 0.12;
+			ring1Ref.current.rotation.x = t * 0.12; // Slower
+			ring1Ref.current.rotation.y = t * 0.08;
 		}
-		if (ring2Ref.current) {
-			ring2Ref.current.rotation.x = t * -0.16;
-			ring2Ref.current.rotation.z = t * 0.2;
-		}
+		// Ring 2 logic removed
 		if (ring3Ref.current) {
-			ring3Ref.current.rotation.y = t * 0.24;
-			ring3Ref.current.rotation.x = t * 0.1;
+			ring3Ref.current.rotation.y = t * 0.15; // Slower
+			ring3Ref.current.rotation.x = t * 0.05;
 		}
 
 		if (coreRef.current) {
-			const scale = 1 + Math.sin(t * 2) * 0.08;
+			const scale = 1 + Math.sin(t * 1.5) * 0.05; // Gentle pulse
 			coreRef.current.scale.set(scale, scale, scale);
-			coreRef.current.rotation.y -= 0.02;
-			coreRef.current.rotation.z -= 0.02;
+			coreRef.current.rotation.y -= 0.01;
+			coreRef.current.rotation.z -= 0.01;
 		}
-
-		if (satellitesRef.current) {
-			satellitesRef.current.rotation.y = t * 0.3;
-			satellitesRef.current.rotation.z = t * 0.1;
-		}
+		// Satellites logic removed
 	});
 
-	const satellites = useMemo(() => Array.from({ length: 4 }, (_, i) => i), []);
-	const crossSatellites = useMemo(() => Array.from({ length: 3 }, (_, i) => i), []);
+	// Arrays removed
 
 	return (
 		<group ref={groupRef} position={[0, 0, 0]} {...props}>
@@ -406,15 +398,7 @@ function CyberMatrix({
 				/>
 			</mesh>
 
-			<mesh ref={ring2Ref} rotation={[Math.PI / 2, 0, 0]}>
-				<torusGeometry args={[1.8, 0.05, 16, 6]} />
-				<meshBasicMaterial
-					color={primary}
-					transparent
-					opacity={isDark ? 0.18 : 0.08}
-					wireframe
-				/>
-			</mesh>
+			{/* Ring 2 removed */}
 
 			<mesh ref={ring3Ref} rotation={[0, Math.PI / 4, 0]}>
 				<torusGeometry args={[1.4, 0.03, 16, 50]} />
@@ -436,42 +420,11 @@ function CyberMatrix({
 				/>
 			</mesh>
 
+			{/* Center Detail */}
 			<mesh scale={[0.4, 0.4, 0.4]}>
 				<dodecahedronGeometry args={[1, 0]} />
 				<meshBasicMaterial color={accent} transparent opacity={isDark ? 0.55 : 0.28} />
 			</mesh>
-
-			<group ref={satellitesRef}>
-				{satellites.map(i => {
-					const a = (i / satellites.length) * Math.PI * 2;
-					const r = 2.8;
-					const x = Math.cos(a) * r;
-					const z = Math.sin(a) * r;
-
-					return (
-						<mesh key={i} position={[x, 0, z]}>
-							<sphereGeometry args={[0.08, 8, 8]} />
-							<meshBasicMaterial color={secondary} transparent opacity={0.6} />
-						</mesh>
-					);
-				})}
-
-				<group rotation={[Math.PI / 2, 0, 0]}>
-					{crossSatellites.map(i => {
-						const a = (i / crossSatellites.length) * Math.PI * 2;
-						const r = 2.2;
-						const x = Math.cos(a) * r;
-						const z = Math.sin(a) * r;
-
-						return (
-							<mesh key={i} position={[x, 0, z]}>
-								<boxGeometry args={[0.1, 0.1, 0.1]} />
-								<meshBasicMaterial color={primary} transparent opacity={0.7} />
-							</mesh>
-						);
-					})}
-				</group>
-			</group>
 		</group>
 	);
 }
