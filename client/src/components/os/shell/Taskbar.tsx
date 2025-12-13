@@ -72,7 +72,7 @@ const TaskbarItem = memo(function TaskbarItem({
 					}}
 					onClick={onClick}
 					className={cn(
-						'relative h-9 sm:h-7 px-3 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
+						'relative h-10 sm:h-9 md:h-7 px-3 min-h-[44px] sm:min-h-0 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
 						isActive
 							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
 							: 'bg-transparent border-transparent hover:bg-white/5',
@@ -450,7 +450,7 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="w-full shrink-0 h-12 sm:h-8 bg-black/40 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
+				className="w-full shrink-0 h-14 sm:h-10 md:h-8 bg-black/40 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
 			>
 				{/* Ambient Glow */}
 				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />

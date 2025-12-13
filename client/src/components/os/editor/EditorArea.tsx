@@ -19,7 +19,7 @@ export function EditorArea() {
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-6 md:p-12"
+					className="h-full w-full flex flex-col items-center justify-center text-muted-foreground select-none pointer-events-none p-4 sm:p-6 md:p-12"
 				>
 					{/* Hero Section */}
 					<div className="relative mb-8 md:mb-12 group">
@@ -29,20 +29,20 @@ export function EditorArea() {
 						</div>
 					</div>
 
-					<h3 className="text-2xl sm:text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-4 tracking-tight text-center">
+					<h3 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-4 tracking-tight text-center">
 						AnuragOS{' '}
-						<span className="text-white/20 text-lg sm:text-2xl font-mono align-top">
+						<span className="text-white/20 text-sm sm:text-lg md:text-2xl font-mono align-top">
 							v2.0
 						</span>
 					</h3>
 
-					<p className="text-xs sm:text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed mb-8 md:mb-12 px-4 font-mono">
+					<p className="text-xs sm:text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed mb-6 sm:mb-8 md:mb-12 px-4 font-mono">
 						Secure Environment • System Active • Awaiting Input
 					</p>
 
 					{/* Quick Actions Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl pointer-events-auto">
-						<div className="flex flex-col gap-3 p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300 group cursor-default">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 w-full max-w-2xl pointer-events-auto">
+						<div className="flex flex-col gap-3 p-4 sm:p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300 group cursor-default">
 							<div className="flex items-center gap-3 text-emerald-400 mb-1">
 								<div className="p-2 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
 									<MousePointer2 className="w-5 h-5" />
@@ -61,7 +61,7 @@ export function EditorArea() {
 						</div>
 
 						{/* Hide Terminal card on very small screens since CLI isn't visible */}
-						<div className="hidden sm:flex flex-col gap-3 p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
+						<div className="hidden sm:flex flex-col gap-3 p-4 sm:p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
 							<div className="flex items-center gap-3 text-blue-400 mb-1">
 								<div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
 									<Command className="w-5 h-5" />
@@ -82,7 +82,7 @@ export function EditorArea() {
 					</div>
 
 					{/* System Status Footer - Stack on mobile */}
-					<div className="mt-8 md:mt-16 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
+					<div className="mt-6 sm:mt-8 md:mt-16 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
 						<div className="flex items-center gap-2">
 							<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 							<span>Kernel: Stable</span>

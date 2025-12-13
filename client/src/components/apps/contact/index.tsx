@@ -118,7 +118,7 @@ export function ContactModule() {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="p-6 md:p-10 max-w-6xl mx-auto pb-20">
+			<div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto pb-20">
 				{/* Standardized Header */}
 				<ModuleHeader
 					icon={MessageSquare}
@@ -134,13 +134,13 @@ export function ContactModule() {
 						transition={{ duration: 0.5 }}
 						className="flex-1 space-y-8"
 					>
-						<p className="text-muted-foreground text-lg leading-relaxed">
+						<p className="text-muted-foreground text-base md:text-lg leading-relaxed">
 							I&apos;m always open to discussing new projects, creative ideas, or
 							opportunities to be part of your visions.
 						</p>
 
 						<div className="space-y-6">
-							<div className="p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
 								<div className="flex items-start gap-4">
 									<div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
 										<Mail className="w-6 h-6" />
@@ -169,7 +169,7 @@ export function ContactModule() {
 								</div>
 							</div>
 
-							<div className="p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-purple-500/30 transition-all group">
+							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-purple-500/30 transition-all group">
 								<div className="flex items-start gap-4">
 									<div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
 										<MapPin className="w-6 h-6" />
@@ -193,11 +193,11 @@ export function ContactModule() {
 							<h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
 								Social Protocols
 							</h3>
-							<div className="flex gap-3">
+							<div className="flex gap-2 sm:gap-3">
 								<a
 									href="#"
 									target="_blank"
-									className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group"
+									className="p-3 sm:p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group"
 								>
 									<Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
 								</a>
@@ -226,7 +226,7 @@ export function ContactModule() {
 						transition={{ duration: 0.5, delay: 0.2 }}
 						className="flex-1"
 					>
-						<div className="p-8 rounded-3xl bg-card/30 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
+						<div className="p-6 sm:p-8 rounded-3xl bg-card/30 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
 							<div className="absolute inset-0 bg-linear-to-br from-green-500/5 to-transparent pointer-events-none" />
 
 							<h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 relative z-10">
@@ -235,8 +235,7 @@ export function ContactModule() {
 							</h2>
 
 							<form onSubmit={handleSubmit} className="space-y-5 relative z-10">
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									"
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div className="space-y-2">
 										<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
 											Name
@@ -247,7 +246,7 @@ export function ContactModule() {
 											value={formData.name}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											className="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 min-h-[44px] text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
 											placeholder="John Doe"
 										/>
 									</div>
@@ -301,7 +300,7 @@ export function ContactModule() {
 										type="submit"
 										disabled={loading || success}
 										className={cn(
-											'w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg',
+											'w-full py-3.5 min-h-[48px] rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg',
 											success
 												? 'bg-green-500 text-black cursor-default'
 												: 'bg-white text-black hover:bg-gray-200 hover:scale-[1.02]',
