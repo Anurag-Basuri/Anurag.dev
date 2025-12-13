@@ -24,9 +24,13 @@ import {
 	Target,
 	Zap,
 	Award,
+	Download,
+	Linkedin,
+	Twitter,
+	ExternalLink,
+	Mail,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { fadeInUp } from '@/lib/animations';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
@@ -37,12 +41,18 @@ function AboutSkeleton() {
 	return (
 		<div className="p-4 sm:p-6 space-y-6 sm:space-y-8 animate-pulse">
 			<div className="h-40 sm:h-48 md:h-56 bg-muted/50 rounded-b-3xl" />
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-				<div className="h-28 sm:h-32 bg-muted/50 rounded-xl" />
-				<div className="h-28 sm:h-32 bg-muted/50 rounded-xl" />
-				<div className="h-28 sm:h-32 bg-muted/50 rounded-xl" />
+			<div className="flex justify-center -mt-12">
+				<div className="w-32 h-32 bg-muted rounded-full border-4 border-background" />
 			</div>
-			<div className="h-48 sm:h-64 bg-muted/50 rounded-xl" />
+			<div className="space-y-4 text-center px-4">
+				<div className="h-8 bg-muted rounded w-1/3 mx-auto" />
+				<div className="h-4 bg-muted rounded w-1/2 mx-auto" />
+			</div>
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 px-4">
+				<div className="h-28 bg-muted/50 rounded-xl" />
+				<div className="h-28 bg-muted/50 rounded-xl" />
+				<div className="h-28 bg-muted/50 rounded-xl" />
+			</div>
 		</div>
 	);
 }
@@ -56,6 +66,13 @@ const iconMap: Record<string, any> = {
 	Sparkles,
 	Zap,
 	Award,
+};
+
+const socialIconMap: Record<string, any> = {
+	GitHub: Github,
+	LinkedIn: Linkedin,
+	Twitter: Twitter,
+	Email: Mail,
 };
 
 export function AboutModule() {
@@ -96,107 +113,143 @@ export function AboutModule() {
 
 	return (
 		<ScrollArea className="h-full">
-			<div className="max-w-7xl mx-auto">
+			<div className="max-w-7xl mx-auto pb-12">
 				{/* Enhanced Hero Section */}
 				<motion.div
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
-					className="relative h-40 sm:h-48 md:h-56 lg:h-64 bg-linear-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 rounded-b-3xl overflow-hidden"
+					className="relative h-48 sm:h-56 md:h-64 lg:h-72 bg-linear-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 rounded-b-[2.5rem] overflow-hidden"
 				>
 					{/* Animated background patterns */}
 					<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 animate-pulse" />
-					<div className="absolute inset-0">
-						<div className="absolute top-10 left-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
+					<div className="absolute inset-0 overflow-hidden">
+						<div className="absolute top-10 left-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse" />
 						<div
-							className="absolute bottom-10 right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl animate-pulse"
+							className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/20 rounded-full blur-[100px] animate-pulse"
 							style={{ animationDelay: '1s' }}
 						/>
 					</div>
-					<div className="absolute inset-0 bg-linear-to-t from-background via-background/50 to-transparent" />
+					<div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 
-					{/* Profile Picture - Better mobile positioning */}
-					<div className="absolute -bottom-12 sm:-bottom-16 left-1/2 -translate-x-1/2 sm:left-6 md:left-8 sm:translate-x-0 z-10">
+					{/* Profile Picture - Centered & Overlapping */}
+					<div className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-10">
 						<motion.div
 							initial={{ scale: 0 }}
 							animate={{ scale: 1 }}
 							transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-							className="relative"
+							className="relative group"
 						>
-							<div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-400 to-blue-500 blur-2xl opacity-60 animate-pulse" />
-							<div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full border-4 border-background bg-background shadow-2xl hover:shadow-emerald-500/50 p-1 hover:scale-105 transition-all duration-300">
+							<div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-400 to-blue-500 blur-2xl opacity-60 animate-pulse group-hover:opacity-80 transition-opacity" />
+							<div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full border-[6px] border-background bg-background shadow-2xl p-1.5 transition-transform duration-300 group-hover:scale-[1.02]">
 								<img
 									src={about.avatarUrl || '/logo.png'}
 									alt={about.name}
-									className="w-full h-full object-cover rounded-full"
+									className="w-full h-full object-cover rounded-full bg-muted"
 								/>
 								<motion.div
 									animate={{ scale: [1, 1.2, 1] }}
 									transition={{ repeat: Infinity, duration: 2 }}
-									className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-emerald-500 border-2 border-background shadow-lg"
+									className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 border-4 border-background shadow-lg"
+									title="Online"
 								/>
 							</div>
 						</motion.div>
 					</div>
+
+					{/* Header Actions - Resume Button */}
+					{about.resumeUrl && (
+						<div className="absolute top-6 right-6 z-20">
+							<a
+								href={about.resumeUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 backdrop-blur-md border border-white/10 hover:bg-background/80 transition-all text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl hover:scale-105"
+							>
+								<Download className="w-4 h-4" />
+								<span className="hidden sm:inline">Download CV</span>
+							</a>
+						</div>
+					)}
 				</motion.div>
 
-				{/* Name & Role Section - Improved mobile layout */}
-				<div className="mt-16 sm:mt-20 md:mt-8 px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 text-center sm:text-left sm:ml-40 md:ml-48">
+				{/* Identity Section */}
+				<div className="mt-20 sm:mt-24 px-4 text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
-						className="space-y-3 sm:space-y-4"
+						className="space-y-3"
 					>
-						<h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-linear-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+						<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight tracking-tight">
 							{about.name}
 						</h1>
-						<p className="text-base sm:text-lg md:text-xl text-muted-foreground">
+						<p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-medium">
 							{about.role}
 						</p>
-						<p className="text-xs sm:text-sm text-primary/80 italic max-w-2xl">
+						<p className="text-sm sm:text-base text-primary/80 italic max-w-2xl mx-auto">
 							{about.tagline}
 						</p>
 
+						{/* Social Links */}
+						{about.socials && (
+							<div className="flex items-center justify-center gap-3 pt-2">
+								{about.socials.map(social => {
+									const Icon = socialIconMap[social.platform] || Globe;
+									return (
+										<a
+											key={social.platform}
+											href={social.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="p-2.5 rounded-full bg-muted/50 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+											title={social.platform}
+										>
+											<Icon className="w-5 h-5" />
+										</a>
+									);
+								})}
+							</div>
+						)}
+
 						{/* Enhanced Status Badges */}
-						<div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 pt-2">
+						<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4 sm:pt-6">
 							{about.currentStatus && (
 								<motion.div
-									initial={{ opacity: 0, x: -20 }}
-									animate={{ opacity: 1, x: 0 }}
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
 									transition={{ delay: 0.4 }}
-									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs sm:text-sm backdrop-blur-sm hover:bg-emerald-500/20 transition-all cursor-default group"
+									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs sm:text-sm backdrop-blur-sm cursor-default"
 								>
-									<motion.div
-										animate={{ scale: [1, 1.3, 1] }}
-										transition={{ repeat: Infinity, duration: 2 }}
-										className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50"
-									/>
-									<span className="text-emerald-400 font-medium">
+									<span className="relative flex h-2 w-2">
+										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+									</span>
+									<span className="text-emerald-500 font-medium">
 										{about.currentStatus.label}
 									</span>
 								</motion.div>
 							)}
 							{about.location && (
 								<motion.div
-									initial={{ opacity: 0, x: -20 }}
-									animate={{ opacity: 1, x: 0 }}
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
 									transition={{ delay: 0.5 }}
-									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm backdrop-blur-sm hover:bg-white/10 transition-all"
+									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-card border border-border text-xs sm:text-sm text-muted-foreground shadow-sm"
 								>
 									<MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-									<span className="text-muted-foreground">{about.location}</span>
+									<span>{about.location}</span>
 								</motion.div>
 							)}
 							{about.workPreferences &&
 								(about.workPreferences.remote || about.workPreferences.hybrid) && (
 									<motion.div
-										initial={{ opacity: 0, x: -20 }}
-										animate={{ opacity: 1, x: 0 }}
+										initial={{ opacity: 0, scale: 0.9 }}
+										animate={{ opacity: 1, scale: 1 }}
 										transition={{ delay: 0.6 }}
-										className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs sm:text-sm backdrop-blur-sm hover:bg-blue-500/20 transition-all"
+										className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs sm:text-sm text-blue-400 shadow-sm"
 									>
 										<Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-										<span className="text-blue-400 font-medium">
+										<span>
 											{about.workPreferences.remote &&
 											about.workPreferences.hybrid
 												? 'Remote / Hybrid'
@@ -210,158 +263,153 @@ export function AboutModule() {
 					</motion.div>
 				</div>
 
-				<div className="px-4 sm:px-6 md:px-8 space-y-6 sm:space-y-8 pb-8">
-					{/* Enhanced Highlights Section */}
+				<div className="mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 space-y-8 sm:space-y-12">
+					{/* Highlights Section */}
 					{about.highlights && about.highlights.length > 0 && (
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.4 }}
-						>
-							<h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-								<Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-								<span>Highlights</span>
-							</h2>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-								{about.highlights.map((highlight, index) => {
-									const Icon =
-										highlight.icon && iconMap[highlight.icon]
-											? iconMap[highlight.icon]
-											: Star;
-									return (
-										<motion.div
-											key={highlight.label}
-											initial={{ opacity: 0, scale: 0.9 }}
-											animate={{ opacity: 1, scale: 1 }}
-											whileHover={{ scale: 1.02, y: -4 }}
-											transition={{ delay: 0.5 + index * 0.1 }}
-											className="relative group cursor-default"
-										>
-											<div className="absolute inset-0 bg-linear-to-br from-emerald-500/20 to-blue-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
-											<div className="relative bg-card/40 backdrop-blur-sm border border-border/50 rounded-2xl p-4 sm:p-6 hover:border-emerald-500/50 transition-all shadow-lg hover:shadow-emerald-500/10">
-												<Icon className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400 mb-2 sm:mb-3 group-hover:scale-110 transition-transform" />
-												<div className="text-2xl sm:text-3xl font-bold bg-linear-to-br from-emerald-400 to-blue-400 bg-clip-text text-transparent mb-1">
-													{highlight.value}
-												</div>
-												<div className="text-xs sm:text-sm text-muted-foreground">
-													{highlight.label}
-												</div>
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+							{about.highlights.map((highlight, index) => {
+								const Icon =
+									highlight.icon && iconMap[highlight.icon]
+										? iconMap[highlight.icon]
+										: Star;
+								return (
+									<motion.div
+										key={highlight.label}
+										initial={{ opacity: 0, y: 20 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ delay: 0.4 + index * 0.1 }}
+										whileHover={{ y: -5 }}
+										className="relative group p-6 rounded-2xl bg-card/40 backdrop-blur-md border border-border/50 hover:border-emerald-500/30 transition-all cursor-default overflow-hidden"
+									>
+										<div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+										<div className="relative z-10">
+											<div className="w-12 h-12 rounded-xl bg-background/50 flex items-center justify-center mb-4 text-emerald-500 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+												<Icon className="w-6 h-6" />
 											</div>
-										</motion.div>
-									);
-								})}
-							</div>
-						</motion.div>
+											<div className="text-3xl font-bold text-foreground mb-1 tracking-tight">
+												{highlight.value}
+											</div>
+											<div className="text-sm text-muted-foreground font-medium">
+												{highlight.label}
+											</div>
+										</div>
+									</motion.div>
+								);
+							})}
+						</div>
 					)}
 
-					{/* Enhanced About & Stats Grid */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.6 }}
-						className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"
-					>
-						{/* Bio Section */}
-						<div className="lg:col-span-2 bg-card/30 backdrop-blur-sm border border-border/40 rounded-2xl p-4 sm:p-6 shadow-xl hover:shadow-emerald-500/5 transition-all">
-							<h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
-								<User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-								<span>About Me</span>
-							</h2>
-							<p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3 sm:mb-4">
-								{about.summary}
-							</p>
-							{about.currentStatus?.description && (
-								<p className="text-xs sm:text-sm text-muted-foreground/80 italic border-l-2 border-emerald-500/50 pl-3 sm:pl-4 py-2">
-									{about.currentStatus.description}
-								</p>
-							)}
-						</div>
+					{/* Bio & Stats Grid */}
+					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+						{/* Bio */}
+						<motion.div
+							initial={{ opacity: 0, x: -20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.5 }}
+							className="lg:col-span-2 space-y-6"
+						>
+							<div className="bg-card/40 backdrop-blur-md border border-border/50 rounded-3xl p-6 sm:p-8 relative overflow-hidden group">
+								<div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
 
-						{/* Enhanced Quick Stats */}
-						<div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-							<motion.div
-								whileHover={{ scale: 1.03, y: -4 }}
-								className="bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 text-center shadow-lg hover:shadow-emerald-500/20 transition-all cursor-default"
-							>
-								<Briefcase className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-400 mx-auto mb-2 sm:mb-3" />
-								<div className="text-3xl sm:text-4xl font-bold text-emerald-400 mb-1">
+								<h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+									<User className="w-5 h-5 text-primary" />
+									About Me
+								</h2>
+								<div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+									<p>{about.summary}</p>
+								</div>
+
+								{about.currentStatus?.description && (
+									<div className="mt-6 pt-6 border-t border-border/50">
+										<p className="text-sm font-medium text-foreground/80 italic flex items-start gap-2">
+											<span className="text-2xl text-primary/40 leading-none -mt-1">
+												❝
+											</span>
+											{about.currentStatus.description}
+										</p>
+									</div>
+								)}
+							</div>
+
+							{/* Focus Areas */}
+							{about.focusAreas && about.focusAreas.length > 0 && (
+								<div className="bg-card/40 backdrop-blur-md border border-border/50 rounded-3xl p-6 sm:p-8">
+									<h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+										<Target className="w-5 h-5 text-primary" />
+										Focus Areas
+									</h2>
+									<div className="flex flex-wrap gap-2.5">
+										{about.focusAreas.map((area, index) => (
+											<motion.div
+												key={area}
+												initial={{ opacity: 0, scale: 0.8 }}
+												animate={{ opacity: 1, scale: 1 }}
+												transition={{ delay: 0.6 + index * 0.05 }}
+												whileHover={{ scale: 1.05 }}
+												className="px-4 py-2 rounded-xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 text-xs sm:text-sm font-medium text-emerald-500/90 cursor-default shadow-sm"
+											>
+												{area}
+											</motion.div>
+										))}
+									</div>
+								</div>
+							)}
+						</motion.div>
+
+						{/* Quick Stats Column */}
+						<motion.div
+							initial={{ opacity: 0, x: 20 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.6 }}
+							className="space-y-4 sm:space-y-6"
+						>
+							<div className="bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/30 rounded-3xl p-6 text-center hover:border-emerald-500/50 transition-colors shadow-lg shadow-emerald-500/5">
+								<div className="w-12 h-12 mx-auto bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-4 text-emerald-500">
+									<Briefcase className="w-6 h-6" />
+								</div>
+								<div className="text-4xl sm:text-5xl font-bold text-emerald-500 mb-2">
 									{about.experienceYears}+
 								</div>
-								<div className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+								<div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
 									Years Experience
 								</div>
-							</motion.div>
-							<motion.div
-								whileHover={{ scale: 1.03, y: -4 }}
-								className="bg-linear-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/30 rounded-2xl p-4 sm:p-6 text-center shadow-lg hover:shadow-blue-500/20 transition-all cursor-default"
-							>
-								<Code2 className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 mx-auto mb-2 sm:mb-3" />
-								<div className="text-3xl sm:text-4xl font-bold text-blue-400 mb-1">
+							</div>
+
+							<div className="bg-linear-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/30 rounded-3xl p-6 text-center hover:border-blue-500/50 transition-colors shadow-lg shadow-blue-500/5">
+								<div className="w-12 h-12 mx-auto bg-blue-500/20 rounded-2xl flex items-center justify-center mb-4 text-blue-500">
+									<Code2 className="w-6 h-6" />
+								</div>
+								<div className="text-4xl sm:text-5xl font-bold text-blue-500 mb-2">
 									{about.projectsCount}+
 								</div>
-								<div className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+								<div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
 									Projects Delivered
 								</div>
-							</motion.div>
-						</div>
-					</motion.div>
-
-					{/* Enhanced Focus Areas */}
-					{about.focusAreas && about.focusAreas.length > 0 && (
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.7 }}
-							className="bg-card/30 backdrop-blur-sm border border-border/40 rounded-2xl p-4 sm:p-6 shadow-xl"
-						>
-							<h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-								<Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-								<span>Focus Areas</span>
-							</h2>
-							<div className="flex flex-wrap gap-2 sm:gap-3">
-								{about.focusAreas.map((area, index) => (
-									<motion.span
-										key={area}
-										initial={{ opacity: 0, scale: 0 }}
-										animate={{ opacity: 1, scale: 1 }}
-										whileHover={{ scale: 1.05, y: -2 }}
-										transition={{ delay: 0.8 + index * 0.05 }}
-										className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 text-emerald-400 text-xs sm:text-sm font-medium border border-emerald-500/30 hover:border-emerald-500/50 hover:from-emerald-500/20 hover:to-blue-500/20 transition-all cursor-default shadow-sm hover:shadow-emerald-500/20"
-									>
-										{area}
-									</motion.span>
-								))}
 							</div>
 						</motion.div>
-					)}
+					</div>
 
-					{/* Enhanced Skills Section */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.8 }}
-					>
-						<h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-							<Code2 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-							<span>Technical Skills</span>
+					{/* Skills Grid */}
+					<div className="space-y-6">
+						<h2 className="text-2xl font-bold flex items-center gap-2.5 px-2">
+							<Cpu className="w-6 h-6 text-primary" />
+							Technical Arsenal
 						</h2>
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 							{/* Frontend */}
 							<motion.div
-								whileHover={{ scale: 1.02, y: -4 }}
-								className="bg-linear-to-br from-indigo-500/10 to-indigo-600/5 border border-indigo-500/30 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-indigo-500/20 transition-all"
+								whileHover={{ y: -5 }}
+								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
 							>
-								<div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-									<Layers className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-400" />
-									<h3 className="font-bold text-indigo-400 text-sm sm:text-base">
-										Frontend
-									</h3>
+								<div className="flex items-center gap-3 mb-5 border-b border-indigo-500/20 pb-4">
+									<Layers className="w-6 h-6 text-indigo-400" />
+									<h3 className="font-bold text-lg text-indigo-400">Frontend</h3>
 								</div>
-								<div className="flex flex-wrap gap-1.5 sm:gap-2">
+								<div className="flex flex-wrap gap-2">
 									{about.skills.frontend.map(skill => (
 										<span
 											key={skill.name}
-											className="px-2 sm:px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-300 text-xs border border-indigo-500/20 hover:border-indigo-500/40 transition-colors"
+											className="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-xs font-medium border border-indigo-500/20"
 										>
 											{skill.name}
 										</span>
@@ -371,20 +419,18 @@ export function AboutModule() {
 
 							{/* Backend */}
 							<motion.div
-								whileHover={{ scale: 1.02, y: -4 }}
-								className="bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/30 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-emerald-500/20 transition-all"
+								whileHover={{ y: -5 }}
+								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
 							>
-								<div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-									<Cpu className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
-									<h3 className="font-bold text-emerald-400 text-sm sm:text-base">
-										Backend
-									</h3>
+								<div className="flex items-center gap-3 mb-5 border-b border-emerald-500/20 pb-4">
+									<Cpu className="w-6 h-6 text-emerald-400" />
+									<h3 className="font-bold text-lg text-emerald-400">Backend</h3>
 								</div>
-								<div className="flex flex-wrap gap-1.5 sm:gap-2">
+								<div className="flex flex-wrap gap-2">
 									{about.skills.backend.map(skill => (
 										<span
 											key={skill.name}
-											className="px-2 sm:px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs border border-emerald-500/20 hover:border-emerald-500/40 transition-colors"
+											className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 text-xs font-medium border border-emerald-500/20"
 										>
 											{skill.name}
 										</span>
@@ -392,22 +438,20 @@ export function AboutModule() {
 								</div>
 							</motion.div>
 
-							{/* ML/AI */}
+							{/* AI/ML */}
 							<motion.div
-								whileHover={{ scale: 1.02, y: -4 }}
-								className="bg-linear-to-br from-purple-500/10 to-pink-600/5 border border-purple-500/30 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-purple-500/20 transition-all"
+								whileHover={{ y: -5 }}
+								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
 							>
-								<div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-									<Box className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
-									<h3 className="font-bold text-purple-400 text-sm sm:text-base">
-										AI & ML
-									</h3>
+								<div className="flex items-center gap-3 mb-5 border-b border-purple-500/20 pb-4">
+									<Box className="w-6 h-6 text-purple-400" />
+									<h3 className="font-bold text-lg text-purple-400">AI & ML</h3>
 								</div>
-								<div className="flex flex-wrap gap-1.5 sm:gap-2">
+								<div className="flex flex-wrap gap-2">
 									{about.skills.ml.map(skill => (
 										<span
 											key={skill.name}
-											className="px-2 sm:px-3 py-1 rounded-lg bg-purple-500/10 text-purple-300 text-xs border border-purple-500/20 hover:border-purple-500/40 transition-colors"
+											className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 text-xs font-medium border border-purple-500/20"
 										>
 											{skill.name}
 										</span>
@@ -415,180 +459,126 @@ export function AboutModule() {
 								</div>
 							</motion.div>
 						</div>
-					</motion.div>
+					</div>
 
-					{/* Enhanced Coding Profiles */}
-					{codingStats && (
-						<motion.div
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.9 }}
-						>
-							<h2 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
-								<Code className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-								<span>Coding Profiles</span>
-							</h2>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
-								<motion.a
-									href={codingStats.github.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									whileHover={{ scale: 1.02, y: -4 }}
-									className="group relative bg-card/40 backdrop-blur-sm border border-border/40 rounded-2xl p-4 sm:p-6 hover:border-white/30 transition-all overflow-hidden shadow-lg hover:shadow-white/10"
-								>
-									<div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-									<div className="relative flex items-center justify-between">
-										<div>
-											<div className="text-[10px] sm:text-xs text-muted-foreground uppercase mb-1">
-												GitHub
-											</div>
-											<div className="text-base sm:text-lg font-bold">
-												@{codingStats.github.username}
-											</div>
-										</div>
-										<Github className="w-6 h-6 sm:w-8 sm:h-8 text-white/60 group-hover:text-white group-hover:scale-110 transition-all" />
-									</div>
-								</motion.a>
-
-								<motion.a
-									href={codingStats.leetcode.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									whileHover={{ scale: 1.02, y: -4 }}
-									className="group relative bg-linear-to-br from-yellow-500/10 to-orange-500/5 border border-yellow-500/30 rounded-2xl p-4 sm:p-6 hover:border-yellow-500/50 transition-all overflow-hidden shadow-lg hover:shadow-yellow-500/20"
-								>
-									<div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-									<div className="relative flex items-center justify-between">
-										<div>
-											<div className="text-[10px] sm:text-xs text-yellow-400/60 uppercase mb-1">
-												LeetCode
-											</div>
-											<div className="text-base sm:text-lg font-bold text-yellow-400">
-												@{codingStats.leetcode.username}
-											</div>
-										</div>
-										<Code className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400/60 group-hover:text-yellow-400 group-hover:scale-110 transition-all" />
-									</div>
-								</motion.a>
-
-								<motion.a
-									href={codingStats.codeforces.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									whileHover={{ scale: 1.02, y: -4 }}
-									className="group relative bg-linear-to-br from-red-500/10 to-orange-500/5 border border-red-500/30 rounded-2xl p-4 sm:p-6 hover:border-red-500/50 transition-all overflow-hidden shadow-lg hover:shadow-red-500/20"
-								>
-									<div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-									<div className="relative flex items-center justify-between">
-										<div>
-											<div className="text-[10px] sm:text-xs text-red-400/60 uppercase mb-1">
-												Codeforces
-											</div>
-											<div className="text-base sm:text-lg font-bold text-red-400">
-												@{codingStats.codeforces.username}
-											</div>
-										</div>
-										<Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-red-400/60 group-hover:text-red-400 group-hover:scale-110 transition-all" />
-									</div>
-								</motion.a>
-
-								{codingStats.codechef && (
-									<motion.a
-										href={codingStats.codechef.url}
-										target="_blank"
-										rel="noopener noreferrer"
-										whileHover={{ scale: 1.02, y: -4 }}
-										className="group relative bg-linear-to-br from-orange-500/10 to-amber-500/5 border border-orange-500/30 rounded-2xl p-4 sm:p-6 hover:border-orange-500/50 transition-all overflow-hidden shadow-lg hover:shadow-orange-500/20"
-									>
-										<div className="absolute inset-0 bg-linear-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-										<div className="relative flex items-center justify-between">
-											<div>
-												<div className="text-[10px] sm:text-xs text-orange-400/60 uppercase mb-1">
-													CodeChef
-												</div>
-												<div className="text-base sm:text-lg font-bold text-orange-400">
-													@{codingStats.codechef.username}
-												</div>
-											</div>
-											<Terminal className="w-6 h-6 sm:w-8 sm:h-8 text-orange-400/60 group-hover:text-orange-400 group-hover:scale-110 transition-all" />
-										</div>
-									</motion.a>
-								)}
-							</div>
-
-							<motion.button
-								onClick={() => openWindow('profiles')}
-								whileHover={{ scale: 1.01, y: -2 }}
-								whileTap={{ scale: 0.99 }}
-								className="w-full p-3 sm:p-4 rounded-xl bg-linear-to-br from-emerald-500/10 to-blue-500/10 border border-emerald-500/30 hover:border-emerald-500/50 hover:from-emerald-500/20 hover:to-blue-500/20 transition-all group flex items-center justify-between shadow-lg hover:shadow-emerald-500/20"
-							>
-								<div className="flex items-center gap-2 sm:gap-3">
-									<Code className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
-									<div className="text-left">
-										<div className="text-xs sm:text-sm font-bold text-foreground group-hover:text-emerald-400 transition-colors">
-											View Detailed Coding Stats
-										</div>
-										<div className="text-[10px] sm:text-xs text-muted-foreground">
-											Complete analytics from all platforms
-										</div>
-									</div>
-								</div>
-								<ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
-							</motion.button>
-						</motion.div>
-					)}
-
-					{/* Enhanced Personal Info */}
-					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 1 }}
-						className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
-					>
+					{/* Personal Info Grid */}
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
 						{about.languages && (
-							<motion.div
-								whileHover={{ scale: 1.02, y: -4 }}
-								className="bg-card/30 backdrop-blur-sm border border-border/40 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-primary/10 transition-all"
-							>
-								<h3 className="font-bold tracking-widest text-xs sm:text-sm uppercase mb-3 sm:mb-4 flex items-center gap-2">
-									<Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-									<span>Languages</span>
+							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8">
+								<h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 flex items-center gap-2 tracking-wider">
+									<Globe className="w-4 h-4" />
+									Languages
 								</h3>
-								<div className="flex flex-wrap gap-1.5 sm:gap-2">
+								<div className="flex flex-wrap gap-2">
 									{about.languages.map(lang => (
 										<span
 											key={lang}
-											className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium border border-primary/20 hover:border-primary/40 transition-colors"
+											className="px-3 py-1.5 rounded-lg bg-background border border-border text-sm font-medium shadow-sm"
 										>
 											{lang}
 										</span>
 									))}
 								</div>
-							</motion.div>
+							</div>
 						)}
 
 						{about.hobbies && (
-							<motion.div
-								whileHover={{ scale: 1.02, y: -4 }}
-								className="bg-card/30 backdrop-blur-sm border border-border/40 rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-primary/10 transition-all"
-							>
-								<h3 className="font-bold tracking-widest text-xs sm:text-sm uppercase mb-3 sm:mb-4 flex items-center gap-2">
-									<User className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-									<span>Interests</span>
+							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8">
+								<h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 flex items-center gap-2 tracking-wider">
+									<Sparkles className="w-4 h-4" />
+									Interests & Hobbies
 								</h3>
-								<div className="flex flex-wrap gap-1.5 sm:gap-2">
+								<div className="flex flex-wrap gap-2">
 									{about.hobbies.map(hobby => (
 										<span
 											key={hobby}
-											className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-surface-200/50 text-muted-foreground text-xs border border-white/5 hover:bg-white/10 transition-colors"
+											className="px-3 py-1.5 rounded-lg bg-surface-200/50 hover:bg-surface-300/50 transition-colors border border-white/5 text-sm cursor-default"
 										>
 											{hobby}
 										</span>
 									))}
 								</div>
-							</motion.div>
+							</div>
 						)}
-					</motion.div>
+					</div>
+
+					{/* Coding Profiles Footer */}
+					{codingStats && (
+						<div className="space-y-6">
+							<div className="flex items-center justify-between">
+								<h2 className="text-2xl font-bold flex items-center gap-2.5 px-2">
+									<Terminal className="w-6 h-6 text-primary" />
+									Coding Profiles
+								</h2>
+								<button
+									onClick={() => openWindow('profiles')}
+									className="group flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+								>
+									View Details
+									<ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+								</button>
+							</div>
+
+							<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+								<a
+									href={codingStats.github.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-4 rounded-xl bg-card border border-border/50 hover:border-foreground/20 hover:bg-accent/5 transition-all text-center group"
+								>
+									<Github className="w-8 h-8 mx-auto mb-3 text-muted-foreground group-hover:text-foreground transition-colors" />
+									<div className="font-bold text-sm">GitHub</div>
+									<div className="text-xs text-muted-foreground mt-1">
+										@{codingStats.github.username}
+									</div>
+								</a>
+								<a
+									href={codingStats.leetcode.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-4 rounded-xl bg-card border border-border/50 hover:border-yellow-500/30 hover:bg-yellow-500/5 transition-all text-center group"
+								>
+									<Code className="w-8 h-8 mx-auto mb-3 text-muted-foreground group-hover:text-yellow-500 transition-colors" />
+									<div className="font-bold text-sm text-yellow-500/80 group-hover:text-yellow-500">
+										LeetCode
+									</div>
+									<div className="text-xs text-muted-foreground mt-1">
+										@{codingStats.leetcode.username}
+									</div>
+								</a>
+								<a
+									href={codingStats.codeforces.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="p-4 rounded-xl bg-card border border-border/50 hover:border-red-500/30 hover:bg-red-500/5 transition-all text-center group"
+								>
+									<Trophy className="w-8 h-8 mx-auto mb-3 text-muted-foreground group-hover:text-red-500 transition-colors" />
+									<div className="font-bold text-sm text-red-500/80 group-hover:text-red-500">
+										Codeforces
+									</div>
+									<div className="text-xs text-muted-foreground mt-1">
+										@{codingStats.codeforces.username}
+									</div>
+								</a>
+								{codingStats.codechef && (
+									<a
+										href={codingStats.codechef.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="p-4 rounded-xl bg-card border border-border/50 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all text-center group"
+									>
+										<Terminal className="w-8 h-8 mx-auto mb-3 text-muted-foreground group-hover:text-orange-500 transition-colors" />
+										<div className="font-bold text-sm text-orange-500/80 group-hover:text-orange-500">
+											CodeChef
+										</div>
+										<div className="text-xs text-muted-foreground mt-1">
+											@{codingStats.codechef.username}
+										</div>
+									</a>
+								)}
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</ScrollArea>
