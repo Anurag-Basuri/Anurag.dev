@@ -5,26 +5,61 @@ import { api, Certification } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ModuleError } from '@/components/ui/module-error';
+
+function CertificationsSkeleton() {
+	return (
+		<div className="p-6 md:p-10 max-w-5xl mx-auto pb-20 animate-pulse">
+			<div className="mb-10 border-b border-border/40 pb-6">
+				<div className="h-4 bg-muted rounded w-32 mb-2" />
+				<div className="h-8 bg-muted rounded w-64" />
+			</div>
+			<div className="grid gap-6 md:grid-cols-2">
+				{[1, 2, 3, 4].map(i => (
+					<div key={i} className="p-6 rounded-2xl bg-card/20 border border-border/40">
+						<div className="flex justify-between items-start mb-4">
+							<div className="h-12 w-12 bg-muted rounded-xl" />
+							<div className="h-4 w-4 bg-muted rounded" />
+						</div>
+						<div className="h-6 bg-muted rounded w-3/4 mb-2" />
+						<div className="h-4 bg-muted rounded w-1/2 mb-4" />
+						<div className="h-4 bg-muted rounded w-24 mb-4" />
+						<div className="flex gap-2">
+							<div className="h-6 w-16 bg-muted rounded" />
+							<div className="h-6 w-16 bg-muted rounded" />
+						</div>
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
 
 export function CertificationModule() {
 	const [certs, setCerts] = useState<Certification[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const fetchData = async () => {
+		try {
+			setLoading(true);
+			setError(null);
+			const data = await api.getCertifications();
+			setCerts(data);
+		} catch (err: any) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		api.getCertifications()
-			.then(setCerts)
-			.catch(err => setError(err.message))
-			.finally(() => setLoading(false));
+		fetchData();
 	}, []);
 
-	if (loading)
-		return (
-			<div className="p-10 text-center text-muted-foreground animate-pulse">
-				Scanning credentials...
-			</div>
-		);
-	if (error) return <div className="p-10 text-center text-red-400">Error: {error}</div>;
+	if (loading) return <CertificationsSkeleton />;
+
+	if (error) return <ModuleError message={error} onRetry={fetchData} />;
 
 	return (
 		<ScrollArea className="h-full">
