@@ -27,11 +27,38 @@ export const AboutSchema = z.object({
 	resumeUrl: z.string().url().optional(),
 	experienceYears: z.number().default(0),
 	projectsCount: z.number().default(0),
-	status: z.string().optional(),
-	availability: z.string().optional(),
+
+	currentStatus: z
+		.object({
+			label: z.string(),
+			description: z.string().optional(),
+		})
+		.optional(),
+
+	focusAreas: z.array(z.string()).optional(),
+
+	highlights: z
+		.array(
+			z.object({
+				label: z.string(),
+				value: z.string(),
+				icon: z.string().optional(),
+			}),
+		)
+		.optional(),
+
 	coverUrl: z.string().url().optional(),
 	languages: z.array(z.string()).optional(),
 	hobbies: z.array(z.string()).optional(),
+
+	workPreferences: z
+		.object({
+			remote: z.boolean().optional(),
+			hybrid: z.boolean().optional(),
+			onsite: z.boolean().optional(),
+			timezone: z.string().optional(),
+		})
+		.optional(),
 
 	skills: z.object({
 		frontend: z.array(SkillSchema),

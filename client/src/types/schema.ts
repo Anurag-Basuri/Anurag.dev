@@ -112,7 +112,7 @@ export interface AboutData {
 	experienceYears: number;
 	projectsCount: number;
 
-	urrentStatus?: {
+	currentStatus?: {
 		label: string;
 		description?: string;
 	};
