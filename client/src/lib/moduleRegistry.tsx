@@ -60,7 +60,7 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	blog: withSuspense(BlogModule),
 	contact: withSuspense(ContactModule),
 	ailab: withSuspense(AILabModule),
-	'stats.exe': withSuspense(CodingStatsModule),
+	profiles: withSuspense(CodingStatsModule),
 };
 
 const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
@@ -72,8 +72,7 @@ const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
 	blog: { title: 'Blog', icon: Book },
 	contact: { title: 'Contact', icon: Contact },
 	ailab: { title: 'AI Lab', icon: Code },
-	'coding-stats': { title: 'Coding Stats', icon: Code },
-	'stats.exe': { title: 'Coding Stats', icon: Code },
+	profiles: { title: 'Coding Profiles', icon: Code },
 	terminal: { title: 'Terminal', icon: Terminal },
 };
 

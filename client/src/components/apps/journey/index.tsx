@@ -65,8 +65,14 @@ export function JourneyModule() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [isMounted, setIsMounted] = useState(false);
 
-	// Scroll progress for the central line
+	// Defer scroll tracking until after hydration
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	// Scroll progress for the central line - only initialize after mount
 	const { scrollYProgress } = useScroll({
 		container: containerRef,
 		offset: ['start start', 'end end'],

@@ -45,12 +45,9 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
 		children: [{ name: 'README.md', type: 'file', id: 'contact/README.md' }],
 	},
 	{
-		name: 'tools',
+		name: 'profiles',
 		type: 'folder',
-		id: 'tools',
-		children: [
-			{ name: 'resume.pdf', type: 'file', id: 'tools/resume.pdf' },
-			{ name: 'stats.exe', type: 'file', id: 'tools/stats.exe' },
-		],
+		id: 'profiles',
+		children: [{ name: 'README.md', type: 'file', id: 'profiles/README.md' }],
 	},
 ];
