@@ -19,6 +19,7 @@ import {
 	ArrowRight,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { fadeInUp } from '@/lib/animations';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -84,19 +85,13 @@ export function AboutModule() {
 
 	if (!about) return null;
 
-	const fadeInUp = {
-		initial: { opacity: 0, y: 20 },
-		animate: { opacity: 1, y: 0 },
-		transition: { duration: 0.4 },
-	};
-
 	return (
 		<ScrollArea className="h-full">
 			<div className="p-6 space-y-8 max-w-6xl mx-auto">
 				{/* 1. Standardized System Header */}
 				<div className="flex items-end justify-between border-b border-border/40 pb-4">
 					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500">
+						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
 							PROFILE DOSSIER
 						</h1>
 						<p className="text-sm text-muted-foreground tracking-wider uppercase font-mono mt-1">
@@ -113,8 +108,9 @@ export function AboutModule() {
 					{/* Left Column: Identity Card */}
 					<div className="md:col-span-4 space-y-6">
 						<motion.div
-							initial={fadeInUp.initial}
-							animate={fadeInUp.animate}
+							initial="hidden"
+							animate="visible"
+							variants={fadeInUp}
 							className="bg-card/30 backdrop-blur-md border border-border/50 rounded-2xl p-6 flex flex-col items-center text-center relative overflow-hidden group"
 						>
 							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -147,7 +143,7 @@ export function AboutModule() {
 							transition={{ delay: 0.15 }}
 							className="grid grid-cols-2 gap-3"
 						>
-							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+							<div className="bg-card/30 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
 								<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 								<span className="text-3xl font-bold text-foreground">
 									{about.experienceYears}+
@@ -156,7 +152,7 @@ export function AboutModule() {
 									Years Exp.
 								</span>
 							</div>
-							<div className="bg-card/40 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
+							<div className="bg-card/30 border border-border/50 rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden group">
 								<div className="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 								<span className="text-3xl font-bold text-foreground">
 									{about.projectsCount}+

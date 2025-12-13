@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { fadeInUp, scaleIn } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
 interface Message {
@@ -113,9 +114,9 @@ export function AILabModule() {
 						{messages.map(msg => (
 							<motion.div
 								key={msg.id}
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								transition={{ duration: 0.3 }}
+								variants={scaleIn}
+								initial="hidden"
+								animate="visible"
 								className={cn(
 									'flex gap-4 max-w-[85%]',
 									msg.sender === 'user'
@@ -145,7 +146,7 @@ export function AILabModule() {
 										'p-4 rounded-2xl border text-sm leading-relaxed shadow-sm',
 										msg.sender === 'user'
 											? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-100 rounded-tr-sm'
-											: 'bg-card/40 border-border/40 text-foreground rounded-tl-sm backdrop-blur-md',
+											: 'bg-card/30 border-border/40 text-foreground rounded-tl-sm backdrop-blur-md',
 									)}
 								>
 									{msg.text}
