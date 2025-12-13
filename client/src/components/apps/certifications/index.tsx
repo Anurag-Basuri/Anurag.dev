@@ -72,7 +72,7 @@ export function CertificationModule() {
 							<ShieldCheck className="w-4 h-4" />
 							<span>Verified Attributes</span>
 						</div>
-						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500">
+						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
 							Certifications
 						</h1>
 					</div>
