@@ -538,3 +538,85 @@
 .animate-fadeIn {
 	animation: fadeIn 0.5s ease-out forwards;
 }
+
+/* =========================
+	Responsive Utilities
+	========================= */
+
+/* Touch Target Minimum Sizes (WCAG 2.5.5) */
+.touch-target {
+	min-height: 44px;
+	min-width: 44px;
+}
+
+.touch-target-sm {
+	min-height: 32px;
+	min-width: 32px;
+}
+
+/* Responsive Typography Utilities */
+.text-responsive-xs {
+	font-size: clamp(0.625rem, 0.5rem + 0.5vw, 0.75rem);
+}
+
+.text-responsive-sm {
+	font-size: clamp(0.75rem, 0.625rem + 0.5vw, 0.875rem);
+}
+
+.text-responsive-base {
+	font-size: clamp(0.875rem, 0.75rem + 0.5vw, 1rem);
+}
+
+.text-responsive-lg {
+	font-size: clamp(1rem, 0.875rem + 0.5vw, 1.125rem);
+}
+
+.text-responsive-xl {
+	font-size: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+}
+
+.text-responsive-2xl {
+	font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+}
+
+.text-responsive-3xl {
+	font-size: clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);
+}
+
+/* Mobile-Optimized Scrollbar */
+@media (max-width: 768px) {
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+}
+
+/* Fluid Spacing Utilities */
+.p-fluid-sm {
+	padding: clamp(0.5rem, 0.25rem + 1vw, 1rem);
+}
+
+.p-fluid-md {
+	padding: clamp(1rem, 0.5rem + 2vw, 1.5rem);
+}
+
+.p-fluid-lg {
+	padding: clamp(1.5rem, 1rem + 2.5vw, 2.5rem);
+}
+
+/* Ensure all interactive elements meet minimum touch target on mobile */
+@media (max-width: 768px) {
+	button:not(.no-min-touch),
+	a:not(.no-min-touch),
+	[role='button']:not(.no-min-touch) {
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+}
