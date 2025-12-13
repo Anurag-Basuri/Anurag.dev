@@ -86,7 +86,7 @@ function FolderTreeItem({
 		<div className="relative">
 			<div
 				className={cn(
-					'flex items-center py-3 md:py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
+					'flex items-center py-4 md:py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
 					'hover:bg-white/5',
 					isHovered && !isFolder && 'text-emerald-400',
 					level > 0 && 'ml-4', // Indentation

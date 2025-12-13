@@ -343,7 +343,7 @@ export function Taskbar() {
 							transition={{ type: 'spring', damping: 25, stiffness: 350 }}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							className="absolute bottom-14 left-2 w-88 sm:w-80 z-50 bg-black/60 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
+							className="absolute bottom-16 sm:bottom-14 left-2 right-2 sm:right-auto w-auto sm:w-80 z-50 bg-black/60 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
 						>
 							<div className="absolute inset-x-0 top-0 h-[120px] bg-linear-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
 
