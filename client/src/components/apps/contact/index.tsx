@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -11,10 +13,31 @@ import {
 	Linkedin,
 	Copy,
 	Check,
+	MessageSquare,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
+
+function ContactSkeleton() {
+	return (
+		<div className="p-6 md:p-10 max-w-6xl mx-auto animate-pulse">
+			<div className="flex flex-col md:flex-row gap-12">
+				<div className="flex-1 space-y-8">
+					<div className="h-8 bg-muted rounded w-64" />
+					<div className="h-20 bg-muted rounded" />
+					<div className="space-y-4">
+						<div className="h-32 bg-card/20 rounded-2xl" />
+						<div className="h-32 bg-card/20 rounded-2xl" />
+					</div>
+				</div>
+				<div className="flex-1">
+					<div className="h-96 bg-card/20 rounded-3xl" />
+				</div>
+			</div>
+		</div>
+	);
+}
 
 export function ContactModule() {
 	const [formData, setFormData] = useState({
@@ -24,9 +47,15 @@ export function ContactModule() {
 		message: '',
 	});
 	const [loading, setLoading] = useState(false);
+	const [initialLoading, setInitialLoading] = useState(true);
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
+
+	// Simulate initial load
+	useState(() => {
+		setTimeout(() => setInitialLoading(false), 300);
+	});
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -84,9 +113,22 @@ export function ContactModule() {
 		setTimeout(() => setCopied(false), 2000);
 	};
 
+	if (initialLoading) return <ContactSkeleton />;
+
 	return (
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-6xl mx-auto pb-20">
+				{/* Standardized Header */}
+				<div className="mb-8 border-b border-border/40 pb-6">
+					<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
+						<MessageSquare className="w-4 h-4" />
+						<span>Communication Channel</span>
+					</div>
+					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500">
+						Get In Touch
+					</h1>
+				</div>
+
 				<div className="flex flex-col md:flex-row gap-12">
 					{/* Left Column: Info */}
 					<motion.div
@@ -95,15 +137,10 @@ export function ContactModule() {
 						transition={{ duration: 0.5 }}
 						className="flex-1 space-y-8"
 					>
-						<div>
-							<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-green-400 to-emerald-600 mb-4 flex items-center gap-2">
-								<span className="text-emerald-500">$</span> ./contact-info.sh
-							</h1>
-							<p className="text-muted-foreground text-lg leading-relaxed">
-								I&apos;m always open to discussing new projects, creative ideas, or
-								opportunities to be part of your visions.
-							</p>
-						</div>
+						<p className="text-muted-foreground text-lg leading-relaxed">
+							I&apos;m always open to discussing new projects, creative ideas, or
+							opportunities to be part of your visions.
+						</p>
 
 						<div className="space-y-6">
 							<div className="p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
