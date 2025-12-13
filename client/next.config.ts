@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
 				protocol: 'https',
 				hostname: 'placehold.co',
 			},
+			{
+				protocol: 'https',
+				hostname: 'avatars.githubusercontent.com',
+			},
+			{
+				protocol: 'https',
+				hostname: 'raw.githubusercontent.com',
+			},
 		],
 	},
 };

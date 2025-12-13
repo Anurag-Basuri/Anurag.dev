@@ -1,10 +1,17 @@
 'use client';
 
-import { MainLayout } from '@/components/layout/MainLayout';
 import { BootAnimation } from '@/components/layout/BootAnimation';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store/atoms';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const MainLayout = dynamic(
+	() => import('@/components/layout/MainLayout').then(mod => mod.MainLayout),
+	{
+		ssr: false,
+	},
+);
 
 export default function Home() {
 	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
