@@ -103,16 +103,27 @@ export interface AboutData {
 	tagline: string;
 	summary: string;
 	bio: string;
+
 	location?: string;
 	avatarUrl: string;
+	coverUrl?: string;
 	resumeUrl?: string;
+
 	experienceYears: number;
 	projectsCount: number;
-	status?: string;
-	availability?: string;
-	coverUrl?: string;
-	languages?: string[];
-	hobbies?: string[];
+
+	urrentStatus?: {
+		label: string;
+		description?: string;
+	};
+
+	focusAreas?: string[];
+
+	highlights?: {
+		label: string;
+		value: string;
+		icon?: string;
+	}[];
 
 	skills: {
 		frontend: Skill[];
@@ -121,20 +132,22 @@ export interface AboutData {
 		other?: Skill[];
 	};
 
+	languages?: string[];
+	hobbies?: string[];
+
+	workPreferences?: {
+		remote?: boolean;
+		hybrid?: boolean;
+		onsite?: boolean;
+		timezone?: string;
+	};
+
 	socials?: SocialLink[];
 }
 
 export interface PlatformStats {
 	username: string;
 	url: string;
-	stats?: {
-		rating?: number;
-		globalRank?: string | number;
-		solved?: number;
-		stars?: number;
-		commits?: number;
-		followers?: number;
-	};
 }
 
 export interface CodingStats {
