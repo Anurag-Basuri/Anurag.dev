@@ -6,6 +6,7 @@ import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 import ClientToaster from '@/components/shared/ClientToaster';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { JotaiProvider } from '@/components/providers/jotai-provider';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -53,17 +54,19 @@ export default function RootLayout({
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 				suppressHydrationWarning
 			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<ErrorBoundary>
-						<ClientToaster />
-						{children}
-					</ErrorBoundary>
-				</ThemeProvider>
+				<JotaiProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<ErrorBoundary>
+							<ClientToaster />
+							{children}
+						</ErrorBoundary>
+					</ThemeProvider>
+				</JotaiProvider>
 			</body>
 		</html>
 	);
