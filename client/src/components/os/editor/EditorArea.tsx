@@ -29,12 +29,14 @@ export function EditorArea() {
 						</div>
 					</div>
 
-					<h3 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-4 tracking-tight text-center">
+					<h3 className="text-2xl sm:text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-4 tracking-tight text-center">
 						AnuragOS{' '}
-						<span className="text-white/20 text-2xl font-mono align-top">v2.0</span>
+						<span className="text-white/20 text-lg sm:text-2xl font-mono align-top">
+							v2.0
+						</span>
 					</h3>
 
-					<p className="text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed mb-12 px-4 font-mono">
+					<p className="text-xs sm:text-sm md:text-base text-white/50 max-w-md text-center leading-relaxed mb-8 md:mb-12 px-4 font-mono">
 						Secure Environment • System Active • Awaiting Input
 					</p>
 
@@ -58,7 +60,8 @@ export function EditorArea() {
 							</p>
 						</div>
 
-						<div className="flex flex-col gap-3 p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
+						{/* Hide Terminal card on very small screens since CLI isn't visible */}
+						<div className="hidden sm:flex flex-col gap-3 p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/30 transition-all duration-300 group cursor-default">
 							<div className="flex items-center gap-3 text-blue-400 mb-1">
 								<div className="p-2 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
 									<Command className="w-5 h-5" />
@@ -78,8 +81,8 @@ export function EditorArea() {
 						</div>
 					</div>
 
-					{/* System Status Footer */}
-					<div className="mt-16 flex items-center gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
+					{/* System Status Footer - Stack on mobile */}
+					<div className="mt-8 md:mt-16 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-[10px] font-mono text-white/20 uppercase tracking-widest">
 						<div className="flex items-center gap-2">
 							<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
 							<span>Kernel: Stable</span>
