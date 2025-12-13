@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { fadeInUp, scaleIn } from '@/lib/animations';
 import { cn } from '@/lib/utils';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 
 interface Message {
 	id: string;
@@ -81,30 +82,22 @@ export function AILabModule() {
 	return (
 		<div className="flex flex-col h-full bg-black/20 backdrop-blur-sm">
 			{/* Header */}
-			<div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-black/20">
-				<div className="flex items-center gap-3">
-					<div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-						<Bot className="w-5 h-5" />
-					</div>
-					<div>
-						<h2 className="font-bold text-lg text-foreground flex items-center gap-2">
-							AI Lab{' '}
-							<span className="px-2 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/20 uppercase tracking-wider">
-								Beta
-							</span>
-						</h2>
-						<p className="text-xs text-muted-foreground">
-							Experiment_v1.0.2 // Simulation Mode
-						</p>
-					</div>
-				</div>
-				<button
-					onClick={() => setMessages([INITIAL_MESSAGE])}
-					className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white transition-colors"
-					title="Reset Chat"
-				>
-					<RefreshCw className="w-4 h-4" />
-				</button>
+			<div className="px-6 pt-4 bg-black/20">
+				<ModuleHeader
+					label="AI Lab Beta"
+					icon={Bot}
+					title="Experiment_v1.0.2"
+					description="Simulation Mode // Neural networks initializing..."
+					actions={
+						<button
+							onClick={() => setMessages([INITIAL_MESSAGE])}
+							className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white transition-colors border border-transparent hover:border-white/10"
+							title="Reset Chat"
+						>
+							<RefreshCw className="w-4 h-4" />
+						</button>
+					}
+				/>
 			</div>
 
 			{/* Chat Area */}

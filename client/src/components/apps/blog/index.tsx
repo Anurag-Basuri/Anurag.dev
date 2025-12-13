@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 import { staggerContainer, staggerItem } from '@/lib/animations';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 
 function BlogSkeleton() {
 	return (
@@ -65,29 +66,24 @@ export function BlogModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-12 max-w-6xl mx-auto pb-24">
 				{/* Header */}
-				<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border/40 pb-6">
-					<div>
-						<div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-emerald-500 mb-2">
-							<BookOpen className="w-4 h-4" />
-							<span>Knowledge Base</span>
+				<ModuleHeader
+					label="Blogs"
+					icon={BookOpen}
+					title="Engineering Log"
+					actions={
+						<div className="relative group w-full md:w-72">
+							<div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-emerald-500 transition-colors z-10" />
+							<input
+								type="text"
+								placeholder="Search articles & notes..."
+								value={searchQuery}
+								onChange={e => setSearchQuery(e.target.value)}
+								className="relative z-10 w-full bg-black/20 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all placeholder:text-muted-foreground/50 backdrop-blur-md"
+							/>
 						</div>
-						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
-							Engineering Log
-						</h1>
-					</div>
-
-					<div className="relative group w-full md:w-72">
-						<div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-emerald-500 transition-colors z-10" />
-						<input
-							type="text"
-							placeholder="Search articles & notes..."
-							value={searchQuery}
-							onChange={e => setSearchQuery(e.target.value)}
-							className="relative z-10 w-full bg-black/20 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-emerald-500/50 focus:bg-black/40 transition-all placeholder:text-muted-foreground/50 backdrop-blur-md"
-						/>
-					</div>
-				</div>
+					}
+				/>
 
 				<motion.div
 					variants={staggerContainer}
