@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import type { JSX } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
+import { Points, PointMaterial, Trail } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import type { Points as ThreePoints, Mesh } from 'three';
+import type { Points as ThreePoints, Mesh, Group } from 'three';
 import * as THREE from 'three';
 
 // Generate random positions in a sphere
@@ -28,16 +28,23 @@ function generateSpherePoints(count: number, radius: number) {
 	return points;
 }
 
-// Generate galaxy spiral arm points
+// Generate logarithmic spiral for realistic galaxy arms
 function generateGalaxyPoints(count: number) {
 	const points = new Float32Array(count * 3);
+	const arms = 3;
+	const armWidth = 0.5;
+
 	for (let i = 0; i < count; i++) {
-		const angle = Math.random() * Math.PI * 4; // Multiple rotations
-		const radius = Math.random() * 2;
-		const spiralOffset = angle * 0.3; // Spiral tightness
-		const x = Math.cos(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
-		const y = (Math.random() - 0.5) * 0.3; // Flat disk
-		const z = Math.sin(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
+		// Logarithmic spiral formula
+		const armIndex = i % arms;
+		const randomOffset = Math.random() * armWidth;
+		const distance = Math.pow(Math.random(), 2) * 2; // Bias towards center
+		const angle = armIndex * ((Math.PI * 2) / arms) + distance * 3 + randomOffset;
+
+		const x = Math.cos(angle) * distance;
+		const y = (Math.random() - 0.5) * 0.2 * (2 - distance); // Thicker center
+		const z = Math.sin(angle) * distance;
+
 		points[i * 3] = x;
 		points[i * 3 + 1] = y;
 		points[i * 3 + 2] = z;
@@ -50,8 +57,9 @@ function CameraRig() {
 	useFrame(state => {
 		const time = state.clock.elapsedTime;
 		// Gentle circular orbit
-		state.camera.position.x = Math.sin(time / 10) * 0.3;
-		state.camera.position.z = 1 + Math.cos(time / 10) * 0.3;
+		state.camera.position.x = Math.sin(time / 20) * 0.5;
+		state.camera.position.z = 1.5 + Math.cos(time / 20) * 0.5;
+		state.camera.position.y = Math.sin(time / 40) * 0.2; // Slight vertical wave
 		state.camera.lookAt(0, 0, 0);
 	});
 	return null;
@@ -60,14 +68,13 @@ function CameraRig() {
 // Distant background stars
 function DistantStars(props: JSX.IntrinsicElements['group']) {
 	const ref = useRef<ThreePoints>(null);
-	const [sphere] = useState(() => generateSpherePoints(3000, 3));
+	const [sphere] = useState(() => generateSpherePoints(3000, 4));
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
 	useFrame((_, delta) => {
 		if (ref.current) {
-			ref.current.rotation.x -= delta / 30;
-			ref.current.rotation.y -= delta / 40;
+			ref.current.rotation.y -= delta / 50;
 		}
 	});
 
@@ -77,36 +84,7 @@ function DistantStars(props: JSX.IntrinsicElements['group']) {
 				<PointMaterial
 					transparent
 					color={isDark ? '#ffffff' : '#a5b4fc'}
-					size={0.001}
-					sizeAttenuation={true}
-					depthWrite={false}
-					opacity={isDark ? 0.4 : 0.3}
-				/>
-			</Points>
-		</group>
-	);
-}
-
-// Main galaxy spiral stars
-function GalaxyStars(props: JSX.IntrinsicElements['group']) {
-	const ref = useRef<ThreePoints>(null);
-	const [galaxy] = useState(() => generateGalaxyPoints(4000));
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame((_, delta) => {
-		if (ref.current) {
-			ref.current.rotation.y += delta / 20;
-		}
-	});
-
-	return (
-		<group rotation={[Math.PI / 6, 0, 0]} {...props}>
-			<Points ref={ref} positions={galaxy} stride={3} frustumCulled={false}>
-				<PointMaterial
-					transparent
-					color={isDark ? '#a78bfa' : '#6366f1'}
-					size={0.003}
+					size={0.0015}
 					sizeAttenuation={true}
 					depthWrite={false}
 					opacity={isDark ? 0.6 : 0.4}
@@ -116,30 +94,29 @@ function GalaxyStars(props: JSX.IntrinsicElements['group']) {
 	);
 }
 
-// Nebula particles (larger, colorful, glowing)
-function NebulaParticles(props: JSX.IntrinsicElements['group']) {
+// Main galaxy spiral stars
+function GalaxyStars(props: JSX.IntrinsicElements['group']) {
 	const ref = useRef<ThreePoints>(null);
-	const [nebula] = useState(() => generateSpherePoints(800, 2));
+	const [galaxy] = useState(() => generateGalaxyPoints(5000));
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
-	useFrame(state => {
+	useFrame((_, delta) => {
 		if (ref.current) {
-			ref.current.rotation.x = state.clock.elapsedTime / 30;
-			ref.current.rotation.y = state.clock.elapsedTime / 25;
+			ref.current.rotation.y += delta / 25;
 		}
 	});
 
 	return (
-		<group {...props}>
-			<Points ref={ref} positions={nebula} stride={3} frustumCulled={false}>
+		<group rotation={[Math.PI / 8, 0, 0]} {...props}>
+			<Points ref={ref} positions={galaxy} stride={3} frustumCulled={false}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#ec4899' : '#d946ef'}
-					size={0.015}
+					color={isDark ? '#a78bfa' : '#6366f1'}
+					size={0.004}
 					sizeAttenuation={true}
 					depthWrite={false}
-					opacity={isDark ? 0.15 : 0.1}
+					opacity={isDark ? 0.8 : 0.6}
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
@@ -147,142 +124,98 @@ function NebulaParticles(props: JSX.IntrinsicElements['group']) {
 	);
 }
 
-// Twinkling foreground stars
-function TwinklingStars(props: JSX.IntrinsicElements['group']) {
-	const ref = useRef<ThreePoints>(null);
-	const [stars] = useState(() => generateSpherePoints(1500, 2.5));
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
+// Shooting Star
+function ShootingStar() {
+	const ref = useRef<Mesh>(null);
+	const [resetKey, setResetKey] = useState(0);
 
 	useFrame(state => {
 		if (ref.current) {
-			const material = ref.current.material as THREE.PointsMaterial;
-			material.opacity = 0.3 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
-			ref.current.rotation.y += 0.0001;
+			ref.current.position.x -= 0.15;
+			ref.current.position.y -= 0.05;
+
+			// Reset when out of view
+			if (ref.current.position.x < -4) {
+				const startX = 3 + Math.random() * 2;
+				const startY = 1 + Math.random();
+				const startZ = -1 + Math.random() * 2;
+				ref.current.position.set(startX, startY, startZ);
+				setResetKey(prev => prev + 1); // Reset trail
+			}
 		}
 	});
 
 	return (
-		<group {...props}>
-			<Points ref={ref} positions={stars} stride={3} frustumCulled={false}>
-				<PointMaterial
-					transparent
-					color={isDark ? '#22d3ee' : '#3b82f6'}
-					size={0.002}
-					sizeAttenuation={true}
-					depthWrite={false}
-					opacity={0.5}
-				/>
-			</Points>
+		<mesh ref={ref} position={[3, 2, 0]}>
+			<sphereGeometry args={[0.02, 8, 8]} />
+			<meshBasicMaterial color="#ffffff" transparent opacity={0} />
+			<Trail
+				key={resetKey}
+				width={1}
+				length={8}
+				color={new THREE.Color('#4f46e5')}
+				attenuation={t => t * t}
+			>
+				<mesh>
+					<sphereGeometry args={[0.01, 8, 8]} />
+					<meshBasicMaterial color="#ffffff" />
+				</mesh>
+			</Trail>
+		</mesh>
+	);
+}
+
+// Planet Component
+function Planet({
+	position,
+	size,
+	color,
+	ring = false,
+}: {
+	position: [number, number, number];
+	size: number;
+	color: string;
+	ring?: boolean;
+}) {
+	const ref = useRef<Mesh>(null);
+	const ringRef = useRef<Mesh>(null);
+
+	useFrame(state => {
+		if (ref.current) {
+			ref.current.rotation.y += 0.005;
+		}
+		if (ringRef.current) {
+			ringRef.current.rotation.x = -Math.PI / 2;
+			ringRef.current.rotation.z += 0.002;
+		}
+	});
+
+	return (
+		<group position={position}>
+			<mesh ref={ref}>
+				<sphereGeometry args={[size, 32, 32]} />
+				<meshStandardMaterial color={color} roughness={0.7} />
+			</mesh>
+			{ring && (
+				<mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
+					<ringGeometry args={[size * 1.4, size * 1.8, 64]} />
+					<meshBasicMaterial
+						color={color}
+						transparent
+						opacity={0.4}
+						side={THREE.DoubleSide}
+					/>
+				</mesh>
+			)}
 		</group>
-	);
-}
-
-// Floating geometric ring
-function FloatingRing() {
-	const ref = useRef<Mesh>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (ref.current) {
-			ref.current.rotation.x = state.clock.elapsedTime / 3;
-			ref.current.rotation.y = state.clock.elapsedTime / 2;
-			ref.current.position.y = Math.sin(state.clock.elapsedTime / 2) * 0.2;
-		}
-	});
-
-	return (
-		<mesh ref={ref} position={[1.5, 0, -2]}>
-			<torusGeometry args={[0.3, 0.02, 16, 100]} />
-			<meshBasicMaterial
-				color={isDark ? '#8b5cf6' : '#6366f1'}
-				transparent
-				opacity={0.3}
-				wireframe
-			/>
-		</mesh>
-	);
-}
-
-// Crystal shape (octahedron)
-function FloatingCrystal() {
-	const ref = useRef<Mesh>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (ref.current) {
-			ref.current.rotation.x = state.clock.elapsedTime / 4;
-			ref.current.rotation.y = state.clock.elapsedTime / 3;
-			ref.current.position.y = Math.cos(state.clock.elapsedTime / 3) * 0.15;
-		}
-	});
-
-	return (
-		<mesh ref={ref} position={[-1.8, 0.3, -2.5]}>
-			<octahedronGeometry args={[0.15, 0]} />
-			<meshBasicMaterial
-				color={isDark ? '#14b8a6' : '#06b6d4'}
-				transparent
-				opacity={0.4}
-				wireframe
-			/>
-		</mesh>
-	);
-}
-
-// Glowing orbs
-function GlowingOrb({ position }: { position: [number, number, number] }) {
-	const ref = useRef<Mesh>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (ref.current) {
-			const scale = 1 + Math.sin(state.clock.elapsedTime * 2 + position[0]) * 0.2;
-			ref.current.scale.set(scale, scale, scale);
-		}
-	});
-
-	return (
-		<mesh ref={ref} position={position}>
-			<sphereGeometry args={[0.08, 16, 16]} />
-			<meshBasicMaterial color={isDark ? '#f472b6' : '#ec4899'} transparent opacity={0.6} />
-		</mesh>
-	);
-}
-
-// Distant rotating icosahedron
-function DistantIcosahedron() {
-	const ref = useRef<Mesh>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (ref.current) {
-			ref.current.rotation.x = state.clock.elapsedTime / 6;
-			ref.current.rotation.z = state.clock.elapsedTime / 8;
-		}
-	});
-
-	return (
-		<mesh ref={ref} position={[0, -1, -3]}>
-			<icosahedronGeometry args={[0.4, 0]} />
-			<meshBasicMaterial
-				color={isDark ? '#a78bfa' : '#8b5cf6'}
-				transparent
-				opacity={0.15}
-				wireframe
-			/>
-		</mesh>
 	);
 }
 
 export function Background3D() {
 	const [hasWebGLError, setHasWebGLError] = useState(false);
+	const { theme } = useTheme();
+	const isDark = useMemo(() => theme === 'dark', [theme]);
 
-	// Check if WebGL is available
 	useEffect(() => {
 		try {
 			const canvas = document.createElement('canvas');
@@ -295,7 +228,6 @@ export function Background3D() {
 		}
 	}, []);
 
-	// If WebGL is not available, render nothing
 	if (hasWebGLError) {
 		return null;
 	}
@@ -304,24 +236,34 @@ export function Background3D() {
 		<div className="absolute inset-0 z-0 pointer-events-none">
 			<ErrorBoundary>
 				<Canvas
-					camera={{ position: [0, 0, 1], fov: 75 }}
+					camera={{ position: [0, 0, 1], fov: 60 }}
 					onCreated={({ gl }) => {
 						if (!gl) {
 							setHasWebGLError(true);
 						}
 					}}
 				>
+					<ambientLight intensity={0.5} />
+					<pointLight position={[10, 10, 10]} intensity={1} />
+
 					<CameraRig />
 					<DistantStars />
 					<GalaxyStars />
-					<NebulaParticles />
-					<TwinklingStars />
-					<FloatingRing />
-					<FloatingCrystal />
-					<DistantIcosahedron />
-					<GlowingOrb position={[0.8, 0.5, -1.5]} />
-					<GlowingOrb position={[-0.6, -0.3, -1.8]} />
-					<GlowingOrb position={[0.2, 0.8, -2.2]} />
+
+					{/* Cosmic Objects */}
+					<Planet
+						position={[1.8, 0.5, -2]}
+						size={0.15}
+						color={isDark ? '#8b5cf6' : '#a5b4fc'}
+						ring
+					/>
+					<Planet
+						position={[-2, -0.8, -1.5]}
+						size={0.1}
+						color={isDark ? '#2dd4bf' : '#99f6e4'}
+					/>
+
+					<ShootingStar />
 				</Canvas>
 			</ErrorBoundary>
 		</div>
