@@ -35,11 +35,12 @@ import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/hooks/use-window-manager';
+import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '@/lib/animations';
 
 // Enhanced skeleton loader
 function AboutSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 space-y-6 sm:space-y-8 animate-pulse">
+		<div className="p-4 sm:p-6 space-y-6 sm:space-y-8 animate-pulse max-w-7xl mx-auto">
 			<div className="h-40 sm:h-48 md:h-56 bg-muted/50 rounded-b-3xl" />
 			<div className="flex justify-center -mt-12">
 				<div className="w-32 h-32 bg-muted rounded-full border-4 border-background" />
@@ -134,9 +135,9 @@ export function AboutModule() {
 					{/* Profile Picture - Centered & Overlapping */}
 					<div className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-10">
 						<motion.div
-							initial={{ scale: 0 }}
-							animate={{ scale: 1 }}
-							transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+							variants={scaleIn}
+							initial="hidden"
+							animate="visible"
 							className="relative group"
 						>
 							<div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-400 to-blue-500 blur-2xl opacity-60 animate-pulse group-hover:opacity-80 transition-opacity" />
@@ -175,9 +176,9 @@ export function AboutModule() {
 				{/* Identity Section */}
 				<div className="mt-20 sm:mt-24 px-4 text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
 					<motion.div
-						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.3 }}
+						variants={fadeInUp}
+						initial="hidden"
+						animate="visible"
 						className="space-y-3"
 					>
 						<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight tracking-tight">
@@ -214,12 +215,7 @@ export function AboutModule() {
 						{/* Enhanced Status Badges */}
 						<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-4 sm:pt-6">
 							{about.currentStatus && (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.9 }}
-									animate={{ opacity: 1, scale: 1 }}
-									transition={{ delay: 0.4 }}
-									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs sm:text-sm backdrop-blur-sm cursor-default"
-								>
+								<div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs sm:text-sm backdrop-blur-sm cursor-default">
 									<span className="relative flex h-2 w-2">
 										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -227,27 +223,17 @@ export function AboutModule() {
 									<span className="text-emerald-500 font-medium">
 										{about.currentStatus.label}
 									</span>
-								</motion.div>
+								</div>
 							)}
 							{about.location && (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.9 }}
-									animate={{ opacity: 1, scale: 1 }}
-									transition={{ delay: 0.5 }}
-									className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-card border border-border text-xs sm:text-sm text-muted-foreground shadow-sm"
-								>
+								<div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-card border border-border text-xs sm:text-sm text-muted-foreground shadow-sm">
 									<MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
 									<span>{about.location}</span>
-								</motion.div>
+								</div>
 							)}
 							{about.workPreferences &&
 								(about.workPreferences.remote || about.workPreferences.hybrid) && (
-									<motion.div
-										initial={{ opacity: 0, scale: 0.9 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{ delay: 0.6 }}
-										className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs sm:text-sm text-blue-400 shadow-sm"
-									>
+									<div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs sm:text-sm text-blue-400 shadow-sm">
 										<Globe className="w-3 h-3 sm:w-4 sm:h-4" />
 										<span>
 											{about.workPreferences.remote &&
@@ -257,7 +243,7 @@ export function AboutModule() {
 												? 'Remote'
 												: 'Hybrid'}
 										</span>
-									</motion.div>
+									</div>
 								)}
 						</div>
 					</motion.div>
@@ -266,7 +252,12 @@ export function AboutModule() {
 				<div className="mt-12 sm:mt-16 px-4 sm:px-6 md:px-8 space-y-8 sm:space-y-12">
 					{/* Highlights Section */}
 					{about.highlights && about.highlights.length > 0 && (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+						<motion.div
+							variants={staggerContainer}
+							initial="hidden"
+							animate="visible"
+							className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+						>
 							{about.highlights.map((highlight, index) => {
 								const Icon =
 									highlight.icon && iconMap[highlight.icon]
@@ -275,9 +266,7 @@ export function AboutModule() {
 								return (
 									<motion.div
 										key={highlight.label}
-										initial={{ opacity: 0, y: 20 }}
-										animate={{ opacity: 1, y: 0 }}
-										transition={{ delay: 0.4 + index * 0.1 }}
+										variants={staggerItem}
 										whileHover={{ y: -5 }}
 										className="relative group p-6 rounded-2xl bg-card/40 backdrop-blur-md border border-border/50 hover:border-emerald-500/30 transition-all cursor-default overflow-hidden"
 									>
@@ -296,16 +285,17 @@ export function AboutModule() {
 									</motion.div>
 								);
 							})}
-						</div>
+						</motion.div>
 					)}
 
 					{/* Bio & Stats Grid */}
 					<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
 						{/* Bio */}
 						<motion.div
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.5 }}
+							variants={fadeInUp}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true }}
 							className="lg:col-span-2 space-y-6"
 						>
 							<div className="bg-card/40 backdrop-blur-md border border-border/50 rounded-3xl p-6 sm:p-8 relative overflow-hidden group">
@@ -317,6 +307,12 @@ export function AboutModule() {
 								</h2>
 								<div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
 									<p>{about.summary}</p>
+									{/* Display full bio formatted with newlines if available */}
+									{about.bio && (
+										<div className="mt-4 pt-4 border-t border-border/30 whitespace-pre-line">
+											{about.bio}
+										</div>
+									)}
 								</div>
 
 								{about.currentStatus?.description && (
@@ -338,29 +334,34 @@ export function AboutModule() {
 										<Target className="w-5 h-5 text-primary" />
 										Focus Areas
 									</h2>
-									<div className="flex flex-wrap gap-2.5">
+									<motion.div
+										variants={staggerContainer}
+										initial="hidden"
+										whileInView="visible"
+										viewport={{ once: true }}
+										className="flex flex-wrap gap-2.5"
+									>
 										{about.focusAreas.map((area, index) => (
 											<motion.div
 												key={area}
-												initial={{ opacity: 0, scale: 0.8 }}
-												animate={{ opacity: 1, scale: 1 }}
-												transition={{ delay: 0.6 + index * 0.05 }}
+												variants={staggerItem}
 												whileHover={{ scale: 1.05 }}
 												className="px-4 py-2 rounded-xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 text-xs sm:text-sm font-medium text-emerald-500/90 cursor-default shadow-sm"
 											>
 												{area}
 											</motion.div>
 										))}
-									</div>
+									</motion.div>
 								</div>
 							)}
 						</motion.div>
 
 						{/* Quick Stats Column */}
 						<motion.div
-							initial={{ opacity: 0, x: 20 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{ delay: 0.6 }}
+							variants={fadeInUp}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true }}
 							className="space-y-4 sm:space-y-6"
 						>
 							<div className="bg-linear-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/30 rounded-3xl p-6 text-center hover:border-emerald-500/50 transition-colors shadow-lg shadow-emerald-500/5">
@@ -390,7 +391,13 @@ export function AboutModule() {
 					</div>
 
 					{/* Skills Grid */}
-					<div className="space-y-6">
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						className="space-y-6"
+					>
 						<h2 className="text-2xl font-bold flex items-center gap-2.5 px-2">
 							<Cpu className="w-6 h-6 text-primary" />
 							Technical Arsenal
@@ -398,6 +405,7 @@ export function AboutModule() {
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 							{/* Frontend */}
 							<motion.div
+								variants={staggerItem}
 								whileHover={{ y: -5 }}
 								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
 							>
@@ -419,6 +427,7 @@ export function AboutModule() {
 
 							{/* Backend */}
 							<motion.div
+								variants={staggerItem}
 								whileHover={{ y: -5 }}
 								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
 							>
@@ -440,6 +449,7 @@ export function AboutModule() {
 
 							{/* AI/ML */}
 							<motion.div
+								variants={staggerItem}
 								whileHover={{ y: -5 }}
 								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
 							>
@@ -459,21 +469,27 @@ export function AboutModule() {
 								</div>
 							</motion.div>
 						</div>
-					</div>
+					</motion.div>
 
 					{/* Personal Info Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
+					<motion.div
+						variants={fadeInUp}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8"
+					>
 						{about.languages && (
-							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8">
+							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8 hover:bg-card/40 transition-colors">
 								<h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 flex items-center gap-2 tracking-wider">
-									<Globe className="w-4 h-4" />
+									<Globe className="w-4 h-4 text-emerald-500" />
 									Languages
 								</h3>
 								<div className="flex flex-wrap gap-2">
 									{about.languages.map(lang => (
 										<span
 											key={lang}
-											className="px-3 py-1.5 rounded-lg bg-background border border-border text-sm font-medium shadow-sm"
+											className="px-3 py-1.5 rounded-lg bg-background/50 border border-border text-sm font-medium shadow-sm"
 										>
 											{lang}
 										</span>
@@ -483,16 +499,16 @@ export function AboutModule() {
 						)}
 
 						{about.hobbies && (
-							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8">
+							<div className="bg-card/30 border border-border/50 rounded-2xl p-6 sm:p-8 hover:bg-card/40 transition-colors">
 								<h3 className="font-bold text-sm uppercase text-muted-foreground mb-4 flex items-center gap-2 tracking-wider">
-									<Sparkles className="w-4 h-4" />
+									<Sparkles className="w-4 h-4 text-purple-500" />
 									Interests & Hobbies
 								</h3>
 								<div className="flex flex-wrap gap-2">
 									{about.hobbies.map(hobby => (
 										<span
 											key={hobby}
-											className="px-3 py-1.5 rounded-lg bg-surface-200/50 hover:bg-surface-300/50 transition-colors border border-white/5 text-sm cursor-default"
+											className="px-3 py-1.5 rounded-lg bg-surface-200/20 hover:bg-surface-300/30 transition-colors border border-white/5 text-sm cursor-default"
 										>
 											{hobby}
 										</span>
@@ -500,11 +516,17 @@ export function AboutModule() {
 								</div>
 							</div>
 						)}
-					</div>
+					</motion.div>
 
 					{/* Coding Profiles Footer */}
 					{codingStats && (
-						<div className="space-y-6">
+						<motion.div
+							variants={staggerContainer}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true }}
+							className="space-y-6"
+						>
 							<div className="flex items-center justify-between">
 								<h2 className="text-2xl font-bold flex items-center gap-2.5 px-2">
 									<Terminal className="w-6 h-6 text-primary" />
@@ -520,7 +542,9 @@ export function AboutModule() {
 							</div>
 
 							<div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-								<a
+								<motion.a
+									variants={staggerItem}
+									whileHover={{ y: -5 }}
 									href={codingStats.github.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -531,8 +555,10 @@ export function AboutModule() {
 									<div className="text-xs text-muted-foreground mt-1">
 										@{codingStats.github.username}
 									</div>
-								</a>
-								<a
+								</motion.a>
+								<motion.a
+									variants={staggerItem}
+									whileHover={{ y: -5 }}
 									href={codingStats.leetcode.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -545,8 +571,10 @@ export function AboutModule() {
 									<div className="text-xs text-muted-foreground mt-1">
 										@{codingStats.leetcode.username}
 									</div>
-								</a>
-								<a
+								</motion.a>
+								<motion.a
+									variants={staggerItem}
+									whileHover={{ y: -5 }}
 									href={codingStats.codeforces.url}
 									target="_blank"
 									rel="noopener noreferrer"
@@ -559,9 +587,11 @@ export function AboutModule() {
 									<div className="text-xs text-muted-foreground mt-1">
 										@{codingStats.codeforces.username}
 									</div>
-								</a>
+								</motion.a>
 								{codingStats.codechef && (
-									<a
+									<motion.a
+										variants={staggerItem}
+										whileHover={{ y: -5 }}
 										href={codingStats.codechef.url}
 										target="_blank"
 										rel="noopener noreferrer"
@@ -574,10 +604,10 @@ export function AboutModule() {
 										<div className="text-xs text-muted-foreground mt-1">
 											@{codingStats.codechef.username}
 										</div>
-									</a>
+									</motion.a>
 								)}
 							</div>
-						</div>
+						</motion.div>
 					)}
 				</div>
 			</div>
