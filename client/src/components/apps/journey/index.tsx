@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { api, JourneyEntry } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
 
@@ -64,25 +64,6 @@ export function JourneyModule() {
 	const [journey, setJourney] = useState<JourneyEntry[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [isMounted, setIsMounted] = useState(false);
-	const ref = useRef<HTMLDivElement>(null);
-
-	// Defer scroll tracking until after hydration
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
-
-	// Scroll progress for the central line - only track if mounted
-	const { scrollYProgress } = useScroll({
-		container: isMounted ? ref : undefined,
-		offset: ['start start', 'end end'],
-	});
-
-	const scaleY = useSpring(scrollYProgress, {
-		stiffness: 100,
-		damping: 30,
-		restDelta: 0.001,
-	});
 
 	const fetchData = async () => {
 		try {
@@ -108,7 +89,7 @@ export function JourneyModule() {
 	}
 
 	return (
-		<div className="h-full overflow-y-auto relative custom-scrollbar" ref={ref}>
+		<ScrollArea className="h-full">
 			<div className="p-6 md:p-12 max-w-5xl mx-auto pb-24 relative">
 				{/* Header */}
 				<div className="mb-16 text-center md:text-left">
@@ -124,15 +105,10 @@ export function JourneyModule() {
 				</div>
 
 				<div className="relative">
-					{/* Central Line (Desktop) */}
-					<div className="absolute left-[19px] md:left-1/2 top-4 bottom-0 w-0.5 bg-border/30 md:-translate-x-1/2 rounded-full hidden md:block">
-						<motion.div
-							className="absolute top-0 left-0 w-full bg-linear-to-b from-emerald-500 via-cyan-500 to-purple-500 origin-top rounded-full"
-							style={{ scaleY, height: '100%' }}
-						/>
-					</div>
+					{/* Static Central Line - Simple gradient without scroll animation */}
+					<div className="absolute left-[19px] md:left-1/2 top-4 bottom-0 w-0.5 bg-linear-to-b from-emerald-500 via-cyan-500 to-purple-500 md:-translate-x-1/2 rounded-full opacity-30 hidden md:block" />
 
-					{/* Central Line (Mobile) - Static for now or simplified */}
+					{/* Mobile Line */}
 					<div className="absolute left-[19px] top-4 bottom-0 w-0.5 bg-border/30 rounded-full md:hidden" />
 
 					<div className="space-y-12">
@@ -260,6 +236,6 @@ export function JourneyModule() {
 					</div>
 				)}
 			</div>
-		</div>
+		</ScrollArea>
 	);
 }
