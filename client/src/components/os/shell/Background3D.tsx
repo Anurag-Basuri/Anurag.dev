@@ -9,7 +9,7 @@ import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import type { Points as ThreePoints } from 'three';
 import * as THREE from 'three';
 
-type Pointer = { x: number; y: number };
+// --- Utilities ---
 
 function usePrefersReducedMotion() {
 	const [reduced, setReduced] = useState(false);
@@ -33,42 +33,7 @@ function usePrefersReducedMotion() {
 	return reduced;
 }
 
-function useWindowPointer() {
-	const pointerRef = useRef<Pointer>({ x: 0, y: 0 });
-
-	useEffect(() => {
-		const updateFromEvent = (clientX: number, clientY: number) => {
-			const w = window.innerWidth || 1;
-			const h = window.innerHeight || 1;
-
-			// Normalize to [-1, 1]
-			const x = (clientX / w) * 2 - 1;
-			const y = -((clientY / h) * 2 - 1);
-
-			pointerRef.current.x = THREE.MathUtils.clamp(x, -1, 1);
-			pointerRef.current.y = THREE.MathUtils.clamp(y, -1, 1);
-		};
-
-		const onPointerMove = (e: PointerEvent) => updateFromEvent(e.clientX, e.clientY);
-		const onTouchMove = (e: TouchEvent) => {
-			const t = e.touches?.[0];
-			if (t) updateFromEvent(t.clientX, t.clientY);
-		};
-
-		window.addEventListener('pointermove', onPointerMove, { passive: true });
-		window.addEventListener('touchmove', onTouchMove, { passive: true });
-
-		return () => {
-			window.removeEventListener('pointermove', onPointerMove);
-			window.removeEventListener('touchmove', onTouchMove);
-		};
-	}, []);
-
-	return pointerRef;
-}
-
-// Generate random positions in a sphere
-function generateSpherePoints(count: number, radius: number) {
+function generateStarPoints(count: number, radius: number) {
 	const points = new Float32Array(count * 3);
 	for (let i = 0; i < count; i++) {
 		const u = Math.random();
@@ -84,347 +49,134 @@ function generateSpherePoints(count: number, radius: number) {
 	return points;
 }
 
-// Generate galaxy spiral arm points
-function generateGalaxyPoints(count: number) {
-	const points = new Float32Array(count * 3);
-	for (let i = 0; i < count; i++) {
-		const angle = Math.random() * Math.PI * 4;
-		const radius = Math.random() * 2;
-		const spiralOffset = angle * 0.3;
+// --- Components ---
 
-		points[i * 3] = Math.cos(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
-		points[i * 3 + 1] = (Math.random() - 0.5) * 0.3;
-		points[i * 3 + 2] = Math.sin(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
-	}
-	return points;
-}
+function MovingGrid({ reducedMotion }: { reducedMotion: boolean }) {
+	const gridRef = useRef<THREE.Group>(null);
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
 
-function CameraRig({
-	pointerRef,
-	reducedMotion,
-}: {
-	pointerRef: React.MutableRefObject<Pointer>;
-	reducedMotion: boolean;
-}) {
-	const base = useMemo(() => new THREE.Vector3(0, 0, 5.5), []);
+	// Colors
+	const gridColor = isDark ? '#10b981' : '#6366f1'; // Emerald vs Indigo
+	const opacity = isDark ? 0.2 : 0.15;
 
 	useFrame((state, delta) => {
-		if (reducedMotion) return;
+		if (reducedMotion || !gridRef.current) return;
 
-		// Exponential smoothing that feels consistent across FPS
-		const t = 1 - Math.pow(0.001, delta);
-
-		const px = pointerRef.current.x;
-		const py = pointerRef.current.y;
-
-		// Mild parallax: "viewer perspective" improvement without being distracting
-		const targetX = base.x + px * 0.45;
-		const targetY = base.y + py * 0.25;
-
-		// Tiny drift so it doesn’t feel static if the user isn’t moving the mouse
-		const driftX = Math.sin(state.clock.elapsedTime * 0.12) * 0.08;
-		const driftY = Math.cos(state.clock.elapsedTime * 0.1) * 0.06;
-
-		state.camera.position.x = THREE.MathUtils.lerp(
-			state.camera.position.x,
-			targetX + driftX,
-			t,
-		);
-		state.camera.position.y = THREE.MathUtils.lerp(
-			state.camera.position.y,
-			targetY + driftY,
-			t,
-		);
-		state.camera.position.z = THREE.MathUtils.lerp(state.camera.position.z, base.z, t);
-
-		state.camera.lookAt(0, 0, 0);
+		// Move grid towards camera (z-axis positive)
+		// We use a group with two identical grids to simulate infinity
+		gridRef.current.position.z = (state.clock.elapsedTime * 0.8) % 2;
 	});
 
+	return (
+		<group ref={gridRef} position={[0, -2, 0]}>
+			<gridHelper
+				args={[60, 60, gridColor, gridColor]}
+				position={[0, 0, 0]}
+				rotation={[0, 0, 0]}
+			>
+				<meshBasicMaterial
+					attach="material"
+					color={gridColor}
+					transparent
+					opacity={opacity}
+					depthWrite={false}
+				/>
+			</gridHelper>
+			{/* Second grid for seamless loop if needed, but modulo usually handles it with just one if large enough relative to movement. 
+                Actually, simpler approach: Just one large grid moving. Modulo 1 cell unit (1) to reset.
+                GridHelper size 60, div 60 implies cell size 1.
+            */}
+		</group>
+	);
+}
+
+function StarField({ reducedMotion }: { reducedMotion: boolean }) {
+	const ref = useRef<ThreePoints>(null);
+	// Generate stars in a large sphere
+	const stars = useMemo(() => generateStarPoints(600, 25), []);
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
+
+	useFrame((state, delta) => {
+		if (reducedMotion || !ref.current) return;
+		// Slow rotation
+		ref.current.rotation.y += delta * 0.02;
+		ref.current.rotation.x += delta * 0.005;
+	});
+
+	return (
+		<group rotation={[0, 0, Math.PI / 4]}>
+			<Points ref={ref} positions={stars} stride={3} frustumCulled={false}>
+				<PointMaterial
+					transparent
+					color={isDark ? '#fff' : '#000'}
+					size={0.06} // slightly chunkier stars
+					sizeAttenuation
+					depthWrite={false}
+					opacity={isDark ? 0.6 : 0.4}
+				/>
+			</Points>
+		</group>
+	);
+}
+
+function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
+	useFrame(state => {
+		if (reducedMotion) return;
+
+		// Gentle mouse parallax
+		const x = state.pointer.x * 0.5;
+		const y = state.pointer.y * 0.3;
+
+		state.camera.position.x += (x - state.camera.position.x) * 0.02;
+		state.camera.position.y += (1 - y - state.camera.position.y) * 0.02; // Look slightly down by hovering up
+		state.camera.lookAt(0, -2, 0); // Look at the grid floor
+	});
 	return null;
 }
 
-// Distant background stars
-function DistantStars({
-	reducedMotion,
-	...props
-}: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
-	const ref = useRef<ThreePoints>(null);
-	const sphere = useMemo(() => generateSpherePoints(700, 3.2), []);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame((_, delta) => {
-		if (reducedMotion) return;
-		if (ref.current) {
-			ref.current.rotation.x -= delta * 0.03;
-			ref.current.rotation.y -= delta * 0.02;
-		}
-	});
-
-	return (
-		<group position={[0, 0, -2.0]} {...props}>
-			<Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
-				<PointMaterial
-					transparent
-					color={isDark ? '#ffffff' : '#a5b4fc'}
-					size={0.0012}
-					sizeAttenuation
-					depthWrite={false}
-					opacity={isDark ? 0.35 : 0.25}
-				/>
-			</Points>
-		</group>
-	);
-}
-
-// Main galaxy spiral stars
-function GalaxyStars({
-	reducedMotion,
-	...props
-}: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
-	const ref = useRef<ThreePoints>(null);
-	const galaxy = useMemo(() => generateGalaxyPoints(1000), []);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame((_, delta) => {
-		if (reducedMotion) return;
-		if (ref.current) {
-			ref.current.rotation.y += delta * 0.06;
-		}
-	});
-
-	return (
-		<group rotation={[Math.PI / 7, 0, 0]} position={[0, 0, -0.8]} {...props}>
-			<Points ref={ref} positions={galaxy} stride={3} frustumCulled={false}>
-				<PointMaterial
-					transparent
-					color={isDark ? '#a78bfa' : '#6366f1'}
-					size={0.0035}
-					sizeAttenuation
-					depthWrite={false}
-					opacity={isDark ? 0.55 : 0.35}
-				/>
-			</Points>
-		</group>
-	);
-}
-
-// Nebula particles (larger, colorful, glowing)
-function NebulaParticles({
-	reducedMotion,
-	...props
-}: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
-	const ref = useRef<ThreePoints>(null);
-	const nebula = useMemo(() => generateSpherePoints(200, 2.2), []);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (reducedMotion) return;
-		if (ref.current) {
-			ref.current.rotation.x = state.clock.elapsedTime / 30;
-			ref.current.rotation.y = state.clock.elapsedTime / 25;
-		}
-	});
-
-	return (
-		<group position={[0.15, -0.05, -0.4]} {...props}>
-			<Points ref={ref} positions={nebula} stride={3} frustumCulled={false}>
-				<PointMaterial
-					transparent
-					color={isDark ? '#ec4899' : '#d946ef'}
-					size={0.016}
-					sizeAttenuation
-					depthWrite={false}
-					opacity={isDark ? 0.14 : 0.09}
-					blending={THREE.AdditiveBlending}
-				/>
-			</Points>
-		</group>
-	);
-}
-
-// Twinkling foreground stars
-function TwinklingStars({
-	reducedMotion,
-	...props
-}: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
-	const pointsRef = useRef<ThreePoints>(null);
-	const materialRef = useRef<import('@react-three/drei').PointMaterialImpl | null>(null);
-	const stars = useMemo(() => generateSpherePoints(300, 2.8), []);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	useFrame(state => {
-		if (reducedMotion) return;
-
-		const baseOpacity = isDark ? 0.45 : 0.35;
-		const twinkle = 0.12 * Math.sin(state.clock.elapsedTime * 2.0);
-		const nextOpacity = THREE.MathUtils.clamp(baseOpacity + twinkle, 0.15, 0.65);
-
-		if (materialRef.current) {
-			// drei's PointMaterial is a ShaderMaterial with an opacity field
-			(materialRef.current as unknown as { opacity: number }).opacity = nextOpacity;
-		}
-
-		if (pointsRef.current) {
-			pointsRef.current.rotation.y += 0.002;
-		}
-	});
-
-	return (
-		<group position={[0, 0, 0.55]} {...props}>
-			<Points ref={pointsRef} positions={stars} stride={3} frustumCulled={false}>
-				<PointMaterial
-					ref={materialRef}
-					transparent
-					color={isDark ? '#22d3ee' : '#3b82f6'}
-					size={0.0024}
-					sizeAttenuation
-					depthWrite={false}
-					opacity={isDark ? 0.45 : 0.35}
-				/>
-			</Points>
-		</group>
-	);
-}
+// --- Main ---
 
 export function Background3D() {
-	const [hasWebGLError, setHasWebGLError] = useState(false);
 	const [dpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1.5));
-
 	const reducedMotion = usePrefersReducedMotion();
-	const pointerRef = useWindowPointer();
 
+	// WebGL availability check
+	const [hasWebGLError, setHasWebGLError] = useState(false);
 	useEffect(() => {
 		try {
 			const canvas = document.createElement('canvas');
 			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) Promise.resolve().then(() => setHasWebGLError(true));
+			if (!gl) setHasWebGLError(true);
 		} catch {
-			Promise.resolve().then(() => setHasWebGLError(true));
+			setHasWebGLError(true);
 		}
 	}, []);
 
 	if (hasWebGLError) return null;
 
 	return (
-		<div className="absolute inset-0 z-0 pointer-events-none">
+		<div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000 ease-in-out">
 			<ErrorBoundary>
 				<Canvas
 					dpr={dpr}
 					frameloop={reducedMotion ? 'demand' : 'always'}
-					camera={{ position: [0, 0, 5.5], fov: 50, near: 0.1, far: 50 }}
+					// Camera pushed back and up
+					camera={{ position: [0, 2, 6], fov: 60, near: 0.1, far: 50 }}
 					gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
-					onCreated={({ gl }) => {
-						// Keep the rest of the UI visible through the canvas.
-						gl.setClearAlpha(0);
-					}}
+					onCreated={({ gl }) => gl.setClearAlpha(0)}
 				>
-					<CameraRig pointerRef={pointerRef} reducedMotion={reducedMotion} />
-
-					<CyberMatrix reducedMotion={reducedMotion} scale={0.9} />
-					<DistantStars reducedMotion={reducedMotion} />
-					<GalaxyStars reducedMotion={reducedMotion} />
-					<NebulaParticles reducedMotion={reducedMotion} />
-					<TwinklingStars reducedMotion={reducedMotion} />
+					{/* Fog for depth fading */}
+					{/* We can't easily adhere to theme inside Canvas for fog without context, 
+                        but we can assume dark mode mostly or pass a prop if needed. 
+                        Let's skip fog for now to keep it crisp as requested (grid + stars).
+                    */}
+					<CameraRig reducedMotion={reducedMotion} />
+					<MovingGrid reducedMotion={reducedMotion} />
+					<StarField reducedMotion={reducedMotion} />
 				</Canvas>
 			</ErrorBoundary>
 		</div>
-	);
-}
-
-// Advanced Cyber-tech visual system
-function CyberMatrix({
-	reducedMotion,
-	...props
-}: JSX.IntrinsicElements['group'] & { reducedMotion: boolean }) {
-	const groupRef = useRef<THREE.Group>(null);
-	const { theme } = useTheme();
-	const isDark = theme === 'dark';
-
-	const ring1Ref = useRef<THREE.Mesh>(null);
-	// Ring 2 removed for simplification
-	const ring3Ref = useRef<THREE.Mesh>(null);
-	const coreRef = useRef<THREE.Mesh>(null);
-	// Satellites removed for simplification
-
-	const primary = isDark ? '#10b981' : '#64748b';
-	const secondary = isDark ? '#3b82f6' : '#94a3b8';
-	const accent = isDark ? '#8b5cf6' : '#a78bfa';
-
-	useFrame(state => {
-		if (reducedMotion) return;
-
-		const t = state.clock.elapsedTime;
-
-		if (groupRef.current) {
-			groupRef.current.position.y = Math.sin(t * 0.2) * 0.08;
-			groupRef.current.rotation.z = t * 0.05;
-			groupRef.current.rotation.x = Math.sin(t * 0.1) * 0.06;
-		}
-
-		if (ring1Ref.current) {
-			ring1Ref.current.rotation.x = t * 0.12; // Slower
-			ring1Ref.current.rotation.y = t * 0.08;
-		}
-		// Ring 2 logic removed
-		if (ring3Ref.current) {
-			ring3Ref.current.rotation.y = t * 0.15; // Slower
-			ring3Ref.current.rotation.x = t * 0.05;
-		}
-
-		if (coreRef.current) {
-			const scale = 1 + Math.sin(t * 1.5) * 0.05; // Gentle pulse
-			coreRef.current.scale.set(scale, scale, scale);
-			coreRef.current.rotation.y -= 0.01;
-			coreRef.current.rotation.z -= 0.01;
-		}
-		// Satellites logic removed
-	});
-
-	// Arrays removed
-
-	return (
-		<group ref={groupRef} position={[0, 0, 0]} {...props}>
-			<mesh ref={ring1Ref}>
-				<torusGeometry args={[2.2, 0.02, 16, 100]} />
-				<meshBasicMaterial
-					color={secondary}
-					transparent
-					opacity={isDark ? 0.14 : 0.05}
-					wireframe
-				/>
-			</mesh>
-
-			{/* Ring 2 removed */}
-
-			<mesh ref={ring3Ref} rotation={[0, Math.PI / 4, 0]}>
-				<torusGeometry args={[1.4, 0.03, 16, 50]} />
-				<meshBasicMaterial
-					color={accent}
-					transparent
-					opacity={isDark ? 0.22 : 0.1}
-					wireframe
-				/>
-			</mesh>
-
-			<mesh ref={coreRef}>
-				<octahedronGeometry args={[0.8, 0]} />
-				<meshBasicMaterial
-					color={primary}
-					wireframe
-					transparent
-					opacity={isDark ? 0.35 : 0.18}
-				/>
-			</mesh>
-
-			{/* Center Detail */}
-			<mesh scale={[0.4, 0.4, 0.4]}>
-				<dodecahedronGeometry args={[1, 0]} />
-				<meshBasicMaterial color={accent} transparent opacity={isDark ? 0.55 : 0.28} />
-			</mesh>
-		</group>
 	);
 }
