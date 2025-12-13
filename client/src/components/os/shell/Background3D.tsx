@@ -196,8 +196,9 @@ export function Background3D() {
 						if (!gl) {
 							setHasWebGLError(true);
 						}
-					}}>
-					<TechGeometry />
+					}}
+				>
+					<CyberMatrix />
 					<DistantStars />
 					<GalaxyStars />
 					<NebulaParticles />
@@ -208,59 +209,136 @@ export function Background3D() {
 	);
 }
 
-// Tech-themed geometric elements (Wireframes, Cyber-grid feel)
-function TechGeometry(props: JSX.IntrinsicElements['group']) {
+// Advanced Cyber-tech visual system
+function CyberMatrix(props: JSX.IntrinsicElements['group']) {
 	const groupRef = useRef<THREE.Group>(null);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
-	useFrame((state) => {
+	// Animation refs for independent movements
+	const ring1Ref = useRef<THREE.Mesh>(null);
+	const ring2Ref = useRef<THREE.Mesh>(null);
+	const ring3Ref = useRef<THREE.Mesh>(null);
+	const coreRef = useRef<THREE.Mesh>(null);
+	const satellitesRef = useRef<THREE.Group>(null);
+
+	// Theme colors
+	const primary = isDark ? '#10b981' : '#64748b'; // Emerald/Slate
+	const secondary = isDark ? '#3b82f6' : '#94a3b8'; // Blue/Slate-light
+	const accent = isDark ? '#8b5cf6' : '#a78bfa'; // Purple
+
+	useFrame(state => {
+		const t = state.clock.elapsedTime;
+
 		if (groupRef.current) {
-			// Rotate the entire system slowly
-			groupRef.current.rotation.x = state.clock.elapsedTime * 0.05;
-			groupRef.current.rotation.y = state.clock.elapsedTime * 0.08;
+			// Gentle floating of entire system
+			groupRef.current.position.y = Math.sin(t * 0.2) * 0.1;
+			groupRef.current.rotation.z = t * 0.05;
+		}
+
+		// Independent ring rotations (Gyroscopic effect)
+		if (ring1Ref.current) {
+			ring1Ref.current.rotation.x = t * 0.2;
+			ring1Ref.current.rotation.y = t * 0.1;
+		}
+		if (ring2Ref.current) {
+			ring2Ref.current.rotation.x = t * -0.15;
+			ring2Ref.current.rotation.z = t * 0.2;
+		}
+		if (ring3Ref.current) {
+			ring3Ref.current.rotation.y = t * 0.25;
+			ring3Ref.current.rotation.x = t * 0.1;
+		}
+
+		// Core pulsing
+		if (coreRef.current) {
+			const scale = 1 + Math.sin(t * 2) * 0.1;
+			coreRef.current.scale.set(scale, scale, scale);
+			coreRef.current.rotation.y -= 0.02;
+			coreRef.current.rotation.z -= 0.02;
+		}
+
+		// Satellites orbiting
+		if (satellitesRef.current) {
+			satellitesRef.current.rotation.y = t * 0.3;
+			satellitesRef.current.rotation.z = t * 0.1;
 		}
 	});
 
-	// Only show heavily in dark mode for that cyber-feel, lighter in light mode
-	const primaryColor = isDark ? '#10b981' : '#64748b'; // Emerald or Slate
-	const secondaryColor = isDark ? '#3b82f6' : '#94a3b8'; // Blue or Slate-light
-
 	return (
 		<group ref={groupRef} {...props}>
-			{/* Inner Core: Detailed Icosahedron */}
-			<mesh>
-				<icosahedronGeometry args={[1.2, 1]} />
+			{/* Ring 1: Large Outer Structure */}
+			<mesh ref={ring1Ref}>
+				<torusGeometry args={[2.2, 0.02, 16, 100]} />
 				<meshBasicMaterial
-					wireframe
-					color={primaryColor}
+					color={secondary}
 					transparent
-					opacity={isDark ? 0.08 : 0.03}
+					opacity={isDark ? 0.15 : 0.05}
+					wireframe
 				/>
 			</mesh>
 
-			{/* Outer Shell: Sparse Geometry */}
-			<mesh rotation={[Math.PI / 4, 0, Math.PI / 4]}>
-				<icosahedronGeometry args={[2, 0]} />
+			{/* Ring 2: Mid-level Data Ring */}
+			<mesh ref={ring2Ref} rotation={[Math.PI / 2, 0, 0]}>
+				<torusGeometry args={[1.8, 0.05, 16, 6]} /> {/* Low segments for hexagonal feel */}
 				<meshBasicMaterial
-					wireframe
-					color={secondaryColor}
+					color={primary}
 					transparent
-					opacity={isDark ? 0.05 : 0.02}
+					opacity={isDark ? 0.2 : 0.08}
+					wireframe
 				/>
 			</mesh>
 
-			{/* Floating Data Nodes (Vertices of a hidden shape) */}
-			<mesh scale={[1.5, 1.5, 1.5]} rotation={[-0.2, -0.2, 0]}>
-				<dodecahedronGeometry args={[1, 0]} />
-				<pointsMaterial
-					color={isDark ? '#8b5cf6' : '#a78bfa'}
-					size={0.02}
+			{/* Ring 3: Fast Inner Ring */}
+			<mesh ref={ring3Ref} rotation={[0, Math.PI / 4, 0]}>
+				<torusGeometry args={[1.4, 0.03, 16, 50]} />
+				<meshBasicMaterial
+					color={accent}
+					transparent
+					opacity={isDark ? 0.25 : 0.1}
+					wireframe
+				/>
+			</mesh>
+
+			{/* Central Core: Complex Geodesic */}
+			<mesh ref={coreRef}>
+				<octahedronGeometry args={[0.8, 0]} />
+				<meshBasicMaterial
+					color={primary}
+					wireframe
 					transparent
 					opacity={isDark ? 0.4 : 0.2}
-					sizeAttenuation
 				/>
 			</mesh>
+
+			{/* Solid Inner Core for Glow */}
+			<mesh scale={[0.4, 0.4, 0.4]}>
+				<dodecahedronGeometry args={[1, 0]} />
+				<meshBasicMaterial color={accent} transparent opacity={isDark ? 0.6 : 0.3} />
+			</mesh>
+
+			{/* Orbiting Satellite Nodes */}
+			<group ref={satellitesRef}>
+				{[...Array(4)].map((_, i) => (
+					<mesh key={i} position={[2.8, 0, 0]} rotation={[0, (i * Math.PI) / 2, 0]}>
+						<sphereGeometry args={[0.08, 8, 8]} />
+						<meshBasicMaterial color={secondary} transparent opacity={0.6} />
+					</mesh>
+				))}
+				{/* Cross-orbit satellites */}
+				<group rotation={[Math.PI / 2, 0, 0]}>
+					{[...Array(3)].map((_, i) => (
+						<mesh
+							key={i}
+							position={[2.2, 0, 0]}
+							rotation={[0, (i * Math.PI * 2) / 3, 0]}
+						>
+							<boxGeometry args={[0.1, 0.1, 0.1]} />
+							<meshBasicMaterial color={primary} transparent opacity={0.7} />
+						</mesh>
+					))}
+				</group>
+			</group>
 		</group>
 	);
 }
