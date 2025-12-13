@@ -49,6 +49,16 @@ function generateStarPoints(count: number, radius: number) {
 	return points;
 }
 
+function generateDustPoints(count: number) {
+	const points = new Float32Array(count * 3);
+	for (let i = 0; i < count; i++) {
+		points[i * 3] = (Math.random() - 0.5) * 10; // x
+		points[i * 3 + 1] = (Math.random() - 0.5) * 5; // y
+		points[i * 3 + 2] = (Math.random() - 0.5) * 20; // z
+	}
+	return points;
+}
+
 // --- Components ---
 
 function MovingGrid({ reducedMotion }: { reducedMotion: boolean }) {
@@ -56,22 +66,20 @@ function MovingGrid({ reducedMotion }: { reducedMotion: boolean }) {
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
-	// Colors
-	const gridColor = isDark ? '#10b981' : '#6366f1'; // Emerald vs Indigo
-	const opacity = isDark ? 0.2 : 0.15;
+	// Colors - slightly boosted for more "glow"
+	const gridColor = isDark ? '#10b981' : '#6366f1';
+	const opacity = isDark ? 0.25 : 0.18;
 
 	useFrame((state, delta) => {
 		if (reducedMotion || !gridRef.current) return;
-
-		// Move grid towards camera (z-axis positive)
-		// We use a group with two identical grids to simulate infinity
-		gridRef.current.position.z = (state.clock.elapsedTime * 0.8) % 2;
+		// Slightly faster grid for more speed sensation
+		gridRef.current.position.z = (state.clock.elapsedTime * 1.5) % 2;
 	});
 
 	return (
 		<group ref={gridRef} position={[0, -2, 0]}>
 			<gridHelper
-				args={[60, 60, gridColor, gridColor]}
+				args={[80, 80, gridColor, gridColor]}
 				position={[0, 0, 0]}
 				rotation={[0, 0, 0]}
 			>
@@ -83,25 +91,20 @@ function MovingGrid({ reducedMotion }: { reducedMotion: boolean }) {
 					depthWrite={false}
 				/>
 			</gridHelper>
-			{/* Second grid for seamless loop if needed, but modulo usually handles it with just one if large enough relative to movement. 
-                Actually, simpler approach: Just one large grid moving. Modulo 1 cell unit (1) to reset.
-                GridHelper size 60, div 60 implies cell size 1.
-            */}
 		</group>
 	);
 }
 
 function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 	const ref = useRef<ThreePoints>(null);
-	// Generate stars in a large sphere
-	const stars = useMemo(() => generateStarPoints(600, 25), []);
+	// Boosted count: 2000 stars
+	const stars = useMemo(() => generateStarPoints(2000, 35), []);
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
 	useFrame((state, delta) => {
 		if (reducedMotion || !ref.current) return;
-		// Slow rotation
-		ref.current.rotation.y += delta * 0.02;
+		ref.current.rotation.y += delta * 0.015;
 		ref.current.rotation.x += delta * 0.005;
 	});
 
@@ -111,10 +114,45 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 				<PointMaterial
 					transparent
 					color={isDark ? '#fff' : '#000'}
-					size={0.06} // slightly chunkier stars
+					size={0.05}
 					sizeAttenuation
 					depthWrite={false}
-					opacity={isDark ? 0.6 : 0.4}
+					opacity={isDark ? 0.7 : 0.5}
+				/>
+			</Points>
+		</group>
+	);
+}
+
+function SpaceDust({ reducedMotion }: { reducedMotion: boolean }) {
+	const ref = useRef<ThreePoints>(null);
+	const dust = useMemo(() => generateDustPoints(300), []);
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
+
+	useFrame((state, delta) => {
+		if (reducedMotion || !ref.current) return;
+
+		// Move dust slowly towards camera
+		// Since we use Points, we can't easily animate individual particles in a basic setup without shader/attribute manipulation.
+		// A simple trick is rotating the group or shifting it back and forth.
+		// For true "fly through", we'd need loop logic.
+		// Simplification: Just gentle oscillation/rotation to add "life" near the camera.
+		ref.current.rotation.z += delta * 0.02;
+		ref.current.position.z = (state.clock.elapsedTime * 0.5) % 5;
+	});
+
+	return (
+		<group position={[0, 0, 0]}>
+			<Points ref={ref} positions={dust} stride={3} frustumCulled={false}>
+				<PointMaterial
+					transparent
+					color={isDark ? '#34d399' : '#818cf8'} // Tinted dust
+					size={0.03}
+					sizeAttenuation
+					depthWrite={false}
+					opacity={isDark ? 0.4 : 0.2}
+					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
 		</group>
@@ -125,13 +163,21 @@ function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
 	useFrame(state => {
 		if (reducedMotion) return;
 
-		// Gentle mouse parallax
-		const x = state.pointer.x * 0.5;
-		const y = state.pointer.y * 0.3;
+		// Mouse parallax
+		const x = state.pointer.x * 1.5; // increased range
+		const y = state.pointer.y * 1.0;
 
+		// Damping
 		state.camera.position.x += (x - state.camera.position.x) * 0.02;
-		state.camera.position.y += (1 - y - state.camera.position.y) * 0.02; // Look slightly down by hovering up
-		state.camera.lookAt(0, -2, 0); // Look at the grid floor
+		state.camera.position.y += (1 - y - state.camera.position.y) * 0.02;
+
+		// Banking (Roll) - tilt camera left/right based on horizontal movement
+		// When x is negative (left), rotate z positive (right tilt)? No, usually bank into turn.
+		// Let's just do a subtle roll proportional to X position
+		const targetRotZ = -state.pointer.x * 0.05; // 5% tilt
+		state.camera.rotation.z += (targetRotZ - state.camera.rotation.z) * 0.03;
+
+		state.camera.lookAt(0, -1, -5); // Look slightly ahead
 	});
 	return null;
 }
@@ -162,18 +208,13 @@ export function Background3D() {
 				<Canvas
 					dpr={dpr}
 					frameloop={reducedMotion ? 'demand' : 'always'}
-					// Camera pushed back and up
-					camera={{ position: [0, 2, 6], fov: 60, near: 0.1, far: 50 }}
+					camera={{ position: [0, 2, 5], fov: 65, near: 0.1, far: 60 }}
 					gl={{ antialias: false, alpha: true, powerPreference: 'high-performance' }}
 					onCreated={({ gl }) => gl.setClearAlpha(0)}
 				>
-					{/* Fog for depth fading */}
-					{/* We can't easily adhere to theme inside Canvas for fog without context, 
-                        but we can assume dark mode mostly or pass a prop if needed. 
-                        Let's skip fog for now to keep it crisp as requested (grid + stars).
-                    */}
 					<CameraRig reducedMotion={reducedMotion} />
 					<MovingGrid reducedMotion={reducedMotion} />
+					<SpaceDust reducedMotion={reducedMotion} />
 					<StarField reducedMotion={reducedMotion} />
 				</Canvas>
 			</ErrorBoundary>
