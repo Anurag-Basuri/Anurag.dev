@@ -71,7 +71,7 @@ export function BlogModule() {
 							<BookOpen className="w-4 h-4" />
 							<span>Knowledge Base</span>
 						</div>
-						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-foreground to-muted-foreground">
+						<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
 							Engineering Log
 						</h1>
 					</div>
@@ -89,7 +89,12 @@ export function BlogModule() {
 					</div>
 				</div>
 
-				<div className="grid gap-6">
+				<motion.div
+					variants={staggerContainer}
+					initial="hidden"
+					animate="visible"
+					className="grid gap-6"
+				>
 					{filteredPosts.map((post, index) => {
 						const publishedDate = post.publishedAt
 							? new Date(post.publishedAt)
@@ -98,10 +103,8 @@ export function BlogModule() {
 						return (
 							<motion.article
 								key={post.id}
-								initial={{ opacity: 0, y: 30 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.5, delay: index * 0.1 }}
-								className="group relative flex flex-col md:flex-row gap-6 p-6 md:p-8 rounded-3xl bg-card/20 border border-border/40 backdrop-blur-md hover:bg-card/40 hover:border-emerald-500/30 transition-all duration-300 cursor-pointer overflow-hidden hover:shadow-2xl hover:-translate-y-1"
+								variants={staggerItem}
+								className="group relative flex flex-col md:flex-row gap-6 p-6 md:p-8 rounded-3xl bg-card/30 border border-border/50 backdrop-blur-md hover:bg-card/40 hover:border-emerald-500/30 transition-all duration-300 cursor-pointer overflow-hidden hover:shadow-2xl hover:-translate-y-1"
 							>
 								{/* Hover Gradient */}
 								<div className="absolute inset-0 bg-linear-to-r from-emerald-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -160,7 +163,7 @@ export function BlogModule() {
 							</motion.article>
 						);
 					})}
-				</div>
+				</motion.div>
 
 				{filteredPosts.length === 0 && (
 					<div className="text-center py-20 text-muted-foreground">

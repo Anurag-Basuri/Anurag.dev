@@ -93,7 +93,7 @@ export function JourneyModule() {
 			<div className="p-6 md:p-12 max-w-5xl mx-auto pb-24 relative">
 				{/* Header */}
 				<div className="mb-16 text-center md:text-left">
-					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500 mb-3 flex items-center justify-center md:justify-start gap-3">
+					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500 mb-3 flex items-center justify-center md:justify-start gap-3">
 						<span className="text-emerald-500 font-mono text-2xl">~/journey</span>
 						<span className="h-8 w-[2px] bg-emerald-500/50 rotate-12" />
 						<span>Timeline</span>
@@ -134,7 +134,7 @@ export function JourneyModule() {
 										<div
 											className={cn(
 												'group relative p-6 rounded-2xl border backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
-												'bg-card/40 border-border/50 hover:border-border/80',
+												'bg-card/30 border-border/50 hover:border-border/80',
 												// config.border,
 												// config.bg
 											)}

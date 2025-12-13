@@ -124,7 +124,7 @@ export function ContactModule() {
 						<MessageSquare className="w-4 h-4" />
 						<span>Communication Channel</span>
 					</div>
-					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-500">
+					<h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
 						Get In Touch
 					</h1>
 				</div>
@@ -229,7 +229,7 @@ export function ContactModule() {
 						transition={{ duration: 0.5, delay: 0.2 }}
 						className="flex-1"
 					>
-						<div className="p-8 rounded-3xl bg-card/40 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
+						<div className="p-8 rounded-3xl bg-card/30 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
 							<div className="absolute inset-0 bg-linear-to-br from-green-500/5 to-transparent pointer-events-none" />
 
 							<h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 relative z-10">
