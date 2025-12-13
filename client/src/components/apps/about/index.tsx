@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -142,11 +143,15 @@ export function AboutModule() {
 						>
 							<div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-400 to-blue-500 blur-2xl opacity-60 animate-pulse group-hover:opacity-80 transition-opacity" />
 							<div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full border-[6px] border-background bg-background shadow-2xl p-1.5 transition-transform duration-300 group-hover:scale-[1.02]">
-								<img
-									src={about.avatarUrl || '/logo.png'}
-									alt={about.name}
-									className="w-full h-full object-cover rounded-full bg-muted"
-								/>
+								<div className="relative w-full h-full rounded-full overflow-hidden">
+									<Image
+										src={about.avatarUrl || '/logo.png'}
+										alt={about.name}
+										fill
+										className="object-cover"
+										priority
+									/>
+								</div>
 								<motion.div
 									animate={{ scale: [1, 1.2, 1] }}
 									transition={{ repeat: Infinity, duration: 2 }}

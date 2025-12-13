@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { api, Project } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -138,10 +139,11 @@ export function ProjectsModule() {
 								{/* Image / Preview Area */}
 								<div className="aspect-video w-full bg-black/40 overflow-hidden relative">
 									{project.thumbnail ? (
-										<img
+										<Image
 											src={project.thumbnail}
 											alt={project.title}
-											className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+											fill
+											className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
 										/>
 									) : (
 										<div className="w-full h-full flex items-center justify-center bg-linear-to-br from-gray-800 to-black group-hover:from-gray-800/80 group-hover:to-black/80 transition-colors">
@@ -219,10 +221,11 @@ export function ProjectsModule() {
 										<X className="w-5 h-5" />
 									</button>
 									{selectedProject.thumbnail ? (
-										<img
+										<Image
 											src={selectedProject.thumbnail}
 											alt={selectedProject.title}
-											className="w-full h-full object-cover opacity-80"
+											fill
+											className="object-cover opacity-80"
 										/>
 									) : (
 										<div className="w-full h-full bg-linear-to-br from-gray-900 via-black to-emerald-950/20 flex items-center justify-center">
