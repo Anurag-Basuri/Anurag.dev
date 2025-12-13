@@ -134,18 +134,32 @@ export function AboutModule() {
 
 							{/* Status & Availability */}
 							<div className="flex flex-col gap-2 w-full mt-2">
-								{about.status && (
-									<div className="flex items-center justify-center gap-2 text-xs text-muted-foreground bg-black/20 py-1.5 px-3 rounded-lg border border-white/5">
-										<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-										{about.status}
+								{about.currentStatus && (
+									<div className="flex flex-col items-center justify-center gap-1 text-xs bg-black/20 py-2 px-3 rounded-lg border border-white/5">
+										<div className="flex items-center gap-2 text-muted-foreground">
+											<div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+											{about.currentStatus.label}
+										</div>
+										{about.currentStatus.description && (
+											<div className="text-[10px] text-muted-foreground/60 text-center">
+												{about.currentStatus.description}
+											</div>
+										)}
 									</div>
 								)}
-								{about.availability && (
-									<div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-wider font-bold text-emerald-400/80">
-										<div className="w-1 h-1 rounded-full bg-emerald-400" />
-										{about.availability}
-									</div>
-								)}
+								{about.workPreferences &&
+									(about.workPreferences.remote ||
+										about.workPreferences.hybrid) && (
+										<div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-wider font-bold text-emerald-400/80">
+											<div className="w-1 h-1 rounded-full bg-emerald-400" />
+											{about.workPreferences.remote &&
+											about.workPreferences.hybrid
+												? 'Remote / Hybrid'
+												: about.workPreferences.remote
+												? 'Remote'
+												: 'Hybrid'}
+										</div>
+									)}
 							</div>
 						</motion.div>
 
@@ -195,9 +209,7 @@ export function AboutModule() {
 											GitHub
 										</span>
 										<span className="text-sm font-bold group-hover:text-white transition-colors">
-											{codingStats.github.stats?.stars !== undefined
-												? `${codingStats.github.stats.stars} ★`
-												: `@${codingStats.github.username}`}
+											@{codingStats.github.username}
 										</span>
 									</div>
 									<div className="text-xs font-mono text-muted-foreground">
@@ -215,9 +227,7 @@ export function AboutModule() {
 											LeetCode
 										</span>
 										<span className="text-sm font-bold group-hover:text-yellow-400 transition-colors">
-											{codingStats.leetcode.stats?.solved !== undefined
-												? `${codingStats.leetcode.stats.solved} Solved`
-												: `@${codingStats.leetcode.username}`}
+											@{codingStats.leetcode.username}
 										</span>
 									</div>
 									<div className="text-[10px] uppercase text-muted-foreground">
@@ -235,9 +245,7 @@ export function AboutModule() {
 											Codeforces
 										</span>
 										<span className="text-sm font-bold group-hover:text-red-400 transition-colors">
-											{codingStats.codeforces.stats?.rating !== undefined
-												? `${codingStats.codeforces.stats.rating} Rating`
-												: `@${codingStats.codeforces.username}`}
+											@{codingStats.codeforces.username}
 										</span>
 									</div>
 									<div className="text-[10px] uppercase text-muted-foreground">
@@ -256,9 +264,7 @@ export function AboutModule() {
 												CodeChef
 											</span>
 											<span className="text-sm font-bold group-hover:text-orange-400 transition-colors">
-												{codingStats.codechef.stats?.rating !== undefined
-													? `${codingStats.codechef.stats.rating} Rating`
-													: `@${codingStats.codechef.username}`}
+												@{codingStats.codechef.username}
 											</span>
 										</div>
 										<div className="text-[10px] uppercase text-muted-foreground">
@@ -445,13 +451,38 @@ export function AboutModule() {
 							</div>
 						</motion.div>
 
+						{/* Focus Areas */}
+						{about.focusAreas && (
+							<motion.div
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: 0.35 }}
+								className="bg-card/20 border border-border/40 rounded-2xl p-6"
+							>
+								<h3 className="font-bold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
+									<Code2 className="w-4 h-4 text-primary" />
+									Focus Areas
+								</h3>
+								<div className="flex flex-wrap gap-2">
+									{about.focusAreas.map((area: string) => (
+										<span
+											key={area}
+											className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20"
+										>
+											{area}
+										</span>
+									))}
+								</div>
+							</motion.div>
+						)}
+
 						{/* Personal Interests & Languages */}
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 							{about.languages && (
 								<motion.div
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
-									transition={{ delay: 0.35 }}
+									transition={{ delay: 0.4 }}
 									className="bg-card/20 border border-border/40 rounded-2xl p-6"
 								>
 									<h3 className="font-bold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
@@ -475,7 +506,7 @@ export function AboutModule() {
 								<motion.div
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
-									transition={{ delay: 0.4 }}
+									transition={{ delay: 0.45 }}
 									className="bg-card/20 border border-border/40 rounded-2xl p-6"
 								>
 									<h3 className="font-bold tracking-widest text-sm uppercase mb-4 flex items-center gap-2">
