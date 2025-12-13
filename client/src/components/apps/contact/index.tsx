@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -53,9 +53,9 @@ export function ContactModule() {
 	const [copied, setCopied] = useState(false);
 
 	// Simulate initial load
-	useState(() => {
+	useEffect(() => {
 		setTimeout(() => setInitialLoading(false), 300);
-	});
+	}, []);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
