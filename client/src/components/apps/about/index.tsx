@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeInUp } from '@/lib/animations';
+import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -89,20 +90,16 @@ export function AboutModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 space-y-8 max-w-6xl mx-auto">
 				{/* 1. Standardized System Header */}
-				<div className="flex items-end justify-between border-b border-border/40 pb-4">
-					<div>
-						<h1 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-blue-500">
-							PROFILE DOSSIER
-						</h1>
-						<p className="text-sm text-muted-foreground tracking-wider uppercase font-mono mt-1">
-							User Identification & Capability Analysis
-						</p>
-					</div>
-					<div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
-						<User className="w-3 h-3" />
-						<span>ID: VERIFIED</span>
-					</div>
-				</div>
+				<ModuleHeader
+					label="Profile"
+					icon={User}
+					title="PROFILE DOSSIER"
+					actions={
+						<div className="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+							<User className="w-3 h-3" />
+						</div>
+					}
+				/>
 
 				<div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 					{/* Left Column: Identity Card */}
