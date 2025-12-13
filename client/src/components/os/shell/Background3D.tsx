@@ -196,8 +196,8 @@ export function Background3D() {
 						if (!gl) {
 							setHasWebGLError(true);
 						}
-					}}
-				>
+					}}>
+					<TechGeometry />
 					<DistantStars />
 					<GalaxyStars />
 					<NebulaParticles />
@@ -205,5 +205,62 @@ export function Background3D() {
 				</Canvas>
 			</ErrorBoundary>
 		</div>
+	);
+}
+
+// Tech-themed geometric elements (Wireframes, Cyber-grid feel)
+function TechGeometry(props: JSX.IntrinsicElements['group']) {
+	const groupRef = useRef<THREE.Group>(null);
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
+
+	useFrame((state) => {
+		if (groupRef.current) {
+			// Rotate the entire system slowly
+			groupRef.current.rotation.x = state.clock.elapsedTime * 0.05;
+			groupRef.current.rotation.y = state.clock.elapsedTime * 0.08;
+		}
+	});
+
+	// Only show heavily in dark mode for that cyber-feel, lighter in light mode
+	const primaryColor = isDark ? '#10b981' : '#64748b'; // Emerald or Slate
+	const secondaryColor = isDark ? '#3b82f6' : '#94a3b8'; // Blue or Slate-light
+
+	return (
+		<group ref={groupRef} {...props}>
+			{/* Inner Core: Detailed Icosahedron */}
+			<mesh>
+				<icosahedronGeometry args={[1.2, 1]} />
+				<meshBasicMaterial
+					wireframe
+					color={primaryColor}
+					transparent
+					opacity={isDark ? 0.08 : 0.03}
+				/>
+			</mesh>
+
+			{/* Outer Shell: Sparse Geometry */}
+			<mesh rotation={[Math.PI / 4, 0, Math.PI / 4]}>
+				<icosahedronGeometry args={[2, 0]} />
+				<meshBasicMaterial
+					wireframe
+					color={secondaryColor}
+					transparent
+					opacity={isDark ? 0.05 : 0.02}
+				/>
+			</mesh>
+
+			{/* Floating Data Nodes (Vertices of a hidden shape) */}
+			<mesh scale={[1.5, 1.5, 1.5]} rotation={[-0.2, -0.2, 0]}>
+				<dodecahedronGeometry args={[1, 0]} />
+				<pointsMaterial
+					color={isDark ? '#8b5cf6' : '#a78bfa'}
+					size={0.02}
+					transparent
+					opacity={isDark ? 0.4 : 0.2}
+					sizeAttenuation
+				/>
+			</mesh>
+		</group>
 	);
 }
