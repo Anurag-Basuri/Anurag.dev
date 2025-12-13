@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import type { JSX } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import type { Points as ThreePoints } from 'three';
+import * as THREE from 'three';
 
-// Simple random sphere generator to avoid external dependency
+// Generate random positions in a sphere
 function generateSpherePoints(count: number, radius: number) {
 	const points = new Float32Array(count * 3);
 	for (let i = 0; i < count; i++) {
@@ -16,7 +17,7 @@ function generateSpherePoints(count: number, radius: number) {
 		const v = Math.random();
 		const theta = 2 * Math.PI * u;
 		const phi = Math.acos(2 * v - 1);
-		const r = Math.cbrt(Math.random()) * radius; // Cubic root for uniform distribution
+		const r = Math.cbrt(Math.random()) * radius;
 		const x = r * Math.sin(phi) * Math.cos(theta);
 		const y = r * Math.sin(phi) * Math.sin(theta);
 		const z = r * Math.cos(phi);
@@ -27,49 +28,141 @@ function generateSpherePoints(count: number, radius: number) {
 	return points;
 }
 
-function Stars(props: JSX.IntrinsicElements["group"]) {
+// Generate galaxy spiral arm points
+function generateGalaxyPoints(count: number) {
+	const points = new Float32Array(count * 3);
+	for (let i = 0; i < count; i++) {
+		const angle = Math.random() * Math.PI * 4; // Multiple rotations
+		const radius = Math.random() * 2;
+		const spiralOffset = angle * 0.3; // Spiral tightness
+		const x = Math.cos(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
+		const y = (Math.random() - 0.5) * 0.3; // Flat disk
+		const z = Math.sin(angle + spiralOffset) * radius + (Math.random() - 0.5) * 0.5;
+		points[i * 3] = x;
+		points[i * 3 + 1] = y;
+		points[i * 3 + 2] = z;
+	}
+	return points;
+}
+
+// Distant background stars
+function DistantStars(props: JSX.IntrinsicElements['group']) {
 	const ref = useRef<ThreePoints>(null);
-	const [sphere] = useState(() => generateSpherePoints(5000, 1.5));
+	const [sphere] = useState(() => generateSpherePoints(3000, 3));
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
 	useFrame((_, delta) => {
 		if (ref.current) {
-			ref.current.rotation.x -= delta / 10;
-			ref.current.rotation.y -= delta / 15;
+			ref.current.rotation.x -= delta / 30;
+			ref.current.rotation.y -= delta / 40;
 		}
 	});
 
 	return (
-		<group rotation={[0, 0, Math.PI / 4]} {...props}>
+		<group rotation={[0, 0, 0]} {...props}>
 			<Points ref={ref} positions={sphere} stride={3} frustumCulled={false}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#00ffcc' : '#4f46e5'}
-					size={0.002}
+					color={isDark ? '#ffffff' : '#a5b4fc'}
+					size={0.001}
 					sizeAttenuation={true}
 					depthWrite={false}
-					opacity={isDark ? 0.3 : 0.2}
+					opacity={isDark ? 0.4 : 0.3}
 				/>
 			</Points>
 		</group>
 	);
 }
 
-function Grid() {
+// Main galaxy spiral stars
+function GalaxyStars(props: JSX.IntrinsicElements['group']) {
+	const ref = useRef<ThreePoints>(null);
+	const [galaxy] = useState(() => generateGalaxyPoints(4000));
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
+	useFrame((_, delta) => {
+		if (ref.current) {
+			ref.current.rotation.y += delta / 20;
+		}
+	});
+
 	return (
-		<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 0]}>
-			<planeGeometry args={[50, 50, 50, 50]} />
-			<meshBasicMaterial
-				color={isDark ? '#00ffcc' : '#4f46e5'}
-				wireframe={true}
-				transparent={true}
-				opacity={isDark ? 0.02 : 0.015}
-			/>
-		</mesh>
+		<group rotation={[Math.PI / 6, 0, 0]} {...props}>
+			<Points ref={ref} positions={galaxy} stride={3} frustumCulled={false}>
+				<PointMaterial
+					transparent
+					color={isDark ? '#a78bfa' : '#6366f1'}
+					size={0.003}
+					sizeAttenuation={true}
+					depthWrite={false}
+					opacity={isDark ? 0.6 : 0.4}
+				/>
+			</Points>
+		</group>
+	);
+}
+
+// Nebula particles (larger, colorful, glowing)
+function NebulaParticles(props: JSX.IntrinsicElements['group']) {
+	const ref = useRef<ThreePoints>(null);
+	const [nebula] = useState(() => generateSpherePoints(800, 2));
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
+
+	useFrame(state => {
+		if (ref.current) {
+			ref.current.rotation.x = state.clock.elapsedTime / 30;
+			ref.current.rotation.y = state.clock.elapsedTime / 25;
+		}
+	});
+
+	return (
+		<group {...props}>
+			<Points ref={ref} positions={nebula} stride={3} frustumCulled={false}>
+				<PointMaterial
+					transparent
+					color={isDark ? '#ec4899' : '#d946ef'}
+					size={0.015}
+					sizeAttenuation={true}
+					depthWrite={false}
+					opacity={isDark ? 0.15 : 0.1}
+					blending={THREE.AdditiveBlending}
+				/>
+			</Points>
+		</group>
+	);
+}
+
+// Twinkling foreground stars
+function TwinklingStars(props: JSX.IntrinsicElements['group']) {
+	const ref = useRef<ThreePoints>(null);
+	const [stars] = useState(() => generateSpherePoints(1500, 2.5));
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
+
+	useFrame(state => {
+		if (ref.current) {
+			const material = ref.current.material as THREE.PointsMaterial;
+			material.opacity = 0.3 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
+			ref.current.rotation.y += 0.0001;
+		}
+	});
+
+	return (
+		<group {...props}>
+			<Points ref={ref} positions={stars} stride={3} frustumCulled={false}>
+				<PointMaterial
+					transparent
+					color={isDark ? '#22d3ee' : '#3b82f6'}
+					size={0.002}
+					sizeAttenuation={true}
+					depthWrite={false}
+					opacity={0.5}
+				/>
+			</Points>
+		</group>
 	);
 }
 
@@ -89,7 +182,7 @@ export function Background3D() {
 		}
 	}, []);
 
-	// If WebGL is not available, render nothing or a simple fallback
+	// If WebGL is not available, render nothing
 	if (hasWebGLError) {
 		return null;
 	}
@@ -100,14 +193,15 @@ export function Background3D() {
 				<Canvas
 					camera={{ position: [0, 0, 1] }}
 					onCreated={({ gl }) => {
-						// Additional WebGL context validation
 						if (!gl) {
 							setHasWebGLError(true);
 						}
 					}}
 				>
-					<Stars />
-					<Grid />
+					<DistantStars />
+					<GalaxyStars />
+					<NebulaParticles />
+					<TwinklingStars />
 				</Canvas>
 			</ErrorBoundary>
 		</div>
