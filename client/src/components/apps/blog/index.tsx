@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { api, BlogPost } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, Tag, Search, BookOpen, Clock, ChevronRight, ArrowUpRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ModuleError } from '@/components/ui/module-error';
+import { staggerContainer, staggerItem } from '@/lib/animations';
 
 function BlogSkeleton() {
 	return (

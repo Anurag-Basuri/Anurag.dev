@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ModuleError } from '@/components/ui/module-error';
+import { staggerContainer, staggerItem, viewportSettings } from '@/lib/animations';
 
 function CertificationsSkeleton() {
 	return (
@@ -77,14 +78,18 @@ export function CertificationModule() {
 					</div>
 				</div>
 
-				<div className="grid gap-6 md:grid-cols-2">
-					{certs.map((cert, index) => (
+				<motion.div 
+					className="grid gap-6 md:grid-cols-2"
+					variants={staggerContainer}
+					initial="hidden"
+					animate="visible"
+				>
+					{certs.map((cert) => (
 						<motion.div
 							key={cert.id}
-							initial={{ opacity: 0, y: 20 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: index * 0.1 }}
-							className="group relative p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all"
+							variants={staggerItem}
+							whileHover={{ y: -4, transition: { duration: 0.2 } }}
+							className="group relative p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all hover:shadow-xl"
 						>
 							<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -125,10 +130,7 @@ export function CertificationModule() {
 										</span>
 									))}
 								</div>
-							</div>
-						</motion.div>
-					))}
-				</div>
+				</motion.div>
 			</div>
 		</ScrollArea>
 	);
