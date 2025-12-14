@@ -101,47 +101,71 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 						{...maximizedProps}
 						onDragStart={handleFocus}
 						style={{ width: '100%', height: '100%' }}
-						className={cn('bg-transparent overflow-hidden flex flex-col')}
+						className={cn(
+							'flex flex-col overflow-hidden transition-shadow duration-300',
+							// Active State Visuals: Glow and Border
+							isActive
+								? 'shadow-[0_0_0_1px_rgba(16,185,129,0.3),0_20px_60px_-10px_rgba(0,0,0,0.6)]'
+								: 'shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_10px_30px_-5px_rgba(0,0,0,0.4)] opacity-90',
+						)}
 						onMouseDown={handleFocus}
 					>
-						{/* Title Bar - Minimalist and Transparent */}
+						{/* Title Bar - Premium Glassmorphism */}
 						<div
 							className={cn(
-								'h-9 flex items-center justify-between px-4 shrink-0 transition-colors select-none',
-								'bg-black/40 backdrop-blur-md border-b border-white/5',
+								'h-10 flex items-center justify-between px-4 shrink-0 transition-colors select-none relative z-50',
+								'bg-black/60 backdrop-blur-xl border-b border-white/5',
+								isActive ? 'bg-black/80' : 'bg-black/40',
 							)}
 						>
-							<span className="text-[13px] font-medium tracking-wide text-white/80 flex items-center gap-2">
+							{/* Drag Handle Area */}
+							<div className="absolute inset-0 w-full h-full" />
+
+							<span
+								className={cn(
+									'text-[13px] font-medium tracking-wide flex items-center gap-2 relative z-10 transition-colors',
+									isActive ? 'text-white' : 'text-white/40',
+								)}
+							>
+								{/* Activity Dot */}
+								<div
+									className={cn(
+										'w-2 h-2 rounded-full transition-colors',
+										isActive
+											? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]'
+											: 'bg-white/20',
+									)}
+								/>
 								{title}
 							</span>
-							<div className="flex items-center gap-1.5">
+							<div className="flex items-center gap-2 relative z-10">
 								<button
 									onClick={handleMinimize}
 									className={cn(
-										'group/min w-6 h-6 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors',
+										'group/min w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors',
 										isMobile && 'hidden',
 									)}
 									title="Minimize"
 								>
 									<Minus
-										size={14}
+										size={16}
 										className="text-white/40 group-hover/min:text-white transition-colors"
 									/>
 								</button>
 								<button
 									onClick={handleClose}
-									className="group/close w-6 h-6 flex items-center justify-center rounded-md hover:bg-red-500/20 transition-colors"
+									className="group/close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-500/20 transition-colors"
 									title="Close"
 								>
 									<X
-										size={14}
+										size={16}
 										className="text-white/40 group-hover/close:text-red-400 transition-colors"
 									/>
 								</button>
 							</div>
 						</div>
-						{/* Content */}
-						<div className="grow overflow-auto bg-transparent relative w-full h-full">
+						{/* Content Background to prevent bleed */}
+						<div className="grow overflow-auto bg-[#0d1117]/95 backdrop-blur-md relative w-full h-full">
 							{component}
 						</div>
 					</Rnd>
