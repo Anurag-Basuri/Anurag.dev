@@ -367,6 +367,92 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 	return null;
 });
 
+const AnimatedGrid = React.memo(function AnimatedGrid({
+	reducedMotion,
+}: {
+	reducedMotion: boolean;
+}) {
+	const { theme } = useTheme();
+	const meshRef = useRef<THREE.Mesh>(null);
+	const materialRef = useRef<THREE.ShaderMaterial>(null);
+
+	const gridShader = useMemo(
+		() => ({
+			uniforms: {
+				time: { value: 0 },
+				gridColor: { value: new THREE.Color(theme === 'dark' ? '#0ea5e9' : '#94a3b8') },
+				fadeColor: { value: new THREE.Color(theme === 'dark' ? '#000000' : '#ffffff') },
+				opacity: { value: theme === 'dark' ? 0.3 : 0.15 },
+			},
+			vertexShader: `
+			uniform float time;
+			varying vec2 vUv;
+			varying float vElevation;
+			
+			void main() {
+				vUv = uv;
+				
+				vec3 pos = position;
+				float wave1 = sin(pos.x * 0.3 + time * 0.5) * cos(pos.y * 0.3 + time * 0.5);
+				float wave2 = sin(pos.x * 0.2 - time * 0.3) * sin(pos.y * 0.2 + time * 0.4);
+				
+				float elevation = (wave1 + wave2) * 0.5;
+				pos.z += elevation;
+				
+				vElevation = elevation;
+				
+				gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+			}
+		`,
+			fragmentShader: `
+			uniform vec3 gridColor;
+			uniform vec3 fadeColor;
+			uniform float opacity;
+			varying vec2 vUv;
+			varying float vElevation;
+			
+			void main() {
+				// Grid lines
+				vec2 grid = abs(fract(vUv * 20.0 - 0.5) - 0.5) / fwidth(vUv * 20.0);
+				float line = min(grid.x, grid.y);
+				float gridPattern = 1.0 - min(line, 1.0);
+				
+				// Distance fade
+				float dist = length(vUv - 0.5) * 2.0;
+				float fade = 1.0 - smoothstep(0.3, 1.0, dist);
+				
+				// Elevation glow
+				float elevationGlow = abs(vElevation) * 0.5;
+				
+				vec3 color = mix(fadeColor, gridColor, gridPattern + elevationGlow);
+				float alpha = gridPattern * fade * opacity;
+				
+				gl_FragColor = vec4(color, alpha);
+			}
+		`,
+		}),
+		[theme],
+	);
+
+	useFrame(state => {
+		if (reducedMotion || !materialRef.current) return;
+		materialRef.current.uniforms.time.value = state.clock.elapsedTime;
+	});
+
+	return (
+		<mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
+			<planeGeometry args={[100, 100, 50, 50]} />
+			<shaderMaterial
+				ref={materialRef}
+				{...gridShader}
+				transparent
+				depthWrite={false}
+				blending={THREE.AdditiveBlending}
+			/>
+		</mesh>
+	);
+});
+
 const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
@@ -438,6 +524,7 @@ export function Background3D() {
 					<color attach="background" args={[theme === 'dark' ? '#000000' : '#ffffff']} />
 					<CameraRig reducedMotion={reducedMotion} />
 					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#ffffff', 30, 100]} />
+					<AnimatedGrid reducedMotion={reducedMotion} />
 					<NebulaField reducedMotion={reducedMotion} />
 					<StarField reducedMotion={reducedMotion} />
 					<PostProcessingEffects />
@@ -448,48 +535,6 @@ export function Background3D() {
 				<div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:via-black/20 dark:to-black/40" />
 				<div className="absolute inset-0 bg-gradient-radial from-transparent to-transparent dark:to-black/30" />
 			</div>
-		</div>
-	);
-}
-
-// Simple fallback for low-end devices
-export function SimpleBackground3D() {
-	const [dpr, setDpr] = useState(() =>
-		Math.min(window.devicePixelRatio || 1, CONFIG.PERFORMANCE.simpleDPR),
-	);
-	const reducedMotion = usePrefersReducedMotion();
-	const [hasWebGLError, setHasWebGLError] = useState(false);
-
-	useEffect(() => {
-		const handleResize = () =>
-			setDpr(Math.min(window.devicePixelRatio || 1, CONFIG.PERFORMANCE.simpleDPR));
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	}, []);
-
-	useEffect(() => {
-		try {
-			const canvas = document.createElement('canvas');
-			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) queueMicrotask(() => setHasWebGLError(true));
-		} catch {
-			queueMicrotask(() => setHasWebGLError(true));
-		}
-	}, []);
-
-	if (hasWebGLError) return null;
-
-	return (
-		<div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
-			<Canvas
-				dpr={dpr}
-				frameloop={reducedMotion ? 'demand' : 'always'}
-				camera={{ position: [0, 0, 5], fov: 75 }}
-				gl={{ antialias: false, alpha: true, powerPreference: 'low-power' }}
-			>
-				<StarField reducedMotion={reducedMotion} />
-				<CameraRig reducedMotion={reducedMotion} />
-			</Canvas>
 		</div>
 	);
 }
