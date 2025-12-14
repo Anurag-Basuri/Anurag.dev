@@ -3,116 +3,99 @@ export type { FileSystemItem };
 
 export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
 	{
-		name: 'about',
-		type: 'folder',
-		id: 'about',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'about/README.md',
-				content:
-					"# About Me\n\nHi, I'm Anurag Basuri - a Full Stack Engineer passionate about building elegant solutions.",
-			},
-		],
-	},
-	{
-		name: 'projects',
-		type: 'folder',
-		id: 'projects',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'projects/README.md',
-				content:
-					'# Projects\n\n- AnuragOS Portfolio\n- AI Lab Experiments\n- Dynamic Web Apps',
-			},
-		],
-	},
-	{
-		name: 'journey',
-		type: 'folder',
-		id: 'journey',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'journey/README.md',
-				content: '# My Journey\n\nFrom curious beginner to Full Stack Engineer...',
-			},
-		],
-	},
-	{
-		name: 'certifications',
-		type: 'folder',
-		id: 'certifications',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'certifications/README.md',
-				content: '# Certifications\n\nProfessional certifications and achievements.',
-			},
-		],
-	},
-	{
-		name: 'ai-lab',
-		type: 'folder',
-		id: 'ailab',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'ailab/README.md',
-				content: '# AI Lab\n\nExperimental AI projects and research.',
-			},
-		],
-	},
-	{
-		name: 'blog',
-		type: 'folder',
-		id: 'blog',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'blog/README.md',
-				content: '# Blog\n\nThoughts on development, AI, and technology.',
-			},
-		],
-	},
-	{
-		name: 'contact',
-		type: 'folder',
-		id: 'contact',
-		children: [
-			{
-				name: 'README.md',
-				type: 'file',
-				id: 'contact/README.md',
-				content: '# Contact\n\nEmail: contact@anurag.dev\nGitHub: @Anurag-Basuri',
-			},
-		],
-	},
-	{
-		name: 'resume.pdf',
+		name: 'README.md',
 		type: 'file',
-		id: 'resume',
-		content: '[Binary PDF Data]',
+		id: 'root/readme',
+		content:
+			'# Welcome to AnuragOS\n\nI am a Full Stack Engineer passionate about building elegant solutions.\n\nType `help` to see available commands, or explore the directories below:\n\n- `bio/`: About me, my journey, and resume\n- `work/`: My projects, AI experiments, and coding stats\n- `connect/`: Contact info, social links, and blog',
 	},
 	{
-		name: 'coding-profiles',
+		name: 'bio',
 		type: 'folder',
-		id: 'coding-profiles',
-		moduleId: 'coding-stats',
+		id: 'bio',
 		children: [
 			{
-				name: 'README.md',
+				name: 'about.md',
 				type: 'file',
-				id: 'coding-profiles/README.md',
+				id: 'bio/about',
+				moduleId: 'about',
+				content: 'Opening About module...',
+			},
+			{
+				name: 'journey.md',
+				type: 'file',
+				id: 'bio/journey',
+				moduleId: 'journey',
+				content: 'Opening Journey module...',
+			},
+			{
+				name: 'certifications.md',
+				type: 'file',
+				id: 'bio/certs',
+				moduleId: 'certifications',
+				content: 'Opening Certifications module...',
+			},
+			{
+				name: 'resume.pdf',
+				type: 'file',
+				id: 'resume',
+				content: '[Binary PDF Data]',
+			},
+		],
+	},
+	{
+		name: 'work',
+		type: 'folder',
+		id: 'work',
+		children: [
+			{
+				name: 'projects.app',
+				type: 'file',
+				id: 'work/projects',
+				moduleId: 'projects',
+				content: '[Executable App] Run to view projects.',
+			},
+			{
+				name: 'ai-lab.app',
+				type: 'file',
+				id: 'work/ailab',
+				moduleId: 'ailab',
+				content: '[Executable App] Run to enter AI Lab.',
+			},
+			{
+				name: 'coding-stats.app',
+				type: 'file',
+				id: 'work/stats',
+				moduleId: 'coding-stats',
+				content: '[Executable App] Run to view coding statistics.',
+			},
+		],
+	},
+	{
+		name: 'connect',
+		type: 'folder',
+		id: 'connect',
+		children: [
+			{
+				name: 'contact.md',
+				type: 'file',
+				id: 'connect/contact',
+				moduleId: 'contact',
+				content: 'Opening Contact module...',
+			},
+			{
+				name: 'socials.md',
+				type: 'file',
+				id: 'connect/socials',
 				content:
-					'# Coding Profiles\n\nLeetCode, Codeforces, CodeChef, and GitHub statistics.',
+					'Find me on:\n\n- GitHub: https://github.com/Anurag-Basuri\n- LinkedIn: https://www.linkedin.com/in/anuragbasuri/\n- Twitter: https://twitter.com/AnuragBasuri',
+			},
+			{
+				name: 'blog.app',
+				type: 'file',
+				id: 'connect/blog',
+				moduleId: 'blog',
+				content: '[Executable App] Run to read blog.',
 			},
 		],
 	},
