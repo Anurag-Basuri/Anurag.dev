@@ -4,5 +4,7 @@ export type FileSystemItem = {
 	children?: FileSystemItem[];
 	id: string;
 	icon?: string;
+	content?: string;
+	moduleId?: string;
 	metadata?: any;
 };
