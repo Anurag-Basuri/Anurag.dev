@@ -12,6 +12,44 @@ import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocess
 import { BlendFunction } from 'postprocessing';
 import { Perf } from 'r3f-perf';
 
+// --- Configuration ---
+const CONFIG = {
+	STARS: {
+		DISTANT: { count: 3000, radius: 100, size: 0.02, opacity: 0.6, rotationSpeed: 0.005 },
+		MEDIUM: { count: 1500, radius: 50, size: 0.04, opacity: 0.8, rotationSpeed: 0.01 },
+		CLOSE: { count: 500, radius: 25, size: 0.08, opacity: 0.9, rotationSpeed: 0.02 },
+	},
+	PARTICLES: {
+		count: 300,
+		bounds: { x: 25, y: 15, z: 30 },
+		sizeRange: { min: 0.02, max: 0.1 },
+		velocityRange: 0.002,
+		opacityRange: { min: 0.3, max: 1.0 },
+	},
+	SHOOTING_STARS: {
+		count: 4,
+		maxTrailLength: 20,
+		lifeRange: { min: 2, max: 5 },
+		velocityY: { min: -1.0, max: -0.5 },
+	},
+	CONSTELLATIONS: {
+		count: 8,
+		pointsPerConstellation: { min: 5, max: 9 },
+		spread: 4,
+	},
+	CAMERA: {
+		defaultPosition: [0, 2, 5] as [number, number, number],
+		fov: 75,
+		near: 0.1,
+		far: 200,
+		lookAt: [0, -0.5, -3] as [number, number, number],
+	},
+	PERFORMANCE: {
+		maxDPR: 1.5,
+		simpleDPR: 1,
+	},
+} as const;
+
 // --- Types ---
 interface Particle {
 	position: Vector3;
@@ -116,7 +154,9 @@ function generateStarPoints(
 
 function generateParticles(count: number, bounds: { x: number; y: number; z: number }): Particle[] {
 	return Array.from({ length: count }, () => {
-		const size = 0.02 + Math.random() * 0.08;
+		const size =
+			CONFIG.PARTICLES.sizeRange.min +
+			Math.random() * (CONFIG.PARTICLES.sizeRange.max - CONFIG.PARTICLES.sizeRange.min);
 		return {
 			position: new THREE.Vector3(
 				(Math.random() - 0.5) * bounds.x,
@@ -124,13 +164,16 @@ function generateParticles(count: number, bounds: { x: number; y: number; z: num
 				(Math.random() - 0.5) * bounds.z,
 			),
 			velocity: new THREE.Vector3(
-				(Math.random() - 0.5) * 0.002,
-				(Math.random() - 0.5) * 0.002,
-				(Math.random() - 0.5) * 0.002,
+				(Math.random() - 0.5) * CONFIG.PARTICLES.velocityRange,
+				(Math.random() - 0.5) * CONFIG.PARTICLES.velocityRange,
+				(Math.random() - 0.5) * CONFIG.PARTICLES.velocityRange,
 			),
 			size,
 			originalSize: size,
-			opacity: 0.3 + Math.random() * 0.7,
+			opacity:
+				CONFIG.PARTICLES.opacityRange.min +
+				Math.random() *
+					(CONFIG.PARTICLES.opacityRange.max - CONFIG.PARTICLES.opacityRange.min),
 			color: Math.random() > 0.5 ? '#60a5fa' : '#38bdf8',
 		};
 	});
@@ -144,7 +187,7 @@ const ConstellationLines = React.memo(() => {
 
 	const [constellations] = useState<Vector3[][]>(() => {
 		const newConstellations: Vector3[][] = [];
-		for (let i = 0; i < 8; i++) {
+		for (let i = 0; i < CONFIG.CONSTELLATIONS.count; i++) {
 			const points = [];
 			const center = new THREE.Vector3(
 				(Math.random() - 0.5) * 20,
@@ -152,15 +195,23 @@ const ConstellationLines = React.memo(() => {
 				(Math.random() - 0.5) * 30 - 10,
 			);
 
-			for (let j = 0; j < 5 + Math.floor(Math.random() * 4); j++) {
+			const pointCount =
+				CONFIG.CONSTELLATIONS.pointsPerConstellation.min +
+				Math.floor(
+					Math.random() *
+						(CONFIG.CONSTELLATIONS.pointsPerConstellation.max -
+							CONFIG.CONSTELLATIONS.pointsPerConstellation.min),
+				);
+
+			for (let j = 0; j < pointCount; j++) {
 				points.push(
 					center
 						.clone()
 						.add(
 							new THREE.Vector3(
-								(Math.random() - 0.5) * 4,
-								(Math.random() - 0.5) * 4,
-								(Math.random() - 0.5) * 4,
+								(Math.random() - 0.5) * CONFIG.CONSTELLATIONS.spread,
+								(Math.random() - 0.5) * CONFIG.CONSTELLATIONS.spread,
+								(Math.random() - 0.5) * CONFIG.CONSTELLATIONS.spread,
 							),
 						),
 				);
@@ -493,20 +544,30 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
-	const distantStars = useMemo(() => generateStarPoints(3000, 100, 'sphere'), []);
-	const mediumStars = useMemo(() => generateStarPoints(1500, 50, 'galaxy'), []);
-	const closeStars = useMemo(() => generateStarPoints(500, 25, 'disc'), []);
+	const distantStars = useMemo(
+		() => generateStarPoints(CONFIG.STARS.DISTANT.count, CONFIG.STARS.DISTANT.radius, 'sphere'),
+		[],
+	);
+	const mediumStars = useMemo(
+		() => generateStarPoints(CONFIG.STARS.MEDIUM.count, CONFIG.STARS.MEDIUM.radius, 'galaxy'),
+		[],
+	);
+	const closeStars = useMemo(
+		() => generateStarPoints(CONFIG.STARS.CLOSE.count, CONFIG.STARS.CLOSE.radius, 'disc'),
+		[],
+	);
 
 	useFrame((state, delta) => {
 		if (reducedMotion) return;
 
-		if (distantRef.current) distantRef.current.rotation.y += delta * 0.005;
+		if (distantRef.current)
+			distantRef.current.rotation.y += delta * CONFIG.STARS.DISTANT.rotationSpeed;
 		if (mediumRef.current) {
-			mediumRef.current.rotation.y += delta * 0.01;
+			mediumRef.current.rotation.y += delta * CONFIG.STARS.MEDIUM.rotationSpeed;
 			mediumRef.current.rotation.x += delta * 0.003;
 		}
 		if (closeRef.current) {
-			closeRef.current.rotation.y += delta * 0.02;
+			closeRef.current.rotation.y += delta * CONFIG.STARS.CLOSE.rotationSpeed;
 			closeRef.current.rotation.z += delta * 0.005;
 		}
 	});
@@ -521,10 +582,10 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 				<PointMaterial
 					transparent
 					vertexColors
-					size={0.02}
+					size={CONFIG.STARS.DISTANT.size}
 					sizeAttenuation
 					depthWrite={false}
-					opacity={0.6}
+					opacity={CONFIG.STARS.DISTANT.opacity}
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
@@ -532,10 +593,10 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 				<PointMaterial
 					transparent
 					color={isDark ? '#c7d2fe' : '#312e81'}
-					size={0.04}
+					size={CONFIG.STARS.MEDIUM.size}
 					sizeAttenuation
 					depthWrite={false}
-					opacity={0.8}
+					opacity={CONFIG.STARS.MEDIUM.opacity}
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
@@ -543,10 +604,10 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 				<PointMaterial
 					transparent
 					color={isDark ? '#ffffff' : '#000000'}
-					size={0.08}
+					size={CONFIG.STARS.CLOSE.size}
 					sizeAttenuation
 					depthWrite={false}
-					opacity={0.9}
+					opacity={CONFIG.STARS.CLOSE.opacity}
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
@@ -614,7 +675,7 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.02;
 		camera.rotation.set(camera.rotation.x, camera.rotation.y, newRotZ);
 
-		camera.lookAt(0, -0.5, -3);
+		camera.lookAt(...CONFIG.CAMERA.lookAt);
 	});
 
 	return null;
@@ -707,8 +768,14 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 						color="#60a5fa"
 						reducedMotion={reducedMotion}
 					/>
-					<DynamicParticles count={300} reducedMotion={reducedMotion} />
-					<ShootingStars count={4} reducedMotion={reducedMotion} />
+					<DynamicParticles
+						count={CONFIG.PARTICLES.count}
+						reducedMotion={reducedMotion}
+					/>
+					<ShootingStars
+						count={CONFIG.SHOOTING_STARS.count}
+						reducedMotion={reducedMotion}
+					/>
 					<PostProcessingEffects />
 				</Canvas>
 			</ErrorBoundary>
@@ -723,12 +790,15 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 
 // Simple fallback for low-end devices
 export function SimpleBackground3D() {
-	const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1));
+	const [dpr, setDpr] = useState(() =>
+		Math.min(window.devicePixelRatio || 1, CONFIG.PERFORMANCE.simpleDPR),
+	);
 	const reducedMotion = usePrefersReducedMotion();
 	const [hasWebGLError, setHasWebGLError] = useState(false);
 
 	useEffect(() => {
-		const handleResize = () => setDpr(Math.min(window.devicePixelRatio || 1, 1));
+		const handleResize = () =>
+			setDpr(Math.min(window.devicePixelRatio || 1, CONFIG.PERFORMANCE.simpleDPR));
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
