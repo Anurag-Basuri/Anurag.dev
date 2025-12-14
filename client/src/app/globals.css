@@ -66,56 +66,58 @@
 }
 
 .dark {
-	/* Dark Mode - Deep Space Black, Neon Accents */
-	--background: oklch(0.12 0.03 260); /* Deep navy/black */
-	--foreground: oklch(0.95 0.01 220); /* Crisp white */
+	/* Dark Mode - Enhanced Contrast */
+	--background: oklch(0.14 0.03 260); /* Slightly lighter for better readability */
+	--foreground: oklch(0.96 0.01 220); /* Brighter white */
 
-	--card: oklch(0.15 0.03 260);
+	--card: oklch(0.18 0.03 260); /* More distinct from background */
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(0.14 0.03 260);
+	--popover: oklch(0.17 0.03 260);
 	--popover-foreground: var(--foreground);
 
 	/* Primary - Neon Emerald */
-	--primary: oklch(0.8 0.18 160);
-	--primary-foreground: oklch(0.1 0.03 260);
+	--primary: oklch(0.75 0.2 160);
+	--primary-foreground: oklch(0.12 0.03 260);
 
-	--secondary: oklch(0.2 0.03 260);
-	--secondary-foreground: oklch(0.8 0.18 160);
+	--secondary: oklch(0.22 0.04 260);
+	--secondary-foreground: oklch(0.85 0.15 160);
 
-	--muted: oklch(0.18 0.02 260);
-	--muted-foreground: oklch(0.65 0.03 250);
+	/* Muted - More visible */
+	--muted: oklch(0.22 0.03 260);
+	--muted-foreground: oklch(0.7 0.04 250);
 
-	/* Accent - Cool Purple/Blue */
-	--accent: oklch(0.2 0.04 280);
-	--accent-foreground: oklch(0.9 0.05 280);
+	/* Accent - Brighter Purple/Blue */
+	--accent: oklch(0.25 0.06 280);
+	--accent-foreground: oklch(0.92 0.08 280);
 
-	--destructive: oklch(0.5 0.2 25);
-	--destructive-foreground: oklch(0.95 0 0);
+	--destructive: oklch(0.55 0.22 25);
+	--destructive-foreground: oklch(0.96 0 0);
 
-	--border: oklch(0.25 0.03 260 / 0.4);
-	--input: oklch(0.22 0.03 260);
-	--ring: oklch(0.8 0.18 160);
+	/* Border - More visible for clarity */
+	--border: oklch(0.32 0.04 260 / 0.6);
+	--input: oklch(0.25 0.04 260);
+	--ring: oklch(0.75 0.2 160);
 
 	/* Sidebar specific - Dark Mode */
-	--sidebar: oklch(0.11 0.03 260); /* Measures darker than main bg */
+	--sidebar: oklch(0.12 0.03 260); /* Darker than main bg */
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
 	--sidebar-accent: var(--accent);
 	--sidebar-accent-foreground: var(--accent-foreground);
-	--sidebar-border: var(--border);
+	--sidebar-border: oklch(0.3 0.04 260 / 0.5);
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Dark */
-	--terminal-bg: oklch(0.1 0.03 260);
-	--terminal-text: oklch(0.9 0.02 220);
-	--terminal-cursor: oklch(0.8 0.18 160);
+	--terminal-bg: oklch(0.11 0.03 260);
+	--terminal-text: oklch(0.92 0.02 220);
+	--terminal-cursor: oklch(0.75 0.2 160);
 
-	/* Elevation / Shadows (Dark) */
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 50px -10px rgba(0, 0, 0, 0.6),
-		0 8px 20px -2px rgba(16, 185, 129, 0.15); /* Subtle emerald glow */
+	/* Elevation / Shadows (Dark) - Enhanced */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 20px 50px -10px rgba(0, 0, 0, 0.7),
+		0 8px 20px -2px rgba(16, 185, 129, 0.2); /* Brighter emerald glow */
 }
 
 /* ================
