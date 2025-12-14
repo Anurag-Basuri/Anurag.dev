@@ -80,7 +80,7 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 					<a
 						href="/resume.pdf"
 						target="_blank"
-						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-colors cursor-pointer"
+						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-all hover:shadow-[0_0_10px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 cursor-pointer"
 					>
 						<Download className="w-3 h-3" />
 						<span className="uppercase tracking-wider">Resume</span>
@@ -119,10 +119,10 @@ function SocialButton({
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="flex-1 flex items-center justify-center h-7 rounded border border-border/40 bg-card/50 hover:bg-card/80 hover:border-border/60 transition-colors text-muted-foreground hover:text-foreground"
+			className="flex-1 flex items-center justify-center h-7 rounded border border-border/40 bg-card/50 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white hover:-translate-y-0.5 hover:shadow-sm"
 			title={label}
 		>
-			<Icon className="w-3.5 h-3.5" />
+			<Icon className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
 		</a>
 	);
 }

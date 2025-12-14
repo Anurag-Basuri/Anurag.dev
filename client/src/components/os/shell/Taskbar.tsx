@@ -100,10 +100,11 @@ const TaskbarItem = memo(function TaskbarItem({
 					{isActive && (
 						<motion.div
 							layoutId="active-pill"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="absolute -bottom-[2px] left-3 right-3 h-[2px] bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+							initial={{ opacity: 0, scale: 0.5 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0, scale: 0.5 }}
+							transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+							className="absolute -bottom-[4px] left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-400 rounded-full shadow-[0_0_8px_2px_rgba(52,211,153,0.6)]"
 						/>
 					)}
 
@@ -450,7 +451,7 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="w-full shrink-0 h-14 sm:h-10 md:h-8 bg-black/40 backdrop-blur-2xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-3 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.3)]"
+				className="w-full shrink-0 h-14 sm:h-12 md:h-10 bg-black/30 backdrop-blur-2xl border-t border-white/5 flex items-center justify-between z-40 px-2 sm:px-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.5)] relative"
 			>
 				{/* Ambient Glow */}
 				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />
