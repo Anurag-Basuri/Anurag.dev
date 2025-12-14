@@ -1,10 +1,12 @@
+import { AppModuleId } from '@/lib/moduleRegistry';
+
 export type FileSystemItem = {
 	name: string;
 	type: 'folder' | 'file';
 	children?: FileSystemItem[];
-	id: string;
+	id: string; // Full path e.g. "root/bio/about"
 	icon?: string;
 	content?: string;
-	moduleId?: string;
+	moduleId?: AppModuleId; // Strictly typed to registry keys
 	metadata?: any;
 };

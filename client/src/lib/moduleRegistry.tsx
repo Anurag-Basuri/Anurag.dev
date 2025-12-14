@@ -65,6 +65,8 @@ export const moduleRegistry: Record<string, React.ReactNode> = {
 	profiles: withSuspense(CodingStatsModule),
 };
 
+export type AppModuleId = keyof typeof moduleRegistry;
+
 const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
 	default: { title: 'Untitled', icon: ShieldQuestion },
 	about: { title: 'About Me', icon: Info },
