@@ -90,7 +90,7 @@ const TaskbarItem = memo(function TaskbarItem({
 					<span
 						className={cn(
 							'text-[10px] font-medium transition-colors max-w-[100px] truncate',
-							isActive ? 'text-white/90' : 'text-white/50 group-hover:text-white',
+							isActive ? 'text-foreground' : 'text-muted-foreground/60 group-hover:text-foreground',
 						)}
 					>
 						{window.title}
@@ -451,10 +451,10 @@ export function Taskbar() {
 				initial={{ y: 100, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="w-full shrink-0 h-14 sm:h-12 md:h-10 bg-black/30 backdrop-blur-2xl border-t border-white/5 flex items-center justify-between z-40 px-2 sm:px-4 shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.5)] relative"
+				className="w-full shrink-0 h-14 sm:h-12 md:h-10 bg-background/20 backdrop-blur-2xl border-t border-border/20 flex items-center justify-between z-40 px-2 sm:px-4 shadow-2xl relative"
 			>
 				{/* Ambient Glow */}
-				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-60" />
+				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-primary/20 to-transparent opacity-60" />
 
 				<div className="flex items-center gap-2 sm:gap-4 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide px-2">
 					{/* Start Button */}
@@ -468,8 +468,8 @@ export function Taskbar() {
 								className={cn(
 									'h-8 sm:h-6 px-3 rounded-lg flex items-center gap-2 transition-all duration-300 relative group shrink-0',
 									isStartOpen
-										? 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]'
-										: 'bg-white/5 hover:bg-white/10 text-white/80 hover:text-white border border-white/5 hover:border-white/10',
+										? 'bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.5)]'
+										: 'bg-primary/5 hover:bg-primary/10 text-muted-foreground hover:text-foreground border border-border/10 hover:border-border/20',
 								)}
 							>
 								<Logo />

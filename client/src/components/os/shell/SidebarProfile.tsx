@@ -15,7 +15,7 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 		<div className="bg-transparent">
 			{/* Header - matching terminal style (h-7) */}
 			{/* Header - matching terminal style (h-7) */}
-			<header className="h-7 px-2 border-b border-white/5 bg-black/20 backdrop-blur-md flex items-center justify-between shrink-0 select-none">
+			<header className="h-7 px-2 border-b border-sidebar-border/20 bg-sidebar/50 backdrop-blur-md flex items-center justify-between shrink-0 select-none">
 				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2">
 					{/* macOS Traffic Lights - Hidden on mobile */}
@@ -39,18 +39,18 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 
 					{/* Explorer Title */}
 					<div className="flex items-center gap-1.5 text-[10px] font-mono">
-						<FolderOpen className="w-3 h-3 text-emerald-500" aria-hidden="true" />
+						<FolderOpen className="w-3 h-3 text-primary" aria-hidden="true" />
 						<span className="text-muted-foreground">Explorer</span>
 					</div>
 				</div>
 			</header>
 
 			{/* Profile Section - compact */}
-			<div className="p-3 border-b border-border/40 bg-card/40 backdrop-blur-sm">
+			<div className="p-3 border-b border-sidebar-border/20 bg-card/30 backdrop-blur-sm">
 				<div className="flex items-center gap-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/60">
+						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/40">
 							<Image
 								src="/logo.png"
 								alt="AnuragOS Logo"
@@ -61,15 +61,15 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 							/>
 						</div>
 						{/* Online indicator */}
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
+						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full border-2 border-background" />
 					</div>
 
 					{/* Info */}
 					<div className="min-w-0 flex-1">
-						<h3 className="font-semibold text-sm text-white/90 truncate leading-tight">
+						<h3 className="font-semibold text-sm text-foreground truncate leading-tight">
 							Anurag Basuri
 						</h3>
-						<p className="text-[10px] text-white/40 font-mono truncate">
+						<p className="text-[10px] text-muted-foreground font-mono truncate">
 							Full Stack Engineer
 						</p>
 					</div>
