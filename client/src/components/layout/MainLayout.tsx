@@ -52,7 +52,8 @@ export function MainLayout() {
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
-			const moduleId = item.id.split('/')[0];
+			// Prefer explicitly defined moduleId (e.g., 'projects'), fallback to parsing ID if needed (legacy)
+			const moduleId = item.moduleId || item.id.split('/')[0];
 			openWindow(moduleId);
 		}
 	};
