@@ -48,7 +48,7 @@ const ModuleLoader = () => (
 );
 
 // Wrapper to add Suspense boundary
-const withSuspense = (Component: React.LazyExoticComponent<any>) => (
+const withSuspense = (Component: React.ComponentType | React.LazyExoticComponent<any>) => (
 	<Suspense fallback={<ModuleLoader />}>
 		<Component />
 	</Suspense>

@@ -46,7 +46,8 @@ const windowsStorage: Storage<WindowState[]> = {
 		const raw = window.localStorage.getItem(key);
 		if (!raw) return [];
 		try {
-			const parsed = JSON.parse(raw) as PersistedWindowState[];
+			const parsed = JSON.parse(raw);
+			if (!Array.isArray(parsed)) return [];
 			return parsed
 				.filter(win => win && typeof win.id === 'string')
 				.map(win => ({
