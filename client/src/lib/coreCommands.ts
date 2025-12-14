@@ -107,7 +107,9 @@ const lsCommand = createCommand({
 	usage: 'ls [path]',
 	category: 'Files',
 	execute: ctx => {
-		const targetPath = ctx.args[0] || ctx.currentPath;
+		// Default to current directory '.' instead of using currentPath as relative path
+		const targetPath = ctx.args[0] || '.';
+
 		const { item } = resolvePath(targetPath, ctx.currentPath);
 
 		if (!item) {
@@ -135,9 +137,20 @@ const lsCommand = createCommand({
 const treeCommand = createCommand({
 	name: 'tree',
 	description: 'List contents of directories in a tree-like format.',
-	usage: 'tree',
+	usage: 'tree [path]',
 	category: 'Files',
-	execute: () => {
+	execute: ctx => {
+		const targetPath = ctx.args[0] || '.';
+		const { item } = resolvePath(targetPath, ctx.currentPath);
+
+		if (!item) {
+			return { ok: false, error: `tree: ${targetPath}: No such file or directory` };
+		}
+
+		if (item.type !== 'folder') {
+			return { ok: true, data: item.name };
+		}
+
 		const buildTree = (items: FileSystemItem[], prefix = ''): string => {
 			let result = '';
 			const length = items.length;
@@ -156,7 +169,13 @@ const treeCommand = createCommand({
 			return result;
 		};
 
-		const tree = `.\n${buildTree(INITIAL_FILE_SYSTEM)}`;
+		const rootName =
+			targetPath === '.'
+				? ctx.currentPath === '~'
+					? '~'
+					: ctx.currentPath.split('/').pop()
+				: item.name;
+		const tree = `${rootName || '.'}\n${buildTree(item.children || [])}`;
 		return { ok: true, data: tree };
 	},
 });
@@ -245,6 +264,11 @@ const openCommand = createCommand({
 		// 3. Fallback for executables or special files not caught above
 		if (item.name.endsWith('.app') || item.name.endsWith('.exe')) {
 			return { ok: false, error: `open: ${item.name}: No executable handler found.` };
+		}
+
+		// 4. Fallback for text files (act like cat but with a message)
+		if (item.type === 'file') {
+			return { ok: true, data: `Opened ${item.name}\n\n${item.content}` };
 		}
 
 		return { ok: true, data: `Opened ${item.name}` };
