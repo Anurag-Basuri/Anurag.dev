@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { mainVerticalSizesAtom, mainHorizontalSizesAtom, activeWindowIdAtom } from '@/store/atoms';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -21,6 +21,8 @@ import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { ContextMenuProvider, useContextMenu } from '@/components/providers/context-menu-provider';
+import { DesktopContextMenu } from '@/components/os/shell/DesktopContextMenu';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -224,37 +226,62 @@ export function MainLayout() {
 		</motion.div>
 	);
 
+	// Wrap content in ContextMenuHandler to access the hook
+	const ContextMenuHandler = ({ children }: { children: React.ReactNode }) => {
+		const { showMenu } = useContextMenu();
+
+		const handleContextMenu = useCallback(
+			(e: React.MouseEvent) => {
+				e.preventDefault();
+				showMenu(e.clientX, e.clientY);
+			},
+			[showMenu],
+		);
+
+		return (
+			<div className="h-full w-full" onContextMenu={handleContextMenu}>
+				{children}
+				<DesktopContextMenu />
+			</div>
+		);
+	};
+
 	return (
 		<ErrorBoundary>
-			<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
-				<Toaster
-					position="bottom-right"
-					toastOptions={{
-						style: {
-							background: 'rgba(13, 17, 23, 0.95)',
-							color: 'rgba(255, 255, 255, 0.9)',
-							border: '1px solid rgba(255, 255, 255, 0.1)',
-							backdropFilter: 'blur(10px)',
-						},
-					}}
-				/>
-				<Background3D />
+			<ContextMenuProvider>
+				<ContextMenuHandler>
+					<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+						<Toaster
+							position="bottom-right"
+							toastOptions={{
+								style: {
+									background: 'rgba(13, 17, 23, 0.95)',
+									color: 'rgba(255, 255, 255, 0.9)',
+									border: '1px solid rgba(255, 255, 255, 0.1)',
+									backdropFilter: 'blur(10px)',
+								},
+							}}
+						/>
+						<Background3D />
 
-				<TopBar
-					isMobile={isMobile}
-					sidebarCollapsed={sidebar.isCollapsed}
-					terminalCollapsed={terminal.isCollapsed}
-					onToggleSidebar={sidebar.toggle}
-					onToggleTerminal={terminal.toggle}
-					onFileSelect={handleFileSelect}
-				/>
+						<TopBar
+							isMobile={isMobile}
+							sidebarCollapsed={sidebar.isCollapsed}
+							terminalCollapsed={terminal.isCollapsed}
+							onToggleSidebar={sidebar.toggle}
+							onToggleTerminal={terminal.toggle}
+							onFileSelect={handleFileSelect}
+						/>
 
-				<div className="flex-1 overflow-hidden p-0 sm:p-1">
-					{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
-				</div>
+						<div className="flex-1 overflow-hidden p-0 sm:p-1">
+							{isLayoutReady &&
+								(isMobile ? renderMobileLayout() : renderDesktopLayout())}
+						</div>
 
-				<Taskbar />
-			</div>
+						<Taskbar />
+					</div>
+				</ContextMenuHandler>
+			</ContextMenuProvider>
 		</ErrorBoundary>
 	);
 }
