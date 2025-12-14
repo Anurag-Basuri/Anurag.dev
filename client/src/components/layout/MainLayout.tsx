@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { mainVerticalSizesAtom, mainHorizontalSizesAtom } from '@/store/atoms';
+import { mainVerticalSizesAtom, mainHorizontalSizesAtom, activeWindowIdAtom } from '@/store/atoms';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -27,6 +27,7 @@ export function MainLayout() {
 	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
 	const [windows] = useAtom(windowsAtom);
+	const [activeWindowId] = useAtom(activeWindowIdAtom);
 
 	const [isLayoutReady] = useState(true);
 
@@ -117,7 +118,11 @@ export function MainLayout() {
 								<SidebarProfile onCollapse={sidebar.collapse} />
 
 								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-									<FolderTree items={fileSystem} onSelect={handleFileSelect} />
+									<FolderTree
+										items={fileSystem}
+										onSelect={handleFileSelect}
+										activeModuleId={activeWindowId}
+									/>
 								</div>
 							</motion.div>
 						)}

@@ -1,8 +1,21 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { FileSystemItem } from '@/types/file-system';
-import { Folder, FolderOpen, File, ChevronRight, FileCode, FileJson, FileText } from 'lucide-react';
+import {
+	Folder,
+	FolderOpen,
+	File,
+	ChevronRight,
+	FileCode,
+	FileJson,
+	FileText,
+	LayoutDashboard,
+	Terminal,
+	Database,
+	Globe,
+	Image as ImageIcon,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,36 +23,54 @@ interface FolderTreeProps {
 	items: FileSystemItem[];
 	level?: number;
 	onSelect?: (item: FileSystemItem) => void;
+	activeModuleId?: string | null;
 }
 
-const FileIcon = ({ name }: { name: string }) => {
-	if (name.endsWith('.json'))
-		return <FileJson className="w-4 h-4 md:w-4 md:h-4 text-yellow-500/90" />;
+const getFileIcon = (name: string, moduleId?: string) => {
+	// App shortcuts
+	if (name.endsWith('.app')) {
+		if (moduleId === 'projects') return <LayoutDashboard className="w-4 h-4 text-blue-400" />;
+		if (moduleId === 'ailab') return <Terminal className="w-4 h-4 text-purple-400" />;
+		if (moduleId === 'profiles') return <Database className="w-4 h-4 text-orange-400" />;
+		if (moduleId === 'blog') return <Globe className="w-4 h-4 text-pink-400" />;
+		return <Terminal className="w-4 h-4 text-emerald-400" />;
+	}
+
+	// File extensions
+	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-yellow-500/90" />;
 	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 md:w-4 md:h-4 text-blue-400/90" />;
-	if (
-		name.endsWith('.py') ||
-		name.endsWith('.js') ||
-		name.endsWith('.tsx') ||
-		name.endsWith('.ts')
-	)
-		return <FileCode className="w-4 h-4 md:w-4 md:h-4 text-emerald-400/90" />;
-	if (name.endsWith('.pdf')) return <File className="w-4 h-4 md:w-4 md:h-4 text-red-400/90" />;
-	return <File className="w-4 h-4 md:w-4 md:h-4 text-slate-400/60" />;
+		return <FileText className="w-4 h-4 text-slate-400" />;
+	if (name.endsWith('.tsx') || name.endsWith('.ts'))
+		return <FileCode className="w-4 h-4 text-blue-500" />;
+	if (name.endsWith('.js') || name.endsWith('.jsx'))
+		return <FileCode className="w-4 h-4 text-yellow-400" />;
+	if (name.endsWith('.css') || name.endsWith('.scss'))
+		return <FileCode className="w-4 h-4 text-sky-400" />;
+	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-400/90" />;
+	if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.svg'))
+		return <ImageIcon className="w-4 h-4 text-purple-400" />;
+
+	return <File className="w-4 h-4 text-slate-500" />;
 };
 
-export function FolderTree({ items, level = 0, onSelect }: FolderTreeProps) {
+export function FolderTree({ items, level = 0, onSelect, activeModuleId }: FolderTreeProps) {
 	return (
 		<div className="w-full font-mono relative">
 			{/* Connector line for nested levels */}
 			{level > 0 && (
 				<div
-					className="absolute left-[13px] top-0 bottom-0 w-px bg-white/5"
+					className="absolute left-[11px] top-0 bottom-0 w-px bg-border/40"
 					aria-hidden="true"
 				/>
 			)}
 			{items.map(item => (
-				<FolderTreeItem key={item.id} item={item} level={level} onSelect={onSelect} />
+				<FolderTreeItem
+					key={item.id}
+					item={item}
+					level={level}
+					onSelect={onSelect}
+					activeModuleId={activeModuleId}
+				/>
 			))}
 		</div>
 	);
@@ -49,10 +80,12 @@ function FolderTreeItem({
 	item,
 	level,
 	onSelect,
+	activeModuleId,
 }: {
 	item: FileSystemItem;
 	level: number;
 	onSelect?: (item: FileSystemItem) => void;
+	activeModuleId?: string | null;
 }) {
 	const isFolder = item.type === 'folder';
 	// Auto-expand root level folders by default
@@ -60,6 +93,9 @@ function FolderTreeItem({
 		isFolder && (level === 0 || item.name === 'src' || item.name === 'components'),
 	);
 	const [isHovered, setIsHovered] = useState(false);
+
+	// Check if this file is active based on moduleId matching the active window
+	const isActive = !isFolder && item.moduleId && item.moduleId === activeModuleId;
 
 	React.useEffect(() => {
 		const handleCollapse = () => {
@@ -86,20 +122,24 @@ function FolderTreeItem({
 		<div className="relative">
 			<div
 				className={cn(
-					'flex items-center py-4 md:py-1.5 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative',
-					'hover:bg-white/5',
-					isHovered && !isFolder && 'text-emerald-400',
+					'flex items-center py-1 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative my-0.5',
+					isActive
+						? 'bg-primary/10 text-primary'
+						: 'text-muted-foreground hover:text-foreground',
 					level > 0 && 'ml-4', // Indentation
 				)}
 				onClick={handleToggle}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
 			>
-				{/* Hover Background Indicator */}
-				{isHovered && (
+				{/* Hover/Active Background Indicator */}
+				{(isHovered || isActive) && (
 					<motion.div
-						layoutId="folder-hover"
-						className="absolute inset-0 bg-white/4 rounded-sm pointer-events-none"
+						layoutId={isActive ? 'folder-active' : undefined}
+						className={cn(
+							'absolute inset-0 rounded-sm pointer-events-none',
+							isActive ? 'bg-primary/10 border border-primary/20' : 'bg-accent/40',
+						)}
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
@@ -107,37 +147,36 @@ function FolderTreeItem({
 					/>
 				)}
 
-				<motion.span
-					animate={{ rotate: isFolder && isOpen ? 90 : 0 }}
-					transition={{ duration: 0.2, ease: 'easeOut' }}
-					className="mr-2 text-white/40 group-hover:text-white/80 transition-colors"
-				>
-					{isFolder ? (
-						<ChevronRight className="w-3.5 h-3.5" />
-					) : (
-						<span className="w-3.5 h-3.5 inline-block" />
-					)}
-				</motion.span>
-
-				<span className="mr-2.5 relative z-10">
-					{isFolder ? (
-						isOpen ? (
-							<FolderOpen className="w-4 h-4 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)] transition-colors" />
-						) : (
-							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-400 transition-colors" />
-						)
-					) : (
-						<FileIcon name={item.name} />
+				{/* Arrow for folders */}
+				<span className="mr-1.5 flex-shrink-0 w-4 flex items-center justify-center text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
+					{isFolder && (
+						<motion.span
+							animate={{ rotate: isOpen ? 90 : 0 }}
+							transition={{ duration: 0.15 }}
+						>
+							<ChevronRight className="w-3 h-3" />
+						</motion.span>
 					)}
 				</span>
 
+				{/* Icon */}
+				<span className="mr-2 relative z-10 flex-shrink-0">
+					{isFolder ? (
+						isOpen ? (
+							<FolderOpen className="w-4 h-4 text-emerald-500/90" />
+						) : (
+							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-500 transition-colors" />
+						)
+					) : (
+						getFileIcon(item.name, item.moduleId)
+					)}
+				</span>
+
+				{/* Label */}
 				<span
 					className={cn(
-						'truncate transition-colors duration-200 relative z-10',
-						isFolder
-							? 'text-white/90 font-semibold tracking-wide group-hover:text-white'
-							: 'text-white/70 group-hover:text-white',
-						item.name === 'secret' && 'text-white/30 italic',
+						'truncate relative z-10 font-medium tracking-tight',
+						isActive && 'font-semibold',
 					)}
 				>
 					{item.name}
@@ -150,10 +189,15 @@ function FolderTreeItem({
 						initial={{ height: 0, opacity: 0 }}
 						animate={{ height: 'auto', opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
-						transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+						transition={{ duration: 0.2, ease: 'easeOut' }}
 						className="overflow-hidden"
 					>
-						<FolderTree items={item.children} level={level + 1} onSelect={onSelect} />
+						<FolderTree
+							items={item.children}
+							level={level + 1}
+							onSelect={onSelect}
+							activeModuleId={activeModuleId}
+						/>
 					</motion.div>
 				)}
 			</AnimatePresence>
