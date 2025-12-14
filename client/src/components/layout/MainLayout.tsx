@@ -103,21 +103,21 @@ export function MainLayout() {
 
 		if (!isLayoutReady) {
 			return (
-				<div className="h-full w-full flex items-center justify-center bg-[#0d1117] relative overflow-hidden">
-					<div className="absolute inset-0 bg-linear-to-b from-blue-500/5 to-transparent pointer-events-none" />
+				<div className="h-full w-full flex items-center justify-center bg-background relative overflow-hidden">
+					<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
 					<div className="flex flex-col items-center gap-6 relative z-10">
 						<div className="relative">
-							<div className="absolute inset-0 bg-emerald-500/30 blur-2xl rounded-full animate-pulse" />
-							<div className="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin relative z-10" />
+							<div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
+							<div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin relative z-10" />
 							<div className="absolute inset-0 flex items-center justify-center">
-								<div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+								<div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
 							</div>
 						</div>
 						<div className="flex flex-col items-center gap-1">
-							<div className="text-sm font-bold tracking-[0.2em] text-emerald-400 animate-pulse uppercase">
+							<div className="text-sm font-bold tracking-[0.2em] text-primary animate-pulse uppercase">
 								System Initializing
 							</div>
-							<div className="text-[10px] text-emerald-500/50 font-mono tracking-widest">
+							<div className="text-[10px] text-muted-foreground font-mono tracking-widest">
 								LOADING MODULES...
 							</div>
 						</div>
@@ -152,7 +152,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.2 }}
-								className="h-full rounded-sm border border-white/10 overflow-hidden flex flex-col"
+								className="h-full rounded-sm border border-border/20 bg-sidebar/50 overflow-hidden flex flex-col"
 							>
 								<SidebarProfile onCollapse={sidebar.collapse} />
 
@@ -170,7 +170,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[resize-handle-state=hover]:bg-emerald-500/50 data-resize-handle-active:bg-emerald-500 border-x border-white/5"
+					className="w-1 bg-transparent hover:bg-primary/50 transition-colors data-[resize-handle-state=hover]:bg-primary/50 data-resize-handle-active:bg-primary border-x border-border/10"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -182,14 +182,14 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="rounded-sm border border-white/10 shadow-2xl overflow-hidden"
+							className="rounded-sm border border-border/20 shadow-2xl overflow-hidden bg-background/50 relative"
 						>
 							<EditorArea />
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-1 bg-[#0d1117] hover:bg-emerald-500/50 transition-colors data-[resize-handle-state=hover]:bg-emerald-500/50 data-resize-handle-active:bg-emerald-500 border-y border-white/5"
+							className="h-1 bg-transparent hover:bg-primary/50 transition-colors data-[resize-handle-state=hover]:bg-primary/50 data-resize-handle-active:bg-primary border-y border-border/10"
 						/>
 
 						<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>

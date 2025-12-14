@@ -114,8 +114,8 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 						<div
 							className={cn(
 								'h-10 flex items-center justify-between px-4 shrink-0 transition-colors select-none relative z-50',
-								'bg-black/60 backdrop-blur-xl border-b border-white/5',
-								isActive ? 'bg-black/80' : 'bg-black/40',
+								'bg-card/40 backdrop-blur-xl border-b border-border/10',
+								isActive ? 'bg-card/60' : 'bg-card/20',
 							)}
 						>
 							{/* Drag Handle Area */}
@@ -124,7 +124,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 							<span
 								className={cn(
 									'text-[13px] font-medium tracking-wide flex items-center gap-2 relative z-10 transition-colors',
-									isActive ? 'text-white' : 'text-white/40',
+									isActive ? 'text-foreground' : 'text-muted-foreground',
 								)}
 							>
 								{/* Activity Dot */}
@@ -132,8 +132,8 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 									className={cn(
 										'w-2 h-2 rounded-full transition-colors',
 										isActive
-											? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]'
-											: 'bg-white/20',
+											? 'bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)]'
+											: 'bg-muted-foreground/30',
 									)}
 								/>
 								{title}
@@ -142,30 +142,30 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 								<button
 									onClick={handleMinimize}
 									className={cn(
-										'group/min w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors',
+										'group/min w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/20 transition-colors',
 										isMobile && 'hidden',
 									)}
 									title="Minimize"
 								>
 									<Minus
 										size={16}
-										className="text-white/40 group-hover/min:text-white transition-colors"
+										className="text-muted-foreground/60 group-hover/min:text-foreground transition-colors"
 									/>
 								</button>
 								<button
 									onClick={handleClose}
-									className="group/close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-500/20 transition-colors"
+									className="group/close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-destructive/10 transition-colors"
 									title="Close"
 								>
 									<X
 										size={16}
-										className="text-white/40 group-hover/close:text-red-400 transition-colors"
+										className="text-muted-foreground/60 group-hover/close:text-destructive transition-colors"
 									/>
 								</button>
 							</div>
 						</div>
 						{/* Content Background to prevent bleed */}
-						<div className="grow overflow-auto bg-[#0d1117]/95 backdrop-blur-md relative w-full h-full">
+						<div className="grow overflow-auto bg-background/95 backdrop-blur-md relative w-full h-full">
 							{component}
 						</div>
 					</Rnd>
