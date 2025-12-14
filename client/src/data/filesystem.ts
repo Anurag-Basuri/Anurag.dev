@@ -102,10 +102,18 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
 		content: '[Binary PDF Data]',
 	},
 	{
-		name: 'stats.exe',
-		type: 'file',
-		id: 'stats',
+		name: 'coding-profiles',
+		type: 'folder',
+		id: 'coding-profiles',
 		moduleId: 'coding-stats',
-		content: '[Binary Executable]',
+		children: [
+			{
+				name: 'README.md',
+				type: 'file',
+				id: 'coding-profiles/README.md',
+				content:
+					'# Coding Profiles\n\nLeetCode, Codeforces, CodeChef, and GitHub statistics.',
+			},
+		],
 	},
 ];
