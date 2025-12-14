@@ -25,8 +25,8 @@ export function EditorArea() {
 				>
 					{/* Background Glow */}
 					<div className="absolute inset-0 pointer-events-none overflow-hidden">
-						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px]" />
-						<div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px]" />
+						<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px]" />
+						<div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
 					</div>
 
 					{/* Live Clock Widget */}
@@ -38,9 +38,9 @@ export function EditorArea() {
 					<div className="relative mb-8 group z-10 text-center">
 						<div className="flex items-center justify-center mb-6">
 							<div className="relative group/icon cursor-default">
-								<div className="absolute -inset-4 bg-emerald-500/20 rounded-full blur-xl opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500" />
-								<div className="relative bg-[#0d1117]/80 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl ring-1 ring-white/5 group-hover/icon:scale-105 transition-transform duration-300">
-									<Command className="w-10 h-10 text-emerald-500" />
+								<div className="absolute -inset-4 bg-primary/20 rounded-full blur-xl opacity-0 group-hover/icon:opacity-100 transition-opacity duration-500" />
+								<div className="relative bg-background/40 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl ring-1 ring-white/5 group-hover/icon:scale-105 transition-transform duration-300">
+									<Command className="w-10 h-10 text-primary" />
 								</div>
 							</div>
 						</div>
@@ -144,7 +144,7 @@ function QuickAction({
 	const { openWindow } = require('@/hooks/use-window-manager').useWindowManager(); // Inline require to avoid circular dep if any, or just proper hook usage
 
 	const colorClasses: Record<string, string> = {
-		emerald: 'text-emerald-400 group-hover:bg-emerald-500/20 group-hover:border-emerald-500/30',
+		emerald: 'text-primary group-hover:bg-primary/20 group-hover:border-primary/30',
 		blue: 'text-blue-400 group-hover:bg-blue-500/20 group-hover:border-blue-500/30',
 		purple: 'text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/30',
 	};

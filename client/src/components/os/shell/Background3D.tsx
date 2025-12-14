@@ -324,7 +324,7 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 			<Points ref={closeRef} positions={closeStars.positions}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#ffffff' : '#000000'}
+					color={isDark ? '#ffffff' : '#1e293b'}
 					size={CONFIG.STARS.CLOSE.size}
 					sizeAttenuation
 					depthWrite={false}
@@ -522,7 +522,7 @@ export function Background3D() {
 					}}
 					shadows={false}
 				>
-					<color attach="background" args={[theme === 'dark' ? '#000000' : '#ffffff']} />
+					<color attach="background" args={[theme === 'dark' ? '#000000' : '#f8f9fa']} />
 					<CameraRig reducedMotion={reducedMotion} />
 					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#ffffff', 30, 100]} />
 					<AnimatedGrid reducedMotion={reducedMotion} />
@@ -533,8 +533,8 @@ export function Background3D() {
 			</ErrorBoundary>
 			{/* Overlay gradient for depth */}
 			<div className="absolute inset-0 pointer-events-none">
-				<div className="absolute inset-0 bg-linear-to-t from-transparent via-transparent to-transparent dark:via-black/20 dark:to-black/40" />
-				<div className="absolute inset-0 bg-gradient-radial from-transparent to-transparent dark:to-black/30" />
+				<div className="absolute inset-0 bg-linear-to-t from-background/0 via-background/0 to-background/0 dark:via-background/20 dark:to-background/40" />
+				<div className="absolute inset-0 bg-gradient-radial from-transparent to-transparent dark:to-background/30" />
 			</div>
 		</div>
 	);
