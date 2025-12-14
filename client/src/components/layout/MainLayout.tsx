@@ -20,6 +20,7 @@ import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -37,19 +38,57 @@ export function MainLayout() {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 
-	// Auto-open About module on first load if no windows are open
+	// Routing Integration
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	// Auto-open About module on first load if no windows are open, OR sync from URL
 	const hasInitialized = React.useRef(false);
+
+	// 1. URL -> State (Initial Load & Back/Forward)
 	useEffect(() => {
-		// Only run once, and only if there's no 'about' window already
-		if (!hasInitialized.current) {
+		if (hasInitialized.current) return;
+
+		const appParam = searchParams.get('app');
+
+		if (appParam) {
+			// URL has an app, open it
 			hasInitialized.current = true;
-			const aboutExists = windows.some(w => w.id === 'about');
-			if (!aboutExists && windows.length === 0) {
-				// Small delay to ensure localStorage has hydrated
-				setTimeout(() => openWindow('about'), 0);
+			// Small delay to allow hydration
+			setTimeout(() => openWindow(appParam), 0);
+		} else if (windows.length === 0) {
+			// No URL param and no windows (fresh load), default to 'about'
+			hasInitialized.current = true;
+			setTimeout(() => {
+				openWindow('about');
+				// Also update URL to reflect this default
+				router.replace(`${pathname}?app=about`);
+			}, 0);
+		} else {
+			// Windows exist (restored from storage), but we might want to ensure URL matches active?
+			// For now, mark initialized.
+			hasInitialized.current = true;
+		}
+	}, [searchParams, windows.length, openWindow, router, pathname]);
+
+	// 2. State -> URL (Sync active window to URL)
+	useEffect(() => {
+		if (!hasInitialized.current) return;
+
+		if (activeWindowId) {
+			const currentApp = searchParams.get('app');
+			if (currentApp !== activeWindowId) {
+				router.replace(`${pathname}?app=${activeWindowId}`);
+			}
+		} else {
+			// No active window? Maybe clear param or leave last one?
+			// Clearing it feels "correct" for an empty desktop state.
+			if (searchParams.has('app')) {
+				router.replace(pathname);
 			}
 		}
-	}, [windows, openWindow]);
+	}, [activeWindowId, router, pathname, searchParams]);
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
