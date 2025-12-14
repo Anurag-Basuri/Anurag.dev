@@ -62,12 +62,13 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
 				moduleId: 'ailab',
 				content: '[Executable App] Run to enter AI Lab.',
 			},
+
 			{
-				name: 'coding-stats.app',
+				name: 'profiles.app',
 				type: 'file',
-				id: 'work/stats',
-				moduleId: 'coding-stats',
-				content: '[Executable App] Run to view coding statistics.',
+				id: 'work/profiles',
+				moduleId: 'profiles',
+				content: '[Executable App] Run to view detailed coding profiles.',
 			},
 		],
 	},

@@ -467,7 +467,7 @@ const statsCommand = createCommand({
 	category: 'Development',
 	execute: () => ({
 		ok: true,
-		data: { type: 'open_module', moduleId: 'coding-stats' },
+		data: { type: 'open_module', moduleId: 'profiles' },
 	}),
 });
 
