@@ -14,16 +14,16 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 3000, radius: 100, size: 0.02, opacity: 0.6, rotationSpeed: 0.005 },
-		MEDIUM: { count: 1500, radius: 50, size: 0.04, opacity: 0.8, rotationSpeed: 0.01 },
-		CLOSE: { count: 500, radius: 25, size: 0.08, opacity: 0.9, rotationSpeed: 0.02 },
+		DISTANT: { count: 2500, radius: 100, size: 0.015, opacity: 0.5, rotationSpeed: 0.003 },
+		MEDIUM: { count: 1200, radius: 50, size: 0.035, opacity: 0.7, rotationSpeed: 0.007 },
+		CLOSE: { count: 400, radius: 25, size: 0.075, opacity: 0.85, rotationSpeed: 0.015 },
 	},
 	PARTICLES: {
-		count: 300,
+		count: 250,
 		bounds: { x: 25, y: 15, z: 30 },
-		sizeRange: { min: 0.02, max: 0.1 },
-		velocityRange: 0.002,
-		opacityRange: { min: 0.3, max: 1.0 },
+		sizeRange: { min: 0.015, max: 0.08 },
+		velocityRange: 0.0015,
+		opacityRange: { min: 0.35, max: 0.9 },
 	},
 	SHOOTING_STARS: {
 		count: 4,
@@ -284,11 +284,11 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 			distantRef.current.rotation.y += delta * CONFIG.STARS.DISTANT.rotationSpeed;
 		if (mediumRef.current) {
 			mediumRef.current.rotation.y += delta * CONFIG.STARS.MEDIUM.rotationSpeed;
-			mediumRef.current.rotation.x += delta * 0.003;
+			mediumRef.current.rotation.x += delta * 0.002;
 		}
 		if (closeRef.current) {
 			closeRef.current.rotation.y += delta * CONFIG.STARS.CLOSE.rotationSpeed;
-			closeRef.current.rotation.z += delta * 0.005;
+			closeRef.current.rotation.z += delta * 0.004;
 		}
 	});
 
@@ -343,22 +343,22 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 		if (reducedMotion) return;
 
 		const drift = {
-			x: Math.sin(state.clock.elapsedTime * 0.1) * 0.3,
-			y: Math.cos(state.clock.elapsedTime * 0.15) * 0.2,
-			z: Math.sin(state.clock.elapsedTime * 0.2) * 0.1,
+			x: Math.sin(state.clock.elapsedTime * 0.08) * 0.25,
+			y: Math.cos(state.clock.elapsedTime * 0.12) * 0.18,
+			z: Math.sin(state.clock.elapsedTime * 0.15) * 0.08,
 		};
 
-		const mouseX = state.pointer.x * 2 + drift.x;
-		const mouseY = state.pointer.y * 1.2 + drift.y;
+		const mouseX = state.pointer.x * 1.8 + drift.x;
+		const mouseY = state.pointer.y * 1.0 + drift.y;
 
-		targetPosition.current.x += (mouseX - targetPosition.current.x) * 0.02;
-		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.02;
+		targetPosition.current.x += (mouseX - targetPosition.current.x) * 0.025;
+		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.025;
 		targetPosition.current.z = 5 + drift.z;
 
-		camera.position.lerp(targetPosition.current, 0.05);
+		camera.position.lerp(targetPosition.current, 0.06);
 
-		const targetRotZ = -state.pointer.x * 0.03;
-		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.02;
+		const targetRotZ = -state.pointer.x * 0.025;
+		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.025;
 		camera.rotation.set(camera.rotation.x, camera.rotation.y, newRotZ);
 
 		camera.lookAt(...CONFIG.CAMERA.lookAt);
@@ -393,10 +393,10 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 				vUv = uv;
 				
 				vec3 pos = position;
-				float wave1 = sin(pos.x * 0.3 + time * 0.5) * cos(pos.y * 0.3 + time * 0.5);
-				float wave2 = sin(pos.x * 0.2 - time * 0.3) * sin(pos.y * 0.2 + time * 0.4);
+				float wave1 = sin(pos.x * 0.25 + time * 0.4) * cos(pos.y * 0.25 + time * 0.4);
+				float wave2 = sin(pos.x * 0.18 - time * 0.25) * sin(pos.y * 0.18 + time * 0.35);
 				
-				float elevation = (wave1 + wave2) * 0.5;
+				float elevation = (wave1 + wave2) * 0.4;
 				pos.z += elevation;
 				
 				vElevation = elevation;
@@ -460,13 +460,13 @@ const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	return (
 		<EffectComposer>
 			<Bloom
-				intensity={isDark ? 1.2 : 0.6}
-				luminanceThreshold={0.4}
-				luminanceSmoothing={0.9}
+				intensity={isDark ? 1.0 : 0.5}
+				luminanceThreshold={0.5}
+				luminanceSmoothing={0.85}
 				height={300}
 			/>
-			<Noise opacity={0.02} blendFunction={BlendFunction.OVERLAY} />
-			<Vignette darkness={isDark ? 0.4 : 0.2} offset={0.3} />
+			<Noise opacity={0.015} blendFunction={BlendFunction.OVERLAY} />
+			<Vignette darkness={isDark ? 0.35 : 0.18} offset={0.35} />
 		</EffectComposer>
 	);
 });
