@@ -62,6 +62,7 @@ const resolvePath = (
 };
 
 // --- Commands ---
+
 const helpCommand = createCommand({
 	name: 'help',
 	aliases: ['h', '?'],
@@ -123,13 +124,40 @@ const lsCommand = createCommand({
 		}
 
 		// Format output: Folders in blue (conceptually), files in white
-		// We can return a formatted string or a component if we wanted rich text
-		// For now, let's just mark folders with a trailing slash
 		const output = children
 			.map(child => (child.type === 'folder' ? `${child.name}/` : child.name))
 			.join('\n');
 
 		return { ok: true, data: output };
+	},
+});
+
+const treeCommand = createCommand({
+	name: 'tree',
+	description: 'List contents of directories in a tree-like format.',
+	usage: 'tree',
+	category: 'Files',
+	execute: () => {
+		const buildTree = (items: FileSystemItem[], prefix = ''): string => {
+			let result = '';
+			const length = items.length;
+
+			items.forEach((item, index) => {
+				const isLast = index === length - 1;
+				const connector = isLast ? '└── ' : '├── ';
+				const childPrefix = isLast ? '    ' : '│   ';
+
+				result += `${prefix}${connector}${item.name}\n`;
+
+				if (item.type === 'folder' && item.children) {
+					result += buildTree(item.children, prefix + childPrefix);
+				}
+			});
+			return result;
+		};
+
+		const tree = `.\n${buildTree(INITIAL_FILE_SYSTEM)}`;
+		return { ok: true, data: tree };
 	},
 });
 
@@ -200,6 +228,7 @@ const openCommand = createCommand({
 			return { ok: false, error: `open: ${ctx.args[0]}: No such file or directory` };
 		}
 
+		// 1. Direct Module ID (if file metadata has it)
 		if (item.moduleId) {
 			return {
 				ok: true,
@@ -207,32 +236,15 @@ const openCommand = createCommand({
 			};
 		}
 
-		// Map folder IDs to modules for convenience (e.g., 'about' folder -> 'about' module)
-		if (item.type === 'folder' && item.id !== 'root') {
-			// Check if folder name matches a known module
-			const moduleMap: Record<string, string> = {
-				about: 'about',
-				projects: 'projects',
-				journey: 'journey',
-				contact: 'contact',
-				blog: 'blog',
-				certifications: 'certifications',
-				ailab: 'ailab',
-			};
-
-			if (moduleMap[item.name]) {
-				return {
-					ok: true,
-					data: { type: 'open_module', moduleId: moduleMap[item.name] },
-				};
-			}
-
-			return { ok: false, error: `open: ${item.name}: is a directory` };
-		}
-
+		// 2. Resume PDF Special Case
 		if (item.name === 'resume.pdf') {
 			if (typeof window !== 'undefined') window.open('/resume.pdf', '_blank');
 			return { ok: true, data: 'Opening resume...' };
+		}
+
+		// 3. Fallback for executables or special files not caught above
+		if (item.name.endsWith('.app') || item.name.endsWith('.exe')) {
+			return { ok: false, error: `open: ${item.name}: No executable handler found.` };
 		}
 
 		return { ok: true, data: `Opened ${item.name}` };
@@ -440,6 +452,7 @@ export function registerCoreCommands() {
 	registerCommands([
 		helpCommand,
 		lsCommand,
+		treeCommand,
 		cdCommand,
 		catCommand,
 		openCommand,
