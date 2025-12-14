@@ -5,113 +5,97 @@
    CSS Variables for Theming
    ========================= */
 :root {
-	/* Light Mode - Warm, Sophisticated with Refined Accents */
-	--background: oklch(0.985 0.008 85); /* Warm cream-white */
-	--foreground: oklch(0.2 0.025 260); /* Deep navy text */
+	/* Light Mode - Clean, Cool, Tech-Minimalist */
+	--background: oklch(0.98 0 0); /* Pure white/lightest gray */
+	--foreground: oklch(0.25 0.02 260); /* Deep cool gray text */
 
-	--card: oklch(0.975 0.01 80);
+	--card: oklch(1 0 0); /* Pure white cards */
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(0.99 0.005 85);
+	--popover: oklch(1 0 0);
 	--popover-foreground: var(--foreground);
 
-	/* Primary - Rich Indigo/Violet */
-	--primary: oklch(0.58 0.22 280);
+	/* Primary - Crisp Emerald/Teal */
+	--primary: oklch(0.65 0.18 160);
 	--primary-foreground: oklch(0.99 0 0);
 
-	--secondary: oklch(0.93 0.018 270);
-	--secondary-foreground: oklch(0.28 0.05 280);
+	--secondary: oklch(0.96 0.01 260);
+	--secondary-foreground: oklch(0.3 0.05 260);
 
-	--muted: oklch(0.94 0.015 85);
-	--muted-foreground: oklch(0.45 0.025 260);
+	--muted: oklch(0.96 0.01 260);
+	--muted-foreground: oklch(0.55 0.03 260);
 
-	/* Accent - Warm Teal/Cyan */
-	--accent: oklch(0.92 0.04 190);
-	--accent-foreground: oklch(0.3 0.14 190);
+	/* Accent - Electric Blue/Cyan */
+	--accent: oklch(0.95 0.03 240);
+	--accent-foreground: oklch(0.4 0.15 240);
 
-	--destructive: oklch(0.55 0.22 25);
+	--destructive: oklch(0.6 0.2 25);
 	--destructive-foreground: oklch(0.99 0 0);
 
-	--border: oklch(0.82 0.02 260 / 0.5);
-	--input: oklch(0.9 0.012 85 / 0.65);
-	--ring: oklch(0.58 0.2 280);
+	--border: oklch(0.9 0.02 260);
+	--input: oklch(0.92 0.01 260);
+	--ring: oklch(0.7 0.15 160);
 
 	--radius: 0.5rem;
 
-	/* Sidebar specific */
-	--sidebar: oklch(0.96 0.012 85);
+	/* Sidebar specific - Light Mode */
+	--sidebar: oklch(0.97 0 0); /* Slightly off-white/gray sidebar */
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: var(--accent);
-	--sidebar-accent-foreground: var(--accent-foreground);
-	--sidebar-border: var(--border);
+	--sidebar-accent: oklch(0.94 0.02 260);
+	--sidebar-accent-foreground: var(--foreground);
+	--sidebar-border: oklch(0.92 0 0);
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Light */
-	--terminal-bg: oklch(0.97 0.008 85);
-	--terminal-text: oklch(0.25 0.025 260);
-	--terminal-cursor: oklch(0.55 0.2 280);
+	--terminal-bg: oklch(0.99 0 0);
+	--terminal-text: oklch(0.2 0.02 260);
+	--terminal-cursor: oklch(0.6 0.15 160);
 
-	/* --- New Design Tokens --- */
-
-	/* Spacing Scale (Fluid) */
-	--spacing-xs: 0.25rem;
-	--spacing-sm: 0.5rem;
-	--spacing-md: 1rem;
-	--spacing-lg: 1.5rem;
-	--spacing-xl: 2rem;
-	--spacing-2xl: 3rem;
-	--spacing-3xl: 4rem;
-
-	/* Elevation / Shadows */
-	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-	--shadow-premium: 0 0 0 1px color-mix(in oklch, var(--border) 100%, transparent),
-		0 8px 40px -4px color-mix(in oklch, var(--primary) 5%, transparent),
-		0 4px 16px -2px color-mix(in oklch, var(--primary) 3%, transparent);
-
-	/* Animation Tokens */
-	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-	--ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+	/* Elevation / Shadows (Light) */
+	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
+	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 8px 30px -4px rgba(0, 0, 0, 0.1),
+		0 4px 12px -2px rgba(0, 0, 0, 0.05);
 }
 
 .dark {
-	/* Dark Mode - Rich & Immersive with Refined Neon */
-	--background: oklch(0.11 0.018 260); /* Deeper blue-black */
-	--foreground: oklch(0.94 0.012 210); /* Brighter cool white */
+	/* Dark Mode - Deep Space Black, Neon Accents */
+	--background: oklch(0.12 0.03 260); /* Deep navy/black */
+	--foreground: oklch(0.95 0.01 220); /* Crisp white */
 
-	--card: oklch(0.18 0.02 260);
+	--card: oklch(0.15 0.03 260);
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(0.17 0.018 260);
+	--popover: oklch(0.14 0.03 260);
 	--popover-foreground: var(--foreground);
 
-	/* Primary - Electric Cyan-Green (softer glow) */
-	--primary: oklch(0.82 0.2 165);
-	--primary-foreground: oklch(0.1 0.018 260);
+	/* Primary - Neon Emerald */
+	--primary: oklch(0.8 0.18 160);
+	--primary-foreground: oklch(0.1 0.03 260);
 
-	--secondary: oklch(0.24 0.022 260);
-	--secondary-foreground: oklch(0.82 0.16 165);
+	--secondary: oklch(0.2 0.03 260);
+	--secondary-foreground: oklch(0.8 0.18 160);
 
-	--muted: oklch(0.24 0.02 260);
-	--muted-foreground: oklch(0.62 0.025 210);
+	--muted: oklch(0.18 0.02 260);
+	--muted-foreground: oklch(0.65 0.03 250);
 
-	/* Accent - Subtle Purple/Magenta */
-	--accent: oklch(0.26 0.028 280);
-	--accent-foreground: oklch(0.78 0.16 300);
+	/* Accent - Cool Purple/Blue */
+	--accent: oklch(0.2 0.04 280);
+	--accent-foreground: oklch(0.9 0.05 280);
 
-	--destructive: oklch(0.55 0.22 20);
-	--destructive-foreground: oklch(0.98 0 0);
+	--destructive: oklch(0.5 0.2 25);
+	--destructive-foreground: oklch(0.95 0 0);
 
-	--border: oklch(0.38 0.028 260 / 0.55);
-	--input: oklch(0.28 0.022 260 / 0.65);
-	--ring: oklch(0.78 0.18 165);
+	--border: oklch(0.25 0.03 260 / 0.4);
+	--input: oklch(0.22 0.03 260);
+	--ring: oklch(0.8 0.18 160);
 
-	/* Sidebar specific */
-	--sidebar: oklch(0.15 0.018 260);
+	/* Sidebar specific - Dark Mode */
+	--sidebar: oklch(0.11 0.03 260); /* Measures darker than main bg */
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
@@ -121,14 +105,14 @@
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Dark */
-	--terminal-bg: oklch(0.12 0.012 260);
-	--terminal-text: oklch(0.88 0.015 210);
-	--terminal-cursor: oklch(0.78 0.18 165);
+	--terminal-bg: oklch(0.1 0.03 260);
+	--terminal-text: oklch(0.9 0.02 220);
+	--terminal-cursor: oklch(0.8 0.18 160);
 
-	/* Shadow adjustments for dark mode */
-	--shadow-premium: 0 0 0 1px color-mix(in oklch, var(--border) 100%, transparent),
-		0 20px 60px -10px color-mix(in oklch, black 40%, transparent),
-		0 8px 20px -2px color-mix(in oklch, var(--primary) 10%, transparent);
+	/* Elevation / Shadows (Dark) */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 50px -10px rgba(0, 0, 0, 0.6),
+		0 8px 20px -2px rgba(16, 185, 129, 0.15); /* Subtle emerald glow */
 }
 
 /* ================
