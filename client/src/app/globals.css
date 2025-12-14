@@ -5,61 +5,64 @@
    CSS Variables for Theming
    ========================= */
 :root {
-	/* Light Mode - Clean, Cool, Tech-Minimalist */
-	--background: oklch(0.98 0 0); /* Pure white/lightest gray */
-	--foreground: oklch(0.25 0.02 260); /* Deep cool gray text */
+	/* Light Mode - Crisp, Modern, Professional */
+	--background: oklch(0.99 0.005 240); /* Very subtle cool white */
+	--foreground: oklch(0.2 0.03 255); /* Deep slate text for high contrast */
 
-	--card: oklch(1 0 0); /* Pure white cards */
+	--card: oklch(1 0 0); /* Pure white surface */
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(1 0 0);
+	--popover: oklch(1 0 0); /* Pure white popover */
 	--popover-foreground: var(--foreground);
 
-	/* Primary - Crisp Emerald/Teal */
-	--primary: oklch(0.65 0.18 160);
-	--primary-foreground: oklch(0.99 0 0);
+	/* Primary - Vibrant Blue/Indigo (More solid than transparency-reliant teal) */
+	--primary: oklch(0.55 0.22 260);
+	--primary-foreground: oklch(0.98 0 0);
 
-	--secondary: oklch(0.96 0.01 260);
-	--secondary-foreground: oklch(0.3 0.05 260);
+	/* Secondary - Slate tint */
+	--secondary: oklch(0.95 0.02 240);
+	--secondary-foreground: oklch(0.3 0.05 255);
 
-	--muted: oklch(0.96 0.01 260);
-	--muted-foreground: oklch(0.55 0.03 260);
+	/* Muted - Subtle gray for borders/separators */
+	--muted: oklch(0.96 0.01 240);
+	--muted-foreground: oklch(0.5 0.04 255);
 
-	/* Accent - Electric Blue/Cyan */
-	--accent: oklch(0.95 0.03 240);
-	--accent-foreground: oklch(0.4 0.15 240);
+	/* Accent - Electric Cyan (for highlights) */
+	--accent: oklch(0.6 0.18 220);
+	--accent-foreground: oklch(0.98 0 0);
 
 	--destructive: oklch(0.6 0.2 25);
-	--destructive-foreground: oklch(0.99 0 0);
+	--destructive-foreground: oklch(0.98 0 0);
 
-	--border: oklch(0.9 0.02 260);
-	--input: oklch(0.92 0.01 260);
-	--ring: oklch(0.7 0.15 160);
+	/* Border - Crisp and visible */
+	--border: oklch(0.85 0.03 240);
+	--input: oklch(0.92 0.02 240);
+	--ring: oklch(0.55 0.22 260);
 
 	--radius: 0.5rem;
 
 	/* Sidebar specific - Light Mode */
-	--sidebar: oklch(0.97 0 0); /* Slightly off-white/gray sidebar */
+	--sidebar: oklch(0.98 0.01 240); /* Distinct from main background */
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.94 0.02 260);
+	--sidebar-accent: oklch(0.93 0.03 240);
 	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.92 0 0);
+	--sidebar-border: oklch(0.88 0.02 240);
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Light */
-	--terminal-bg: oklch(0.99 0 0);
-	--terminal-text: oklch(0.2 0.02 260);
-	--terminal-cursor: oklch(0.6 0.15 160);
+	--terminal-bg: oklch(0.98 0.01 240);
+	--terminal-text: oklch(0.2 0.03 255);
+	--terminal-cursor: oklch(0.55 0.22 260);
 
-	/* Elevation / Shadows (Light) */
-	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08);
-	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 8px 30px -4px rgba(0, 0, 0, 0.1),
-		0 4px 12px -2px rgba(0, 0, 0, 0.05);
+	/* Elevation / Shadows (Light) - Softer, more natural */
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 8px 40px -4px rgba(0, 0, 0, 0.12),
+		0 4px 16px -2px rgba(0, 0, 0, 0.06);
 }
 
 .dark {
