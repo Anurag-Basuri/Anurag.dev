@@ -6,8 +6,6 @@ import { FileSystemBuilder as fs } from '@/lib/filesystem-builder';
 // Here we define the structure.
 
 export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
-	fs.folder('README.md', 'root/readme', []), // Hack: Using folder logic to create a root-level item if needed, but actually root items usually have their own IDs.
-	// Wait, the builder 'file' returns a function waiting for a parentId.
 	// Let's manually create the root readme to match exact ID 'root/readme'.
 	{
 		name: 'README.md',
