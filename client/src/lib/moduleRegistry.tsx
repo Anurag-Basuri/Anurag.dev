@@ -33,7 +33,9 @@ const BlogModule = lazy(() =>
 const ContactModule = lazy(() =>
 	import('@/components/apps/contact').then(m => ({ default: m.ContactModule })),
 );
-const CodingStatsModule = lazy(() => import('@/components/apps/coding-stats'));
+const CodingStatsModule = lazy(() =>
+	import('@/components/apps/coding-stats').then(m => ({ default: m.CodingStatsModule })),
+);
 
 // Loading fallback component
 const ModuleLoader = () => (

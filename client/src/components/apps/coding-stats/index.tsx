@@ -22,7 +22,7 @@ function StatsSkeleton() {
 	);
 }
 
-export default function CodingStatsModule() {
+export function CodingStatsModule() {
 	const [stats, setStats] = useState<CodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -59,11 +59,7 @@ export default function CodingStatsModule() {
 	return (
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-5xl mx-auto pb-20">
-				<ModuleHeader
-					icon={Terminal}
-					label="Profiles"
-					title="Coding Profiles"
-				/>
+				<ModuleHeader icon={Terminal} label="Profiles" title="Coding Profiles" />
 
 				<motion.div
 					variants={staggerContainer}
