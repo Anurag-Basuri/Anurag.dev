@@ -8,5 +8,5 @@ export type FileSystemItem = {
 	icon?: string;
 	content?: string;
 	moduleId?: AppModuleId; // Strictly typed to registry keys
-	metadata?: any;
+	metadata?: Record<string, unknown>;
 };

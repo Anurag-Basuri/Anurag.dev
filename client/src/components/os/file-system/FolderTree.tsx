@@ -148,7 +148,7 @@ function FolderTreeItem({
 				)}
 
 				{/* Arrow for folders */}
-				<span className="mr-1.5 flex-shrink-0 w-4 flex items-center justify-center text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
+				<span className="mr-1.5 shrink-0 w-4 flex items-center justify-center text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
 					{isFolder && (
 						<motion.span
 							animate={{ rotate: isOpen ? 90 : 0 }}
@@ -160,7 +160,7 @@ function FolderTreeItem({
 				</span>
 
 				{/* Icon */}
-				<span className="mr-2 relative z-10 flex-shrink-0">
+				<span className="mr-2 relative z-10 shrink-0">
 					{isFolder ? (
 						isOpen ? (
 							<FolderOpen className="w-4 h-4 text-emerald-500/90" />

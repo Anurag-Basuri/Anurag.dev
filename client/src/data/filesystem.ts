@@ -1,4 +1,5 @@
 import { FileSystemItem } from '@/types/file-system';
+export type { FileSystemItem };
 import { FileSystemBuilder as fs } from '@/lib/filesystem-builder';
 
 // The root ID is intentionally implicit for top-level items, or we can define them explicitly.
