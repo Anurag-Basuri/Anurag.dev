@@ -14,9 +14,9 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 2500, radius: 100, size: 0.015, opacity: 0.5, rotationSpeed: 0.003 },
-		MEDIUM: { count: 1200, radius: 50, size: 0.035, opacity: 0.7, rotationSpeed: 0.007 },
-		CLOSE: { count: 400, radius: 25, size: 0.075, opacity: 0.85, rotationSpeed: 0.015 },
+		DISTANT: { count: 2000, radius: 100, size: 0.012, opacity: 0.3, rotationSpeed: 0.003 },
+		MEDIUM: { count: 1000, radius: 50, size: 0.025, opacity: 0.45, rotationSpeed: 0.007 },
+		CLOSE: { count: 300, radius: 25, size: 0.06, opacity: 0.6, rotationSpeed: 0.015 },
 	},
 	PARTICLES: {
 		count: 250,
@@ -216,19 +216,20 @@ const NebulaField = React.memo(function NebulaField({ reducedMotion }: { reduced
         vec2 uv = vUv * 2.0 - 1.0;
         vec3 pos = vPosition;
         
-        float n1 = fbm(pos.xy * 0.5 + time * 0.1);
-        float n2 = fbm(pos.yz * 0.5 + time * 0.15);
-        float n3 = fbm(pos.zx * 0.5 + time * 0.2);
+        float n1 = fbm(pos.xy * 0.45 + time * 0.08);
+        float n2 = fbm(pos.yz * 0.45 + time * 0.12);
+        float n3 = fbm(pos.zx * 0.45 + time * 0.16);
         
         float pattern = (n1 + n2 + n3) / 3.0;
-        pattern = smoothstep(0.3, 0.7, pattern);
+        pattern = smoothstep(0.4, 0.6, pattern);
         
         vec3 color = mix(color1, color2, pattern);
-        float alpha = pattern * 0.15 * (0.7 + 0.3 * sin(time + pos.x + pos.y));
+        float alpha = pattern * 0.08 * (0.8 + 0.2 * sin(time * 0.6 + pos.x + pos.y));
         
         if (theme < 0.5) {
-          alpha *= 0.6;
+          alpha *= 0.4;
         }
+
         
         gl_FragColor = vec4(color, alpha);
       }
@@ -382,7 +383,7 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 				time: { value: 0 },
 				gridColor: { value: new THREE.Color(theme === 'dark' ? '#0ea5e9' : '#94a3b8') },
 				fadeColor: { value: new THREE.Color(theme === 'dark' ? '#000000' : '#ffffff') },
-				opacity: { value: theme === 'dark' ? 0.3 : 0.15 },
+				opacity: { value: theme === 'dark' ? 0.18 : 0.08 },
 			},
 			vertexShader: `
 			uniform float time;
@@ -460,13 +461,13 @@ const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	return (
 		<EffectComposer>
 			<Bloom
-				intensity={isDark ? 1.0 : 0.5}
-				luminanceThreshold={0.5}
-				luminanceSmoothing={0.85}
+				intensity={isDark ? 0.6 : 0.3}
+				luminanceThreshold={0.6}
+				luminanceSmoothing={0.8}
 				height={300}
 			/>
-			<Noise opacity={0.015} blendFunction={BlendFunction.OVERLAY} />
-			<Vignette darkness={isDark ? 0.35 : 0.18} offset={0.35} />
+			<Noise opacity={0.01} blendFunction={BlendFunction.OVERLAY} />
+			<Vignette darkness={isDark ? 0.25 : 0.12} offset={0.4} />
 		</EffectComposer>
 	);
 });
