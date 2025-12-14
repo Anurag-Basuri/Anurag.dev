@@ -61,7 +61,7 @@ const resolvePath = (
 	return { item: currentItem, absolutePath };
 };
 
-// Navigation Commands
+// --- Commands ---
 const helpCommand = createCommand({
 	name: 'help',
 	aliases: ['h', '?'],
@@ -72,9 +72,9 @@ const helpCommand = createCommand({
 		const categories: Record<string, (typeof helpCommand)[]> = {
 			Navigation: [],
 			System: [],
-			Fun: [],
-			Development: [],
 			Files: [],
+			Development: [],
+			Fun: [],
 		};
 
 		for (const plugin of commandRegistry.getAll()) {
@@ -83,13 +83,13 @@ const helpCommand = createCommand({
 			}
 		}
 
-		let helpText = 'Welcome to my interactive portfolio! Here are available commands:\n\n';
+		let helpText = 'Available commands:\n\n';
 
 		for (const [category, commands] of Object.entries(categories)) {
 			if (commands.length > 0) {
-				helpText += `--- ${category} ---\n`;
+				helpText += `[${category}]\n`;
 				helpText += commands
-					.map(cmd => `  ${cmd.name.padEnd(12)} - ${cmd.description}`)
+					.map(cmd => `  ${cmd.name.padEnd(14)} ${cmd.description}`)
 					.join('\n');
 				helpText += '\n\n';
 			}
@@ -99,192 +99,6 @@ const helpCommand = createCommand({
 	},
 });
 
-const aboutCommand = createCommand({
-	name: 'about',
-	description: 'Opens the "About Me" section.',
-	usage: 'about',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'about' },
-	}),
-});
-
-const projectsCommand = createCommand({
-	name: 'projects',
-	description: 'Lists my key projects.',
-	usage: 'projects',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'projects' },
-	}),
-});
-
-const journeyCommand = createCommand({
-	name: 'journey',
-	description: 'Shows my career and education journey.',
-	usage: 'journey',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'journey' },
-	}),
-});
-
-const contactCommand = createCommand({
-	name: 'contact',
-	description: 'Provides my contact information.',
-	usage: 'contact',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'contact' },
-	}),
-});
-
-const certificationsCommand = createCommand({
-	name: 'certifications',
-	aliases: ['certs'],
-	description: 'View my certifications and achievements.',
-	usage: 'certifications',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'certifications' },
-	}),
-});
-
-const socialsCommand = createCommand({
-	name: 'socials',
-	aliases: ['links'],
-	description: 'Displays my social and professional links.',
-	usage: 'socials',
-	category: 'Navigation',
-	execute: () => ({
-		ok: true,
-		data: `You can find me here:
- - GitHub:   https://github.com/Anurag-Basuri
- - LinkedIn: https://www.linkedin.com/in/anuragbasuri/
- - Twitter:  https://twitter.com/AnuragBasuri`,
-	}),
-});
-
-const resumeCommand = createCommand({
-	name: 'resume',
-	aliases: ['cv'],
-	description: 'Opens my resume.',
-	usage: 'resume',
-	category: 'Navigation',
-	execute: () => {
-		if (typeof window !== 'undefined') {
-			window.open('/resume.pdf', '_blank');
-		}
-		return { ok: true, data: 'Opening resume in a new tab...' };
-	},
-});
-
-// System Commands
-const clearCommand = createCommand({
-	name: 'clear',
-	aliases: ['cls'],
-	description: 'Clears the terminal screen.',
-	usage: 'clear',
-	category: 'System',
-	execute: () => ({ ok: true, data: { type: 'clear' } }),
-});
-
-const themeCommand = createCommand({
-	name: 'theme',
-	description: 'Changes the UI theme.',
-	usage: 'theme <dark|light|toggle>',
-	category: 'System',
-	validate: args => {
-		const mode = args[0]?.toLowerCase();
-		if (!mode || !['dark', 'light', 'toggle'].includes(mode)) {
-			return 'Invalid theme mode';
-		}
-		return null;
-	},
-	execute: ctx => {
-		const mode = ctx.args[0]?.toLowerCase();
-		return {
-			ok: true,
-			data: { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' },
-		};
-	},
-});
-
-const whoamiCommand = createCommand({
-	name: 'whoami',
-	description: 'Displays the current user.',
-	usage: 'whoami',
-	category: 'System',
-	execute: () => ({ ok: true, data: 'guest' }),
-});
-
-// Fun/Hidden Commands
-const secretCommand = createCommand({
-	name: 'secret',
-	description: '???',
-	usage: 'secret',
-	category: 'Fun',
-	hidden: true,
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'secret' },
-	}),
-});
-
-const coffeeCommand = createCommand({
-	name: 'coffee',
-	description: 'Brew some coffee.',
-	usage: 'coffee',
-	category: 'Fun',
-	hidden: true,
-	execute: () => ({
-		ok: false,
-		error: "I'm a teapot", // HTTP 418
-	}),
-});
-
-// Development Commands
-const statsCommand = createCommand({
-	name: 'stats',
-	aliases: ['coding-stats'],
-	description: 'Shows coding statistics.',
-	usage: 'stats',
-	category: 'Development',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'coding-stats' },
-	}),
-});
-
-const blogCommand = createCommand({
-	name: 'blog',
-	description: 'Opens the blog section.',
-	usage: 'blog',
-	category: 'Development',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'blog' },
-	}),
-});
-
-const ailabCommand = createCommand({
-	name: 'ailab',
-	aliases: ['ai'],
-	description: 'Opens the AI Lab section.',
-	usage: 'ailab',
-	category: 'Development',
-	execute: () => ({
-		ok: true,
-		data: { type: 'open_module', moduleId: 'ailab' },
-	}),
-});
-
-// File Commands
 const lsCommand = createCommand({
 	name: 'ls',
 	aliases: ['dir', 'll'],
@@ -292,12 +106,30 @@ const lsCommand = createCommand({
 	usage: 'ls [path]',
 	category: 'Files',
 	execute: ctx => {
-		const path = ctx.args[0] || ctx.currentPath;
-		// This would integrate with the file system
-		return {
-			ok: true,
-			data: `Contents of ${path}:\n  about/\n  projects/\n  contact/\n  resume.pdf`,
-		};
+		const targetPath = ctx.args[0] || ctx.currentPath;
+		const { item } = resolvePath(targetPath, ctx.currentPath);
+
+		if (!item) {
+			return { ok: false, error: `ls: ${targetPath}: No such file or directory` };
+		}
+
+		if (item.type !== 'folder') {
+			return { ok: true, data: item.name };
+		}
+
+		const children = item.children || [];
+		if (children.length === 0) {
+			return { ok: true, data: '(empty)' };
+		}
+
+		// Format output: Folders in blue (conceptually), files in white
+		// We can return a formatted string or a component if we wanted rich text
+		// For now, let's just mark folders with a trailing slash
+		const output = children
+			.map(child => (child.type === 'folder' ? `${child.name}/` : child.name))
+			.join('\n');
+
+		return { ok: true, data: output };
 	},
 });
 
@@ -346,30 +178,9 @@ const catCommand = createCommand({
 			return { ok: false, error: `cat: ${ctx.args[0]}: Is a directory` };
 		}
 
-		if (item.name.endsWith('.pdf')) {
-			return { ok: true, data: '[Binary PDF Data] (Use "open" to view)' };
-		}
-
-		if (item.name === 'stats.exe') {
-			return { ok: true, data: '[Binary Executable] (Use "stats" or "open" to run)' };
-		}
-
-		const contentMap: Record<string, string> = {
-			'about/README.md':
-				"# About Me\n\nHi, I'm Anurag Basuri - a Full Stack Engineer passionate about building elegant solutions.",
-			'projects/README.md':
-				'# Projects\n\n- AnuragOS Portfolio\n- AI Lab Experiments\n- Dynamic Web Apps',
-			'journey/README.md': '# My Journey\n\nFrom curious beginner to Full Stack Engineer...',
-			'contact/README.md': '# Contact\n\nEmail: contact@anurag.dev\nGitHub: @Anurag-Basuri',
-			'blog/README.md': '# Blog\n\nThoughts on development, AI, and technology.',
-			'certifications/README.md':
-				'# Certifications\n\nProfessional certifications and achievements.',
-			'ailab/README.md': '# AI Lab\n\nExperimental AI projects and research.',
-		};
-
 		return {
 			ok: true,
-			data: contentMap[item.id] || `# ${item.name}\n\nContent preview...`,
+			data: item.content || '[Empty file]',
 		};
 	},
 });
@@ -389,23 +200,34 @@ const openCommand = createCommand({
 			return { ok: false, error: `open: ${ctx.args[0]}: No such file or directory` };
 		}
 
-		const moduleMap: Record<string, string> = {
-			about: 'about',
-			projects: 'projects',
-			journey: 'journey',
-			contact: 'contact',
-			blog: 'blog',
-			certifications: 'certifications',
-			ailab: 'ailab',
-			'ai-lab': 'ailab',
-			tools: 'tools',
-		};
-
-		if (moduleMap[item.id] || moduleMap[item.name]) {
+		if (item.moduleId) {
 			return {
 				ok: true,
-				data: { type: 'open_module', moduleId: moduleMap[item.id] || moduleMap[item.name] },
+				data: { type: 'open_module', moduleId: item.moduleId },
 			};
+		}
+
+		// Map folder IDs to modules for convenience (e.g., 'about' folder -> 'about' module)
+		if (item.type === 'folder' && item.id !== 'root') {
+			// Check if folder name matches a known module
+			const moduleMap: Record<string, string> = {
+				about: 'about',
+				projects: 'projects',
+				journey: 'journey',
+				contact: 'contact',
+				blog: 'blog',
+				certifications: 'certifications',
+				ailab: 'ailab',
+			};
+
+			if (moduleMap[item.name]) {
+				return {
+					ok: true,
+					data: { type: 'open_module', moduleId: moduleMap[item.name] },
+				};
+			}
+
+			return { ok: false, error: `open: ${item.name}: is a directory` };
 		}
 
 		if (item.name === 'resume.pdf') {
@@ -413,12 +235,153 @@ const openCommand = createCommand({
 			return { ok: true, data: 'Opening resume...' };
 		}
 
-		if (item.name === 'stats.exe') {
-			return { ok: true, data: { type: 'open_module', moduleId: 'coding-stats' } };
-		}
-
 		return { ok: true, data: `Opened ${item.name}` };
 	},
+});
+
+const echoCommand = createCommand({
+	name: 'echo',
+	description: 'Display a line of text.',
+	usage: 'echo [text...]',
+	category: 'System',
+	execute: ctx => ({
+		ok: true,
+		data: ctx.args.join(' '),
+	}),
+});
+
+const dateCommand = createCommand({
+	name: 'date',
+	description: 'Display current date and time.',
+	usage: 'date',
+	category: 'System',
+	execute: () => ({
+		ok: true,
+		data: new Date().toString(),
+	}),
+});
+
+const pwdCommand = createCommand({
+	name: 'pwd',
+	description: 'Print working directory.',
+	usage: 'pwd',
+	category: 'Files',
+	execute: ctx => ({ ok: true, data: ctx.currentPath === '~' ? '/' : `/${ctx.currentPath}` }),
+});
+
+const clearCommand = createCommand({
+	name: 'clear',
+	aliases: ['cls'],
+	description: 'Clears the terminal screen.',
+	usage: 'clear',
+	category: 'System',
+	execute: () => ({ ok: true, data: { type: 'clear' } }),
+});
+
+const themeCommand = createCommand({
+	name: 'theme',
+	description: 'Changes the UI theme.',
+	usage: 'theme <dark|light|toggle>',
+	category: 'System',
+	validate: args => {
+		const mode = args[0]?.toLowerCase();
+		if (!mode || !['dark', 'light', 'toggle'].includes(mode)) {
+			return 'Invalid theme mode';
+		}
+		return null;
+	},
+	execute: ctx => {
+		const mode = ctx.args[0]?.toLowerCase();
+		return {
+			ok: true,
+			data: { type: 'set_theme', theme: mode as 'dark' | 'light' | 'toggle' },
+		};
+	},
+});
+
+const whoamiCommand = createCommand({
+	name: 'whoami',
+	description: 'Displays the current user.',
+	usage: 'whoami',
+	category: 'System',
+	execute: () => ({ ok: true, data: 'guest' }),
+});
+
+// Shortcut commands to open modules directly
+const makeModuleCommand = (name: string, description: string) =>
+	createCommand({
+		name,
+		description,
+		usage: name,
+		category: 'Navigation',
+		execute: () => ({
+			ok: true,
+			data: { type: 'open_module', moduleId: name },
+		}),
+	});
+
+const projectsCommand = makeModuleCommand('projects', 'Lists my key projects.');
+const aboutCommand = makeModuleCommand('about', 'Opens the "About Me" section.');
+const journeyCommand = makeModuleCommand('journey', 'Shows my career and education journey.');
+const contactCommand = makeModuleCommand('contact', 'Provides my contact information.');
+const certificationsCommand = makeModuleCommand(
+	'certifications',
+	'View my certifications and achievements.',
+);
+const blogCommand = makeModuleCommand('blog', 'Opens the blog section.');
+const ailabCommand = makeModuleCommand('ailab', 'Opens the AI Lab section.');
+
+const socialsCommand = createCommand({
+	name: 'socials',
+	aliases: ['links'],
+	description: 'Displays my social and professional links.',
+	usage: 'socials',
+	category: 'Navigation',
+	execute: () => ({
+		ok: true,
+		data: `You can find me here:
+ - GitHub:   https://github.com/Anurag-Basuri
+ - LinkedIn: https://www.linkedin.com/in/anuragbasuri/
+ - Twitter:  https://twitter.com/AnuragBasuri`,
+	}),
+});
+
+const resumeCommand = createCommand({
+	name: 'resume',
+	aliases: ['cv'],
+	description: 'Opens my resume.',
+	usage: 'resume',
+	category: 'Navigation',
+	execute: () => {
+		if (typeof window !== 'undefined') {
+			window.open('/resume.pdf', '_blank');
+		}
+		return { ok: true, data: 'Opening resume in a new tab...' };
+	},
+});
+
+const secretCommand = createCommand({
+	name: 'secret',
+	description: '???',
+	usage: 'secret',
+	category: 'Fun',
+	hidden: true,
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'secret' },
+	}),
+});
+
+const coffeeCommand = createCommand({
+	name: 'coffee',
+	description: 'Brew some coffee.',
+	usage: 'coffee',
+	category: 'Fun',
+	hidden: true,
+	execute: () => ({
+		ok: false,
+		error: "I'm a teapot", // HTTP 418
+	}),
 });
 
 const sudoCommand = createCommand({
@@ -442,15 +405,6 @@ const mkdirCommand = createCommand({
 	execute: () => ({ ok: false, error: 'mkdir: Permission denied (read-only file system)' }),
 });
 
-const touchCommand = createCommand({
-	name: 'touch',
-	description: 'Create or update file.',
-	usage: 'touch <file>',
-	category: 'Files',
-	hidden: true,
-	execute: () => ({ ok: false, error: 'touch: Permission denied (read-only file system)' }),
-});
-
 const rmCommand = createCommand({
 	name: 'rm',
 	description: 'Remove files.',
@@ -460,41 +414,56 @@ const rmCommand = createCommand({
 	execute: () => ({ ok: false, error: 'rm: Permission denied (read-only file system)' }),
 });
 
-const pwdCommand = createCommand({
-	name: 'pwd',
-	description: 'Print working directory.',
-	usage: 'pwd',
+const touchCommand = createCommand({
+	name: 'touch',
+	description: 'Create or update file.',
+	usage: 'touch <file>',
 	category: 'Files',
-	execute: ctx => ({ ok: true, data: ctx.currentPath === '~' ? '/' : `/${ctx.currentPath}` }),
+	hidden: true,
+	execute: () => ({ ok: false, error: 'touch: Permission denied (read-only file system)' }),
+});
+
+const statsCommand = createCommand({
+	name: 'stats',
+	aliases: ['coding-stats'],
+	description: 'Shows coding statistics.',
+	usage: 'stats',
+	category: 'Development',
+	execute: () => ({
+		ok: true,
+		data: { type: 'open_module', moduleId: 'coding-stats' },
+	}),
 });
 
 // Register all commands
 export function registerCoreCommands() {
 	registerCommands([
 		helpCommand,
-		aboutCommand,
-		projectsCommand,
-		journeyCommand,
-		contactCommand,
-		certificationsCommand,
-		socialsCommand,
-		resumeCommand,
-		clearCommand,
-		themeCommand,
-		whoamiCommand,
-		secretCommand,
-		coffeeCommand,
-		statsCommand,
-		blogCommand,
-		ailabCommand,
 		lsCommand,
 		cdCommand,
 		catCommand,
 		openCommand,
 		pwdCommand,
+		echoCommand,
+		dateCommand,
+		clearCommand,
+		themeCommand,
+		whoamiCommand,
+		projectsCommand,
+		aboutCommand,
+		journeyCommand,
+		contactCommand,
+		certificationsCommand,
+		blogCommand,
+		ailabCommand,
+		socialsCommand,
+		resumeCommand,
+		secretCommand,
+		coffeeCommand,
 		sudoCommand,
 		mkdirCommand,
-		touchCommand,
 		rmCommand,
+		touchCommand,
+		statsCommand,
 	]);
 }
