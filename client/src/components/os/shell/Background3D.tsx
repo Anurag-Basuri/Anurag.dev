@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import type { JSX } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback, MutableRefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Points, PointMaterial, Line, Trail, Float, Text } from '@react-three/drei';
+import { Points, PointMaterial, Line, Float } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import type { Points as ThreePoints, Vector3 } from 'three';
@@ -71,17 +70,15 @@ function generateStarPoints(
 		let r;
 
 		switch (shape) {
-			case 'disc':
-				// Disk-shaped distribution (for galaxy arms)
+			case 'disc': {
 				const angle = 2 * Math.PI * u;
 				r = Math.pow(Math.random(), 0.5) * radius;
 				x = r * Math.cos(angle);
-				y = (Math.random() - 0.5) * radius * 0.1; // Very thin disk
+				y = (Math.random() - 0.5) * radius * 0.1;
 				z = r * Math.sin(angle);
 				break;
-
-			case 'galaxy':
-				// Spiral galaxy distribution
+			}
+			case 'galaxy': {
 				const spiralAngle = 2 * Math.PI * u;
 				const spiralRadius = Math.pow(Math.random(), 0.7) * radius;
 				const armCount = 3;
@@ -92,8 +89,8 @@ function generateStarPoints(
 				y = (Math.random() - 0.5) * radius * 0.15;
 				z = spiralRadius * Math.sin(armAngle);
 				break;
-
-			default: // sphere
+			}
+			default: {
 				const theta = 2 * Math.PI * u;
 				const phi = Math.acos(2 * v - 1);
 				r = Math.cbrt(Math.random()) * radius;
@@ -101,17 +98,17 @@ function generateStarPoints(
 				x = r * Math.sin(phi) * Math.cos(theta);
 				y = r * Math.sin(phi) * Math.sin(theta);
 				z = r * Math.cos(phi);
+			}
 		}
 
 		points[i * 3] = x;
 		points[i * 3 + 1] = y;
 		points[i * 3 + 2] = z;
 
-		// Add color variation
 		const brightness = 0.7 + Math.random() * 0.3;
-		colors[i * 3] = brightness; // R
-		colors[i * 3 + 1] = brightness * 0.9; // G
-		colors[i * 3 + 2] = 1.0; // B (slightly blue tint)
+		colors[i * 3] = brightness;
+		colors[i * 3 + 1] = brightness * 0.9;
+		colors[i * 3 + 2] = 1.0;
 	}
 
 	return { positions: points, colors };
@@ -141,13 +138,11 @@ function generateParticles(count: number, bounds: { x: number; y: number; z: num
 
 // --- Components ---
 
-function ConstellationLines() {
-	const lines = useRef<THREE.Line[]>([]);
+const ConstellationLines = React.memo(() => {
 	const { theme } = useTheme();
 	const lineColor = useThemeColor('--primary', theme === 'dark' ? '#93c5fd' : '#1e40af');
 
 	const [constellations] = useState<Vector3[][]>(() => {
-		// Generate random constellation patterns
 		const newConstellations: Vector3[][] = [];
 		for (let i = 0; i < 8; i++) {
 			const points = [];
@@ -192,10 +187,38 @@ function ConstellationLines() {
 			))}
 		</>
 	);
-}
+});
 
-function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMotion: boolean }) {
-	const [stars, setStars] = useState<ShootingStar[]>([]);
+const ShootingStars = React.memo(function ShootingStars({
+	count = 3,
+	reducedMotion,
+}: {
+	count: number;
+	reducedMotion: boolean;
+}) {
+	const [stars, setStars] = useState<ShootingStar[]>(() => {
+		const newStars: ShootingStar[] = [];
+		for (let i = 0; i < count; i++) {
+			newStars.push({
+				position: new THREE.Vector3(
+					(Math.random() - 0.5) * 30,
+					10 + Math.random() * 5,
+					(Math.random() - 0.5) * 20 - 10,
+				),
+				velocity: new THREE.Vector3(
+					(Math.random() - 0.5) * 0.3,
+					-0.5 - Math.random() * 0.5,
+					(Math.random() - 0.5) * 0.2,
+				),
+				trail: [],
+				maxTrailLength: 20,
+				active: true,
+				life: 1,
+				maxLife: 2 + Math.random() * 3,
+			});
+		}
+		return newStars;
+	});
 
 	useEffect(() => {
 		const newStars: ShootingStar[] = [];
@@ -228,19 +251,13 @@ function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMot
 			prev.map(star => {
 				if (!star.active) return star;
 
-				// Update position
 				star.position.add(star.velocity.clone().multiplyScalar(delta * 60));
-
-				// Add to trail
 				star.trail.push(star.position.clone());
 				if (star.trail.length > star.maxTrailLength) {
 					star.trail.shift();
 				}
-
-				// Update life
 				star.life -= delta;
 				if (star.life <= 0) {
-					// Reset star
 					star.position.set(
 						(Math.random() - 0.5) * 30,
 						10 + Math.random() * 5,
@@ -254,7 +271,6 @@ function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMot
 					star.trail = [];
 					star.life = star.maxLife;
 				}
-
 				return { ...star };
 			}),
 		);
@@ -264,7 +280,6 @@ function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMot
 		<>
 			{stars.map((star, idx) => (
 				<group key={idx}>
-					{/* Star */}
 					<Points
 						positions={Float32Array.from([
 							star.position.x,
@@ -281,8 +296,6 @@ function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMot
 							blending={THREE.AdditiveBlending}
 						/>
 					</Points>
-
-					{/* Trail */}
 					{star.trail.length > 1 && (
 						<Line
 							points={star.trail}
@@ -296,9 +309,9 @@ function ShootingStars({ count = 3, reducedMotion }: { count: number; reducedMot
 			))}
 		</>
 	);
-}
+});
 
-function NebulaField({ reducedMotion }: { reducedMotion: boolean }) {
+const NebulaField = React.memo(function NebulaField({ reducedMotion }: { reducedMotion: boolean }) {
 	const meshRef = useRef<THREE.Mesh>(null);
 	const materialRef = useRef<THREE.ShaderMaterial>(null);
 
@@ -371,9 +384,8 @@ function NebulaField({ reducedMotion }: { reducedMotion: boolean }) {
         vec3 color = mix(color1, color2, pattern);
         float alpha = pattern * 0.15 * (0.7 + 0.3 * sin(time + pos.x + pos.y));
         
-        // Adjust for theme
         if (theme < 0.5) {
-          alpha *= 0.6; // Lighter theme transparency
+          alpha *= 0.6;
         }
         
         gl_FragColor = vec4(color, alpha);
@@ -400,9 +412,9 @@ function NebulaField({ reducedMotion }: { reducedMotion: boolean }) {
 			/>
 		</mesh>
 	);
-}
+});
 
-function DynamicParticles({
+const DynamicParticles = React.memo(function DynamicParticles({
 	count = 200,
 	reducedMotion,
 }: {
@@ -425,31 +437,25 @@ function DynamicParticles({
 			const newParticles = [...prev];
 
 			newParticles.forEach((particle, i) => {
-				// Apply velocity
 				particle.position.add(particle.velocity);
 
-				// Boundary check with soft wrap
 				const bounds = { x: 25, y: 15, z: 30 };
-				['x', 'y', 'z'].forEach(axis => {
-					if (particle.position[axis] > bounds[axis]) {
-						particle.position[axis] = -bounds[axis];
-					} else if (particle.position[axis] < -bounds[axis]) {
-						particle.position[axis] = bounds[axis];
-					}
-				});
+				if (particle.position.x > bounds.x) particle.position.x = -bounds.x;
+				else if (particle.position.x < -bounds.x) particle.position.x = bounds.x;
+				if (particle.position.y > bounds.y) particle.position.y = -bounds.y;
+				else if (particle.position.y < -bounds.y) particle.position.y = bounds.y;
+				if (particle.position.z > bounds.z) particle.position.z = -bounds.z;
+				else if (particle.position.z < -bounds.z) particle.position.z = bounds.z;
 
-				// Pulsing size
 				particle.size =
 					particle.originalSize * (1 + 0.2 * Math.sin(state.clock.elapsedTime * 2 + i));
 
-				// Update geometry arrays
 				positions[i * 3] = particle.position.x;
 				positions[i * 3 + 1] = particle.position.y;
 				positions[i * 3 + 2] = particle.position.z;
 
 				sizes[i] = particle.size;
 
-				// Convert hex color to RGB
 				const color = new THREE.Color(particle.color);
 				colors[i * 3] = color.r * particle.opacity;
 				colors[i * 3 + 1] = color.g * particle.opacity;
@@ -477,9 +483,9 @@ function DynamicParticles({
 			/>
 		</Points>
 	);
-}
+});
 
-function StarField({ reducedMotion }: { reducedMotion: boolean }) {
+const StarField = React.memo(function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 	const distantRef = useRef<ThreePoints>(null);
 	const mediumRef = useRef<ThreePoints>(null);
 	const closeRef = useRef<ThreePoints>(null);
@@ -488,17 +494,13 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 	const isDark = theme === 'dark';
 
 	const distantStars = useMemo(() => generateStarPoints(3000, 100, 'sphere'), []);
-
 	const mediumStars = useMemo(() => generateStarPoints(1500, 50, 'galaxy'), []);
-
 	const closeStars = useMemo(() => generateStarPoints(500, 25, 'disc'), []);
 
 	useFrame((state, delta) => {
 		if (reducedMotion) return;
 
-		if (distantRef.current) {
-			distantRef.current.rotation.y += delta * 0.005;
-		}
+		if (distantRef.current) distantRef.current.rotation.y += delta * 0.005;
 		if (mediumRef.current) {
 			mediumRef.current.rotation.y += delta * 0.01;
 			mediumRef.current.rotation.x += delta * 0.003;
@@ -511,7 +513,6 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 
 	return (
 		<group>
-			{/* Distant stars (small, slow) */}
 			<Points
 				ref={distantRef}
 				positions={distantStars.positions}
@@ -527,8 +528,6 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
-
-			{/* Medium stars */}
 			<Points ref={mediumRef} positions={mediumStars.positions}>
 				<PointMaterial
 					transparent
@@ -540,8 +539,6 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 					blending={THREE.AdditiveBlending}
 				/>
 			</Points>
-
-			{/* Close stars (larger, faster) */}
 			<Points ref={closeRef} positions={closeStars.positions}>
 				<PointMaterial
 					transparent
@@ -555,9 +552,9 @@ function StarField({ reducedMotion }: { reducedMotion: boolean }) {
 			</Points>
 		</group>
 	);
-}
+});
 
-function CelestialBody({
+const CelestialBody = React.memo(function CelestialBody({
 	position,
 	size,
 	color,
@@ -589,23 +586,21 @@ function CelestialBody({
 			</mesh>
 		</Float>
 	);
-}
+});
 
-function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
+const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
 	const { camera } = useThree();
 	const targetPosition = useRef(new THREE.Vector3(0, 2, 5));
 
 	useFrame(state => {
 		if (reducedMotion) return;
 
-		// Smooth camera drift
 		const drift = {
 			x: Math.sin(state.clock.elapsedTime * 0.1) * 0.3,
 			y: Math.cos(state.clock.elapsedTime * 0.15) * 0.2,
 			z: Math.sin(state.clock.elapsedTime * 0.2) * 0.1,
 		};
 
-		// Mouse parallax with drift
 		const mouseX = state.pointer.x * 2 + drift.x;
 		const mouseY = state.pointer.y * 1.2 + drift.y;
 
@@ -613,20 +608,19 @@ function CameraRig({ reducedMotion }: { reducedMotion: boolean }) {
 		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.02;
 		targetPosition.current.z = 5 + drift.z;
 
-		// Smooth camera movement
 		camera.position.lerp(targetPosition.current, 0.05);
 
-		// Subtle banking effect
 		const targetRotZ = -state.pointer.x * 0.03;
-		camera.rotation.z += (targetRotZ - camera.rotation.z) * 0.02;
+		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.02;
+		camera.rotation.set(camera.rotation.x, camera.rotation.y, newRotZ);
 
 		camera.lookAt(0, -0.5, -3);
 	});
 
 	return null;
-}
+});
 
-function PostProcessingEffects() {
+const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	const { theme } = useTheme();
 	const isDark = theme === 'dark';
 
@@ -642,36 +636,41 @@ function PostProcessingEffects() {
 			<Vignette darkness={isDark ? 0.4 : 0.2} offset={0.3} />
 		</EffectComposer>
 	);
-}
+});
 
 // --- Main Component ---
 
 export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
-	const [dpr, setDpr] = useState(1);
-	const [mounted, setMounted] = useState(false);
+	const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1.5));
 	const reducedMotion = usePrefersReducedMotion();
 	const { theme } = useTheme();
-
 	const [hasWebGLError, setHasWebGLError] = useState(false);
 
+	// Responsive DPR
 	useEffect(() => {
-		setMounted(true);
-		setDpr(Math.min(window.devicePixelRatio || 1, 1.5));
+		const handleResize = () => setDpr(Math.min(window.devicePixelRatio || 1, 1.5));
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
-		// WebGL check
+	// WebGL check
+	useEffect(() => {
 		try {
 			const canvas = document.createElement('canvas');
 			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) setHasWebGLError(true);
+			if (!gl) queueMicrotask(() => setHasWebGLError(true));
 		} catch {
-			setHasWebGLError(true);
+			queueMicrotask(() => setHasWebGLError(true));
 		}
 	}, []);
 
-	if (hasWebGLError || !mounted) return null;
+	if (hasWebGLError || typeof window === 'undefined') return null;
 
 	return (
-		<div className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000 ease-in-out overflow-hidden">
+		<div
+			className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000 ease-in-out overflow-hidden"
+			aria-hidden="true"
+		>
 			<ErrorBoundary>
 				<Canvas
 					dpr={dpr}
@@ -690,14 +689,9 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 					shadows={false}
 				>
 					{showPerf && <Perf position="top-left" />}
-
 					<color attach="background" args={[theme === 'dark' ? '#000000' : '#ffffff']} />
-
 					<CameraRig reducedMotion={reducedMotion} />
-
 					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#ffffff', 30, 100]} />
-
-					{/* Layers from farthest to nearest */}
 					<NebulaField reducedMotion={reducedMotion} />
 					<StarField reducedMotion={reducedMotion} />
 					<ConstellationLines />
@@ -715,11 +709,9 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 					/>
 					<DynamicParticles count={300} reducedMotion={reducedMotion} />
 					<ShootingStars count={4} reducedMotion={reducedMotion} />
-
 					<PostProcessingEffects />
 				</Canvas>
 			</ErrorBoundary>
-
 			{/* Overlay gradient for depth */}
 			<div className="absolute inset-0 pointer-events-none">
 				<div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent dark:via-black/20 dark:to-black/40" />
@@ -729,26 +721,32 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 	);
 }
 
-// Additional simplified version for lower-end devices
+// Simple fallback for low-end devices
 export function SimpleBackground3D() {
-	const [dpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1));
+	const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1));
 	const reducedMotion = usePrefersReducedMotion();
 	const [hasWebGLError, setHasWebGLError] = useState(false);
+
+	useEffect(() => {
+		const handleResize = () => setDpr(Math.min(window.devicePixelRatio || 1, 1));
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
 	useEffect(() => {
 		try {
 			const canvas = document.createElement('canvas');
 			const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-			if (!gl) setHasWebGLError(true);
+			if (!gl) queueMicrotask(() => setHasWebGLError(true));
 		} catch {
-			setHasWebGLError(true);
+			queueMicrotask(() => setHasWebGLError(true));
 		}
 	}, []);
 
 	if (hasWebGLError) return null;
 
 	return (
-		<div className="absolute inset-0 z-0 pointer-events-none">
+		<div className="absolute inset-0 z-0 pointer-events-none" aria-hidden="true">
 			<Canvas
 				dpr={dpr}
 				frameloop={reducedMotion ? 'demand' : 'always'}
