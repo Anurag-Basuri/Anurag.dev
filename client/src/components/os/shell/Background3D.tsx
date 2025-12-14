@@ -10,7 +10,6 @@ import * as THREE from 'three';
 import { useThemeColor } from '@/hooks/use-theme-colors';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
-import { Perf } from 'r3f-perf';
 
 // --- Configuration ---
 const CONFIG = {
@@ -701,7 +700,7 @@ const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 
 // --- Main Component ---
 
-export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
+export function Background3D() {
 	const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio || 1, 1.5));
 	const reducedMotion = usePrefersReducedMotion();
 	const { theme } = useTheme();
@@ -749,7 +748,6 @@ export function Background3D({ showPerf = false }: { showPerf?: boolean }) {
 					}}
 					shadows={false}
 				>
-					{showPerf && <Perf position="top-left" />}
 					<color attach="background" args={[theme === 'dark' ? '#000000' : '#ffffff']} />
 					<CameraRig reducedMotion={reducedMotion} />
 					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#ffffff', 30, 100]} />
