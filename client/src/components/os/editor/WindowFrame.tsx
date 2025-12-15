@@ -5,7 +5,7 @@ import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms'
 import { cn } from '@/lib/utils';
 import { X, Minus, Maximize } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, useCallback } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface WindowFrameProps {
@@ -35,17 +35,17 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 	const zIndex = windowStack.indexOf(id) + 10;
 	const isActive = activeWindowId === id;
 
-	const bringToFront = () => {
+	const bringToFront = useCallback(() => {
 		if (windowStack.at(-1) !== id) {
 			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
 		}
-	};
+	}, [windowStack, id, setWindowStack]);
 
 	useEffect(() => {
 		if (isActive) {
 			bringToFront();
 		}
-	}, [isActive]);
+	}, [isActive, bringToFront]);
 
 	const handleFocus = () => {
 		setActiveWindowId(id);
@@ -74,44 +74,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 	// Snap Preview State
 	const [snapPhantom, setSnapPhantom] = React.useState<null | 'left' | 'right' | 'top'>(null);
 
-	const handleDrag = (e: any, d: any) => {
-		const { x, y } = d;
-
-		// Get parent dimensions (viewport or boundary)
-		// We can approximate or use logic. Since bounds is parent, we can check node position.
-		// NOTE: 'd' provides x,y relative to initial or absolute? Rnd default is absolute if not controlled?
-		// We are controlling 'position'.
-
-		const SNAP_THRESHOLD = 50;
-		const offsetParent = d.node.offsetParent;
-		if (!offsetParent) return;
-
-		const parentWidth = offsetParent.offsetWidth;
-		// const parentHeight = offsetParent.offsetHeight;
-
-		if (y < 10) {
-			setSnapPhantom('top');
-		} else if (x < SNAP_THRESHOLD) {
-			setSnapPhantom('left');
-		} else if (x > parentWidth - SNAP_THRESHOLD - d.node.offsetWidth / 2) {
-			// Better right edge detection: x + width > parentWidth - threshold
-			// Actually Rnd d.x is left position.
-			// Right edge snap: if cursor is near right edge?
-			// Simple approach: if x + width > parentWidth - threshold?
-			// User drags from header. d.x is current position.
-			// Let's use mouse clientX if possible? e.clientX
-			// But e is mouse event.
-			// Let's rely on dragged position vs parent width.
-			if (e.clientX > parentWidth - SNAP_THRESHOLD) {
-				setSnapPhantom('right');
-			} else {
-				// Check if we exited left/top
-				setSnapPhantom(null);
-			}
-		} else {
-			setSnapPhantom(null);
-		}
-	};
+	// import type { DraggableEvent, DraggableData } from 'react-rnd';
 
 	// More robust right edge detection
 	const handleDragCallback = (e: any, d: any) => {
@@ -183,7 +146,15 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 		setSnapPhantom(null);
 	};
 
-	const handleResizeStop = (e: any, direction: any, ref: any, delta: any, position: any) => {
+	import type { RndResizeStartCallback, RndResizeStopCallback, ResizeDirection } from 'react-rnd';
+
+	const handleResizeStop: RndResizeStopCallback = (
+		e,
+		direction,
+		ref,
+		delta,
+		position
+	) => {
 		setWindows(prev =>
 			prev.map(w =>
 				w.id === id
@@ -357,3 +328,64 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 		</AnimatePresence>
 	);
 });
+
+// Keyboard Shortcuts Hook
+interface KeyboardShortcut {
+	key: string;
+	ctrl?: boolean;
+	shift?: boolean;
+	alt?: boolean;
+	meta?: boolean;
+	handler: () => void;
+	description: string;
+}
+
+export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled = true) {
+	const handleKeyDown = useCallback(
+		(event: KeyboardEvent) => {
+			if (!enabled) return;
+
+			for (const shortcut of shortcuts) {
+				const {
+					key,
+					ctrl = false,
+					shift = false,
+					alt = false,
+					meta = false,
+					handler,
+				} = shortcut;
+
+				const keyMatches = event.key.toLowerCase() === key.toLowerCase();
+				const ctrlMatches = ctrl === (event.ctrlKey || event.metaKey); // Support both Ctrl and Cmd
+				const shiftMatches = shift === event.shiftKey;
+				const altMatches = alt === event.altKey;
+				const metaMatches = meta === event.metaKey;
+
+				if (keyMatches && ctrlMatches && shiftMatches && altMatches && metaMatches) {
+					event.preventDefault();
+					handler();
+					break;
+				}
+			}
+		},
+		[shortcuts, enabled],
+	);
+
+	useEffect(() => {
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [handleKeyDown]);
+}
+
+// Helper to get all registered shortcuts for help display
+export function getShortcutDisplay(shortcut: KeyboardShortcut): string {
+	const keys: string[] = [];
+
+	if (shortcut.ctrl) keys.push('Ctrl');
+	if (shortcut.shift) keys.push('Shift');
+	if (shortcut.alt) keys.push('Alt');
+	if (shortcut.meta) keys.push('Cmd');
+	keys.push(shortcut.key.toUpperCase());
+
+	return keys.join(' + ');
+}
