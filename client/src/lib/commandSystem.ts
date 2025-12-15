@@ -51,6 +51,9 @@ export interface CommandRegistry {
 class CommandRegistryImpl implements CommandRegistry {
 	private plugins = new Map<string, CommandPlugin>();
 	private aliasMap = new Map<string, string>();
+	private normalize(name: string): string {
+		return name.trim().toLowerCase();
+	}
 
 	register(plugin: CommandPlugin): void {
 		// Validate plugin
@@ -58,34 +61,57 @@ class CommandRegistryImpl implements CommandRegistry {
 			throw new Error('Invalid plugin: missing required properties');
 		}
 
-		// Register main command
-		this.plugins.set(plugin.name.toLowerCase(), plugin);
+		const name = this.normalize(plugin.name);
+		if (this.plugins.has(name)) {
+			console.warn(
+				`[CommandRegistry] Command '${plugin.name}' is already registered. Skipping duplicate.`,
+			);
+			return;
+		}
 
-		// Register aliases
-		if (plugin.aliases) {
-			for (const alias of plugin.aliases) {
-				this.aliasMap.set(alias.toLowerCase(), plugin.name.toLowerCase());
+		const aliases = (plugin.aliases || []).map(this.normalize).filter(Boolean);
+		const safeAliases: string[] = [];
+
+		for (const alias of aliases) {
+			if (alias === name) continue;
+			if (this.plugins.has(alias)) {
+				console.warn(
+					`[CommandRegistry] Alias '${alias}' for '${plugin.name}' conflicts with an existing command. Skipping this alias.`,
+				);
+				continue;
 			}
+			const mapped = this.aliasMap.get(alias);
+			if (mapped && mapped !== name) {
+				console.warn(
+					`[CommandRegistry] Alias '${alias}' already points to '${mapped}'. Skipping this alias for '${plugin.name}'.`,
+				);
+				continue;
+			}
+			safeAliases.push(alias);
+		}
+
+		this.plugins.set(name, { ...plugin, aliases });
+		for (const alias of safeAliases) {
+			this.aliasMap.set(alias, name);
 		}
 	}
 
 	unregister(name: string): void {
-		const plugin = this.plugins.get(name.toLowerCase());
+		const key = this.normalize(name);
+		const plugin = this.plugins.get(key);
 		if (!plugin) return;
 
 		// Remove main command
-		this.plugins.delete(name.toLowerCase());
+		this.plugins.delete(key);
 
 		// Remove aliases
-		if (plugin.aliases) {
-			for (const alias of plugin.aliases) {
-				this.aliasMap.delete(alias.toLowerCase());
-			}
+		for (const alias of plugin.aliases || []) {
+			this.aliasMap.delete(this.normalize(alias));
 		}
 	}
 
 	get(name: string): CommandPlugin | undefined {
-		return this.plugins.get(name.toLowerCase());
+		return this.plugins.get(this.normalize(name));
 	}
 
 	getAll(): CommandPlugin[] {
@@ -97,12 +123,12 @@ class CommandRegistryImpl implements CommandRegistry {
 	}
 
 	findByAlias(alias: string): CommandPlugin | undefined {
-		const mainName = this.aliasMap.get(alias.toLowerCase());
+		const mainName = this.aliasMap.get(this.normalize(alias));
 		return mainName ? this.plugins.get(mainName) : undefined;
 	}
 
 	getSuggestions(input: string, max: number = 3): string[] {
-		const normalizedInput = input.toLowerCase();
+		const normalizedInput = this.normalize(input);
 		if (!normalizedInput) return [];
 
 		const allCommands = this.getAll()
@@ -138,7 +164,8 @@ class CommandRegistryImpl implements CommandRegistry {
 
 	async execute(name: string, ctx: CommandContext): Promise<CommandResponse> {
 		try {
-			const plugin = this.get(name) || this.findByAlias(name);
+			const normalizedName = this.normalize(name);
+			const plugin = this.get(normalizedName) || this.findByAlias(normalizedName);
 
 			if (!plugin) {
 				const suggestion = this.getSuggestions(name, 1)[0];
