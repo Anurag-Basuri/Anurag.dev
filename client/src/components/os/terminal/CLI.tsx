@@ -192,7 +192,7 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 					initial="initial"
 					animate="animate"
 					exit="exit"
-					className="h-full w-full rounded-sm border border-border/20 bg-sidebar/50 overflow-hidden"
+					className="h-full w-full rounded-sm border border-border/30 bg-sidebar/50 overflow-hidden"
 				>
 					<TerminalLayout
 						currentPath={terminalState.currentPath}
