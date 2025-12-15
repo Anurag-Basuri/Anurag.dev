@@ -73,17 +73,15 @@ export function TopBar({
 				initial={{ y: -80, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-				className="h-11 px-3 sm:px-4 bg-gradient-to-r from-background/90 via-background/75 to-background/90 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] flex items-center justify-between z-50 select-none relative overflow-hidden"
+				className="h-10 px-3 sm:px-3 bg-gradient-to-r from-background/90 via-background/75 to-background/90 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.32)] flex items-center justify-between z-50 select-none relative overflow-hidden"
 			>
-				{/* Ambient layers */}
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
 					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
 					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
 				</div>
 
-				{/* Left Section */}
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2.5">
 					{isMobile && (
 						<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 							<SheetTrigger asChild>
@@ -100,13 +98,9 @@ export function TopBar({
 								className="w-[280px] p-0 bg-background/95 backdrop-blur-xl border-r border-border/20 flex flex-col"
 							>
 								<SheetTitle className="sr-only">File Explorer</SheetTitle>
-
-								{/* Profile Section */}
 								<div className="shrink-0">
 									<SidebarProfile />
 								</div>
-
-								{/* Folder Tree */}
 								<div className="flex-1 overflow-hidden">
 									<ScrollArea className="h-full">
 										<div className="p-4">
@@ -135,9 +129,9 @@ export function TopBar({
 				{/* Center Section: Clock & Date */}
 				{!isMobile && (
 					<div className="absolute left-1/2 -translate-x-1/2 flex items-center">
-						<div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.25)] hover:bg-white/8 transition-colors">
+						<div className="flex items-center gap-2 px-2.5 py-1.25 rounded-full bg-white/6 border border-white/12 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:bg-white/10 transition-colors">
 							<Clock className="w-4 h-4 text-emerald-300" />
-							<span className="text-xs font-semibold text-white/85 font-mono tracking-[0.14em]">
+							<span className="text-[11px] font-semibold text-white/85 font-mono tracking-[0.14em]">
 								{currentTime}
 							</span>
 						</div>
@@ -145,16 +139,16 @@ export function TopBar({
 				)}
 
 				{/* Right Section */}
-				<div className="flex items-center gap-1.5 sm:gap-3">
-					<div className="hidden sm:flex items-center gap-3 px-3 py-1 rounded-full bg-white/5 border border-white/10 shadow-inner">
+				<div className="flex items-center gap-1.5 sm:gap-2.5">
+					<div className="hidden sm:flex items-center gap-2.5 px-2.5 py-1 rounded-full bg-white/6 border border-white/12 shadow-inner">
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<div className="flex items-center gap-2 cursor-help">
+								<div className="flex items-center gap-1.5 cursor-help">
 									<span className="relative flex h-2.5 w-2.5">
 										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 										<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
 									</span>
-									<span className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/65">
+									<span className="text-[10px] uppercase font-bold tracking-[0.18em] text-white/65">
 										Online
 									</span>
 								</div>
@@ -175,14 +169,14 @@ export function TopBar({
 					</div>
 
 					{!isMobile && (
-						<div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.2)]">
+						<div className="flex items-center gap-1 bg-white/6 p-1 rounded-lg border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.18)]">
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<motion.button
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 										onClick={handleContactClick}
-										className="h-7 px-3 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200 transition-colors border border-emerald-500/30 shadow-inner"
+										className="h-6 px-2.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200 transition-colors border border-emerald-500/30 shadow-inner"
 									>
 										Contact
 									</motion.button>
@@ -190,7 +184,7 @@ export function TopBar({
 								<TooltipContent>Get in touch</TooltipContent>
 							</Tooltip>
 
-							<div className="w-px h-4 bg-white/10 mx-1" />
+							<div className="w-px h-3.5 bg-white/10 mx-1" />
 
 							<Tooltip>
 								<TooltipTrigger asChild>
@@ -199,7 +193,7 @@ export function TopBar({
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleSidebar}
 										className={cn(
-											'h-7 w-7 flex items-center justify-center rounded-md transition-colors border border-white/10',
+											'h-6 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											sidebarCollapsed
 												? 'text-white/45'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
@@ -224,7 +218,7 @@ export function TopBar({
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleTerminal}
 										className={cn(
-											'h-7 w-7 flex items-center justify-center rounded-md transition-colors border border-white/10',
+											'h-6 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											terminalCollapsed
 												? 'text-white/45'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
