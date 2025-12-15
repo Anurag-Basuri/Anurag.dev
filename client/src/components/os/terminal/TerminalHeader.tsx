@@ -42,13 +42,13 @@ export function TerminalHeader({
 					<motion.button
 						whileHover={{ scale: 1.15 }}
 						whileTap={{ scale: 0.95 }}
-						onClick={onMinimize}
+						onClick={onClearHistory}
 						className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Minimize terminal"
-						title="Minimize"
+						aria-label="Clear terminal history"
+						title="Clear History"
 					>
 						<div className="absolute -inset-2" />
-						<Minus className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						<Trash2 className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 					</motion.button>
 					<motion.button
 						whileHover={{ scale: 1.15 }}
@@ -80,19 +80,7 @@ export function TerminalHeader({
 			{/* Right: Actions */}
 			<div className="flex items-center gap-2">
 				{/* Clear History Button */}
-				<motion.button
-					whileHover={{
-						backgroundColor: 'rgba(var(--destructive), 0.1)',
-						color: 'rgba(var(--destructive), 1)',
-					}}
-					whileTap={{ scale: 0.95 }}
-					onClick={onClearHistory}
-					className="p-1 rounded transition-colors text-muted-foreground hover:text-destructive"
-					aria-label="Clear history"
-					title="Clear history"
-				>
-					<Trash2 className="w-3.5 h-3.5" />
-				</motion.button>
+
 				{historyLength > 0 && (
 					<span className="text-[10px] font-mono text-muted-foreground/60 tabular-nums px-1.5 py-0.5 rounded bg-muted/40">
 						{historyLength}

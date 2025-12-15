@@ -99,11 +99,13 @@ function FolderTreeItem({
 
 	React.useEffect(() => {
 		const handleCollapse = () => {
-			if (isFolder) setIsOpen(false);
+			if (isFolder) {
+				setIsOpen(prev => !prev);
+			}
 		};
-		// Custom event to collapse all
-		window.addEventListener('collapse-all-folders', handleCollapse);
-		return () => window.removeEventListener('collapse-all-folders', handleCollapse);
+		// Custom event to toggle all
+		window.addEventListener('toggle-all-folders', handleCollapse);
+		return () => window.removeEventListener('toggle-all-folders', handleCollapse);
 	}, [isFolder]);
 
 	const handleToggle = useCallback(
