@@ -24,8 +24,8 @@ ResizablePanelGroup.displayName = ResizablePrimitive.PanelGroup.displayName;
 const ResizablePanel = React.forwardRef<
 	React.ElementRef<typeof ResizablePrimitive.Panel>,
 	React.ComponentProps<typeof ResizablePrimitive.Panel>
->((props, ref) => {
-	return <ResizablePrimitive.Panel ref={ref} {...props} />;
+>(({ className, ...props }, ref) => {
+	return <ResizablePrimitive.Panel ref={ref} className={cn(className)} {...props} />;
 });
 ResizablePanel.displayName = ResizablePrimitive.Panel.displayName;
 
@@ -58,7 +58,7 @@ const ResizableHandle = React.forwardRef<
 ResizableHandle.displayName = ResizablePrimitive.PanelResizeHandle.displayName;
 
 // Export all necessary types from react-resizable-panels
-export type { 
+export type {
 	ImperativePanelHandle,
 	ImperativePanelGroupHandle,
 	PanelGroupProps,
@@ -66,11 +66,7 @@ export type {
 	PanelResizeHandleProps,
 	PanelOnCollapse,
 	PanelOnExpand,
-	PanelOnResize
+	PanelOnResize,
 } from 'react-resizable-panels';
 
-export {
-	ResizablePanelGroup,
-	ResizablePanel,
-	ResizableHandle,
-};
+export { ResizablePanelGroup, ResizablePanel, ResizableHandle };
