@@ -34,10 +34,10 @@
 	--destructive: oklch(0.55 0.22 25);
 	--destructive-foreground: oklch(0.98 0 0);
 
-	/* Border - More visible and defined */
-	--border: oklch(0.75 0.04 240); /* Darker, more visible */
-	--input: oklch(0.88 0.03 240);
-	--ring: oklch(0.5 0.25 260);
+	/* Border - High visibility */
+	--border: oklch(1 0 0); /* white */
+	--input: oklch(1 0 0);
+	--ring: oklch(1 0 0);
 
 	--radius: 0.5rem;
 
@@ -94,8 +94,8 @@
 	--destructive: oklch(0.6 0.24 25); /* Brighter red */
 	--destructive-foreground: oklch(0.98 0 0);
 
-	/* Border - Much more visible */
-	--border: oklch(0.35 0.05 260 / 0.8); /* Higher opacity, lighter */
+	/* Border - Maximum visibility */
+	--border: oklch(0.55 0.05 260); /* Much brighter for visibility against dark backgrounds */
 	--input: oklch(0.28 0.05 260);
 	--ring: oklch(0.8 0.22 155);
 

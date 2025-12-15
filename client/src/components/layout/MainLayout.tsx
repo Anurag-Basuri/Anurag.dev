@@ -131,7 +131,7 @@ export function MainLayout() {
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className="overflow-hidden border border-border/90 bg-card/70"
+					className="overflow-hidden border-2 border-border bg-card/80"
 				>
 					<AnimatePresence mode="wait">
 						{sidebar.isCollapsed ? (
@@ -170,7 +170,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-px bg-border/90 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+					className="w-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -189,20 +189,20 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="overflow-hidden border border-border/90 bg-card/70"
+							className="overflow-hidden border-2 border-border bg-card/80"
 						>
 							<EditorArea />
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-px bg-border/90 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+							className="h-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
 						/>
 
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className="overflow-hidden border border-border/90 bg-card/70"
+							className="overflow-hidden border-2 border-border bg-card/80"
 						>
 							<CLI
 								onToggleCollapse={terminal.toggle}
@@ -238,6 +238,8 @@ export function MainLayout() {
 		<ErrorBoundary>
 			<ContextMenuProvider>
 				<ContextMenuWrapper>
+					<Background3D />
+
 					<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative z-10">
 						<Toaster
 							position="bottom-right"
@@ -250,7 +252,6 @@ export function MainLayout() {
 								},
 							}}
 						/>
-						<Background3D />
 
 						<TopBar
 							isMobile={isMobile}
