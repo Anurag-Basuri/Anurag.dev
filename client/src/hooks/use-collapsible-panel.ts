@@ -50,16 +50,16 @@ export function useCollapsiblePanel({
 			case 'sidebar':
 				return {
 					defaultSize: layoutState.sidebar.size,
-					collapsedSize: 4, // Increased to ensure content is visible
-					minSize: 10,
+					collapsedSize: 2,
+					minSize: 5,
 					maxSize: 25,
 				};
 			case 'terminal':
 				return {
 					defaultSize: layoutState.terminal.size,
-					collapsedSize: 4, // Increased to ensure content is visible
-					minSize: 10,
-					maxSize: 50,
+					collapsedSize: 3,
+					minSize: 4,
+					maxSize: 60,
 				};
 			default:
 				throw new Error(`Unknown panel type: ${type}`);

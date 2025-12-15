@@ -12,7 +12,7 @@ export function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
 			aria-label="Expand Sidebar"
 			title="Click to expand sidebar"
 		>
-			<div className="w-1.5 h-48 rounded-full bg-muted-foreground/50 group-hover:bg-primary/50 group-hover:h-64 group-hover:shadow-[0_0_12px_rgba(var(--primary),0.4)] transition-all duration-300 bg-white" />
+			<div className="w-0.5 h-50 rounded-full group-hover:h-80 group-hover:shadow-[0_0_12px_rgba(var(--primary),0.4)] transition-all bg-white" />
 		</button>
 	);
 }
