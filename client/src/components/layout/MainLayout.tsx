@@ -155,7 +155,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.2 }}
-								className="h-full rounded-sm border border-border/30 bg-sidebar/50 overflow-hidden flex flex-col"
+								className="h-full rounded-sm border border-border/60 bg-sidebar/50 overflow-hidden flex flex-col"
 							>
 								<SidebarProfile onCollapse={sidebar.collapse} />
 
@@ -185,7 +185,7 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="rounded-sm border border-border/30 shadow-none overflow-hidden bg-transparent relative"
+							className="rounded-sm border border-border/60 shadow-none overflow-hidden bg-transparent relative"
 						>
 							<EditorArea />
 						</ResizablePanel>
