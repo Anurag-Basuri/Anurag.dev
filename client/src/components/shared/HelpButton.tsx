@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,11 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 	const panelRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const closeBtnRef = useRef<HTMLButtonElement>(null);
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	const commands = [
 		{ cmd: 'help', desc: 'List commands' },
@@ -137,115 +143,121 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 			)}
 
 			{/* Help Popover */}
-			<AnimatePresence>
-				{isOpen && (
-					<>
-						{/* Backdrop */}
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							onClick={() => setIsOpen(false)}
-							className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-40"
-						/>
+			{mounted &&
+				createPortal(
+					<AnimatePresence>
+						{isOpen && (
+							<>
+								{/* Backdrop */}
+								<motion.div
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									onClick={() => setIsOpen(false)}
+									className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-[60]"
+								/>
 
-						{/* Popover */}
-						<motion.div
-							initial={{ opacity: 0, scale: 0.9, y: 20 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0.9, y: 20 }}
-							transition={{ type: 'spring', duration: 0.3 }}
-							className={cn(
-								'fixed z-50',
-								// Mobile: full-width bottom sheet
-								'max-sm:left-0 max-sm:right-0 max-sm:bottom-0 max-sm:w-full max-sm:p-3',
-								// Desktop: compact panel near trigger
-								'sm:w-80',
-								placement === 'floating'
-									? 'sm:bottom-24 sm:right-6'
-									: 'sm:bottom-16 sm:right-6',
-							)}
-							ref={panelRef}
-							onKeyDown={handlePanelKeyDown}
-						>
-							<div
-								className={cn(
-									'bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden',
-									'rounded-t-2xl sm:rounded-2xl',
-								)}
-							>
-								{/* Header */}
-								<div className="p-4 border-b border-white/10 flex justify-between items-center">
-									<h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base text-white">
-										<Terminal className="w-4 h-4 text-emerald-400" />
-										<span>Quick Help</span>
-									</h3>
-									<button
-										onClick={() => setIsOpen(false)}
-										className="p-2 sm:p-1 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
-										aria-label="Close help"
-										ref={closeBtnRef}
+								{/* Popover */}
+								<motion.div
+									initial={{ opacity: 0, scale: 0.9, y: 20 }}
+									animate={{ opacity: 1, scale: 1, y: 0 }}
+									exit={{ opacity: 0, scale: 0.9, y: 20 }}
+									transition={{ type: 'spring', duration: 0.3 }}
+									className={cn(
+										'fixed z-[60]',
+										// Mobile: full-width bottom sheet
+										'max-sm:left-0 max-sm:right-0 max-sm:bottom-0 max-sm:w-full max-sm:p-3',
+										// Desktop: compact panel near trigger
+										'sm:w-80',
+										placement === 'floating'
+											? 'sm:bottom-24 sm:right-6'
+											: 'sm:bottom-12 sm:right-6',
+									)}
+									ref={panelRef}
+									onKeyDown={handlePanelKeyDown}
+								>
+									<div
+										className={cn(
+											'bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden',
+											'rounded-t-2xl sm:rounded-2xl',
+										)}
 									>
-										<X className="w-5 h-5 sm:w-4 sm:h-4" />
-									</button>
-								</div>
+										{/* Header */}
+										<div className="p-4 border-b border-white/10 flex justify-between items-center">
+											<h3 className="font-semibold flex items-center gap-2 text-sm sm:text-base text-white">
+												<Terminal className="w-4 h-4 text-emerald-400" />
+												<span>Quick Help</span>
+											</h3>
+											<button
+												onClick={() => setIsOpen(false)}
+												className="p-2 sm:p-1 hover:bg-white/10 rounded-full transition-colors text-white/60 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-400/40"
+												aria-label="Close help"
+												ref={closeBtnRef}
+											>
+												<X className="w-5 h-5 sm:w-4 sm:h-4" />
+											</button>
+										</div>
 
-								<div className="p-4 space-y-4 text-sm sm:text-[13px]">
-									<div>
-										<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
-											Common Commands
-										</h4>
-										<div className="space-y-1">
-											{commands.map((item, i) => (
-												<div
-													key={i}
-													className="grid grid-cols-[1fr_auto] items-center gap-4 p-2 rounded-md hover:bg-white/5 transition-colors"
-												>
-													<span className="text-white/60 text-xs sm:text-[13px]">
-														{item.desc}
-													</span>
-													<code className="text-xs sm:text-[11px] bg-white/10 px-2 py-1 rounded font-mono text-emerald-400 shrink-0 justify-self-end">
-														{item.cmd}
-													</code>
+										<div className="p-4 space-y-4 text-sm sm:text-[13px]">
+											<div>
+												<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
+													Common Commands
+												</h4>
+												<div className="space-y-1">
+													{commands.map((item, i) => (
+														<div
+															key={i}
+															className="grid grid-cols-[1fr_auto] items-center gap-4 p-2 rounded-md hover:bg-white/5 transition-colors"
+														>
+															<span className="text-white/60 text-xs sm:text-[13px]">
+																{item.desc}
+															</span>
+															<code className="text-xs sm:text-[11px] bg-white/10 px-2 py-1 rounded font-mono text-emerald-400 shrink-0 justify-self-end">
+																{item.cmd}
+															</code>
+														</div>
+													))}
 												</div>
-											))}
+											</div>
+
+											<Separator className="bg-white/10" />
+
+											<div>
+												<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
+													Tips
+												</h4>
+												<ul className="space-y-3 text-xs sm:text-[13px] text-white/60">
+													<li className="flex items-center gap-3">
+														<Folder className="w-4 h-4 text-emerald-400/80 shrink-0" />
+														<span>
+															Click files in Explorer to open them.
+														</span>
+													</li>
+													<li className="flex items-center gap-3">
+														<Key className="w-4 h-4 text-emerald-400/80 shrink-0" />
+														<span>
+															Press <kbd className="kbd">Tab</kbd> to
+															autocomplete.
+														</span>
+													</li>
+													<li className="flex items-center gap-3">
+														<Terminal className="w-4 h-4 text-emerald-400/80 shrink-0" />
+														<span>
+															Use <kbd className="kbd">↑</kbd> /{' '}
+															<kbd className="kbd">↓</kbd> for command
+															history.
+														</span>
+													</li>
+												</ul>
+											</div>
 										</div>
 									</div>
-
-									<Separator className="bg-white/10" />
-
-									<div>
-										<h4 className="text-xs font-semibold text-white/40 uppercase tracking-wide mb-3">
-											Tips
-										</h4>
-										<ul className="space-y-3 text-xs sm:text-[13px] text-white/60">
-											<li className="flex items-center gap-3">
-												<Folder className="w-4 h-4 text-emerald-400/80 shrink-0" />
-												<span>Click files in Explorer to open them.</span>
-											</li>
-											<li className="flex items-center gap-3">
-												<Key className="w-4 h-4 text-emerald-400/80 shrink-0" />
-												<span>
-													Press <kbd className="kbd">Tab</kbd> to
-													autocomplete.
-												</span>
-											</li>
-											<li className="flex items-center gap-3">
-												<Terminal className="w-4 h-4 text-emerald-400/80 shrink-0" />
-												<span>
-													Use <kbd className="kbd">↑</kbd> /{' '}
-													<kbd className="kbd">↓</kbd> for command
-													history.
-												</span>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</div>
-						</motion.div>
-					</>
+								</motion.div>
+							</>
+						)}
+					</AnimatePresence>,
+					document.body,
 				)}
-			</AnimatePresence>
 		</TooltipProvider>
 	);
 }
