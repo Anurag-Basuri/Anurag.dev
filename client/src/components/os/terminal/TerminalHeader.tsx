@@ -12,6 +12,7 @@ interface TerminalHeaderProps {
 	onMaximize?: () => void;
 	onMinimize?: () => void;
 	onClose?: () => void;
+	isFocused?: boolean;
 }
 
 export function TerminalHeader({
@@ -22,7 +23,11 @@ export function TerminalHeader({
 	onMaximize,
 	onMinimize,
 	onClose,
+	isFocused = false,
 }: TerminalHeaderProps) {
+	function cn(...classes: (string | false | null | undefined)[]): string {
+		return classes.filter(Boolean).join(' ');
+	}
 	return (
 		<header className="h-8 px-1 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
 			{/* Left: Traffic Lights + Title + Path */}
@@ -40,13 +45,54 @@ export function TerminalHeader({
 				<div className="h-4 w-px bg-border/40" aria-hidden="true" />
 
 				{/* Terminal Title + Path (all together) */}
-				<div className="flex items-center gap-1.5 text-xs font-mono">
-					<Terminal className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
-					<span className="text-muted-foreground font-medium">Terminal</span>
-					<span className="text-muted-foreground/40">—</span>
-					<span className="text-primary font-semibold">anurag</span>
-					<span className="text-muted-foreground/40">:</span>
-					<span className="text-accent font-medium">{currentPath}</span>
+				<div className="flex items-center gap-1.5 text-xs font-mono transition-colors">
+					<Terminal
+						className={cn(
+							'w-3.5 h-3.5',
+							isFocused
+								? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]'
+								: 'text-primary',
+						)}
+						aria-hidden="true"
+					/>
+					<span
+						className={cn(
+							'font-medium',
+							isFocused ? 'text-emerald-300' : 'text-muted-foreground',
+						)}
+					>
+						Terminal
+					</span>
+					<span
+						className={cn(
+							isFocused ? 'text-emerald-500/70' : 'text-muted-foreground/40',
+						)}
+					>
+						—
+					</span>
+					<span
+						className={cn(
+							'font-semibold',
+							isFocused ? 'text-emerald-300' : 'text-primary',
+						)}
+					>
+						anurag
+					</span>
+					<span
+						className={cn(
+							isFocused ? 'text-emerald-500/70' : 'text-muted-foreground/40',
+						)}
+					>
+						:
+					</span>
+					<span
+						className={cn(
+							'font-medium',
+							isFocused ? 'text-emerald-200' : 'text-accent',
+						)}
+					>
+						{currentPath}
+					</span>
 				</div>
 			</div>
 

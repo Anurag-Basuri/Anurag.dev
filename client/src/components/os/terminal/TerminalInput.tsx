@@ -44,13 +44,20 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 				{/* Prompt Icon */}
 				<ChevronRight
 					className={cn(
-						'w-3.5 h-3.5 shrink-0 transition-colors',
-						isFocused ? 'text-primary' : 'text-muted-foreground/40',
+						'w-3.5 h-3.5 shrink-0 transition-colors drop-shadow',
+						isFocused ? 'text-emerald-400' : 'text-muted-foreground/40',
 					)}
 				/>
 
 				{/* Path */}
-				<span className="text-xs font-mono text-primary/80 shrink-0 font-medium">
+				<span
+					className={cn(
+						'text-xs font-mono shrink-0 font-medium transition-colors',
+						isFocused
+							? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]'
+							: 'text-primary/80',
+					)}
+				>
 					{currentPath}
 				</span>
 
@@ -77,14 +84,19 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 						enterKeyHint="enter"
 					/>
 					<div
-						className="whitespace-pre text-xs font-mono text-foreground leading-tight"
+						className={cn(
+							'whitespace-pre text-xs font-mono leading-tight transition-colors',
+							isFocused
+								? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.35)]'
+								: 'text-foreground',
+						)}
 						aria-hidden="true"
 					>
 						<span>{input.substring(0, cursorPos)}</span>
 						<span
 							className={cn(
-								'inline-block w-[2px] h-4 align-middle rounded-full',
-								isFocused ? 'bg-primary' : 'bg-muted-foreground/30',
+								'inline-block w-[2px] h-4 align-middle rounded-full transition-all duration-150',
+								isFocused ? 'bg-emerald-400' : 'bg-muted-foreground/20 opacity-40',
 								isFocused && !shouldReduceMotion() && 'animate-blink',
 							)}
 						/>
