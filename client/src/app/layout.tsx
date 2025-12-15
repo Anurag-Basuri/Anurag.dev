@@ -3,8 +3,6 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-
-import ClientToaster from '@/components/shared/ClientToaster';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { JotaiProvider } from '@/components/providers/jotai-provider';
 
@@ -61,10 +59,7 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<ErrorBoundary>
-							<ClientToaster />
-							{children}
-						</ErrorBoundary>
+						<ErrorBoundary>{children}</ErrorBoundary>
 					</ThemeProvider>
 				</JotaiProvider>
 			</body>
