@@ -1,0 +1,151 @@
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { X, Minus, Maximize2, ChevronsUpDown, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Standard MacOS Colors
+const COLORS = {
+	close: {
+		bg: '#ff5f57',
+		hover: '#ff6961',
+		icon: '#990000',
+	},
+	minimize: {
+		bg: '#febc2e',
+		hover: '#ffc940',
+		icon: '#985700',
+	},
+	maximize: {
+		bg: '#28c840',
+		hover: '#35d14b',
+		icon: '#006500',
+	},
+} as const;
+
+interface WindowControlProps {
+	onClose?: () => void;
+	onMinimize?: () => void;
+	onMaximize?: () => void;
+
+	// Optional overrides for specific behaviors
+	minimizeIcon?: React.ElementType<{ className?: string; style?: React.CSSProperties }>;
+	minimizeLabel?: string;
+	className?: string;
+}
+
+export function WindowControls({
+	onClose,
+	onMinimize,
+	onMaximize,
+	minimizeIcon: MinimizeIcon = Minus,
+	minimizeLabel = 'Minimize',
+	className,
+}: WindowControlProps) {
+	return (
+		<div className={cn('flex items-center gap-1.5 group', className)}>
+			{/* Close Button (Red) */}
+			<motion.button
+				whileHover={{ scale: 1.15 }}
+				whileTap={{ scale: 0.95 }}
+				onClick={onClose}
+				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+				style={{ backgroundColor: COLORS.close.bg }}
+				aria-label="Close"
+				title="Close"
+			>
+				{/* Hover state handled by CSS modules or tailwind group-hover if we generated classes dynamically, 
+				    but inline styles for specific colors are safer for these exact hex matches */}
+				<div
+					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+					style={{ backgroundColor: COLORS.close.hover }}
+				/>
+				<div className="absolute -inset-2" /> {/* Hit area */}
+				<X
+					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+					style={{ color: COLORS.close.icon }}
+				/>
+			</motion.button>
+
+			{/* Minimize/Action Button (Yellow) */}
+			<motion.button
+				whileHover={{ scale: 1.15 }}
+				whileTap={{ scale: 0.95 }}
+				onClick={onMinimize}
+				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+				style={{ backgroundColor: COLORS.minimize.bg }}
+				aria-label={minimizeLabel}
+				title={minimizeLabel}
+			>
+				<div
+					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+					style={{ backgroundColor: COLORS.minimize.hover }}
+				/>
+				<div className="absolute -inset-2" />
+				<MinimizeIcon
+					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+					style={{ color: COLORS.minimize.icon }}
+				/>
+			</motion.button>
+
+			{/* Maximize Button (Green) */}
+			<motion.button
+				whileHover={{ scale: 1.15 }}
+				whileTap={{ scale: 0.95 }}
+				onClick={onMaximize}
+				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+				style={{ backgroundColor: COLORS.maximize.bg }}
+				aria-label="Maximize"
+				title="Maximize"
+			>
+				<div
+					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+					style={{ backgroundColor: COLORS.maximize.hover }}
+				/>
+				<div className="absolute -inset-2" />
+				<Maximize2
+					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+					style={{ color: COLORS.maximize.icon }}
+				/>
+			</motion.button>
+		</div>
+	);
+}
+
+// Export pre-configured variants for common use cases
+export const SidebarControls = ({
+	onClose,
+	onToggleFolders,
+	onMaximize,
+}: {
+	onClose?: () => void;
+	onToggleFolders?: () => void;
+	onMaximize?: () => void;
+}) => (
+	<WindowControls
+		onClose={onClose}
+		onMinimize={onToggleFolders}
+		onMaximize={onMaximize}
+		minimizeIcon={ChevronsUpDown}
+		minimizeLabel="Toggle All Folders"
+	/>
+);
+
+export const TerminalControls = ({
+	onClose,
+	onClearHistory,
+	onMaximize,
+}: {
+	onClose?: () => void;
+	onClearHistory?: () => void;
+	onMaximize?: () => void;
+}) => (
+	<WindowControls
+		onClose={onClose}
+		onMinimize={onClearHistory}
+		onMaximize={onMaximize}
+		minimizeIcon={Trash2}
+		minimizeLabel="Clear History"
+	/>
+);
