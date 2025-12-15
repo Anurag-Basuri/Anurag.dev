@@ -123,11 +123,9 @@ function FolderTreeItem({
 		<div className="relative">
 			<div
 				className={cn(
-					'flex items-center py-1 px-2 cursor-pointer select-none text-[13px] transition-all duration-150 rounded-sm group relative my-0.5',
-					isActive
-						? 'bg-primary/10 text-primary'
-						: 'text-muted-foreground hover:text-foreground',
-					level > 0 && 'ml-4', // Indentation
+					'flex items-center py-1 px-2 cursor-pointer select-none text-[13px] transition-all duration-200 rounded-md group relative my-0.5',
+					isActive ? 'text-emerald-300' : 'text-white/70 hover:text-white',
+					level > 0 && 'ml-3.5', // Refined indentation
 				)}
 				onClick={handleToggle}
 				onMouseEnter={() => setIsHovered(true)}
@@ -139,7 +137,9 @@ function FolderTreeItem({
 						layoutId={isActive ? 'folder-active' : undefined}
 						className={cn(
 							'absolute inset-0 rounded-sm pointer-events-none',
-							isActive ? 'bg-primary/10 border border-primary/20' : 'bg-accent/40',
+							isActive
+								? 'bg-emerald-500/10 border border-emerald-500/20'
+								: 'bg-white/5',
 						)}
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}

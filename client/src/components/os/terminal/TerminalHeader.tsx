@@ -29,7 +29,7 @@ export function TerminalHeader({
 		return classes.filter(Boolean).join(' ');
 	}
 	return (
-		<header className="h-8 px-1 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
+		<header className="h-8 px-2 border-b border-white/5 bg-background/80 backdrop-blur-md flex items-center justify-between shrink-0 select-none">
 			{/* Left: Traffic Lights + Title + Path */}
 			<div className="flex items-center gap-2.5">
 				{/* macOS Traffic Lights */}
@@ -42,7 +42,7 @@ export function TerminalHeader({
 				</div>
 
 				{/* Separator */}
-				<div className="h-4 w-px bg-border/40" aria-hidden="true" />
+				<div className="h-3.5 w-px bg-white/10" aria-hidden="true" />
 
 				{/* Terminal Title + Path (all together) */}
 				<div className="flex items-center gap-1.5 text-xs font-mono transition-colors">

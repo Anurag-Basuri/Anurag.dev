@@ -154,7 +154,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
 									onClick={() => setIsOpen(false)}
-									className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-[60]"
+									className="fixed inset-0 bg-black/35 sm:bg-black/20 backdrop-blur-sm z-60"
 								/>
 
 								{/* Popover */}
@@ -164,7 +164,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									exit={{ opacity: 0, scale: 0.9, y: 20 }}
 									transition={{ type: 'spring', duration: 0.3 }}
 									className={cn(
-										'fixed z-[60]',
+										'fixed z-60',
 										// Mobile: full-width bottom sheet
 										'max-sm:left-0 max-sm:right-0 max-sm:bottom-0 max-sm:w-full max-sm:p-3',
 										// Desktop: compact panel near trigger
