@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAtom } from 'jotai';
-import { mainVerticalSizesAtom, mainHorizontalSizesAtom, activeWindowIdAtom } from '@/store/atoms';
+import {
+	mainVerticalSizesAtom,
+	mainHorizontalSizesAtom,
+	activeWindowIdAtom,
+	layoutStateAtom,
+} from '@/store/atoms';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -14,7 +19,7 @@ import { TopBar } from '@/components/os/shell/TopBar';
 import { Background3D } from '@/components/os/shell/Background3D';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
@@ -32,6 +37,7 @@ export function MainLayout() {
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
 	const [windows] = useAtom(windowsAtom);
 	const [activeWindowId] = useAtom(activeWindowIdAtom);
+	const [layoutState, setLayoutState] = useAtom(layoutStateAtom);
 
 	const [isLayoutReady] = useState(true);
 
@@ -130,95 +136,110 @@ export function MainLayout() {
 		}
 
 		return (
-			<ResizablePanelGroup
-				direction="horizontal"
-				onLayout={setMainHorizontalSizes}
-				className="h-full gap-1"
-			>
-				<ResizablePanel
-					{...sidebar.panelProps}
-					defaultSize={mainHorizontalSizes[0]}
-					className="rounded-sm border border-border/60 overflow-hidden"
+			<div className="h-full w-full rounded-md border border-border/60 bg-background/90 backdrop-blur-sm overflow-hidden shadow-sm">
+				<ResizablePanelGroup
+					direction="horizontal"
+					onLayout={layout => {
+						setMainHorizontalSizes(layout);
+						setLayoutState(prev => ({
+							...prev,
+							main: { ...prev.main, horizontal: layout },
+							sidebar: { ...prev.sidebar, size: layout[0] },
+						}));
+					}}
+					className="h-full gap-[1px] bg-border/60"
 				>
-					<AnimatePresence mode="wait">
-						{sidebar.isCollapsed ? (
-							<motion.div
-								key="collapsed-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="h-full bg-sidebar/50"
-							>
-								<CollapsedSidebar onExpand={sidebar.expand} />
-							</motion.div>
-						) : (
-							<motion.div
-								key="expanded-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.2 }}
-								className="h-full bg-sidebar/50 flex flex-col"
-							>
-								<SidebarProfile onCollapse={sidebar.collapse} />
-
-								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-									<FolderTree
-										items={fileSystem}
-										onSelect={handleFileSelect}
-										activeModuleId={activeWindowId}
-									/>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
-				</ResizablePanel>
-
-				<ResizableHandle
-					withHandle
-					className="w-1 bg-transparent hover:bg-primary/50 transition-colors data-[resize-handle-state=hover]:bg-primary/50 data-resize-handle-active:bg-primary border-x border-border/10"
-				/>
-
-				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
-					<ResizablePanelGroup
-						direction="vertical"
-						onLayout={setMainVerticalSizes}
-						className="gap-1"
+					<ResizablePanel
+						{...sidebar.panelProps}
+						defaultSize={mainHorizontalSizes[0]}
+						className="overflow-hidden bg-card/40"
 					>
-						<ResizablePanel
-							defaultSize={mainVerticalSizes[0]}
-							minSize={40}
-							className="rounded-sm border border-border/60 shadow-none overflow-hidden bg-transparent relative"
-						>
-							<EditorArea />
-						</ResizablePanel>
+						<AnimatePresence mode="wait">
+							{sidebar.isCollapsed ? (
+								<motion.div
+									key="collapsed-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="h-full bg-sidebar/50"
+								>
+									<CollapsedSidebar onExpand={sidebar.expand} />
+								</motion.div>
+							) : (
+								<motion.div
+									key="expanded-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.2 }}
+									className="h-full bg-sidebar/50 flex flex-col"
+								>
+									<SidebarProfile onCollapse={sidebar.collapse} />
 
-						<ResizableHandle
-							withHandle
-							className="h-1 bg-transparent hover:bg-primary/50 transition-colors data-[resize-handle-state=hover]:bg-primary/50 data-resize-handle-active:bg-primary border-y border-border/10"
-						/>
+									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+										<FolderTree
+											items={fileSystem}
+											onSelect={handleFileSelect}
+											activeModuleId={activeWindowId}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</ResizablePanel>
 
-						<ResizablePanel
-							{...terminal.panelProps}
-							defaultSize={mainVerticalSizes[1]}
-							className="rounded-sm border border-border/60 overflow-hidden"
+					<ResizableHandle
+						withHandle
+						className="w-[1px] bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+					/>
+
+					<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
+						<ResizablePanelGroup
+							direction="vertical"
+							onLayout={layout => {
+								setMainVerticalSizes(layout);
+								setLayoutState(prev => ({
+									...prev,
+									main: { ...prev.main, vertical: layout },
+									terminal: { ...prev.terminal, size: layout[1] },
+								}));
+							}}
+							className="gap-[1px] bg-border/60"
 						>
-							<CLI
-								onToggleCollapse={terminal.toggle}
-								isCollapsed={terminal.isCollapsed}
+							<ResizablePanel
+								defaultSize={mainVerticalSizes[0]}
+								minSize={40}
+								className="overflow-hidden bg-card/40"
+							>
+								<EditorArea />
+							</ResizablePanel>
+
+							<ResizableHandle
+								withHandle
+								className="h-[1px] bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
 							/>
-						</ResizablePanel>
-					</ResizablePanelGroup>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+
+							<ResizablePanel
+								{...terminal.panelProps}
+								defaultSize={mainVerticalSizes[1]}
+								className="overflow-hidden bg-card/40"
+							>
+								<CLI
+									onToggleCollapse={terminal.toggle}
+									isCollapsed={terminal.isCollapsed}
+								/>
+							</ResizablePanel>
+						</ResizablePanelGroup>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
 		);
 	};
 
 	const [, setIsMobileSidebarOpen] = useAtom(mobileSidebarOpenAtom);
 
-	// Simple swipe detection
-	const handlePanEnd = (event: any, info: any) => {
+	const handlePanEnd = (event: MouseEvent | TouchEvent, info: PanInfo) => {
 		if (info.offset.x > 100) {
 			setIsMobileSidebarOpen(true);
 		}
@@ -239,7 +260,7 @@ export function MainLayout() {
 		<ErrorBoundary>
 			<ContextMenuProvider>
 				<ContextMenuWrapper>
-					<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative">
+					<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative z-10">
 						<Toaster
 							position="bottom-right"
 							toastOptions={{
