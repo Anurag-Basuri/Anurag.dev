@@ -27,8 +27,8 @@ import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider, useContextMenu } from '@/components/providers/context-menu-provider';
-import { DesktopContextMenu } from '@/components/os/shell/DesktopContextMenu';
 import { ContextMenuWrapper } from '@/components/os/shell/ContextMenuWrapper';
+import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 export function MainLayout() {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -243,6 +243,46 @@ export function MainLayout() {
 			<div className="absolute top-0 bottom-0 left-0 w-8 z-50" />
 		</motion.div>
 	);
+
+	useKeyboardShortcuts([
+		{
+			key: 'b',
+			ctrl: true,
+			handler: () => {
+				if (sidebar.isCollapsed) {
+					sidebar.expand();
+				} else {
+					sidebar.collapse();
+				}
+			},
+			description: 'Toggle sidebar',
+		},
+		{
+			key: '`',
+			ctrl: true,
+			handler: () => {
+				if (terminal.isCollapsed) {
+					terminal.expand();
+				} else {
+					terminal.collapse();
+				}
+			},
+			description: 'Toggle terminal',
+		},
+		{
+			key: 'k',
+			ctrl: true,
+			shift: true,
+			handler: () => {
+				// Focus terminal input
+				const terminalInput = document.querySelector<HTMLInputElement>(
+					'input[aria-label="Command input"]',
+				);
+				terminalInput?.focus();
+			},
+			description: 'Focus terminal',
+		},
+	]);
 
 	return (
 		<ErrorBoundary>
