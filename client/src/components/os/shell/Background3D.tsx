@@ -14,9 +14,9 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 1000, radius: 100, size: 0.01, opacity: 0.15, rotationSpeed: 0.002 },
-		MEDIUM: { count: 500, radius: 50, size: 0.02, opacity: 0.2, rotationSpeed: 0.005 },
-		CLOSE: { count: 150, radius: 25, size: 0.04, opacity: 0.3, rotationSpeed: 0.01 },
+		DISTANT: { count: 3000, radius: 100, size: 0.015, opacity: 0.15, rotationSpeed: 0.004 },
+		MEDIUM: { count: 1000, radius: 50, size: 0.025, opacity: 0.25, rotationSpeed: 0.008 },
+		CLOSE: { count: 300, radius: 25, size: 0.05, opacity: 0.35, rotationSpeed: 0.015 },
 	},
 	CAMERA: {
 		defaultPosition: [0, 2, 5] as [number, number, number],
@@ -443,17 +443,16 @@ const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	return (
 		<EffectComposer>
 			<Bloom
-				intensity={isDark ? 0.3 : 0.3}
-				luminanceThreshold={0.6}
+				intensity={isDark ? 0.35 : 0.3}
+				luminanceThreshold={0.5}
 				luminanceSmoothing={0.8}
 				height={300}
 			/>
-			<Noise opacity={0.01} blendFunction={BlendFunction.OVERLAY} />
-			<Vignette darkness={isDark ? 0.25 : 0.12} offset={0.4} />
+			<Noise opacity={0.015} blendFunction={BlendFunction.OVERLAY} />
+			<Vignette darkness={isDark ? 0.3 : 0.12} offset={0.4} />
 		</EffectComposer>
 	);
 });
-
 // --- Main Component ---
 
 export function Background3D() {
