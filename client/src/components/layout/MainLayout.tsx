@@ -156,7 +156,10 @@ export function MainLayout() {
 								transition={{ duration: 0.2 }}
 								className="h-full bg-sidebar/50 flex flex-col"
 							>
-								<SidebarProfile onCollapse={sidebar.collapse} />
+								<SidebarProfile
+									onCollapse={sidebar.collapse}
+									onExpand={sidebar.maximize}
+								/>
 
 								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
 									<FolderTree
@@ -211,6 +214,9 @@ export function MainLayout() {
 							<CLI
 								onToggleCollapse={terminal.toggle}
 								isCollapsed={terminal.isCollapsed}
+								onMaximize={terminal.maximize}
+								onMinimize={terminal.collapse}
+								onClose={terminal.collapse}
 							/>
 						</ResizablePanel>
 					</ResizablePanelGroup>

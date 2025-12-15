@@ -10,9 +10,18 @@ import { TerminalPrompt } from './TerminalPrompt';
 interface CLIProps {
 	onToggleCollapse?: () => void;
 	isCollapsed?: boolean;
+	onMaximize?: () => void;
+	onMinimize?: () => void;
+	onClose?: () => void;
 }
 
-export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIProps) {
+export function CLI({
+	onToggleCollapse,
+	isCollapsed: externalIsCollapsed,
+	onMaximize,
+	onMinimize,
+	onClose,
+}: CLIProps) {
 	const terminalState = useTerminalState();
 
 	// Handlers
@@ -199,6 +208,9 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 						historyLength={terminalState.history.length}
 						onClearHistory={terminalState.clearHistory}
 						onToggleCollapse={onToggleCollapse}
+						onMaximize={onMaximize}
+						onMinimize={onMinimize}
+						onClose={onClose}
 					>
 						<TerminalHistory history={terminalState.history} />
 						<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
