@@ -2,17 +2,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import {
-	Download,
-	Linkedin,
-	Github,
-	Mail,
-	FolderOpen,
-	X,
-	ChevronsUpDown,
-	Maximize2,
-} from 'lucide-react';
+import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useSetAtom } from 'jotai';
+import { folderExpansionSignalAtom } from '@/store/atoms';
+import { SidebarControls } from '@/components/shared/WindowControls';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
@@ -20,6 +14,8 @@ interface SidebarProfileProps {
 }
 
 export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
+	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
+
 	return (
 		<div className="bg-transparent">
 			{/* Header - matching terminal style (h-10) */}
@@ -28,41 +24,11 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 				<div className="flex items-center gap-2.5">
 					{/* macOS Traffic Lights - Hidden on mobile */}
 					<div className="hidden md:flex items-center gap-1.5 group">
-						<motion.button
-							whileHover={{ scale: 1.15 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={onCollapse}
-							className="relative w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn shadow-sm"
-							aria-label="Close sidebar"
-							title="Close"
-						>
-							<div className="absolute -inset-2" />
-							<X className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.15 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={() =>
-								window.dispatchEvent(new CustomEvent('toggle-all-folders'))
-							}
-							className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
-							aria-label="Toggle all folders"
-							title="Toggle All Folders"
-						>
-							<div className="absolute -inset-2" />
-							<ChevronsUpDown className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-						</motion.button>
-						<motion.button
-							whileHover={{ scale: 1.15 }}
-							whileTap={{ scale: 0.95 }}
-							onClick={onExpand}
-							className="relative w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#35d14b] transition-colors flex items-center justify-center group/btn shadow-sm"
-							aria-label="Expand sidebar"
-							title="Expand"
-						>
-							<div className="absolute -inset-2" />
-							<Maximize2 className="w-2 h-2 text-[#006500] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-						</motion.button>
+						<SidebarControls
+							onClose={onCollapse}
+							onMaximize={onExpand}
+							onToggleFolders={() => setFolderSignal(prev => prev + 1)}
+						/>
 					</div>
 
 					{/* Separator */}

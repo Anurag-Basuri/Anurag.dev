@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAtomValue } from 'jotai';
+import { folderExpansionSignalAtom } from '@/store/atoms';
 
 interface FolderTreeProps {
 	items: FileSystemItem[];
@@ -97,16 +99,13 @@ function FolderTreeItem({
 	// Check if this file is active based on moduleId matching the active window
 	const isActive = !isFolder && item.moduleId && item.moduleId === activeModuleId;
 
+	const expansionSignal = useAtomValue(folderExpansionSignalAtom);
+
 	React.useEffect(() => {
-		const handleCollapse = () => {
-			if (isFolder) {
-				setIsOpen(prev => !prev);
-			}
-		};
-		// Custom event to toggle all
-		window.addEventListener('toggle-all-folders', handleCollapse);
-		return () => window.removeEventListener('toggle-all-folders', handleCollapse);
-	}, [isFolder]);
+		if (isFolder && expansionSignal > 0) {
+			setIsOpen(prev => !prev);
+		}
+	}, [expansionSignal, isFolder]);
 
 	const handleToggle = useCallback(
 		(e: React.MouseEvent) => {
