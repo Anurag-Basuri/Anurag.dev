@@ -531,11 +531,11 @@ export function Background3D() {
 					<PostProcessingEffects />
 				</Canvas>
 			</ErrorBoundary>
-			{/* Overlay gradient for depth */}
-			<div className="absolute inset-0 pointer-events-none">
-				<div className="absolute inset-0 bg-gradient-to-t from-background/40 via-background/10 to-transparent dark:from-background/60 dark:via-background/30 dark:to-transparent" />
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.45),_transparent_60%)] dark:bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.65),_transparent_65%)]" />
-			</div>
+			{/* Overlay gradient for depth - reduced opacity for border visibility */}
+			{/* <div className="absolute inset-0 pointer-events-none">
+				<div className="absolute inset-0 bg-gradient-to-t from-background/20 via-background/5 to-transparent dark:from-background/30 dark:via-background/10 dark:to-transparent" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.15),_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.25),_transparent_70%)]" />
+			</div> */}
 		</div>
 	);
 }

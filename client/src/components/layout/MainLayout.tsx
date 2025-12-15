@@ -261,7 +261,7 @@ export function MainLayout() {
 							onFileSelect={handleFileSelect}
 						/>
 
-						<div className="flex-1 overflow-hidden p-2">
+						<div className="flex-1 overflow-hidden p-1">
 							{isLayoutReady &&
 								(isMobile ? renderMobileLayout() : renderDesktopLayout())}
 						</div>
