@@ -70,13 +70,17 @@ export function TopBar({
 	return (
 		<TooltipProvider delayDuration={0}>
 			<motion.header
-				initial={{ y: -100, opacity: 0 }}
+				initial={{ y: -80, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-				className="h-8 bg-background/70 backdrop-blur-2xl border-b border-border/20 flex items-center justify-between z-50 px-2 sm:px-3 select-none relative shadow-sm"
+				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+				className="h-11 px-3 sm:px-4 bg-gradient-to-r from-background/90 via-background/75 to-background/90 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] flex items-center justify-between z-50 select-none relative overflow-hidden"
 			>
-				{/* Ambient Glow Line */}
-				<div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-primary/20 to-transparent opacity-50" />
+				{/* Ambient layers */}
+				<div className="absolute inset-0 pointer-events-none">
+					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
+					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
+					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
+				</div>
 
 				{/* Left Section */}
 				<div className="flex items-center gap-3">
@@ -121,8 +125,8 @@ export function TopBar({
 					)}
 
 					<div className="flex items-center gap-2 group cursor-default">
-						<div className="w-3 h-3 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.4)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.6)] transition-all duration-300" />
-						<span className="font-bold tracking-[0.2em] text-xs text-white/90 group-hover:text-white transition-colors">
+						<div className="w-3.5 h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_10px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_14px_rgba(52,211,153,0.7)] transition-all duration-300" />
+						<span className="font-bold tracking-[0.22em] text-[11px] text-white/90 group-hover:text-white transition-colors">
 							ANURAG<span className="text-emerald-400">OS</span>
 						</span>
 					</div>
@@ -130,10 +134,10 @@ export function TopBar({
 
 				{/* Center Section: Clock & Date */}
 				{!isMobile && (
-					<div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
-						<div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/3 border border-white/5 hover:bg-white/5 transition-colors group">
-							<Clock className="w-3.5 h-3.5 text-emerald-400/80 group-hover:text-emerald-400 transition-colors" />
-							<span className="text-xs font-medium text-white/80 font-mono tracking-wide">
+					<div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+						<div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.25)] hover:bg-white/8 transition-colors">
+							<Clock className="w-4 h-4 text-emerald-300" />
+							<span className="text-xs font-semibold text-white/85 font-mono tracking-[0.14em]">
 								{currentTime}
 							</span>
 						</div>
@@ -142,16 +146,15 @@ export function TopBar({
 
 				{/* Right Section */}
 				<div className="flex items-center gap-1.5 sm:gap-3">
-					{/* Status Indicators */}
-					<div className="hidden sm:flex items-center gap-3 px-3 border-r border-white/10 mr-1">
+					<div className="hidden sm:flex items-center gap-3 px-3 py-1 rounded-full bg-white/5 border border-white/10 shadow-inner">
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<div className="flex items-center gap-1.5 cursor-help">
-									<span className="relative flex h-2 w-2">
+								<div className="flex items-center gap-2 cursor-help">
+									<span className="relative flex h-2.5 w-2.5">
 										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+										<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
 									</span>
-									<span className="text-[10px] uppercase font-bold tracking-wider text-white/50">
+									<span className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/65">
 										Online
 									</span>
 								</div>
@@ -167,17 +170,19 @@ export function TopBar({
 						</Tooltip>
 					</div>
 
-					<ThemeToggle />
+					<div className="hidden sm:flex items-center">
+						<ThemeToggle />
+					</div>
 
 					{!isMobile && (
-						<div className="flex items-center gap-1 bg-white/3 p-0.5 rounded-lg border border-white/5">
+						<div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.2)]">
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<motion.button
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 										onClick={handleContactClick}
-										className="h-6 px-3 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-[10px] font-bold uppercase tracking-wider text-emerald-400 transition-colors border border-emerald-500/20"
+										className="h-7 px-3 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200 transition-colors border border-emerald-500/30 shadow-inner"
 									>
 										Contact
 									</motion.button>
@@ -190,14 +195,14 @@ export function TopBar({
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<motion.button
-										whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+										whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleSidebar}
 										className={cn(
-											'h-6 w-6 flex items-center justify-center rounded-md transition-colors',
+											'h-7 w-7 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											sidebarCollapsed
-												? 'text-white/40'
-												: 'text-emerald-400 bg-white/5',
+												? 'text-white/45'
+												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
 										)}
 									>
 										{sidebarCollapsed ? (
@@ -215,14 +220,14 @@ export function TopBar({
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<motion.button
-										whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+										whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleTerminal}
 										className={cn(
-											'h-6 w-6 flex items-center justify-center rounded-md transition-colors',
+											'h-7 w-7 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											terminalCollapsed
-												? 'text-white/40'
-												: 'text-emerald-400 bg-white/5',
+												? 'text-white/45'
+												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
 										)}
 									>
 										{terminalCollapsed ? (
