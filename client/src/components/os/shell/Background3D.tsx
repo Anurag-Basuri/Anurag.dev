@@ -295,7 +295,7 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 			<Points ref={mediumRef} positions={mediumStars.positions}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#c7d2fe' : '#1e293b'}
+					color={isDark ? '#c7d2fe' : '#64748b'}
 					size={CONFIG.STARS.MEDIUM.size}
 					sizeAttenuation
 					depthWrite={false}
@@ -306,7 +306,7 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 			<Points ref={closeRef} positions={closeStars.positions}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#ffffff' : '#000000'}
+					color={isDark ? '#ffffff' : '#475569'}
 					size={CONFIG.STARS.CLOSE.size}
 					sizeAttenuation
 					depthWrite={false}
@@ -322,6 +322,20 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 	const { camera } = useThree();
 	const targetPosition = useRef(new THREE.Vector3(0, 2, 5));
 
+	// Global mouse tracking
+	const mouseRef = useRef({ x: 0, y: 0 });
+
+	useEffect(() => {
+		const handleMouseMove = (event: MouseEvent) => {
+			// Normalize to -1 to 1
+			mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+			mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+		};
+
+		window.addEventListener('mousemove', handleMouseMove);
+		return () => window.removeEventListener('mousemove', handleMouseMove);
+	}, []);
+
 	useFrame(state => {
 		if (reducedMotion) return;
 
@@ -335,13 +349,10 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 			z: Math.sin(state.clock.elapsedTime * 0.15) * 0.08,
 		};
 
-		// Current camera position for smoothing
-		const currentX = camera.position.x;
-		const currentY = camera.position.y;
-
-		// Enhanced mouse interactions
-		const mouseX = state.pointer.x * 4.0 + drift.x;
-		const mouseY = state.pointer.y * 2.0 + drift.y;
+		// Use global mouse ref instead of state.pointer
+		// Enhanced mouse interactions with higher multiplier for "move with cursor" feel
+		const mouseX = mouseRef.current.x * 2.5 + drift.x;
+		const mouseY = mouseRef.current.y * 1.5 + drift.y;
 
 		targetPosition.current.x += (mouseX - targetPosition.current.x) * 0.05;
 		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.05;
@@ -349,7 +360,7 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 
 		camera.position.lerp(targetPosition.current, 0.08);
 
-		const targetRotZ = -state.pointer.x * 0.05;
+		const targetRotZ = -mouseRef.current.x * 0.05;
 		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.05;
 		camera.rotation.set(camera.rotation.x, camera.rotation.y, newRotZ);
 
@@ -372,9 +383,9 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 		() => ({
 			uniforms: {
 				time: { value: 0 },
-				gridColor: { value: new THREE.Color(theme === 'dark' ? '#0ea5e9' : '#94a3b8') },
-				fadeColor: { value: new THREE.Color(theme === 'dark' ? '#000000' : '#ffffff') },
-				opacity: { value: theme === 'dark' ? 0.1 : 0.08 },
+				gridColor: { value: new THREE.Color(theme === 'dark' ? '#0ea5e9' : '#cbd5e1') }, // Slate-300 for light
+				fadeColor: { value: new THREE.Color(theme === 'dark' ? '#000000' : '#f0f4f8') }, // Light slate bg
+				opacity: { value: theme === 'dark' ? 0.1 : 0.15 },
 			},
 			vertexShader: `
 			uniform float time;
@@ -512,9 +523,9 @@ export function Background3D() {
 					}}
 					shadows={false}
 				>
-					<color attach="background" args={[theme === 'dark' ? '#000000' : '#f8f9fa']} />
+					<color attach="background" args={[theme === 'dark' ? '#000000' : '#f8fafc']} />
 					<CameraRig reducedMotion={reducedMotion} />
-					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#ffffff', 30, 100]} />
+					<fog attach="fog" args={[theme === 'dark' ? '#000000' : '#f1f5f9', 30, 100]} />
 					<AnimatedGrid reducedMotion={reducedMotion} />
 					<NebulaField reducedMotion={reducedMotion} />
 					<StarField reducedMotion={reducedMotion} />
