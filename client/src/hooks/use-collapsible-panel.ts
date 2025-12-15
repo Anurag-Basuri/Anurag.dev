@@ -68,36 +68,45 @@ export function useCollapsiblePanel({
 
 	const toggle = useCallback(() => {
 		const panel = panelRef.current;
-		if (!panel) return;
-
+		if (!panel) {
+			if (process.env.NODE_ENV === 'development') {
+				console.warn(`[useCollapsiblePanel] Panel ref not available for ${type}`);
+			}
+			return;
+		}
+		
 		if (isCollapsed) {
 			panel.expand();
-			setIsCollapsed(false);
-			onExpand?.();
 		} else {
 			panel.collapse();
-			setIsCollapsed(true);
-			onCollapse?.();
 		}
-	}, [isCollapsed, setIsCollapsed, onCollapse, onExpand]);
+	}, [isCollapsed, type]);
 
 	const expand = useCallback(() => {
 		const panel = panelRef.current;
-		if (!panel) return;
+		if (!panel) {
+			if (process.env.NODE_ENV === 'development') {
+				console.warn(`[useCollapsiblePanel] Panel ref not available for ${type}`);
+			}
+			return;
+		}
 
+		// Let the panel handle the state transition
 		panel.expand();
-		setIsCollapsed(false);
-		onExpand?.();
-	}, [setIsCollapsed, onExpand]);
+	}, [type]);
 
 	const collapse = useCallback(() => {
 		const panel = panelRef.current;
-		if (!panel) return;
+		if (!panel) {
+			if (process.env.NODE_ENV === 'development') {
+				console.warn(`[useCollapsiblePanel] Panel ref not available for ${type}`);
+			}
+			return;
+		}
 
+		// Let the panel handle the state transition
 		panel.collapse();
-		setIsCollapsed(true);
-		onCollapse?.();
-	}, [setIsCollapsed, onCollapse]);
+	}, [type]);
 
 	const panelProps = useMemo(
 		() => ({

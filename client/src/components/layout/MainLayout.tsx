@@ -135,7 +135,11 @@ export function MainLayout() {
 				onLayout={setMainHorizontalSizes}
 				className="h-full gap-1"
 			>
-				<ResizablePanel {...sidebar.panelProps} defaultSize={mainHorizontalSizes[0]}>
+				<ResizablePanel
+					{...sidebar.panelProps}
+					defaultSize={mainHorizontalSizes[0]}
+					className="rounded-sm border border-border/60 overflow-hidden"
+				>
 					<AnimatePresence mode="wait">
 						{sidebar.isCollapsed ? (
 							<motion.div
@@ -144,7 +148,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.15 }}
-								className="h-full rounded-sm border border-border/60 bg-sidebar/50 overflow-hidden"
+								className="h-full bg-sidebar/50"
 							>
 								<CollapsedSidebar onExpand={sidebar.expand} />
 							</motion.div>
@@ -155,7 +159,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.2 }}
-								className="h-full rounded-sm border border-border/60 bg-sidebar/50 overflow-hidden flex flex-col"
+								className="h-full bg-sidebar/50 flex flex-col"
 							>
 								<SidebarProfile onCollapse={sidebar.collapse} />
 
@@ -195,7 +199,11 @@ export function MainLayout() {
 							className="h-1 bg-transparent hover:bg-primary/50 transition-colors data-[resize-handle-state=hover]:bg-primary/50 data-resize-handle-active:bg-primary border-y border-border/10"
 						/>
 
-						<ResizablePanel {...terminal.panelProps} defaultSize={mainVerticalSizes[1]}>
+						<ResizablePanel
+							{...terminal.panelProps}
+							defaultSize={mainVerticalSizes[1]}
+							className="rounded-sm border border-border/60 overflow-hidden"
+						>
 							<CLI
 								onToggleCollapse={terminal.toggle}
 								isCollapsed={terminal.isCollapsed}
