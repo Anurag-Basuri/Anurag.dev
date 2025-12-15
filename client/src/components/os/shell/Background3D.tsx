@@ -14,9 +14,9 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 1000, radius: 100, size: 0.01, opacity: 0.25, rotationSpeed: 0.002 },
-		MEDIUM: { count: 500, radius: 50, size: 0.02, opacity: 0.35, rotationSpeed: 0.005 },
-		CLOSE: { count: 150, radius: 25, size: 0.04, opacity: 0.5, rotationSpeed: 0.01 },
+		DISTANT: { count: 1000, radius: 100, size: 0.01, opacity: 0.15, rotationSpeed: 0.002 },
+		MEDIUM: { count: 500, radius: 50, size: 0.02, opacity: 0.2, rotationSpeed: 0.005 },
+		CLOSE: { count: 150, radius: 25, size: 0.04, opacity: 0.3, rotationSpeed: 0.01 },
 	},
 	CAMERA: {
 		defaultPosition: [0, 2, 5] as [number, number, number],
@@ -365,7 +365,7 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 				time: { value: 0 },
 				gridColor: { value: new THREE.Color(theme === 'dark' ? '#0ea5e9' : '#94a3b8') },
 				fadeColor: { value: new THREE.Color(theme === 'dark' ? '#000000' : '#ffffff') },
-				opacity: { value: theme === 'dark' ? 0.18 : 0.08 },
+				opacity: { value: theme === 'dark' ? 0.1 : 0.08 },
 			},
 			vertexShader: `
 			uniform float time;
@@ -443,7 +443,7 @@ const PostProcessingEffects = React.memo(function PostProcessingEffects() {
 	return (
 		<EffectComposer>
 			<Bloom
-				intensity={isDark ? 0.6 : 0.3}
+				intensity={isDark ? 0.3 : 0.3}
 				luminanceThreshold={0.6}
 				luminanceSmoothing={0.8}
 				height={300}
