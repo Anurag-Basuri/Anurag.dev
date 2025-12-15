@@ -2,19 +2,19 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Download, Linkedin, Github, Mail, FolderOpen, Minus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Download, Linkedin, Github, Mail, FolderOpen, X, Minus, Maximize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
+	onExpand?: () => void;
 }
 
-export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
+export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 	return (
 		<div className="bg-transparent">
 			{/* Header - matching terminal style (h-10) */}
-			<header className="h-10 px-3 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
+			<header className="h-10 px-2 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
 				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2.5">
 					{/* macOS Traffic Lights - Hidden on mobile */}
@@ -24,14 +24,34 @@ export function SidebarProfile({ onCollapse }: SidebarProfileProps) {
 							whileTap={{ scale: 0.95 }}
 							onClick={onCollapse}
 							className="relative w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn shadow-sm"
-							aria-label="Collapse sidebar"
-							title="Collapse"
+							aria-label="Close sidebar"
+							title="Close"
 						>
-							<div className="absolute -inset-2" /> {/* Increase hit area */}
-							<Minus className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+							<div className="absolute -inset-2" />
+							<X className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 						</motion.button>
-						<div className="w-3 h-3 rounded-full bg-[#febc2e] shadow-sm" />
-						<div className="w-3 h-3 rounded-full bg-[#28c840] shadow-sm" />
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onCollapse}
+							className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
+							aria-label="Minimize sidebar"
+							title="Minimize"
+						>
+							<div className="absolute -inset-2" />
+							<Minus className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						</motion.button>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onExpand}
+							className="relative w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#35d14b] transition-colors flex items-center justify-center group/btn shadow-sm"
+							aria-label="Expand sidebar"
+							title="Expand"
+						>
+							<div className="absolute -inset-2" />
+							<Maximize2 className="w-2 h-2 text-[#006500] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						</motion.button>
 					</div>
 
 					{/* Separator */}

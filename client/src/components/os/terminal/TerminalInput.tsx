@@ -34,7 +34,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'h-10 px-3 border-t bg-card/60 backdrop-blur-xl shrink-0 flex items-center gap-2.5 cursor-text transition-colors',
+					'h-8 px-1 border-t bg-card/60 backdrop-blur-xl shrink-0 flex items-center gap-2.5 cursor-text transition-colors',
 					isFocused ? 'border-primary/20' : 'border-border/60',
 				)}
 				onClick={handleContainerClick}

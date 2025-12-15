@@ -17,7 +17,7 @@ export function TerminalHeader({
 	onToggleCollapse,
 }: TerminalHeaderProps) {
 	return (
-		<header className="h-10 px-3 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
+		<header className="h-8 px-1 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
 			{/* Left: Traffic Lights + Title + Path */}
 			<div className="flex items-center gap-2.5">
 				{/* macOS Traffic Lights */}
