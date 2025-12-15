@@ -34,8 +34,8 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'h-7 px-2 border-t bg-[#161b22] shrink-0 flex items-center gap-2 cursor-text transition-colors',
-					isFocused ? 'border-emerald-500/20' : 'border-white/8',
+					'h-10 px-3 border-t bg-card/60 backdrop-blur-xl shrink-0 flex items-center gap-2.5 cursor-text transition-colors',
+					isFocused ? 'border-primary/20' : 'border-border/30',
 				)}
 				onClick={handleContainerClick}
 				role="form"
@@ -44,17 +44,17 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 				{/* Prompt Icon */}
 				<ChevronRight
 					className={cn(
-						'w-3 h-3 shrink-0 transition-colors',
-						isFocused ? 'text-emerald-400' : 'text-white/20',
+						'w-3.5 h-3.5 shrink-0 transition-colors',
+						isFocused ? 'text-primary' : 'text-muted-foreground/40',
 					)}
 				/>
 
 				{/* Path */}
-				<span className="text-[10px] font-mono text-emerald-400/70 shrink-0">
+				<span className="text-xs font-mono text-primary/80 shrink-0 font-medium">
 					{currentPath}
 				</span>
 
-				<span className="text-[10px] text-white/20 shrink-0">$</span>
+				<span className="text-xs text-muted-foreground/40 shrink-0 font-medium">$</span>
 
 				{/* Input Area */}
 				<div className="relative flex-1 min-w-0">
@@ -77,14 +77,14 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 						enterKeyHint="enter"
 					/>
 					<div
-						className="whitespace-pre text-[12px] font-mono text-white/90 leading-tight"
+						className="whitespace-pre text-xs font-mono text-foreground leading-tight"
 						aria-hidden="true"
 					>
 						<span>{input.substring(0, cursorPos)}</span>
 						<span
 							className={cn(
-								'inline-block w-[1.5px] h-3 align-[-0.1em] rounded-full',
-								isFocused ? 'bg-emerald-400' : 'bg-white/15',
+								'inline-block w-[2px] h-4 align-middle rounded-full',
+								isFocused ? 'bg-primary' : 'bg-muted-foreground/30',
 								isFocused && !shouldReduceMotion() && 'animate-blink',
 							)}
 						/>
