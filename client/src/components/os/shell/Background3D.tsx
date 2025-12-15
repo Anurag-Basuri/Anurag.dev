@@ -533,8 +533,8 @@ export function Background3D() {
 			</ErrorBoundary>
 			{/* Overlay gradient for depth */}
 			<div className="absolute inset-0 pointer-events-none">
-				<div className="absolute inset-0 bg-linear-to-t from-background/0 via-background/0 to-background/0 dark:via-background/20 dark:to-background/40" />
-				<div className="absolute inset-0 bg-gradient-radial from-transparent to-transparent dark:to-background/30" />
+				<div className="absolute inset-0 bg-gradient-to-t from-background/40 via-background/10 to-transparent dark:from-background/60 dark:via-background/30 dark:to-transparent" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.45),_transparent_60%)] dark:bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.65),_transparent_65%)]" />
 			</div>
 		</div>
 	);

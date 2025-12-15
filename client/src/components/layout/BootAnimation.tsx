@@ -79,7 +79,7 @@ function MatrixRain() {
 		};
 	}, []);
 
-	return <canvas ref={canvasRef} className="absolute inset-0 opacity-12" />;
+	return <canvas ref={canvasRef} className="absolute inset-0 opacity-10" />;
 }
 
 // Hexagon Grid Component
@@ -225,8 +225,9 @@ export function BootAnimation() {
 
 	// Keyboard accessibility: press any key to skip
 	useEffect(() => {
-		function onKey(e: KeyboardEvent) {
+		function onKey() {
 			// Skip on any key press
+			sessionStorage.setItem('booted', '1');
 			setBootComplete(true);
 		}
 		window.addEventListener('keydown', onKey);
@@ -238,7 +239,10 @@ export function BootAnimation() {
 		const tl = gsap.timeline({
 			onComplete: () => {
 				setShowBurst(true);
-				setTimeout(() => setBootComplete(true), 1500);
+				setTimeout(() => {
+					sessionStorage.setItem('booted', '1');
+					setBootComplete(true);
+				}, 1500);
 			},
 		});
 
@@ -302,14 +306,17 @@ export function BootAnimation() {
 		};
 	}, [setBootComplete]);
 
-	const handleSkip = () => setBootComplete(true);
+	const handleSkip = () => {
+		sessionStorage.setItem('booted', '1');
+		setBootComplete(true);
+	};
 
 	if (bootComplete) return null;
 
 	return (
 		<div
 			ref={containerRef}
-			className="fixed inset-0 z-9999 bg-black text-[#00ff41] font-mono overflow-hidden"
+			className="fixed inset-0 z-[9999] bg-black text-[#00ff41] font-mono overflow-hidden"
 			aria-label="Boot animation loading screen"
 			role="dialog"
 			aria-live="polite"
