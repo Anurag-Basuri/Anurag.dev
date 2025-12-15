@@ -40,14 +40,15 @@ const TaskbarItem = memo(function TaskbarItem({
 	isActive,
 	onClick,
 	onClose,
+	Icon,
 }: {
 	window: WindowState;
 	isActive: boolean;
 	onClick: () => void;
 	onClose: (e: React.MouseEvent) => void;
+	Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }) {
 	const isLoading = window.isLoading || false;
-	const Icon = getModuleIcon(window.id);
 
 	return (
 		<Tooltip>
@@ -72,25 +73,25 @@ const TaskbarItem = memo(function TaskbarItem({
 					}}
 					onClick={onClick}
 					className={cn(
-						'relative h-10 sm:h-9 md:h-7 px-3 min-h-[44px] sm:min-h-0 rounded-lg flex items-center gap-2 transition-colors duration-200 group border cursor-pointer',
+						'relative h-10 sm:h-9 md:h-8 px-3 min-h-[44px] sm:min-h-0 rounded-xl flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm',
 						isActive
-							? 'bg-white/8 border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
-							: 'bg-transparent border-transparent hover:bg-white/5',
+							? 'bg-white/10 border-white/15 shadow-[0_8px_24px_rgba(0,0,0,0.28)]'
+							: 'bg-white/4 border-white/5 hover:border-white/15 hover:bg-white/7',
 					)}
 				>
 					<Icon
 						className={cn(
-							'w-3.5 h-3.5 transition-colors duration-300',
+							'w-4 h-4 transition-colors duration-300',
 							isActive
-								? 'text-emerald-400'
-								: 'text-white/60 group-hover:text-emerald-400',
+								? 'text-emerald-300'
+								: 'text-white/70 group-hover:text-emerald-300',
 						)}
 					/>
 
 					<span
 						className={cn(
-							'text-[10px] font-medium transition-colors max-w-[100px] truncate',
-							isActive ? 'text-foreground' : 'text-muted-foreground/60 group-hover:text-foreground',
+							'text-[11px] font-semibold transition-colors max-w-[120px] truncate tracking-wide',
+							isActive ? 'text-white' : 'text-white/70 group-hover:text-white',
 						)}
 					>
 						{window.title}
@@ -104,7 +105,7 @@ const TaskbarItem = memo(function TaskbarItem({
 							animate={{ opacity: 1, scale: 1 }}
 							exit={{ opacity: 0, scale: 0.5 }}
 							transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-							className="absolute -bottom-[4px] left-1/2 -translate-x-1/2 w-1 h-1 bg-emerald-400 rounded-full shadow-[0_0_8px_2px_rgba(52,211,153,0.6)]"
+							className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-emerald-300 rounded-full shadow-[0_0_10px_2px_rgba(52,211,153,0.6)]"
 						/>
 					)}
 
@@ -112,7 +113,7 @@ const TaskbarItem = memo(function TaskbarItem({
 					{/* Close Button */}
 					<button
 						onClick={onClose}
-						className="ml-1 p-1 sm:p-0.5 rounded-full bg-red-500/10 hover:bg-red-500/30 text-red-400 transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
+						className="ml-1 p-1 sm:p-0.5 rounded-full bg-white/5 hover:bg-red-500/25 text-white/70 hover:text-white transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0 border border-white/10"
 						aria-label="Close window"
 						type="button"
 					>
@@ -448,13 +449,16 @@ export function Taskbar() {
 
 			{/* Main Bar */}
 			<motion.div
-				initial={{ y: 100, opacity: 0 }}
+				initial={{ y: 90, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-				className="w-full shrink-0 h-14 sm:h-12 md:h-10 bg-background/20 backdrop-blur-2xl border-t border-border/20 flex items-center justify-between z-40 px-2 sm:px-4 shadow-2xl relative"
+				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+				className="w-full shrink-0 h-14 sm:h-12 md:h-11 bg-gradient-to-r from-background/90 via-background/75 to-background/90 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-40 px-2 sm:px-4 shadow-[0_-10px_30px_rgba(0,0,0,0.35)] relative overflow-hidden"
 			>
-				{/* Ambient Glow */}
-				<div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-primary/20 to-transparent opacity-60" />
+				<div className="absolute inset-0 pointer-events-none">
+					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/25 to-transparent" />
+					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
+					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
+				</div>
 
 				<div className="flex items-center gap-2 sm:gap-4 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide px-2">
 					{/* Start Button */}
@@ -466,20 +470,19 @@ export function Taskbar() {
 								whileTap={{ scale: 0.95 }}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-8 sm:h-6 px-3 rounded-lg flex items-center gap-2 transition-all duration-300 relative group shrink-0',
+									'h-10 sm:h-8 px-3 rounded-xl flex items-center gap-2 transition-all duration-300 relative group shrink-0 border',
 									isStartOpen
-										? 'bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.5)]'
-										: 'bg-primary/5 hover:bg-primary/10 text-muted-foreground hover:text-foreground border border-border/10 hover:border-border/20',
+										? 'bg-emerald-500/25 border-emerald-400/50 text-white shadow-[0_0_20px_rgba(52,211,153,0.45)]'
+										: 'bg-white/6 border-white/12 text-white/80 hover:bg-white/10 hover:border-white/18',
 								)}
 							>
 								<Logo />
-								<span className="text-[10px] font-bold tracking-widest uppercase hidden sm:block">
+								<span className="text-[11px] font-extrabold tracking-[0.24em] uppercase hidden sm:block">
 									Start
 								</span>
-
 								{/* Bottom glow on hover */}
 								{!isStartOpen && (
-									<div className="absolute -bottom-1 left-2 right-2 h-1 bg-emerald-500/50 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
+									<div className="absolute -bottom-1 left-2 right-2 h-1 bg-emerald-400/50 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
 								)}
 							</motion.button>
 						</TooltipTrigger>
@@ -494,31 +497,37 @@ export function Taskbar() {
 						axis="x"
 						values={windows}
 						onReorder={handleReorder}
-						className="flex items-center gap-1.5 h-full pl-1"
+						className="flex items-center gap-2 h-full pl-1"
 						as="div"
 					>
-						{windows.map(window => (
-							<Reorder.Item
-								key={window.id}
-								value={window}
-								as="div"
-								initial={false}
-								className="flex shrink-0"
-							>
-								<TaskbarItem
-									window={window}
-									isActive={window.id === activeWindowId && !window.isMinimized}
-									onClick={() => handleTaskbarClick(window.id)}
-									onClose={e => handleCloseWindow(window.id, e)}
-								/>
-							</Reorder.Item>
-						))}
+						{windows.map(window => {
+							const Icon = getModuleIcon(window.id);
+							return (
+								<Reorder.Item
+									key={window.id}
+									value={window}
+									as="div"
+									initial={false}
+									className="flex shrink-0"
+								>
+									<TaskbarItem
+										window={window}
+										isActive={window.id === activeWindowId && !window.isMinimized}
+										onClick={() => handleTaskbarClick(window.id)}
+										onClose={e => handleCloseWindow(window.id, e)}
+										Icon={Icon}
+									/>
+								</Reorder.Item>
+							);
+						})}
 					</Reorder.Group>
 				</div>
 
 				{/* Right Side Actions - Hidden on mobile to save space, redundant with TopBar */}
 				<div className="hidden sm:flex items-center gap-2">
-					<HelpButton placement="taskbar" />
+					<div className="h-10 px-3 rounded-xl bg-white/6 border border-white/12 shadow-inner flex items-center">
+						<HelpButton placement="taskbar" />
+					</div>
 				</div>
 			</motion.div>
 		</TooltipProvider>
