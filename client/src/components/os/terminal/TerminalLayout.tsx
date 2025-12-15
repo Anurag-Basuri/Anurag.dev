@@ -12,6 +12,7 @@ interface TerminalLayoutProps {
 	onMaximize?: () => void;
 	onMinimize?: () => void;
 	onClose?: () => void;
+	isFocused?: boolean;
 }
 
 export function TerminalLayout({
@@ -23,6 +24,7 @@ export function TerminalLayout({
 	onMaximize,
 	onMinimize,
 	onClose,
+	isFocused = false,
 }: TerminalLayoutProps) {
 	return (
 		<div className="h-full flex flex-col text-foreground font-mono text-sm overflow-hidden">
@@ -34,6 +36,7 @@ export function TerminalLayout({
 				onMaximize={onMaximize}
 				onMinimize={onMinimize}
 				onClose={onClose}
+				isFocused={isFocused}
 			/>
 			<div className="flex-1 min-h-0 flex flex-col relative">{children}</div>
 		</div>

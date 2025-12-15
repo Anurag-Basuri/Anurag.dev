@@ -211,6 +211,7 @@ export function CLI({
 						onMaximize={onMaximize}
 						onMinimize={terminalState.clearHistory}
 						onClose={onClose}
+						isFocused={terminalState.isFocused}
 					>
 						<TerminalHistory history={terminalState.history} />
 						<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
