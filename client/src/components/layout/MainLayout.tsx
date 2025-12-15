@@ -52,61 +52,41 @@ export function MainLayout() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
-	// Auto-open About module on first load if no windows are open, OR sync from URL
-	const hasInitialized = React.useRef(false);
-
-	// 1. URL -> State (Initial Load & Back/Forward)
+	// URL -> State: Sync window from URL or open default
 	useEffect(() => {
-		if (hasInitialized.current) return;
-
 		const appParam = searchParams.get('app');
 
 		if (appParam) {
-			// URL has an app, open it
-			hasInitialized.current = true;
-			// Small delay to allow hydration
-			setTimeout(() => openWindow(appParam), 0);
+			const alreadyOpen = windows.some(w => w.id === appParam);
+			if (!alreadyOpen) {
+				openWindow(appParam);
+			}
 		} else if (windows.length === 0) {
-			// No URL param and no windows (fresh load), default to 'about'
-			hasInitialized.current = true;
-			setTimeout(() => {
-				openWindow('about');
-				// Also update URL to reflect this default
-				router.replace(`${pathname}?app=about`);
-			}, 0);
-		} else {
-			// Windows exist (restored from storage), but we might want to ensure URL matches active?
-			// For now, mark initialized.
-			hasInitialized.current = true;
+			openWindow('about');
+			router.replace(`${pathname}?app=about`, { scroll: false });
 		}
-	}, [searchParams, windows.length, openWindow, router, pathname]);
+	}, [searchParams]);
 
-	// 2. State -> URL (Sync active window to URL)
+	// State -> URL: Sync active window changes to URL
 	useEffect(() => {
-		if (!hasInitialized.current) return;
-
 		if (activeWindowId) {
 			const currentApp = searchParams.get('app');
 			if (currentApp !== activeWindowId) {
-				router.replace(`${pathname}?app=${activeWindowId}`);
+				router.replace(`${pathname}?app=${activeWindowId}`, { scroll: false });
 			}
-		} else {
-			// No active window? Maybe clear param or leave last one?
-			// Clearing it feels "correct" for an empty desktop state.
-			if (searchParams.has('app')) {
-				router.replace(pathname);
-			}
+		} else if (searchParams.has('app')) {
+			router.replace(pathname, { scroll: false });
 		}
-	}, [activeWindowId, router, pathname, searchParams]);
+	}, [activeWindowId, pathname]);
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {
-			// Prefer explicitly defined moduleId (e.g., 'projects'), fallback to parsing ID if needed (legacy)
 			const moduleId = item.moduleId || item.id.split('/')[0];
 			openWindow(moduleId);
 		}
 	};
 
+	// Layout Rendering
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
@@ -190,7 +170,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-[1px] bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+					className="w-px bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -216,7 +196,7 @@ export function MainLayout() {
 
 						<ResizableHandle
 							withHandle
-							className="h-[1px] bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+							className="h-px bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
 						/>
 
 						<ResizablePanel
