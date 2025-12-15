@@ -19,6 +19,8 @@ export interface CollapsiblePanelReturn {
 	toggle: () => void;
 	expand: () => void;
 	collapse: () => void;
+	maximize: () => void;
+	reset: () => void;
 	panelRef: React.RefObject<ImperativePanelHandle>;
 	panelProps: {
 		ref: React.RefObject<ImperativePanelHandle>;
@@ -105,8 +107,21 @@ export function useCollapsiblePanel({
 		}
 
 		// Let the panel handle the state transition
+		// Let the panel handle the state transition
 		panel.collapse();
 	}, [type]);
+
+	const maximize = useCallback(() => {
+		const panel = panelRef.current;
+		if (!panel) return;
+		panel.resize(panelConfig.maxSize);
+	}, [panelConfig.maxSize]);
+
+	const reset = useCallback(() => {
+		const panel = panelRef.current;
+		if (!panel) return;
+		panel.resize(panelConfig.defaultSize);
+	}, [panelConfig.defaultSize]);
 
 	const panelProps = useMemo(
 		() => ({
@@ -133,6 +148,8 @@ export function useCollapsiblePanel({
 		toggle,
 		expand,
 		collapse,
+		maximize,
+		reset,
 		panelRef,
 		panelProps,
 	};

@@ -9,6 +9,9 @@ interface TerminalLayoutProps {
 	currentPath: string;
 	historyLength: number;
 	onClearHistory: () => void;
+	onMaximize?: () => void;
+	onMinimize?: () => void;
+	onClose?: () => void;
 }
 
 export function TerminalLayout({
@@ -17,6 +20,9 @@ export function TerminalLayout({
 	currentPath,
 	historyLength,
 	onClearHistory,
+	onMaximize,
+	onMinimize,
+	onClose,
 }: TerminalLayoutProps) {
 	return (
 		<div className="h-full flex flex-col text-foreground font-mono text-sm overflow-hidden">
@@ -25,6 +31,9 @@ export function TerminalLayout({
 				historyLength={historyLength}
 				onClearHistory={onClearHistory}
 				onToggleCollapse={onToggleCollapse!}
+				onMaximize={onMaximize}
+				onMinimize={onMinimize}
+				onClose={onClose}
 			/>
 			<div className="flex-1 min-h-0 flex flex-col relative">{children}</div>
 		</div>

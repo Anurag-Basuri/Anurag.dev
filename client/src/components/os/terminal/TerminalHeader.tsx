@@ -1,6 +1,6 @@
 'use client';
 
-import { Terminal, ChevronDown, Trash2, Minus } from 'lucide-react';
+import { Terminal, ChevronDown, Trash2, Minus, X, Maximize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface TerminalHeaderProps {
@@ -8,6 +8,9 @@ interface TerminalHeaderProps {
 	historyLength: number;
 	onClearHistory: () => void;
 	onToggleCollapse: () => void;
+	onMaximize?: () => void;
+	onMinimize?: () => void;
+	onClose?: () => void;
 }
 
 export function TerminalHeader({
@@ -15,6 +18,9 @@ export function TerminalHeader({
 	historyLength,
 	onClearHistory,
 	onToggleCollapse,
+	onMaximize,
+	onMinimize,
+	onClose,
 }: TerminalHeaderProps) {
 	return (
 		<header className="h-8 px-1 border-b border-border/60 bg-card/60 backdrop-blur-xl flex items-center justify-between shrink-0 select-none">
@@ -25,26 +31,36 @@ export function TerminalHeader({
 					<motion.button
 						whileHover={{ scale: 1.15 }}
 						whileTap={{ scale: 0.95 }}
-						onClick={onToggleCollapse}
+						onClick={onClose}
 						className="relative w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Minimize terminal"
-						title="Minimize"
+						aria-label="Close terminal"
+						title="Close"
 					>
-						<div className="absolute -inset-2" /> {/* Increase hit area */}
-						<Minus className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						<div className="absolute -inset-2" />
+						<X className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 					</motion.button>
 					<motion.button
 						whileHover={{ scale: 1.15 }}
 						whileTap={{ scale: 0.95 }}
-						onClick={onClearHistory}
+						onClick={onMinimize}
 						className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Clear history"
-						title="Clear"
+						aria-label="Minimize terminal"
+						title="Minimize"
 					>
-						<div className="absolute -inset-2" /> {/* Increase hit area */}
-						<Trash2 className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+						<div className="absolute -inset-2" />
+						<Minus className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 					</motion.button>
-					<div className="w-3 h-3 rounded-full bg-[#28c840] shadow-sm" />
+					<motion.button
+						whileHover={{ scale: 1.15 }}
+						whileTap={{ scale: 0.95 }}
+						onClick={onMaximize}
+						className="relative w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#35d14b] transition-colors flex items-center justify-center group/btn shadow-sm"
+						aria-label="Maximize terminal"
+						title="Maximize"
+					>
+						<div className="absolute -inset-2" />
+						<Maximize2 className="w-2 h-2 text-[#006500] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+					</motion.button>
 				</div>
 
 				{/* Separator */}
@@ -61,8 +77,22 @@ export function TerminalHeader({
 				</div>
 			</div>
 
-			{/* Right: Stats + Collapse */}
+			{/* Right: Actions */}
 			<div className="flex items-center gap-2">
+				{/* Clear History Button */}
+				<motion.button
+					whileHover={{
+						backgroundColor: 'rgba(var(--destructive), 0.1)',
+						color: 'rgba(var(--destructive), 1)',
+					}}
+					whileTap={{ scale: 0.95 }}
+					onClick={onClearHistory}
+					className="p-1 rounded transition-colors text-muted-foreground hover:text-destructive"
+					aria-label="Clear history"
+					title="Clear history"
+				>
+					<Trash2 className="w-3.5 h-3.5" />
+				</motion.button>
 				{historyLength > 0 && (
 					<span className="text-[10px] font-mono text-muted-foreground/60 tabular-nums px-1.5 py-0.5 rounded bg-muted/40">
 						{historyLength}
