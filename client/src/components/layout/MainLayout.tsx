@@ -131,7 +131,9 @@ export function MainLayout() {
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className="overflow-hidden border-2 border-border bg-card/80"
+					className={`overflow-hidden bg-card/80 ${
+						sidebar.isCollapsed ? '' : 'border border-border'
+					}`}
 				>
 					<AnimatePresence mode="wait">
 						{sidebar.isCollapsed ? (
@@ -189,7 +191,7 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="overflow-hidden border-2 border-border bg-card/80"
+							className="overflow-hidden border border-border bg-card/80"
 						>
 							<EditorArea />
 						</ResizablePanel>
@@ -202,7 +204,9 @@ export function MainLayout() {
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className="overflow-hidden border-2 border-border bg-card/80"
+							className={`overflow-hidden bg-card/80 ${
+								terminal.isCollapsed ? '' : 'border border-border'
+							}`}
 						>
 							<CLI
 								onToggleCollapse={terminal.toggle}

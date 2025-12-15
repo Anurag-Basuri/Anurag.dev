@@ -74,7 +74,7 @@ export function useCollapsiblePanel({
 			}
 			return;
 		}
-		
+
 		if (isCollapsed) {
 			panel.expand();
 		} else {
