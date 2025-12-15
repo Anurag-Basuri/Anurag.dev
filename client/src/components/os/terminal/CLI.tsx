@@ -175,14 +175,14 @@ export function CLI({ onToggleCollapse, isCollapsed: externalIsCollapsed }: CLIP
 					initial="initial"
 					animate="animate"
 					exit="exit"
-					className="h-full flex items-center justify-center"
+					className="h-full w-full rounded-sm border border-border/60 bg-sidebar/50 overflow-hidden flex items-center justify-center"
 				>
 					<button
 						onClick={onToggleCollapse}
 						className="flex items-center justify-center w-full h-full cursor-pointer group"
 						aria-label="Expand Terminal"
 					>
-						<div className="h-1 w-60 rounded-full bg-white/10 group-hover:bg-emerald-500/50 group-hover:w-80 group-hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] transition-all duration-300" />
+						<div className="h-1 w-60 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 group-hover:w-80 group-hover:shadow-[0_0_12px_rgba(var(--primary),0.4)] transition-all duration-300" />
 					</button>
 				</motion.div>
 			) : (

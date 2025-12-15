@@ -144,7 +144,7 @@ export function MainLayout() {
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
 								transition={{ duration: 0.15 }}
-								className="h-full"
+								className="h-full rounded-sm border border-border/60 bg-sidebar/50 overflow-hidden"
 							>
 								<CollapsedSidebar onExpand={sidebar.expand} />
 							</motion.div>
