@@ -233,7 +233,7 @@ const NebulaField = React.memo(function NebulaField({ reducedMotion }: { reduced
 				{...shader}
 				transparent
 				depthWrite={false}
-				blending={THREE.AdditiveBlending}
+				blending={theme === 'dark' ? THREE.AdditiveBlending : THREE.NormalBlending}
 			/>
 		</mesh>
 	);
@@ -289,29 +289,29 @@ const StarField = React.memo(function StarField({ reducedMotion }: { reducedMoti
 					sizeAttenuation
 					depthWrite={false}
 					opacity={CONFIG.STARS.DISTANT.opacity}
-					blending={THREE.AdditiveBlending}
+					blending={isDark ? THREE.AdditiveBlending : THREE.NormalBlending}
 				/>
 			</Points>
 			<Points ref={mediumRef} positions={mediumStars.positions}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#c7d2fe' : '#312e81'}
+					color={isDark ? '#c7d2fe' : '#1e293b'}
 					size={CONFIG.STARS.MEDIUM.size}
 					sizeAttenuation
 					depthWrite={false}
 					opacity={CONFIG.STARS.MEDIUM.opacity}
-					blending={THREE.AdditiveBlending}
+					blending={isDark ? THREE.AdditiveBlending : THREE.NormalBlending}
 				/>
 			</Points>
 			<Points ref={closeRef} positions={closeStars.positions}>
 				<PointMaterial
 					transparent
-					color={isDark ? '#ffffff' : '#1e293b'}
+					color={isDark ? '#ffffff' : '#000000'}
 					size={CONFIG.STARS.CLOSE.size}
 					sizeAttenuation
 					depthWrite={false}
 					opacity={CONFIG.STARS.CLOSE.opacity}
-					blending={THREE.AdditiveBlending}
+					blending={isDark ? THREE.AdditiveBlending : THREE.NormalBlending}
 				/>
 			</Points>
 		</group>
@@ -325,23 +325,32 @@ const CameraRig = React.memo(function CameraRig({ reducedMotion }: { reducedMoti
 	useFrame(state => {
 		if (reducedMotion) return;
 
+		// Responsive Z position
+		const isMobile = state.viewport.width < 7; // Approximate threshold
+		const baseZ = isMobile ? 8 : 5;
+
 		const drift = {
 			x: Math.sin(state.clock.elapsedTime * 0.08) * 0.25,
 			y: Math.cos(state.clock.elapsedTime * 0.12) * 0.18,
 			z: Math.sin(state.clock.elapsedTime * 0.15) * 0.08,
 		};
 
-		const mouseX = state.pointer.x * 1.8 + drift.x;
-		const mouseY = state.pointer.y * 1.0 + drift.y;
+		// Current camera position for smoothing
+		const currentX = camera.position.x;
+		const currentY = camera.position.y;
 
-		targetPosition.current.x += (mouseX - targetPosition.current.x) * 0.025;
-		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.025;
-		targetPosition.current.z = 5 + drift.z;
+		// Enhanced mouse interactions
+		const mouseX = state.pointer.x * 4.0 + drift.x;
+		const mouseY = state.pointer.y * 2.0 + drift.y;
 
-		camera.position.lerp(targetPosition.current, 0.06);
+		targetPosition.current.x += (mouseX - targetPosition.current.x) * 0.05;
+		targetPosition.current.y += (1 - mouseY - targetPosition.current.y) * 0.05;
+		targetPosition.current.z = baseZ + drift.z;
 
-		const targetRotZ = -state.pointer.x * 0.025;
-		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.025;
+		camera.position.lerp(targetPosition.current, 0.08);
+
+		const targetRotZ = -state.pointer.x * 0.05;
+		const newRotZ = camera.rotation.z + (targetRotZ - camera.rotation.z) * 0.05;
 		camera.rotation.set(camera.rotation.x, camera.rotation.y, newRotZ);
 
 		camera.lookAt(...CONFIG.CAMERA.lookAt);
@@ -430,7 +439,7 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 				{...gridShader}
 				transparent
 				depthWrite={false}
-				blending={THREE.AdditiveBlending}
+				blending={theme === 'dark' ? THREE.AdditiveBlending : THREE.NormalBlending}
 			/>
 		</mesh>
 	);
