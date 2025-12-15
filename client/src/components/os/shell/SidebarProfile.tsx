@@ -2,7 +2,16 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Download, Linkedin, Github, Mail, FolderOpen, X, Minus, Maximize2 } from 'lucide-react';
+import {
+	Download,
+	Linkedin,
+	Github,
+	Mail,
+	FolderOpen,
+	X,
+	ChevronsUpDown,
+	Maximize2,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SidebarProfileProps {
@@ -33,13 +42,15 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 						<motion.button
 							whileHover={{ scale: 1.15 }}
 							whileTap={{ scale: 0.95 }}
-							onClick={onCollapse}
+							onClick={() =>
+								window.dispatchEvent(new CustomEvent('toggle-all-folders'))
+							}
 							className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
-							aria-label="Minimize sidebar"
-							title="Minimize"
+							aria-label="Toggle all folders"
+							title="Toggle All Folders"
 						>
 							<div className="absolute -inset-2" />
-							<Minus className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+							<ChevronsUpDown className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
 						</motion.button>
 						<motion.button
 							whileHover={{ scale: 1.15 }}

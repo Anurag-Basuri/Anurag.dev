@@ -209,7 +209,7 @@ export function CLI({
 						onClearHistory={terminalState.clearHistory}
 						onToggleCollapse={onToggleCollapse}
 						onMaximize={onMaximize}
-						onMinimize={onMinimize}
+						onMinimize={terminalState.clearHistory}
 						onClose={onClose}
 					>
 						<TerminalHistory history={terminalState.history} />
