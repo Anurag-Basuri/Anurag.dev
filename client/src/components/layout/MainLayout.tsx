@@ -27,7 +27,7 @@ import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider, useContextMenu } from '@/components/providers/context-menu-provider';
-import { ContextMenuWrapper } from '@/components/os/shell/ContextMenuWrapper';
+
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 export function MainLayout() {
@@ -287,39 +287,36 @@ export function MainLayout() {
 	return (
 		<ErrorBoundary>
 			<ContextMenuProvider>
-				<ContextMenuWrapper>
-					<Background3D />
+				<Background3D />
 
-					<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative z-10">
-						<Toaster
-							position="bottom-right"
-							toastOptions={{
-								style: {
-									background: 'rgba(13, 17, 23, 0.95)',
-									color: 'rgba(255, 255, 255, 0.9)',
-									border: '1px solid rgba(255, 255, 255, 0.1)',
-									backdropFilter: 'blur(10px)',
-								},
-							}}
-						/>
+				<div className="h-full w-full bg-background text-foreground font-mono overflow-hidden flex flex-col relative z-10">
+					<Toaster
+						position="bottom-right"
+						toastOptions={{
+							style: {
+								background: 'rgba(13, 17, 23, 0.95)',
+								color: 'rgba(255, 255, 255, 0.9)',
+								border: '1px solid rgba(255, 255, 255, 0.1)',
+								backdropFilter: 'blur(10px)',
+							},
+						}}
+					/>
 
-						<TopBar
-							isMobile={isMobile}
-							sidebarCollapsed={sidebar.isCollapsed}
-							terminalCollapsed={terminal.isCollapsed}
-							onToggleSidebar={sidebar.toggle}
-							onToggleTerminal={terminal.toggle}
-							onFileSelect={handleFileSelect}
-						/>
+					<TopBar
+						isMobile={isMobile}
+						sidebarCollapsed={sidebar.isCollapsed}
+						terminalCollapsed={terminal.isCollapsed}
+						onToggleSidebar={sidebar.toggle}
+						onToggleTerminal={terminal.toggle}
+						onFileSelect={handleFileSelect}
+					/>
 
-						<div className="flex-1 overflow-hidden p-1">
-							{isLayoutReady &&
-								(isMobile ? renderMobileLayout() : renderDesktopLayout())}
-						</div>
-
-						<Taskbar />
+					<div className="flex-1 overflow-hidden p-1">
+						{isLayoutReady && (isMobile ? renderMobileLayout() : renderDesktopLayout())}
 					</div>
-				</ContextMenuWrapper>
+
+					<Taskbar />
+				</div>
 			</ContextMenuProvider>
 		</ErrorBoundary>
 	);
