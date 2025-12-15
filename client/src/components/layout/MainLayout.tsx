@@ -131,7 +131,7 @@ export function MainLayout() {
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className="overflow-hidden border border-border/60 bg-card/40"
+					className="overflow-hidden border border-border/90 bg-card/70"
 				>
 					<AnimatePresence mode="wait">
 						{sidebar.isCollapsed ? (
@@ -170,7 +170,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-px bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+					className="w-px bg-border/90 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -189,20 +189,20 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="overflow-hidden border border-border/60 bg-card/40"
+							className="overflow-hidden border border-border/90 bg-card/70"
 						>
 							<EditorArea />
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-px bg-border/60 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
+							className="h-px bg-border/90 data-[resize-handle-state=hover]:bg-primary/60 data-[resize-handle-state=drag]:bg-primary/80"
 						/>
 
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className="overflow-hidden border border-border/60 bg-card/40"
+							className="overflow-hidden border border-border/90 bg-card/70"
 						>
 							<CLI
 								onToggleCollapse={terminal.toggle}

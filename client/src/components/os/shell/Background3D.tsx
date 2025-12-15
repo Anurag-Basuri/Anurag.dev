@@ -14,27 +14,9 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 2000, radius: 100, size: 0.012, opacity: 0.3, rotationSpeed: 0.003 },
-		MEDIUM: { count: 1000, radius: 50, size: 0.025, opacity: 0.45, rotationSpeed: 0.007 },
-		CLOSE: { count: 300, radius: 25, size: 0.06, opacity: 0.6, rotationSpeed: 0.015 },
-	},
-	PARTICLES: {
-		count: 250,
-		bounds: { x: 25, y: 15, z: 30 },
-		sizeRange: { min: 0.015, max: 0.08 },
-		velocityRange: 0.0015,
-		opacityRange: { min: 0.35, max: 0.9 },
-	},
-	SHOOTING_STARS: {
-		count: 4,
-		maxTrailLength: 20,
-		lifeRange: { min: 2, max: 5 },
-		velocityY: { min: -1.0, max: -0.5 },
-	},
-	CONSTELLATIONS: {
-		count: 8,
-		pointsPerConstellation: { min: 5, max: 9 },
-		spread: 4,
+		DISTANT: { count: 1000, radius: 100, size: 0.01, opacity: 0.25, rotationSpeed: 0.002 },
+		MEDIUM: { count: 500, radius: 50, size: 0.02, opacity: 0.35, rotationSpeed: 0.005 },
+		CLOSE: { count: 150, radius: 25, size: 0.04, opacity: 0.5, rotationSpeed: 0.01 },
 	},
 	CAMERA: {
 		defaultPosition: [0, 2, 5] as [number, number, number],
@@ -531,11 +513,6 @@ export function Background3D() {
 					<PostProcessingEffects />
 				</Canvas>
 			</ErrorBoundary>
-			{/* Overlay gradient for depth - reduced opacity for border visibility */}
-			{/* <div className="absolute inset-0 pointer-events-none">
-				<div className="absolute inset-0 bg-gradient-to-t from-background/20 via-background/5 to-transparent dark:from-background/30 dark:via-background/10 dark:to-transparent" />
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.15),_transparent_70%)] dark:bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.25),_transparent_70%)]" />
-			</div> */}
 		</div>
 	);
 }
