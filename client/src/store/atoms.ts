@@ -92,3 +92,6 @@ export const terminalCollapsedAtom = atomWithStorage('layout:terminal-collapsed'
 
 export const activeWindowIdAtom = atom<string | null>(null);
 export const mobileSidebarOpenAtom = atom(false);
+
+// Signals
+export const folderExpansionSignalAtom = atom(0); // Increment to trigger toggle

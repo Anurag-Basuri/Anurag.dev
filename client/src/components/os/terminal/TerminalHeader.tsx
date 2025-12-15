@@ -1,7 +1,8 @@
 'use client';
 
-import { Terminal, ChevronDown, Trash2, Minus, X, Maximize2 } from 'lucide-react';
+import { Terminal, ChevronDown, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { TerminalControls } from '@/components/shared/WindowControls';
 
 interface TerminalHeaderProps {
 	currentPath: string;
@@ -28,39 +29,11 @@ export function TerminalHeader({
 			<div className="flex items-center gap-2.5">
 				{/* macOS Traffic Lights */}
 				<div className="flex items-center gap-1.5 group">
-					<motion.button
-						whileHover={{ scale: 1.15 }}
-						whileTap={{ scale: 0.95 }}
-						onClick={onClose}
-						className="relative w-3 h-3 rounded-full bg-[#ff5f57] hover:bg-[#ff6961] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Close terminal"
-						title="Close"
-					>
-						<div className="absolute -inset-2" />
-						<X className="w-2 h-2 text-[#990000] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-					</motion.button>
-					<motion.button
-						whileHover={{ scale: 1.15 }}
-						whileTap={{ scale: 0.95 }}
-						onClick={onClearHistory}
-						className="relative w-3 h-3 rounded-full bg-[#febc2e] hover:bg-[#ffc940] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Clear terminal history"
-						title="Clear History"
-					>
-						<div className="absolute -inset-2" />
-						<Trash2 className="w-2 h-2 text-[#985700] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-					</motion.button>
-					<motion.button
-						whileHover={{ scale: 1.15 }}
-						whileTap={{ scale: 0.95 }}
-						onClick={onMaximize}
-						className="relative w-3 h-3 rounded-full bg-[#28c840] hover:bg-[#35d14b] transition-colors flex items-center justify-center group/btn shadow-sm"
-						aria-label="Maximize terminal"
-						title="Maximize"
-					>
-						<div className="absolute -inset-2" />
-						<Maximize2 className="w-2 h-2 text-[#006500] opacity-0 group-hover/btn:opacity-100 transition-opacity" />
-					</motion.button>
+					<TerminalControls
+						onClose={onClose}
+						onMaximize={onMaximize}
+						onClearHistory={onClearHistory}
+					/>
 				</div>
 
 				{/* Separator */}
