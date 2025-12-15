@@ -126,7 +126,7 @@ export function MainLayout() {
 						sidebar: { ...prev.sidebar, size: layout[0] },
 					}));
 				}}
-				className="h-full"
+				className="h-full gap-1"
 			>
 				<ResizablePanel
 					{...sidebar.panelProps}
@@ -189,7 +189,7 @@ export function MainLayout() {
 								terminal: { ...prev.terminal, size: layout[1] },
 							}));
 						}}
-						className="h-full"
+						className="h-full gap-1"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}

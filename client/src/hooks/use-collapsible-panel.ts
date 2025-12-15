@@ -59,7 +59,7 @@ export function useCollapsiblePanel({
 			case 'terminal':
 				return {
 					defaultSize: layoutState.terminal.size,
-					collapsedSize: 3,
+					collapsedSize: 4,
 					minSize: 4,
 					maxSize: 60,
 				};
