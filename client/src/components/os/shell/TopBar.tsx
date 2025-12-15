@@ -73,7 +73,7 @@ export function TopBar({
 				initial={{ y: -80, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-				className="h-10 px-3 sm:px-3 bg-gradient-to-r from-background/90 via-background/75 to-background/90 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.32)] flex items-center justify-between z-50 select-none relative overflow-hidden"
+				className="h-8 px-3 sm:px-4 bg-background/80 backdrop-blur-md border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden"
 			>
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
@@ -119,8 +119,8 @@ export function TopBar({
 					)}
 
 					<div className="flex items-center gap-2 group cursor-default">
-						<div className="w-3.5 h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_10px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_14px_rgba(52,211,153,0.7)] transition-all duration-300" />
-						<span className="font-bold tracking-[0.22em] text-[11px] text-white/90 group-hover:text-white transition-colors">
+						<div className="w-3 h-3 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.7)] transition-all duration-300" />
+						<span className="font-bold tracking-[0.2em] text-[10px] text-white/90 group-hover:text-white transition-colors">
 							ANURAG<span className="text-emerald-400">OS</span>
 						</span>
 					</div>
@@ -129,9 +129,9 @@ export function TopBar({
 				{/* Center Section: Clock & Date */}
 				{!isMobile && (
 					<div className="absolute left-1/2 -translate-x-1/2 flex items-center">
-						<div className="flex items-center gap-2 px-2.5 py-1.25 rounded-full bg-white/6 border border-white/12 shadow-[0_6px_18px_rgba(0,0,0,0.22)] hover:bg-white/10 transition-colors">
-							<Clock className="w-4 h-4 text-emerald-300" />
-							<span className="text-[11px] font-semibold text-white/85 font-mono tracking-[0.14em]">
+						<div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/5 shadow-sm hover:bg-white/10 transition-colors h-6">
+							<Clock className="w-3 h-3 text-emerald-300" />
+							<span className="text-[10px] font-medium text-white/90 font-mono tracking-wider">
 								{currentTime}
 							</span>
 						</div>
@@ -139,8 +139,8 @@ export function TopBar({
 				)}
 
 				{/* Right Section */}
-				<div className="flex items-center gap-1.5 sm:gap-2.5">
-					<div className="hidden sm:flex items-center gap-2.5 px-2.5 py-1 rounded-full bg-white/6 border border-white/12 shadow-inner">
+				<div className="flex items-center gap-1.5 sm:gap-2">
+					<div className="hidden sm:flex items-center gap-2.5 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 h-6">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div className="flex items-center gap-1.5 cursor-help">
@@ -148,7 +148,7 @@ export function TopBar({
 										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
 										<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></span>
 									</span>
-									<span className="text-[10px] uppercase font-bold tracking-[0.18em] text-white/65">
+									<span className="text-[9px] uppercase font-bold tracking-[0.15em] text-white/65">
 										Online
 									</span>
 								</div>
@@ -158,7 +158,7 @@ export function TopBar({
 
 						<Tooltip>
 							<TooltipTrigger>
-								<Wifi className="w-3.5 h-3.5 text-white/40" />
+								<Wifi className="w-3 h-3 text-white/40" />
 							</TooltipTrigger>
 							<TooltipContent>Connected</TooltipContent>
 						</Tooltip>
@@ -176,7 +176,7 @@ export function TopBar({
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
 										onClick={handleContactClick}
-										className="h-6 px-2.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-200 transition-colors border border-emerald-500/30 shadow-inner"
+										className="h-5 px-2.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-[9px] font-bold uppercase tracking-wider text-emerald-200 transition-colors border border-emerald-500/20"
 									>
 										Contact
 									</motion.button>
@@ -193,16 +193,16 @@ export function TopBar({
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleSidebar}
 										className={cn(
-											'h-6 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
+											'h-5 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											sidebarCollapsed
 												? 'text-white/45'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
 										)}
 									>
 										{sidebarCollapsed ? (
-											<PanelLeftOpen className="w-3.5 h-3.5" />
+											<PanelLeftOpen className="w-3 h-3" />
 										) : (
-											<PanelLeftClose className="w-3.5 h-3.5" />
+											<PanelLeftClose className="w-3 h-3" />
 										)}
 									</motion.button>
 								</TooltipTrigger>
@@ -218,16 +218,16 @@ export function TopBar({
 										whileTap={{ scale: 0.95 }}
 										onClick={onToggleTerminal}
 										className={cn(
-											'h-6 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
+											'h-5 w-6 flex items-center justify-center rounded-md transition-colors border border-white/10',
 											terminalCollapsed
 												? 'text-white/45'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
 										)}
 									>
 										{terminalCollapsed ? (
-											<TerminalIcon className="w-3.5 h-3.5" />
+											<TerminalIcon className="w-3 h-3" />
 										) : (
-											<ChevronDown className="w-3.5 h-3.5" />
+											<ChevronDown className="w-3 h-3" />
 										)}
 									</motion.button>
 								</TooltipTrigger>

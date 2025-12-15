@@ -73,15 +73,15 @@ const TaskbarItem = memo(function TaskbarItem({
 					}}
 					onClick={onClick}
 					className={cn(
-						'relative h-9 sm:h-8 md:h-7 px-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm',
+						'relative h-7 sm:h-6 px-2.5 rounded-md flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm',
 						isActive
-							? 'bg-white/12 border-white/18 shadow-[0_8px_24px_rgba(0,0,0,0.26)]'
-							: 'bg-white/5 border-white/8 hover:border-white/14 hover:bg-white/9',
+							? 'bg-white/10 border-white/10 shadow-sm'
+							: 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10',
 					)}
 				>
 					<Icon
 						className={cn(
-							'w-4 h-4 transition-colors duration-300',
+							'w-3.5 h-3.5 transition-colors duration-300',
 							isActive
 								? 'text-emerald-300'
 								: 'text-white/75 group-hover:text-emerald-300',
@@ -452,7 +452,7 @@ export function Taskbar() {
 				initial={{ y: 90, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-				className="w-full shrink-0 h-12 sm:h-11 md:h-10 bg-gradient-to-r from-background/92 via-background/78 to-background/92 backdrop-blur-xl border-t border-white/10 flex items-center justify-between z-40 px-3 sm:px-4 shadow-[0_-10px_26px_rgba(0,0,0,0.32)] relative overflow-hidden"
+				className="w-full shrink-0 h-9 sm:h-8 bg-background/80 backdrop-blur-md border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 shadow-sm relative overflow-hidden"
 			>
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/25 to-transparent" />
@@ -470,10 +470,10 @@ export function Taskbar() {
 								whileTap={{ scale: 0.95 }}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-9 sm:h-8 md:h-8 px-3 rounded-xl flex items-center gap-2 transition-all duration-300 relative group shrink-0 border',
+									'h-7 sm:h-6 px-3 rounded-md flex items-center gap-2 transition-all duration-300 relative group shrink-0 border',
 									isStartOpen
-										? 'bg-emerald-500/25 border-emerald-400/50 text-white shadow-[0_0_18px_rgba(52,211,153,0.4)]'
-										: 'bg-white/7 border-white/14 text-white/80 hover:bg-white/10 hover:border-white/18',
+										? 'bg-emerald-500/20 border-emerald-400/40 text-white shadow-[0_0_15px_rgba(52,211,153,0.3)]'
+										: 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10 hover:border-white/10',
 								)}
 							>
 								<Logo />
@@ -527,7 +527,7 @@ export function Taskbar() {
 
 				{/* Right Side Actions - Hidden on mobile to save space, redundant with TopBar */}
 				<div className="hidden sm:flex items-center gap-2">
-					<div className="h-9 px-3 rounded-xl bg-white/7 border border-white/14 shadow-inner flex items-center">
+					<div className="h-6 px-3 rounded-md bg-white/7 border border-white/14 shadow-inner flex items-center">
 						<HelpButton placement="taskbar" />
 					</div>
 				</div>
