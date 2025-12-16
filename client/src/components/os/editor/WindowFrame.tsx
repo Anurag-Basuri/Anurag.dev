@@ -3,10 +3,11 @@ import { Rnd } from 'react-rnd';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
-import { X, Minus, Maximize } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import React, { useEffect, memo, useCallback } from 'react';
+import React, { useEffect, memo, useCallback, useState } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { WindowControls } from '@/components/shared/WindowControls';
+import type { RndResizeStopCallback } from 'react-rnd';
 
 interface WindowFrameProps {
 	windowState: WindowState;
@@ -52,45 +53,50 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 		bringToFront();
 	};
 
-	const handleClose = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		setWindows(prev => prev.filter(w => w.id !== id));
-		setWindowStack(windowStack.filter(wid => wid !== id));
-		if (activeWindowId === id) {
-			const remainingStack = windowStack.filter(wid => wid !== id);
-			setActiveWindowId(remainingStack.at(-1) || null);
-		}
-	};
+	const handleClose = useCallback(
+		(e?: React.MouseEvent) => {
+			e?.stopPropagation();
+			setWindows(prev => prev.filter(w => w.id !== id));
+			setWindowStack(windowStack.filter(wid => wid !== id));
+			if (activeWindowId === id) {
+				const remainingStack = windowStack.filter(wid => wid !== id);
+				setActiveWindowId(remainingStack.at(-1) || null);
+			}
+		},
+		[id, windowStack, activeWindowId, setWindows, setWindowStack, setActiveWindowId],
+	);
 
-	const handleMinimize = (e: React.MouseEvent) => {
-		e.stopPropagation();
-		setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-		if (activeWindowId === id) {
-			const remainingStack = windowStack.filter(wid => wid !== id);
-			setActiveWindowId(remainingStack.at(-1) || null);
-		}
-	};
+	const handleMinimize = useCallback(
+		(e?: React.MouseEvent) => {
+			e?.stopPropagation();
+			setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
+			if (activeWindowId === id) {
+				const remainingStack = windowStack.filter(wid => wid !== id);
+				setActiveWindowId(remainingStack.at(-1) || null);
+			}
+		},
+		[id, activeWindowId, windowStack, setWindows, setActiveWindowId],
+	);
+
+	const handleMaximize = useCallback(
+		(e?: React.MouseEvent) => {
+			e?.stopPropagation();
+			setWindows(prev =>
+				prev.map(w => (w.id === id ? { ...w, isMaximized: !isMaximized } : w)),
+			);
+		},
+		[id, isMaximized, setWindows],
+	);
 
 	// Snap Preview State
-	const [snapPhantom, setSnapPhantom] = React.useState<null | 'left' | 'right' | 'top'>(null);
+	const [snapPhantom, setSnapPhantom] = useState<null | 'left' | 'right' | 'top'>(null);
 
-	// import type { DraggableEvent, DraggableData } from 'react-rnd';
-
-	// More robust right edge detection
 	const handleDragCallback = (e: any, d: any) => {
-		// e is regular internal event, d is DraggableData
 		if (!d.node.offsetParent) return;
-		const parentWidth = d.node.offsetParent.offsetWidth;
 		const pointerX = e.clientX || (e.touches && e.touches[0]?.clientX);
 		const pointerY = e.clientY || (e.touches && e.touches[0]?.clientY);
 
-		// Adjust pointer calculation based on sidebar offset if needed?
-		// Logic: if pointer is close to screen bounds.
-		// Since window is inside EditorArea which might be offset, we should check relative to viewport?
-		// No, simplest is:
-
 		if (pointerY < 60) {
-			// Near top (TopBar is ~40px)
 			setSnapPhantom('top');
 		} else if (pointerX < 20) {
 			setSnapPhantom('left');
@@ -138,7 +144,6 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 				),
 			);
 		} else {
-			// Normal move
 			setWindows(prev =>
 				prev.map(w => (w.id === id ? { ...w, position: { x: d.x, y: d.y } } : w)),
 			);
@@ -146,15 +151,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 		setSnapPhantom(null);
 	};
 
-	import type { RndResizeStartCallback, RndResizeStopCallback, ResizeDirection } from 'react-rnd';
-
-	const handleResizeStop: RndResizeStopCallback = (
-		e,
-		direction,
-		ref,
-		delta,
-		position
-	) => {
+	const handleResizeStop: RndResizeStopCallback = (e, direction, ref, delta, position) => {
 		setWindows(prev =>
 			prev.map(w =>
 				w.id === id
@@ -186,7 +183,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 									snapPhantom === 'left' &&
 										'top-4 bottom-4 left-4 w-[calc(50%-1rem)]',
 									snapPhantom === 'right' &&
-										'top-4 bottom-4 right-4 left-[calc(50%+0.5rem)]', // Approx
+										'top-4 bottom-4 right-4 left-[calc(50%+0.5rem)]',
 								)}
 							/>
 						)}
@@ -206,7 +203,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 							inset: 0,
 							zIndex,
 						}}
-						className={cn(isMaximized && 'pointer-events-none')} // Passthrough if maximized? No, Rnd handles it.
+						className={cn(isMaximized && 'pointer-events-none')}
 					>
 						<Rnd
 							size={isMaximized ? { width: '100%', height: '100%' } : size}
@@ -221,104 +218,49 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 							minWidth={300}
 							minHeight={200}
 							style={{
-								pointerEvents: 'auto', // Re-enable pointer events
+								pointerEvents: 'auto',
 								position: isMaximized ? 'relative' : 'absolute',
 							}}
 							className={cn(
-								'flex flex-col overflow-hidden transition-shadow duration-300',
-								// Active State Visuals: Glow and Border
+								'flex flex-col overflow-hidden transition-all duration-300 rounded-lg',
 								isActive
-									? 'shadow-[0_0_0_1px_rgba(16,185,129,0.3),0_20px_60px_-10px_rgba(0,0,0,0.6)]'
-									: 'shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_10px_30px_-5px_rgba(0,0,0,0.4)] opacity-90',
+									? 'shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_20px_60px_-10px_rgba(0,0,0,0.5)]'
+									: 'shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_10px_30px_-5px_rgba(0,0,0,0.3)] opacity-90 grayscale-[0.2]',
 							)}
 							onMouseDown={handleFocus}
 							dragHandleClassName="window-drag-handle"
 						>
-							{/* Title Bar - Premium Glassmorphism */}
+							{/* Title Bar */}
 							<div
 								className={cn(
-									'h-10 flex items-center justify-between px-4 shrink-0 transition-colors select-none relative z-50 window-drag-handle cursor-default',
-									'bg-card/40 backdrop-blur-xl border-b border-border/10',
-									isActive ? 'bg-card/60' : 'bg-card/20',
+									'h-9 flex items-center justify-between px-3 shrink-0 select-none relative z-50 window-drag-handle cursor-default backdrop-blur-xl border-b border-white/5',
+									isActive ? 'bg-background/80' : 'bg-background/60',
 								)}
-								onDoubleClick={() => {
-									setWindows(prev =>
-										prev.map(w =>
-											w.id === id ? { ...w, isMaximized: !isMaximized } : w,
-										),
-									);
-								}}
+								onDoubleClick={handleMaximize}
 							>
-								{/* Drag Handle Area */}
-								{/* <div className="absolute inset-0 w-full h-full" /> REMOVE Overlay to allow buttons */}
-
-								<span
-									className={cn(
-										'text-[13px] font-medium tracking-wide flex items-center gap-2 relative z-10 transition-colors',
-										isActive ? 'text-foreground' : 'text-muted-foreground',
-									)}
-								>
-									{/* Activity Dot */}
-									<div
-										className={cn(
-											'w-2 h-2 rounded-full transition-colors',
-											isActive
-												? 'bg-primary shadow-[0_0_8px_rgba(var(--primary),0.8)]'
-												: 'bg-muted-foreground/30',
-										)}
+								{/* Window Controls */}
+								<div className="flex items-center gap-4">
+									<WindowControls
+										onClose={handleClose}
+										onMinimize={handleMinimize}
+										onMaximize={handleMaximize}
 									/>
-									{title}
-								</span>
-								<div
-									className="flex items-center gap-2 relative z-50"
-									onMouseDown={e => e.stopPropagation()}
-								>
-									<button
-										onClick={handleMinimize}
+
+									<div className="h-4 w-px bg-white/10" aria-hidden="true" />
+
+									<span
 										className={cn(
-											'group/min w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/20 transition-colors',
-											isMobile && 'hidden',
+											'text-xs font-medium tracking-wide flex items-center gap-2 transition-colors',
+											isActive ? 'text-foreground' : 'text-muted-foreground',
 										)}
-										title="Minimize"
 									>
-										<Minus
-											size={16}
-											className="text-muted-foreground/60 group-hover/min:text-foreground transition-colors"
-										/>
-									</button>
-									<button
-										onClick={e => {
-											e.stopPropagation();
-											setWindows(prev =>
-												prev.map(w =>
-													w.id === id
-														? { ...w, isMaximized: !isMaximized }
-														: w,
-												),
-											);
-										}}
-										className="group/max w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/20 transition-colors sm:flex"
-										title={isMaximized ? 'Restore' : 'Maximize'}
-									>
-										<Maximize
-											size={14}
-											className="text-muted-foreground/60 group-hover/max:text-foreground transition-colors"
-										/>
-									</button>
-									<button
-										onClick={handleClose}
-										className="group/close w-8 h-8 flex items-center justify-center rounded-lg hover:bg-destructive/10 transition-colors"
-										title="Close"
-									>
-										<X
-											size={16}
-											className="text-muted-foreground/60 group-hover/close:text-destructive transition-colors"
-										/>
-									</button>
+										{title}
+									</span>
 								</div>
 							</div>
-							{/* Content Background - Transparent to show 3D background */}
-							<div className="grow overflow-auto bg-background/20 backdrop-blur-lg relative w-full h-full text-foreground">
+
+							{/* Content Background */}
+							<div className="grow overflow-auto bg-background/40 backdrop-blur-md relative w-full h-full text-foreground">
 								{component}
 							</div>
 						</Rnd>
@@ -328,64 +270,3 @@ export const WindowFrame = memo(function WindowFrame({ windowState, bounds }: Wi
 		</AnimatePresence>
 	);
 });
-
-// Keyboard Shortcuts Hook
-interface KeyboardShortcut {
-	key: string;
-	ctrl?: boolean;
-	shift?: boolean;
-	alt?: boolean;
-	meta?: boolean;
-	handler: () => void;
-	description: string;
-}
-
-export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled = true) {
-	const handleKeyDown = useCallback(
-		(event: KeyboardEvent) => {
-			if (!enabled) return;
-
-			for (const shortcut of shortcuts) {
-				const {
-					key,
-					ctrl = false,
-					shift = false,
-					alt = false,
-					meta = false,
-					handler,
-				} = shortcut;
-
-				const keyMatches = event.key.toLowerCase() === key.toLowerCase();
-				const ctrlMatches = ctrl === (event.ctrlKey || event.metaKey); // Support both Ctrl and Cmd
-				const shiftMatches = shift === event.shiftKey;
-				const altMatches = alt === event.altKey;
-				const metaMatches = meta === event.metaKey;
-
-				if (keyMatches && ctrlMatches && shiftMatches && altMatches && metaMatches) {
-					event.preventDefault();
-					handler();
-					break;
-				}
-			}
-		},
-		[shortcuts, enabled],
-	);
-
-	useEffect(() => {
-		window.addEventListener('keydown', handleKeyDown);
-		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [handleKeyDown]);
-}
-
-// Helper to get all registered shortcuts for help display
-export function getShortcutDisplay(shortcut: KeyboardShortcut): string {
-	const keys: string[] = [];
-
-	if (shortcut.ctrl) keys.push('Ctrl');
-	if (shortcut.shift) keys.push('Shift');
-	if (shortcut.alt) keys.push('Alt');
-	if (shortcut.meta) keys.push('Cmd');
-	keys.push(shortcut.key.toUpperCase());
-
-	return keys.join(' + ');
-}
