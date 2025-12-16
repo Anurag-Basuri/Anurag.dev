@@ -117,24 +117,42 @@ export function AboutModule() {
 		<ScrollArea className="h-full">
 			<div className="max-w-7xl mx-auto pb-12">
 				{/* Enhanced Hero Section */}
-				<motion.div
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="relative h-48 sm:h-56 md:h-64 lg:h-72 bg-linear-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 rounded-b-[2.5rem] overflow-hidden"
-				>
-					{/* Animated background patterns */}
-					<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 animate-pulse" />
-					<div className="absolute inset-0 overflow-hidden">
-						<div className="absolute top-10 left-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse" />
-						<div
-							className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/20 rounded-full blur-[100px] animate-pulse"
-							style={{ animationDelay: '1s' }}
-						/>
-					</div>
-					<div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
+				{/* Enhanced Hero Section */}
+				<div className="relative">
+					<motion.div
+						initial={{ opacity: 0, y: -20 }}
+						animate={{ opacity: 1, y: 0 }}
+						className="relative h-48 sm:h-56 md:h-64 lg:h-72 bg-linear-to-br from-emerald-500/20 via-blue-500/20 to-purple-500/20 rounded-b-[2.5rem] overflow-hidden"
+					>
+						{/* Animated background patterns */}
+						<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 animate-pulse" />
+						<div className="absolute inset-0 overflow-hidden">
+							<div className="absolute top-10 left-10 w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse" />
+							<div
+								className="absolute bottom-10 right-10 w-80 h-80 bg-blue-500/20 rounded-full blur-[100px] animate-pulse"
+								style={{ animationDelay: '1s' }}
+							/>
+						</div>
+						<div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
 
-					{/* Profile Picture - Centered & Overlapping */}
-					<div className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-10">
+						{/* Header Actions - Resume Button */}
+						{about.resumeUrl && (
+							<div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+								<a
+									href={about.resumeUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background/50 backdrop-blur-md border border-white/10 hover:bg-background/80 transition-all text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl hover:scale-105"
+								>
+									<Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+									<span className="inline">Download CV</span>
+								</a>
+							</div>
+						)}
+					</motion.div>
+
+					{/* Profile Picture - Negative Margin Approach for better flow */}
+					<div className="relative -mt-16 sm:-mt-20 z-10 flex justify-center px-4">
 						<motion.div
 							variants={scaleIn}
 							initial="hidden"
@@ -143,7 +161,7 @@ export function AboutModule() {
 						>
 							<div className="absolute inset-0 rounded-full bg-linear-to-br from-emerald-400 to-blue-500 blur-2xl opacity-60 animate-pulse group-hover:opacity-80 transition-opacity" />
 							<div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full border-[6px] border-background bg-background shadow-2xl p-1.5 transition-transform duration-300 group-hover:scale-[1.02]">
-								<div className="relative w-full h-full rounded-full overflow-hidden">
+								<div className="relative w-full h-full rounded-full overflow-hidden bg-muted">
 									<Image
 										src={about.avatarUrl || '/logo.png'}
 										alt={about.name}
@@ -161,22 +179,7 @@ export function AboutModule() {
 							</div>
 						</motion.div>
 					</div>
-
-					{/* Header Actions - Resume Button */}
-					{about.resumeUrl && (
-						<div className="absolute top-6 right-6 z-20">
-							<a
-								href={about.resumeUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-2 px-4 py-2 rounded-full bg-background/50 backdrop-blur-md border border-white/10 hover:bg-background/80 transition-all text-xs sm:text-sm font-medium shadow-lg hover:shadow-xl hover:scale-105"
-							>
-								<Download className="w-4 h-4" />
-								<span className="hidden sm:inline">Download CV</span>
-							</a>
-						</div>
-					)}
-				</motion.div>
+				</div>
 
 				{/* Identity Section */}
 				<div className="mt-20 sm:mt-24 px-4 text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
