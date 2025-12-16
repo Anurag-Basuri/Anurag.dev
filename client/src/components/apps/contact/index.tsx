@@ -140,9 +140,9 @@ export function ContactModule() {
 						</p>
 
 						<div className="space-y-6">
-							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
+							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-white/5 backdrop-blur-sm hover:border-emerald-500/30 transition-all group">
 								<div className="flex items-start gap-4">
-									<div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform">
+									<div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 group-hover:scale-110 transition-transform shadow-inner shadow-emerald-500/5">
 										<Mail className="w-6 h-6" />
 									</div>
 									<div className="flex-1">
@@ -150,7 +150,7 @@ export function ContactModule() {
 											Email Me
 										</h3>
 										<div className="flex items-center gap-2">
-											<span className="text-muted-foreground font-mono">
+											<span className="text-muted-foreground font-mono text-sm sm:text-base">
 												contact@anuragos.dev
 											</span>
 											<button
@@ -169,9 +169,9 @@ export function ContactModule() {
 								</div>
 							</div>
 
-							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-purple-500/30 transition-all group">
+							<div className="p-4 sm:p-6 rounded-2xl bg-card/30 border border-white/5 backdrop-blur-sm hover:border-purple-500/30 transition-all group">
 								<div className="flex items-start gap-4">
-									<div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
+									<div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform shadow-inner shadow-purple-500/5">
 										<MapPin className="w-6 h-6" />
 									</div>
 									<div>
@@ -181,7 +181,7 @@ export function ContactModule() {
 										<p className="text-muted-foreground">
 											San Francisco Bay Area, CA
 										</p>
-										<p className="text-xs text-muted-foreground mt-1">
+										<p className="text-xs text-muted-foreground/60 mt-1 uppercase tracking-wider font-medium">
 											Remote Available
 										</p>
 									</div>
@@ -190,28 +190,28 @@ export function ContactModule() {
 						</div>
 
 						<div className="space-y-4">
-							<h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+							<h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground/60">
 								Social Protocols
 							</h3>
 							<div className="flex gap-2 sm:gap-3">
 								<a
 									href="#"
 									target="_blank"
-									className="p-3 sm:p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group"
+									className="p-3 sm:p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group hover:scale-105 active:scale-95"
 								>
 									<Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
 								</a>
 								<a
 									href="#"
 									target="_blank"
-									className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 hover:bg-blue-500/10 hover:border-blue-500/20 transition-all text-muted-foreground hover:text-blue-400 group"
+									className="p-3 rounded-xl bg-linear-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 hover:border-blue-500/40 transition-all text-blue-400 hover:text-blue-300 group hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-blue-500/10"
 								>
 									<Twitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
 								</a>
 								<a
 									href="#"
 									target="_blank"
-									className="p-3 rounded-xl bg-blue-600/5 border border-blue-600/10 hover:bg-blue-600/10 hover:border-blue-600/20 transition-all text-muted-foreground hover:text-blue-500 group"
+									className="p-3 rounded-xl bg-linear-to-br from-blue-600/10 to-blue-700/5 border border-blue-600/20 hover:border-blue-600/40 transition-all text-blue-500 hover:text-blue-400 group hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-blue-600/10"
 								>
 									<Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
 								</a>
@@ -227,17 +227,17 @@ export function ContactModule() {
 						className="flex-1"
 					>
 						<div className="p-6 sm:p-8 rounded-3xl bg-card/30 border border-white/10 backdrop-blur-md shadow-2xl relative overflow-hidden">
-							<div className="absolute inset-0 bg-linear-to-br from-green-500/5 to-transparent pointer-events-none" />
+							<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent pointer-events-none" />
 
 							<h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 relative z-10">
-								<span className="w-2 h-8 rounded-full bg-green-500" />
+								<span className="w-1.5 h-8 rounded-full bg-linear-to-b from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
 								Send Message
 							</h2>
 
 							<form onSubmit={handleSubmit} className="space-y-5 relative z-10">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div className="space-y-2">
-										<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+										<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
 											Name
 										</label>
 										<input
@@ -246,12 +246,12 @@ export function ContactModule() {
 											value={formData.name}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 min-h-[44px] text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 min-h-[44px] text-foreground focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-hidden transition-all placeholder:text-muted-foreground/20 text-sm"
 											placeholder="John Doe"
 										/>
 									</div>
 									<div className="space-y-2">
-										<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+										<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
 											Email
 										</label>
 										<input
@@ -260,14 +260,14 @@ export function ContactModule() {
 											value={formData.email}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+											className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 min-h-[44px] text-foreground focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-hidden transition-all placeholder:text-muted-foreground/20 text-sm"
 											placeholder="john@example.com"
 										/>
 									</div>
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+									<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
 										Subject
 									</label>
 									<input
@@ -275,13 +275,13 @@ export function ContactModule() {
 										name="subject"
 										value={formData.subject}
 										onChange={handleChange}
-										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all placeholder:text-muted-foreground/30"
+										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 min-h-[44px] text-foreground focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-hidden transition-all placeholder:text-muted-foreground/20 text-sm"
 										placeholder="Project Inquiry"
 									/>
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+									<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
 										Message
 									</label>
 									<textarea
@@ -290,7 +290,7 @@ export function ContactModule() {
 										onChange={handleChange}
 										required
 										rows={5}
-										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-green-500/50 focus:ring-1 focus:ring-green-500/50 focus:outline-none transition-all resize-none placeholder:text-muted-foreground/30"
+										className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-hidden transition-all resize-none placeholder:text-muted-foreground/20 text-sm"
 										placeholder="Tell me about your project..."
 									/>
 								</div>
