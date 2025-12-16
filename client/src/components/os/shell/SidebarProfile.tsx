@@ -19,9 +19,9 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 	return (
 		<div className="bg-transparent">
 			{/* Header - standardized to h-10 (mobile) / h-8 (desktop) */}
-			<header className="h-8 min-h-[32px] max-h-[32px] px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
+			<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
 				{/* Left: Traffic Lights + Title */}
-				<div className="flex items-center gap-2.5">
+				<div className="flex items-center gap-2">
 					{/* macOS Traffic Lights - Hidden on mobile */}
 					<div className="hidden md:flex items-center gap-1.5 group">
 						<SidebarControls

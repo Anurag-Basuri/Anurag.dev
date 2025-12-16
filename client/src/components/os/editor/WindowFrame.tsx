@@ -52,7 +52,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					{/* Title Bar */}
 					<div
 						className={cn(
-							'h-8 min-h-[32px] max-h-[32px] flex items-center justify-between px-2 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200 bg-zinc-900/90 backdrop-blur-sm',
+							'h-7 flex items-center justify-between px-2 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200 bg-zinc-900/90 backdrop-blur-sm',
 							isActive ? 'text-primary-foreground' : 'text-muted-foreground',
 						)}
 					>
