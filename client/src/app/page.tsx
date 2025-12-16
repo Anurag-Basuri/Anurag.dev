@@ -2,7 +2,7 @@
 
 import { BootAnimation } from '@/components/layout/BootAnimation';
 import { useAtom } from 'jotai';
-import { bootCompleteAtom } from '@/store/atoms';
+import { bootCompleteAtom } from '@/store';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 

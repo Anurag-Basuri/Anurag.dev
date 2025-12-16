@@ -7,7 +7,7 @@ import {
 	mainHorizontalSizesAtom,
 	activeWindowIdAtom,
 	layoutStateAtom,
-} from '@/store/atoms';
+} from '@/store';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -24,7 +24,7 @@ import { useWindowManager } from '@/hooks/use-window-manager';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
-import { windowsAtom, mobileSidebarOpenAtom } from '@/store/atoms';
+import { windowsAtom, mobileSidebarOpenAtom } from '@/store';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider, useContextMenu } from '@/components/providers/context-menu-provider';
 
