@@ -141,7 +141,7 @@ export function TopBar({
 				initial={{ y: -80, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-				className="h-8 px-3 sm:px-4 bg-background/80 backdrop-blur-md border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden"
+				className="h-8 px-3 sm:px-4 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden"
 				role="banner"
 			>
 				{/* Decorative gradient borders */}
