@@ -39,13 +39,12 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					exit={{ opacity: 0, scale: 0.98, y: 10 }}
 					transition={{
 						duration: 0.25,
-						ease: [0.2, 0.6, 0.2, 1], // Standard comfortable spring-like ease
+						ease: [0.2, 0.6, 0.2, 1],
 					}}
 					style={{ zIndex }}
 					className={cn(
 						'absolute inset-0 flex flex-col overflow-hidden bg-background/90 backdrop-blur-2xl',
 						'shadow-2xl',
-						// Subtle highlight for active window (though full screen, good for transitions)
 						isActive ? 'z-50' : 'z-40 grayscale-[0.3]',
 					)}
 					onMouseDown={handleFocus}
@@ -53,7 +52,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					{/* Title Bar */}
 					<div
 						className={cn(
-							'h-9 flex items-center justify-between px-3 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200',
+							'h-10 sm:h-8 flex items-center justify-between px-3 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200',
 							isActive ? 'bg-white/5' : 'bg-transparent',
 						)}
 					>
