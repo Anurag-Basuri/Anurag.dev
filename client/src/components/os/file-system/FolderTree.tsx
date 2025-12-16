@@ -57,7 +57,6 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 	// Handle external expansion signal
 	useEffect(() => {
 		if (expansionSignal > 0) {
-			// Expand all visible folders
 			const allFolderIds = new Set<string>();
 			const collectFolders = (nodes: FileSystemItem[]) => {
 				nodes.forEach(node => {
@@ -68,6 +67,18 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 				});
 			};
 			collectFolders(items);
+
+			setExpandedFolders(prev => {
+				// If all folders are currently expanded, we collapse all
+				// Otherwise (some closed or all closed), we expand all
+				const areAllExpanded = Array.from(allFolderIds).every(id => prev.has(id));
+
+				if (areAllExpanded) {
+					return new Set();
+				} else {
+					return allFolderIds;
+				}
+			});
 		}
 	}, [expansionSignal, items]);
 
