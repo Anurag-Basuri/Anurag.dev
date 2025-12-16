@@ -43,7 +43,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					}}
 					style={{ zIndex }}
 					className={cn(
-						'absolute inset-0 flex flex-col overflow-hidden bg-background/90 backdrop-blur-2xl',
+						'absolute inset-0 flex flex-col overflow-hidden',
 						'shadow-2xl',
 						isActive ? 'z-50' : 'z-40 grayscale-[0.3]',
 					)}
@@ -87,7 +87,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					</div>
 
 					{/* Content Background */}
-					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll bg-background/50">
+					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll">
 						{component}
 					</div>
 				</motion.div>

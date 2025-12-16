@@ -131,7 +131,7 @@ export function MainLayout() {
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className={`overflow-hidden bg-card/80 backdrop-blur-md ${
+					className={`overflow-hidden ${
 						sidebar.isCollapsed ? 'border-r border-white/5' : 'border-r border-white/5'
 					}`}
 				>
@@ -194,7 +194,7 @@ export function MainLayout() {
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="overflow-hidden bg-card/80 backdrop-blur-md relative"
+							className="overflow-hidden relative"
 						>
 							<EditorArea />
 						</ResizablePanel>
@@ -207,7 +207,7 @@ export function MainLayout() {
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className={`overflow-hidden bg-card/80 backdrop-blur-md ${
+							className={`overflow-hidden ${
 								terminal.isCollapsed
 									? 'border-t border-white/5'
 									: 'border-t border-white/5'
