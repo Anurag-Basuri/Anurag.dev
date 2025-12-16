@@ -78,7 +78,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					style={{ zIndex }}
 					className={cn(
 						'flex flex-col overflow-hidden transition-all duration-300',
-						'shadow-2xl bg-black/80 backdrop-blur-xl', // Ensure background is opaque in fullscreen
+						'shadow-2xl bg-black/60 backdrop-blur-md', // Ensure background is opaque in fullscreen
 						isMaximized
 							? 'fixed inset-0 z-100 rounded-none w-screen h-screen'
 							: 'absolute inset-0 rounded-none',

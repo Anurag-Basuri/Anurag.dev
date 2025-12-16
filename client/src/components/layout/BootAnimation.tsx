@@ -239,11 +239,12 @@ export function BootAnimation() {
 		// GSAP Timeline orchestrating the boot sequence (content mirrors LinkedIn bio)
 		const tl = gsap.timeline({
 			onComplete: () => {
+				setProgress(100);
 				setShowBurst(true);
 				setTimeout(() => {
 					sessionStorage.setItem('booted', '1');
 					setBootComplete(true);
-				}, 500);
+				}, 800);
 			},
 		});
 
