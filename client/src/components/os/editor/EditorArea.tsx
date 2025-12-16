@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Command, MousePointer2 } from 'lucide-react';
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { useWindowManager } from '@/hooks/use-window-manager';
 
 export function EditorArea() {
 	const [windows] = useAtom(windowsAtom);
@@ -141,7 +142,7 @@ function QuickAction({
 	color: string;
 	moduleId: string;
 }) {
-	const { openWindow } = require('@/hooks/use-window-manager').useWindowManager(); // Inline require to avoid circular dep if any, or just proper hook usage
+	const { openWindow } = useWindowManager();
 
 	const colorClasses: Record<string, string> = {
 		emerald: 'text-primary group-hover:bg-primary/20 group-hover:border-primary/30',
