@@ -19,22 +19,10 @@ export default function Home() {
 	const [isSessionRestored, setIsSessionRestored] = useState(false);
 
 	useEffect(() => {
-		// Check session storage to see if boot was already completed
-		try {
-			const sessionBooted = sessionStorage.getItem('booted');
-			if (sessionBooted) {
-				// User already booted in this session, skip animation
-				setBootComplete(true);
-				setTimeout(() => setIsSessionRestored(true), 0);
-			} else {
-				// New session, show boot animation
-				setTimeout(() => setIsSessionRestored(true), 0);
-			}
-		} catch (e) {
-			// sessionStorage not available, just proceed
-			setTimeout(() => setIsSessionRestored(true), 0);
-		}
-	}, [setBootComplete]);
+		// On refresh, we always want to boot from scratch
+		// so we just confirm the component is mounted/restored
+		setTimeout(() => setIsSessionRestored(true), 0);
+	}, []);
 
 	// Show nothing until we've checked session
 	if (!isSessionRestored) {
