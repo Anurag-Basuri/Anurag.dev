@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
+import { motion } from 'framer-motion';
 
 // Matrix Rain Effect Component (perf + accessibility)
 function MatrixRain() {
@@ -311,15 +312,15 @@ export function BootAnimation() {
 		setBootComplete(true);
 	};
 
-	if (bootComplete) return null;
-
 	return (
-		<div
+		<motion.div
 			ref={containerRef}
-			className="fixed inset-0 z-9999 bg-black text-[#00ff41] font-mono overflow-hidden"
+			className="fixed inset-0 z-[9999] bg-black text-[#00ff41] font-mono overflow-hidden"
 			aria-label="Boot animation loading screen"
 			role="dialog"
 			aria-live="polite"
+			exit={{ opacity: 0, scale: 1.05, filter: 'blur(20px)' }}
+			transition={{ duration: 0.8, ease: 'easeInOut' }}
 		>
 			{/* Background layers */}
 			<MatrixRain />
@@ -463,6 +464,6 @@ export function BootAnimation() {
 
 			{/* Scanline effect */}
 			<div className="scanlines pointer-events-none absolute inset-0 z-30" />
-		</div>
+		</motion.div>
 	);
 }

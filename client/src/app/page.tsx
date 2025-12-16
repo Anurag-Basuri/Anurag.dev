@@ -5,6 +5,7 @@ import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { AnimatePresence } from 'framer-motion';
 
 const MainLayout = dynamic(
 	() => import('@/components/layout/MainLayout').then(mod => mod.MainLayout),
@@ -33,5 +34,10 @@ export default function Home() {
 		return null; // or a loading spinner
 	}
 
-	return <>{bootComplete ? <MainLayout /> : <BootAnimation />}</>;
+	return (
+		<>
+			<AnimatePresence mode="wait">{!bootComplete && <BootAnimation />}</AnimatePresence>
+			<MainLayout />
+		</>
+	);
 }
