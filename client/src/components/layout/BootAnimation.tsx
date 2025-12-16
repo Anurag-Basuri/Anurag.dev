@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
@@ -100,23 +100,11 @@ function HexGrid({ opacity }: { opacity: number }) {
                         linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
                         linear-gradient(30deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
                         linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
-                        linear-gradient(60deg, #00332270 25%, transparent 25.5%, transparent 75%, #00332270 75%, #00332270),
-                        linear-gradient(60deg, #00332270 25%, transparent 25.5%, transparent 75%, #00332270 75%, #00332270)
+                        linear-gradient(60deg, #00ff4120 25%, transparent 25.5%, transparent 75%, #00ff4120 75%, #00ff4120),
+                        linear-gradient(60deg, #00ff4120 25%, transparent 25.5%, transparent 75%, #00ff4120 75%, #00ff4120)
                     `,
 					backgroundSize: '80px 140px',
 					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
-					// darker at top, slightly brighter toward bottom
-					maskImage: `
-                        linear-gradient(
-                            to bottom,
-                            rgba(0,0,0,0.92) 0%,
-                            rgba(0,0,0,0.75) 35%,
-                            rgba(0,0,0,0.45) 70%,
-                            rgba(0,0,0,0.25) 100%
-                        )
-                    `,
-					// subtle luminance lift near bottom without adding boxy feel
-					filter: 'brightness(0.95)',
 				}}
 			/>
 		</div>
@@ -132,67 +120,60 @@ function ParticleBurst({ active }: { active: boolean }) {
 
 		const canvas = canvasRef.current;
 		if (!canvas) return;
-
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
-
-		const prefersReducedMotion = window.matchMedia?.(
-			'(prefers-reduced-motion: reduce)',
-		).matches;
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 
-		const particles: Array<{
+		interface Particle {
 			x: number;
 			y: number;
 			vx: number;
 			vy: number;
 			life: number;
 			maxLife: number;
-		}> = [];
+		}
 
-		const centerX = canvas.width / 2;
-		const centerY = canvas.height / 2;
-		const count = prefersReducedMotion ? 40 : 120;
+		const particles: Particle[] = [];
+		const particleCount = 80;
 
-		for (let i = 0; i < count; i++) {
-			const angle = (Math.PI * 2 * i) / count;
-			const velocity =
-				(prefersReducedMotion ? 1.5 : 2.2) +
-				Math.random() * (prefersReducedMotion ? 1.5 : 3.2);
+		for (let i = 0; i < particleCount; i++) {
+			const angle = (Math.PI * 2 * i) / particleCount;
+			const speed = Math.random() * 3 + 2;
 			particles.push({
-				x: centerX,
-				y: centerY,
-				vx: Math.cos(angle) * velocity,
-				vy: Math.sin(angle) * velocity,
-				life: 0,
-				maxLife:
-					(prefersReducedMotion ? 36 : 64) +
-					Math.random() * (prefersReducedMotion ? 18 : 36),
+				x: canvas.width / 2,
+				y: canvas.height / 2,
+				vx: Math.cos(angle) * speed,
+				vy: Math.sin(angle) * speed,
+				life: 1,
+				maxLife: Math.random() * 0.5 + 0.5,
 			});
 		}
 
-		let animId = 0;
+		let animId: number;
 		function draw() {
 			if (!ctx || !canvas) return;
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			ctx.fillStyle = 'rgba(0,0,0,0.05)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 			particles.forEach(p => {
 				p.x += p.vx;
 				p.y += p.vy;
-				p.life++;
+				p.life -= 0.01;
 
-				const alpha = 1 - p.life / p.maxLife;
-				ctx.fillStyle = `rgba(0, 255, 65, ${alpha})`;
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-				ctx.fill();
+				if (p.life > 0) {
+					const alpha = Math.max(0, p.life);
+					ctx.fillStyle = `rgba(0,255,65,${alpha})`;
+					ctx.beginPath();
+					ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+					ctx.fill();
+				}
 			});
 
-			if (particles.every(p => p.life >= p.maxLife)) {
-				cancelAnimationFrame(animId);
-			} else {
+			const stillAlive = particles.some(p => p.life > 0);
+			if (stillAlive) {
 				animId = requestAnimationFrame(draw);
 			}
 		}
@@ -206,47 +187,57 @@ function ParticleBurst({ active }: { active: boolean }) {
 }
 
 export function BootAnimation() {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
+	const [, setBootComplete] = useAtom(bootCompleteAtom);
 	const [phase, setPhase] = useState(0);
 	const [status, setStatus] = useState('INITIALIZING SYSTEM');
 	const [progress, setProgress] = useState(0);
 	const [showBurst, setShowBurst] = useState(false);
 	const [hexOpacity, setHexOpacity] = useState(0);
+	const [isSkipping, setIsSkipping] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const timelineRef = useRef<gsap.core.Timeline | null>(null);
 
-	// Check if user has visited before
-	useEffect(() => {
-		const hasVisited = localStorage.getItem('anuragos-visited');
-		if (hasVisited) {
+	// Complete boot animation function
+	const completeBoot = useCallback(() => {
+		if (isSkipping) return; // Prevent double trigger
+		setIsSkipping(true);
+
+		setProgress(100);
+		setShowBurst(true);
+
+		// Small delay for burst effect, then complete
+		setTimeout(() => {
+			sessionStorage.setItem('booted', '1');
 			setBootComplete(true);
-		} else {
-			localStorage.setItem('anuragos-visited', 'true');
-		}
-	}, [setBootComplete]);
+		}, 600);
+	}, [setBootComplete, isSkipping]);
 
 	// Keyboard accessibility: press any key to skip
 	useEffect(() => {
-		function onKey() {
-			// Skip on any key press
-			sessionStorage.setItem('booted', '1');
-			setBootComplete(true);
+		function onKey(e: KeyboardEvent) {
+			// Skip on Space, Enter, or Escape
+			if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') {
+				e.preventDefault();
+				if (timelineRef.current) {
+					timelineRef.current.kill();
+				}
+				completeBoot();
+			}
 		}
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
-	}, [setBootComplete]);
+	}, [completeBoot]);
 
+	// Main animation sequence
 	useEffect(() => {
-		// GSAP Timeline orchestrating the boot sequence (content mirrors LinkedIn bio)
+		// GSAP Timeline orchestrating the boot sequence
 		const tl = gsap.timeline({
 			onComplete: () => {
-				setProgress(100);
-				setShowBurst(true);
-				setTimeout(() => {
-					sessionStorage.setItem('booted', '1');
-					setBootComplete(true);
-				}, 800);
+				completeBoot();
 			},
 		});
+
+		timelineRef.current = tl;
 
 		tl.to(
 			{},
@@ -303,23 +294,16 @@ export function BootAnimation() {
 				},
 			);
 
-		// Safety timeout to ensure boot completes even if animation hangs
-		const safetyTimer = setTimeout(() => {
-			if (!bootComplete) {
-				sessionStorage.setItem('booted', '1');
-				setBootComplete(true);
-			}
-		}, 8000);
-
 		return () => {
 			tl.kill();
-			clearTimeout(safetyTimer);
 		};
-	}, [setBootComplete]);
+	}, [completeBoot]);
 
 	const handleSkip = () => {
-		sessionStorage.setItem('booted', '1');
-		setBootComplete(true);
+		if (timelineRef.current) {
+			timelineRef.current.kill();
+		}
+		completeBoot();
 	};
 
 	return (
@@ -329,6 +313,7 @@ export function BootAnimation() {
 			aria-label="Boot animation loading screen"
 			role="dialog"
 			aria-live="polite"
+			initial={{ opacity: 1 }}
 			exit={{ opacity: 0, scale: 1.05, filter: 'blur(20px)' }}
 			transition={{ duration: 0.8, ease: 'easeInOut' }}
 		>
@@ -398,7 +383,7 @@ export function BootAnimation() {
 										aria-valuemax={100}
 										role="progressbar"
 									/>
-									<div className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/10 to-transparent" />
+									<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
 								</div>
 							</div>
 
@@ -464,11 +449,24 @@ export function BootAnimation() {
 				<div className="pointer-events-auto">
 					<button
 						onClick={handleSkip}
-						className="absolute bottom-5 sm:bottom-6 md:bottom-8 right-5 sm:right-6 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm"
-						aria-label="Skip boot animation"
+						className="absolute bottom-5 sm:bottom-6 md:bottom-8 right-5 sm:right-6 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm focus:outline-none focus:ring-2 focus:ring-[#00ff41]/50"
+						aria-label="Skip boot animation and enter system"
 					>
 						SKIP BOOT <span className="ml-1">›</span>
 					</button>
+				</div>
+
+				{/* Keyboard hint */}
+				<div className="absolute bottom-5 sm:bottom-6 md:bottom-8 left-5 sm:left-6 md:left-8 text-[10px] sm:text-xs text-[#00ff41]/60 pointer-events-none">
+					Press{' '}
+					<kbd className="px-1.5 py-0.5 bg-[#00ff41]/10 rounded border border-[#00ff41]/20">
+						ESC
+					</kbd>{' '}
+					or{' '}
+					<kbd className="px-1.5 py-0.5 bg-[#00ff41]/10 rounded border border-[#00ff41]/20">
+						SPACE
+					</kbd>{' '}
+					to skip
 				</div>
 			</div>
 
