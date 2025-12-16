@@ -58,30 +58,37 @@ export function useWindowManager() {
 	const closeWindow = useCallback(
 		(id: string) => {
 			setWindows(prev => prev.filter(w => w.id !== id));
-			setWindowStack(prev => {
-				const newStack = prev.filter(wid => wid !== id);
-				if (activeWindowId === id) {
-					const nextId = newStack.at(-1);
-					setActiveWindowId(nextId || null);
-				}
-				return newStack;
-			});
+
+			// Update stack
+			setWindowStack(prev => prev.filter(wid => wid !== id));
+
+			if (activeWindowId === id) {
+				// Find next candidate
+				const candidateId = [...windowStack]
+					.reverse()
+					.find(wid => wid !== id && !windows.find(w => w.id === wid)?.isMinimized);
+
+				setActiveWindowId(candidateId || null);
+			}
 		},
-		[setWindows, setWindowStack, activeWindowId, setActiveWindowId],
+		[setWindows, setWindowStack, activeWindowId, setActiveWindowId, windows, windowStack],
 	);
 
 	const minimizeWindow = useCallback(
 		(id: string) => {
 			setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
+
 			if (activeWindowId === id) {
-				setWindowStack(prev => {
-					const remaining = prev.filter(wid => wid !== id);
-					setActiveWindowId(remaining.at(-1) || null);
-					return prev;
-				});
+				// Find next candidate that is NOT minimized
+				// We need to look at the current 'windows' state, but assuming the one we just minimized is now excluded
+				const candidateId = [...windowStack]
+					.reverse()
+					.find(wid => wid !== id && !windows.find(w => w.id === wid)?.isMinimized);
+
+				setActiveWindowId(candidateId || null);
 			}
 		},
-		[setWindows, activeWindowId, setActiveWindowId, setWindowStack],
+		[setWindows, activeWindowId, setActiveWindowId, windowStack, windows],
 	);
 
 	const focusWindow = useCallback(
