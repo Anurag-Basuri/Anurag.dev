@@ -65,7 +65,7 @@ export function MainLayout() {
 			openWindow('about');
 			router.replace(`${pathname}?app=about`, { scroll: false });
 		}
-	}, [searchParams]);
+	}, [searchParams, windows, openWindow, router, pathname]);
 
 	// State -> URL: Sync active window changes to URL
 	useEffect(() => {
@@ -77,7 +77,7 @@ export function MainLayout() {
 		} else if (searchParams.has('app')) {
 			router.replace(pathname, { scroll: false });
 		}
-	}, [activeWindowId, pathname]);
+	}, [activeWindowId, pathname, router, searchParams]);
 
 	const handleFileSelect = (item: FileSystemItem) => {
 		if (item.type === 'file') {

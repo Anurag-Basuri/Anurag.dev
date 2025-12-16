@@ -88,15 +88,31 @@ export function TopBar({
 
 	// Battery API (if supported)
 	useEffect(() => {
+		let battery: BatteryManager | null = null;
+		let handleChange: (() => void) | null = null;
+
 		if ('getBattery' in navigator) {
-			(navigator as Navigator & { getBattery?: () => Promise<BatteryManager> })
-				.getBattery!().then((battery: BatteryManager) => {
-				const updateBattery = () => setBatteryLevel(Math.round(battery.level * 100));
-				updateBattery();
-				battery.addEventListener('levelchange', updateBattery);
-				return () => battery.removeEventListener('levelchange', updateBattery);
-			});
+			(navigator as Navigator & { getBattery?: () => Promise<BatteryManager> }).getBattery!()
+				.then((b: BatteryManager) => {
+					battery = b;
+					handleChange = () => setBatteryLevel(Math.round(b.level * 100));
+					handleChange();
+
+					// Safely add listener
+					if (b.addEventListener) {
+						b.addEventListener('levelchange', handleChange);
+					}
+				})
+				.catch(() => {
+					// Ignore battery errors
+				});
 		}
+
+		return () => {
+			if (battery && handleChange && battery.removeEventListener) {
+				battery.removeEventListener('levelchange', handleChange);
+			}
+		};
 	}, []);
 
 	const handleContactClick = useCallback(() => {
