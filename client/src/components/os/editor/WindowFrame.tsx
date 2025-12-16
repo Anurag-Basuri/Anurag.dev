@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useRef, useEffect } from 'react';
 import { useAtomValue } from 'jotai';
 import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowStackAtom } from '@/store';
@@ -25,6 +25,35 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 	const zIndex = isMaximized ? 100 : windowStackAtom ? windowStack.indexOf(id) + 10 : 10;
 	const isActive = activeWindowId === id;
 
+	// Fullscreen Logic
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const container = containerRef.current;
+		if (!container) return;
+
+		const handleFullscreenChange = () => {
+			const isFullscreen = document.fullscreenElement === container;
+			if (!isFullscreen && isMaximized) {
+				toggleMaximizeWindow(id);
+			}
+		};
+
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+		if (isMaximized) {
+			container.requestFullscreen?.().catch(() => {
+				// Fallback or ignore if denied
+			});
+		} else if (document.fullscreenElement === container) {
+			document.exitFullscreen?.().catch(() => {});
+		}
+
+		return () => {
+			document.removeEventListener('fullscreenchange', handleFullscreenChange);
+		};
+	}, [isMaximized, id, toggleMaximizeWindow]);
+
 	const handleFocus = () => {
 		if (!isActive) focusWindow(id);
 	};
@@ -33,13 +62,13 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 		<AnimatePresence mode="wait">
 			{!isMinimized && (
 				<motion.div
+					ref={containerRef}
 					key={id}
 					initial={{ opacity: 0, scale: 0.98, y: 10 }}
 					animate={{
 						opacity: 1,
 						scale: 1,
 						y: 0,
-						// Animate between fixed/absolute positioning if possible, though layout animations might be needed for perfect transition
 					}}
 					exit={{ opacity: 0, scale: 0.98, y: 10 }}
 					transition={{
@@ -49,9 +78,9 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					style={{ zIndex }}
 					className={cn(
 						'flex flex-col overflow-hidden transition-all duration-300',
-						'shadow-2xl',
+						'shadow-2xl bg-black', // Ensure background is opaque in fullscreen
 						isMaximized
-							? 'fixed inset-0 z-100 rounded-none'
+							? 'fixed inset-0 z-100 rounded-none w-screen h-screen'
 							: 'absolute inset-0 rounded-none',
 						isActive ? 'z-50' : 'z-40 grayscale-[0.3]',
 					)}
@@ -95,7 +124,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					</div>
 
 					{/* Content Background */}
-					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll">
+					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll bg-[#0a0a0a]">
 						{component}
 					</div>
 				</motion.div>
