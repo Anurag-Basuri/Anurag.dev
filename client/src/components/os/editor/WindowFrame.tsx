@@ -1,67 +1,33 @@
-import { useAtom, useSetAtom } from 'jotai';
+import { memo } from 'react';
+import { useAtomValue } from 'jotai';
 import { WindowState } from '@/types/window';
-import { activeWindowIdAtom, windowsAtom, windowStackAtom } from '@/store/atoms';
+import { activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import React, { useEffect, memo, useCallback } from 'react';
 import { WindowControls } from '@/components/shared/WindowControls';
+import { useWindowManager } from '@/hooks/use-window-manager';
 
 interface WindowFrameProps {
 	windowState: WindowState;
-	bounds: string; // Kept for compatibility but unused
+	bounds?: string; // Kept via type but unused
 }
 
 export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFrameProps) {
-	const setWindows = useSetAtom(windowsAtom);
-	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
-	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
+	// Atoms: Read-only mostly here, actions via hook
+	const activeWindowId = useAtomValue(activeWindowIdAtom);
+	const windowStack = useAtomValue(windowStackAtom);
+
+	// Actions
+	const { closeWindow, minimizeWindow, focusWindow } = useWindowManager();
 
 	const { id, title, component, isMinimized } = windowState;
 
 	const zIndex = windowStack.indexOf(id) + 10;
 	const isActive = activeWindowId === id;
 
-	const bringToFront = useCallback(() => {
-		if (windowStack.at(-1) !== id) {
-			setWindowStack([...windowStack.filter(wid => wid !== id), id]);
-		}
-	}, [windowStack, id, setWindowStack]);
-
-	useEffect(() => {
-		if (isActive) {
-			bringToFront();
-		}
-	}, [isActive, bringToFront]);
-
 	const handleFocus = () => {
-		setActiveWindowId(id);
-		bringToFront();
+		if (!isActive) focusWindow(id);
 	};
-
-	const handleClose = useCallback(
-		(e?: React.MouseEvent) => {
-			e?.stopPropagation();
-			setWindows(prev => prev.filter(w => w.id !== id));
-			setWindowStack(windowStack.filter(wid => wid !== id));
-			if (activeWindowId === id) {
-				const remainingStack = windowStack.filter(wid => wid !== id);
-				setActiveWindowId(remainingStack.at(-1) || null);
-			}
-		},
-		[id, windowStack, activeWindowId, setWindows, setWindowStack, setActiveWindowId],
-	);
-
-	const handleMinimize = useCallback(
-		(e?: React.MouseEvent) => {
-			e?.stopPropagation();
-			setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-			if (activeWindowId === id) {
-				const remainingStack = windowStack.filter(wid => wid !== id);
-				setActiveWindowId(remainingStack.at(-1) || null);
-			}
-		},
-		[id, activeWindowId, windowStack, setWindows, setActiveWindowId],
-	);
 
 	return (
 		<AnimatePresence mode="wait">
@@ -72,31 +38,30 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					animate={{ opacity: 1, scale: 1, y: 0 }}
 					exit={{ opacity: 0, scale: 0.98, y: 10 }}
 					transition={{
-						duration: 0.2,
-						ease: [0.22, 1, 0.36, 1],
+						duration: 0.25,
+						ease: [0.2, 0.6, 0.2, 1], // Standard comfortable spring-like ease
 					}}
 					style={{ zIndex }}
 					className={cn(
-						'absolute inset-0 flex flex-col overflow-hidden bg-background/90 backdrop-blur-xl',
-						// Subtle border for definition against other windows if they were visible (though full screen)
-						// Shadow mainly for depth if we add margin later
+						'absolute inset-0 flex flex-col overflow-hidden bg-background/90 backdrop-blur-2xl',
 						'shadow-2xl',
-						isActive ? 'z-50' : 'z-40',
+						// Subtle highlight for active window (though full screen, good for transitions)
+						isActive ? 'z-50' : 'z-40 grayscale-[0.3]',
 					)}
 					onMouseDown={handleFocus}
 				>
 					{/* Title Bar */}
 					<div
 						className={cn(
-							'h-9 flex items-center justify-between px-3 shrink-0 select-none relative z-50 cursor-default border-b border-white/5',
+							'h-9 flex items-center justify-between px-3 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200',
 							isActive ? 'bg-white/5' : 'bg-transparent',
 						)}
 					>
 						{/* Window Controls */}
 						<div className="flex items-center gap-4">
 							<WindowControls
-								onClose={handleClose}
-								onMinimize={handleMinimize}
+								onClose={() => closeWindow(id)}
+								onMinimize={() => minimizeWindow(id)}
 								// maximize is disabled/hidden
 							/>
 
@@ -104,15 +69,17 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 
 							<span
 								className={cn(
-									'text-xs font-medium tracking-wide flex items-center gap-2 transition-colors',
+									'text-xs font-medium tracking-wide flex items-center gap-2 transition-colors duration-200',
 									isActive ? 'text-foreground' : 'text-muted-foreground',
 								)}
 							>
 								{/* Activity Dot */}
 								<div
 									className={cn(
-										'w-1.5 h-1.5 rounded-full transition-colors',
-										isActive ? 'bg-primary' : 'bg-muted-foreground/30',
+										'w-1.5 h-1.5 rounded-full transition-colors duration-200',
+										isActive
+											? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]'
+											: 'bg-muted-foreground/30',
 									)}
 								/>
 								{title}
@@ -121,7 +88,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					</div>
 
 					{/* Content Background */}
-					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll">
+					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll bg-background/50">
 						{component}
 					</div>
 				</motion.div>
