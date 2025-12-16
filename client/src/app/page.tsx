@@ -15,7 +15,7 @@ const MainLayout = dynamic(
 );
 
 export default function Home() {
-	const [bootComplete] = useAtom(bootCompleteAtom);
+	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
 	const [isSessionRestored, setIsSessionRestored] = useState(false);
 
 	useEffect(() => {
@@ -24,6 +24,7 @@ export default function Home() {
 			const sessionBooted = sessionStorage.getItem('booted');
 			if (sessionBooted) {
 				// User already booted in this session, skip animation
+				setBootComplete(true);
 				setTimeout(() => setIsSessionRestored(true), 0);
 			} else {
 				// New session, show boot animation
@@ -33,7 +34,7 @@ export default function Home() {
 			// sessionStorage not available, just proceed
 			setTimeout(() => setIsSessionRestored(true), 0);
 		}
-	}, []);
+	}, [setBootComplete]);
 
 	// Show nothing until we've checked session
 	if (!isSessionRestored) {
@@ -49,10 +50,10 @@ export default function Home() {
 
 	return (
 		<>
+			<MainLayout />
 			<AnimatePresence mode="wait">
 				{!bootComplete && !shouldSkipBoot && <BootAnimation key="boot" />}
 			</AnimatePresence>
-			{(bootComplete || shouldSkipBoot) && <MainLayout key="main" />}
 		</>
 	);
 }

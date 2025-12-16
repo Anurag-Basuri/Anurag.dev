@@ -155,8 +155,11 @@ function ParticleBurst({ active }: { active: boolean }) {
 		function draw() {
 			if (!ctx || !canvas) return;
 
+			ctx.globalAlpha = 1;
 			ctx.fillStyle = 'rgba(0,0,0,0.05)';
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+			ctx.fillStyle = '#00ff41';
 
 			particles.forEach(p => {
 				p.x += p.vx;
@@ -164,8 +167,7 @@ function ParticleBurst({ active }: { active: boolean }) {
 				p.life -= 0.01;
 
 				if (p.life > 0) {
-					const alpha = Math.max(0, p.life);
-					ctx.fillStyle = `rgba(0,255,65,${alpha})`;
+					ctx.globalAlpha = Math.max(0, p.life);
 					ctx.beginPath();
 					ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
 					ctx.fill();
