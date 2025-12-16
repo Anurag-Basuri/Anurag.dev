@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { windowsAtom } from '@/store/atoms';
+import { windowsAtom } from '@/store';
 import { WindowFrame } from './WindowFrame';
 
 import { motion } from 'framer-motion';

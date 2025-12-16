@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useAtomValue } from 'jotai';
 import { WindowState } from '@/types/window';
-import { activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
+import { activeWindowIdAtom, windowStackAtom } from '@/store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WindowControls } from '@/components/shared/WindowControls';

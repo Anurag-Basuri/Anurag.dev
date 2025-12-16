@@ -2,24 +2,12 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { FileSystemItem } from '@/types/file-system';
-import {
-	Folder,
-	FolderOpen,
-	File,
-	ChevronRight,
-	FileCode,
-	FileJson,
-	FileText,
-	LayoutDashboard,
-	Terminal,
-	Database,
-	Globe,
-	Image as ImageIcon,
-} from 'lucide-react';
+import { Folder, FolderOpen, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
-import { folderExpansionSignalAtom } from '@/store/atoms';
+import { folderExpansionSignalAtom } from '@/store';
+import { FileIcon } from '@/components/shared/FileIcon';
 
 interface FolderTreeProps {
 	items: FileSystemItem[];
@@ -27,33 +15,6 @@ interface FolderTreeProps {
 	onSelect?: (item: FileSystemItem) => void;
 	activeModuleId?: string | null;
 }
-
-const getFileIcon = (name: string, moduleId?: string) => {
-	// App shortcuts
-	if (name.endsWith('.app')) {
-		if (moduleId === 'projects') return <LayoutDashboard className="w-4 h-4 text-blue-400" />;
-		if (moduleId === 'ailab') return <Terminal className="w-4 h-4 text-purple-400" />;
-		if (moduleId === 'profiles') return <Database className="w-4 h-4 text-orange-400" />;
-		if (moduleId === 'blog') return <Globe className="w-4 h-4 text-pink-400" />;
-		return <Terminal className="w-4 h-4 text-emerald-400" />;
-	}
-
-	// File extensions
-	if (name.endsWith('.json')) return <FileJson className="w-4 h-4 text-yellow-500/90" />;
-	if (name.endsWith('.md') || name.endsWith('.txt'))
-		return <FileText className="w-4 h-4 text-slate-400" />;
-	if (name.endsWith('.tsx') || name.endsWith('.ts'))
-		return <FileCode className="w-4 h-4 text-blue-500" />;
-	if (name.endsWith('.js') || name.endsWith('.jsx'))
-		return <FileCode className="w-4 h-4 text-yellow-400" />;
-	if (name.endsWith('.css') || name.endsWith('.scss'))
-		return <FileCode className="w-4 h-4 text-sky-400" />;
-	if (name.endsWith('.pdf')) return <File className="w-4 h-4 text-red-400/90" />;
-	if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.svg'))
-		return <ImageIcon className="w-4 h-4 text-purple-400" />;
-
-	return <File className="w-4 h-4 text-slate-500" />;
-};
 
 // Flatten the tree for keyboard navigation
 const flattenTree = (
@@ -78,7 +39,7 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 			items.forEach(item => {
 				if (item.type === 'folder' && (item.name === 'src' || item.name === 'components')) {
 					defaults.add(item.id);
-					if (item.children) initExpand(item.children); // No deep default expand logic here, but consistent with original
+					if (item.children) initExpand(item.children);
 				}
 			});
 		};
@@ -160,8 +121,6 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 						setExpandedFolders(next);
 					} else {
 						// Go to parent
-						// Find parent by level? Slower but robust.
-						// Or just iterate backwards until level < currentLevel
 						const currentLevel = flatItems[currentIndex].level;
 						for (let i = currentIndex - 1; i >= 0; i--) {
 							if (flatItems[i].level < currentLevel) {
@@ -207,11 +166,6 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 			ref={treeRef}
 			role="tree"
 		>
-			{/* Connector line for nested levels - rendered recursively in original, but here we flatten or keep recursive structure?
-                We should keep recursive rendering for easy animation, but manage state globally for keyboard nav.
-                Wait, if we use recursive rendering, "flatItems" is correct for logic but rendering needs to match.
-                Let's stick to recursive rendering but pass "expandedFolders" down.
-            */}
 			<RecursiveFolderTree
 				items={items}
 				level={0}
@@ -309,7 +263,6 @@ function FolderTreeItem({
 	const isFolder = item.type === 'folder';
 	const [isHovered, setIsHovered] = useState(false);
 
-	// Check if this file is active based on moduleId matching the active window
 	const isActive = !isFolder && item.moduleId && item.moduleId === activeModuleId;
 
 	const handleClick = useCallback(
@@ -336,13 +289,12 @@ function FolderTreeItem({
 					'flex items-center py-1 px-2 cursor-pointer select-none text-[13px] transition-all duration-200 rounded-md group relative my-0.5 outline-none',
 					isActive ? 'text-emerald-300' : 'text-white/70 hover:text-white',
 					level > 0 && 'ml-3.5',
-					isFocused && 'bg-white/10 ring-1 ring-inset ring-white/20', // Focus style
+					isFocused && 'bg-white/10 ring-1 ring-inset ring-white/20',
 				)}
 				onClick={handleClick}
 				onMouseEnter={() => setIsHovered(true)}
 				onMouseLeave={() => setIsHovered(false)}
 			>
-				{/* Hover/Active Background Indicator */}
 				{(isHovered || isActive) && !isFocused && (
 					<motion.div
 						layoutId={isActive ? 'folder-active' : undefined}
@@ -359,7 +311,6 @@ function FolderTreeItem({
 					/>
 				)}
 
-				{/* Arrow for folders */}
 				<span className="mr-1.5 shrink-0 w-4 flex items-center justify-center text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
 					{isFolder && (
 						<motion.span
@@ -371,7 +322,6 @@ function FolderTreeItem({
 					)}
 				</span>
 
-				{/* Icon */}
 				<span className="mr-2 relative z-10 shrink-0">
 					{isFolder ? (
 						isExpanded ? (
@@ -380,11 +330,10 @@ function FolderTreeItem({
 							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-500 transition-colors" />
 						)
 					) : (
-						getFileIcon(item.name, item.moduleId)
+						<FileIcon name={item.name} moduleId={item.moduleId} className="w-4 h-4" />
 					)}
 				</span>
 
-				{/* Label */}
 				<span
 					className={cn(
 						'truncate relative z-10 font-medium tracking-tight',
