@@ -1,7 +1,7 @@
 import { useCallback, useRef, useMemo } from 'react';
 import { useAtom } from 'jotai';
 import { type ImperativePanelHandle } from '@/components/ui/resizable';
-import { layoutStateAtom, sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store/atoms';
+import { layoutStateAtom, sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
 
 export type PanelType = 'sidebar' | 'terminal';
 

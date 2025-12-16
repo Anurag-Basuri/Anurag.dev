@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
+import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store';
 import { getModuleComponent, getModuleTitle } from '@/lib/moduleRegistry';
 import { WindowState } from '@/types/window';
 import { useCallback } from 'react';
