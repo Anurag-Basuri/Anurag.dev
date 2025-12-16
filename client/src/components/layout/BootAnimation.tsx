@@ -243,14 +243,14 @@ export function BootAnimation() {
 				setTimeout(() => {
 					sessionStorage.setItem('booted', '1');
 					setBootComplete(true);
-				}, 1500);
+				}, 500);
 			},
 		});
 
 		tl.to(
 			{},
 			{
-				duration: 1.6,
+				duration: 1.0,
 				onStart: () => {
 					setStatus('HELLO, WORLD → PASSION FOR INTELLIGENT SYSTEMS');
 					setPhase(0);
@@ -263,7 +263,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.6,
+					duration: 1.0,
 					onStart: () => {
 						setStatus('MODERN STACK + MERN → CLEAN, SCALABLE, HUMAN-CENTERED UX');
 						setPhase(1);
@@ -277,7 +277,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.6,
+					duration: 1.0,
 					onStart: () => {
 						setStatus('AI/ML • LLMs • NLP → LEARNING, REASONING, ADAPTATION');
 						setPhase(2);
@@ -291,7 +291,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.6,
+					duration: 1.0,
 					onStart: () => {
 						setStatus('REAL IMPACT OVER JUST CODE → PORTFOLIO READY');
 						setPhase(3);
@@ -308,7 +308,7 @@ export function BootAnimation() {
 				sessionStorage.setItem('booted', '1');
 				setBootComplete(true);
 			}
-		}, 8000);
+		}, 6000);
 
 		return () => {
 			tl.kill();
@@ -324,7 +324,7 @@ export function BootAnimation() {
 	return (
 		<motion.div
 			ref={containerRef}
-			className="fixed inset-0 z-[9999] bg-black text-[#00ff41] font-mono overflow-hidden"
+			className="fixed inset-0 z-50 bg-black text-[#00ff41] font-mono overflow-hidden"
 			aria-label="Boot animation loading screen"
 			role="dialog"
 			aria-live="polite"

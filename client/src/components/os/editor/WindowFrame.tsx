@@ -78,7 +78,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					style={{ zIndex }}
 					className={cn(
 						'flex flex-col overflow-hidden transition-all duration-300',
-						'shadow-2xl bg-black', // Ensure background is opaque in fullscreen
+						'shadow-2xl bg-black/80 backdrop-blur-xl', // Ensure background is opaque in fullscreen
 						isMaximized
 							? 'fixed inset-0 z-100 rounded-none w-screen h-screen'
 							: 'absolute inset-0 rounded-none',
@@ -89,7 +89,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					{/* Title Bar */}
 					<div
 						className={cn(
-							'h-7 flex items-center justify-between px-2 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200 bg-zinc-900/90 backdrop-blur-sm',
+							'h-7 flex items-center justify-between px-2 shrink-0 select-none relative z-50 cursor-default border-b border-white/5 transition-colors duration-200 bg-zinc-900/50 backdrop-blur-sm',
 							isActive ? 'text-primary-foreground' : 'text-muted-foreground',
 						)}
 					>
@@ -124,7 +124,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					</div>
 
 					{/* Content Background */}
-					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll bg-[#0a0a0a]">
+					<div className="grow overflow-auto relative w-full h-full text-foreground mobile-friendly-scroll bg-black/40 backdrop-blur-sm">
 						{component}
 					</div>
 				</motion.div>
