@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useReducer } from 'react';
 import { useAtom } from 'jotai';
-import { windowsAtom } from '@/store/atoms';
+import { windowsAtom } from '@/store';
 import { processCommand, getCommandSuggestions } from '@/lib/commands';
 import type { CommandResponse } from '@/lib/commands';
 import { getModuleComponent } from '@/lib/moduleRegistry';
@@ -59,8 +59,6 @@ const saveCurrentPath = (path: string): void => {
 };
 
 export function useTerminalState() {
-	// Reducer
-	// We need to initialize state lazily to load from localStorage
 	const [state, dispatch] = useReducer(terminalReducer, initialTerminalState, initial => ({
 		...initial,
 		cmdHistory: loadCommandHistory(),
