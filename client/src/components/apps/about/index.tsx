@@ -182,7 +182,7 @@ export function AboutModule() {
 				</div>
 
 				{/* Identity Section */}
-				<div className="mt-20 sm:mt-24 px-4 text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
+				<div className="mt-4 sm:mt-6 px-4 text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
 					<motion.div
 						variants={fadeInUp}
 						initial="hidden"
@@ -192,6 +192,7 @@ export function AboutModule() {
 						<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-linear-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight tracking-tight">
 							{about.name}
 						</h1>
+						{/* ... rest of identity ... */}
 						<p className="text-lg sm:text-xl md:text-2xl text-muted-foreground font-medium">
 							{about.role}
 						</p>
@@ -415,21 +416,26 @@ export function AboutModule() {
 							<motion.div
 								variants={staggerItem}
 								whileHover={{ y: -5 }}
-								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
+								className="bg-card/40 border border-white/5 rounded-2xl p-6 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/40 transition-all duration-300 relative overflow-hidden group"
 							>
-								<div className="flex items-center gap-3 mb-5 border-b border-indigo-500/20 pb-4">
-									<Layers className="w-6 h-6 text-indigo-400" />
-									<h3 className="font-bold text-lg text-indigo-400">Frontend</h3>
-								</div>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.frontend.map(skill => (
-										<span
-											key={skill.name}
-											className="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-xs font-medium border border-indigo-500/20"
-										>
-											{skill.name}
-										</span>
-									))}
+								<div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+								<div className="relative z-10">
+									<div className="flex items-center gap-3 mb-5 border-b border-indigo-500/20 pb-4">
+										<Layers className="w-6 h-6 text-indigo-400" />
+										<h3 className="font-bold text-lg text-indigo-400">
+											Frontend
+										</h3>
+									</div>
+									<div className="flex flex-wrap gap-2">
+										{about.skills.frontend.map(skill => (
+											<span
+												key={skill.name}
+												className="px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-300 text-xs font-medium border border-indigo-500/20 hover:bg-indigo-500/20 transition-colors"
+											>
+												{skill.name}
+											</span>
+										))}
+									</div>
 								</div>
 							</motion.div>
 
@@ -437,21 +443,26 @@ export function AboutModule() {
 							<motion.div
 								variants={staggerItem}
 								whileHover={{ y: -5 }}
-								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300"
+								className="bg-card/40 border border-white/5 rounded-2xl p-6 hover:shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/40 transition-all duration-300 relative overflow-hidden group"
 							>
-								<div className="flex items-center gap-3 mb-5 border-b border-emerald-500/20 pb-4">
-									<Cpu className="w-6 h-6 text-emerald-400" />
-									<h3 className="font-bold text-lg text-emerald-400">Backend</h3>
-								</div>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.backend.map(skill => (
-										<span
-											key={skill.name}
-											className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 text-xs font-medium border border-emerald-500/20"
-										>
-											{skill.name}
-										</span>
-									))}
+								<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+								<div className="relative z-10">
+									<div className="flex items-center gap-3 mb-5 border-b border-emerald-500/20 pb-4">
+										<Cpu className="w-6 h-6 text-emerald-400" />
+										<h3 className="font-bold text-lg text-emerald-400">
+											Backend
+										</h3>
+									</div>
+									<div className="flex flex-wrap gap-2">
+										{about.skills.backend.map(skill => (
+											<span
+												key={skill.name}
+												className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 text-xs font-medium border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+											>
+												{skill.name}
+											</span>
+										))}
+									</div>
 								</div>
 							</motion.div>
 
@@ -459,21 +470,26 @@ export function AboutModule() {
 							<motion.div
 								variants={staggerItem}
 								whileHover={{ y: -5 }}
-								className="bg-card/40 border border-border/50 rounded-2xl p-6 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
+								className="bg-card/40 border border-white/5 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/10 hover:border-purple-500/40 transition-all duration-300 relative overflow-hidden group"
 							>
-								<div className="flex items-center gap-3 mb-5 border-b border-purple-500/20 pb-4">
-									<Box className="w-6 h-6 text-purple-400" />
-									<h3 className="font-bold text-lg text-purple-400">AI & ML</h3>
-								</div>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.ml.map(skill => (
-										<span
-											key={skill.name}
-											className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 text-xs font-medium border border-purple-500/20"
-										>
-											{skill.name}
-										</span>
-									))}
+								<div className="absolute inset-0 bg-linear-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+								<div className="relative z-10">
+									<div className="flex items-center gap-3 mb-5 border-b border-purple-500/20 pb-4">
+										<Box className="w-6 h-6 text-purple-400" />
+										<h3 className="font-bold text-lg text-purple-400">
+											AI & ML
+										</h3>
+									</div>
+									<div className="flex flex-wrap gap-2">
+										{about.skills.ml.map(skill => (
+											<span
+												key={skill.name}
+												className="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-300 text-xs font-medium border border-purple-500/20 hover:bg-purple-500/20 transition-colors"
+											>
+												{skill.name}
+											</span>
+										))}
+									</div>
 								</div>
 							</motion.div>
 						</div>
