@@ -15,29 +15,44 @@ const MainLayout = dynamic(
 );
 
 export default function Home() {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
+	const [bootComplete] = useAtom(bootCompleteAtom);
 	const [isSessionRestored, setIsSessionRestored] = useState(false);
 
 	useEffect(() => {
+		// Check session storage to see if boot was already completed
 		try {
 			const sessionBooted = sessionStorage.getItem('booted');
 			if (sessionBooted) {
-				setBootComplete(true);
+				// User already booted in this session, skip animation
+				setTimeout(() => setIsSessionRestored(true), 0);
+			} else {
+				// New session, show boot animation
+				setTimeout(() => setIsSessionRestored(true), 0);
 			}
 		} catch (e) {
-			// sessionStorage not available
+			// sessionStorage not available, just proceed
+			setTimeout(() => setIsSessionRestored(true), 0);
 		}
-		Promise.resolve().then(() => setIsSessionRestored(true));
-	}, [setBootComplete]);
+	}, []);
 
+	// Show nothing until we've checked session
 	if (!isSessionRestored) {
-		return null; // or a loading spinner
+		return (
+			<div className="fixed inset-0 bg-black flex items-center justify-center">
+				<div className="w-8 h-8 border-4 border-[#00ff41]/20 border-t-[#00ff41] rounded-full animate-spin" />
+			</div>
+		);
 	}
+
+	// Check if we should skip boot animation based on session storage
+	const shouldSkipBoot = typeof window !== 'undefined' && sessionStorage.getItem('booted');
 
 	return (
 		<>
-			<AnimatePresence mode="wait">{!bootComplete && <BootAnimation />}</AnimatePresence>
-			<MainLayout />
+			<AnimatePresence mode="wait">
+				{!bootComplete && !shouldSkipBoot && <BootAnimation key="boot" />}
+			</AnimatePresence>
+			{(bootComplete || shouldSkipBoot) && <MainLayout key="main" />}
 		</>
 	);
 }
