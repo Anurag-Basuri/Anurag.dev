@@ -278,14 +278,13 @@ function RecursiveFolderTree({
 					setExpandedFolders={setExpandedFolders}
 					focusedId={focusedId}
 					setFocusedId={setFocusedId}
-					items={[]}
 				/>
 			))}
 		</>
 	);
 }
 
-interface FolderTreeItemProps extends RecursiveProps {
+interface FolderTreeItemProps extends Omit<RecursiveProps, 'items'> {
 	item: FileSystemItem;
 	isExpanded: boolean;
 	onToggle: () => void;
