@@ -83,47 +83,58 @@ export function CertificationModule() {
 						<motion.div
 							key={cert.id}
 							variants={staggerItem}
-							whileHover={{ y: -4, transition: { duration: 0.2 } }}
-							className="group relative p-6 rounded-2xl bg-card/30 border border-border/50 backdrop-blur-sm hover:border-emerald-500/30 transition-all hover:shadow-xl"
+							className="group relative overflow-hidden bg-card/40 border border-white/5 rounded-3xl p-6 md:p-8 hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
 						>
-							<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+							{/* Hover Gradient */}
+							<div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-							<div className="relative z-10">
-								<div className="flex justify-between items-start mb-4">
-									<div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">
-										<Award className="w-6 h-6" />
+							<div className="relative z-10 flex flex-col h-full">
+								<div className="flex justify-between items-start gap-4 mb-6">
+									<div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:scale-110 transition-transform duration-500">
+										<Award className="w-8 h-8 text-emerald-400" />
 									</div>
-									{cert.credentialUrl && (
-										<a
-											href={cert.credentialUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="p-2 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white transition-colors"
-										>
-											<ExternalLink className="w-4 h-4" />
-										</a>
-									)}
-								</div>
-
-								<h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-emerald-400 transition-colors">
-									{cert.title}
-								</h3>
-								<p className="text-sm text-muted-foreground mb-4">{cert.issuer}</p>
-
-								<div className="flex items-center gap-2 text-xs text-muted-foreground/60 mb-4 font-mono">
-									<Calendar className="w-3.5 h-3.5" />
-									<span>{new Date(cert.date).toLocaleDateString()}</span>
-								</div>
-
-								<div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
-									{cert.skills.map(skill => (
-										<span
-											key={skill}
-											className="px-2 py-1 rounded-md bg-white/5 text-[10px] text-muted-foreground border border-white/5"
-										>
-											{skill}
+									<div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+										<span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+											{cert.issuer}
 										</span>
-									))}
+									</div>
+								</div>
+
+								<div className="mb-auto space-y-3">
+									<h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-emerald-400 transition-colors leading-tight">
+										{cert.title}
+									</h3>
+									<div className="flex items-center gap-2 text-sm text-muted-foreground/80 font-mono">
+										<Calendar className="w-4 h-4" />
+										<span>
+											Issued: {new Date(cert.date).toLocaleDateString()}
+										</span>
+									</div>
+								</div>
+
+								{cert.skills && cert.skills.length > 0 && (
+									<div className="flex flex-wrap gap-2 my-6 pt-6 border-t border-white/5">
+										{cert.skills.map(skill => (
+											<span
+												key={skill}
+												className="px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider rounded-md bg-white/5 text-muted-foreground/80 border border-white/5 group-hover:bg-white/10 transition-colors"
+											>
+												{skill}
+											</span>
+										))}
+									</div>
+								)}
+
+								<div className="mt-4 pt-4 flex items-center justify-between border-t border-white/5 group-hover:border-white/10 transition-colors">
+									<a
+										href={cert.credentialUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors group/link"
+									>
+										View Credential
+										<ExternalLink className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
+									</a>
 								</div>
 							</div>
 						</motion.div>

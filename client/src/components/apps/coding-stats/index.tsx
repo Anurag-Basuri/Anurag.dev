@@ -70,41 +70,43 @@ export function CodingStatsModule() {
 					{/* GitHub Card */}
 					<motion.div
 						variants={staggerItem}
-						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-white/20 transition-all"
+						className="group relative overflow-hidden rounded-3xl bg-card/40 border border-white/5 p-6 hover:border-white/20 transition-all hover:shaodw-2xl hover:-translate-y-1"
 					>
-						<div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-						<div className="flex justify-between items-start mb-4">
-							<div className="p-2 bg-white/10 rounded-lg">
+						<div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="flex justify-between items-start mb-6">
+							<div className="p-3 bg-white/10 rounded-xl text-white">
 								<Github className="w-6 h-6" />
 							</div>
 							<a
 								href={stats.github.url}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-xs font-mono text-muted-foreground hover:text-white transition-colors"
+								className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-mono text-muted-foreground hover:text-white hover:bg-white/10 transition-colors"
 							>
 								@{stats.github.username} ↗
 							</a>
 						</div>
-						<div className="space-y-4">
+						<div className="space-y-6">
 							<div>
-								<h3 className="text-3xl font-bold text-white mb-1">GitHub</h3>
-								<div className="text-sm text-muted-foreground">Source Control</div>
+								<h3 className="text-2xl font-bold text-white mb-1">GitHub</h3>
+								<div className="text-sm text-muted-foreground">
+									Source Control & Open Source
+								</div>
 							</div>
 							<div className="grid grid-cols-2 gap-4">
-								<div className="p-3 rounded-xl bg-black/20 border border-white/5">
-									<div className="text-2xl font-bold text-white">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-white/10 transition-colors">
+									<div className="text-3xl font-bold text-white mb-1">
 										{stats.github.stats?.stars || 0}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
-										Stars
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+										Stars Earned
 									</div>
 								</div>
-								<div className="p-3 rounded-xl bg-black/20 border border-white/5">
-									<div className="text-2xl font-bold text-white">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-white/10 transition-colors">
+									<div className="text-3xl font-bold text-white mb-1">
 										{stats.github.stats?.followers || 0}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
 										Followers
 									</div>
 								</div>
@@ -115,42 +117,44 @@ export function CodingStatsModule() {
 					{/* LeetCode Card */}
 					<motion.div
 						variants={staggerItem}
-						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-yellow-500/30 transition-all"
+						className="group relative overflow-hidden rounded-3xl bg-card/40 border border-white/5 p-6 hover:border-yellow-500/30 transition-all hover:shadow-2xl hover:-translate-y-1"
 					>
-						<div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-						<div className="flex justify-between items-start mb-4">
-							<div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+						<div className="absolute inset-0 bg-linear-to-br from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="flex justify-between items-start mb-6">
+							<div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500">
 								<Code className="w-6 h-6" />
 							</div>
 							<a
 								href={stats.leetcode.url}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-xs font-mono text-muted-foreground hover:text-yellow-400 transition-colors"
+								className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-mono text-muted-foreground hover:text-yellow-400 hover:bg-yellow-500/10 transition-colors"
 							>
 								@{stats.leetcode.username} ↗
 							</a>
 						</div>
-						<div className="space-y-4">
+						<div className="space-y-6">
 							<div>
-								<h3 className="text-3xl font-bold text-white mb-1">LeetCode</h3>
-								<div className="text-sm text-muted-foreground">Problem Solving</div>
+								<h3 className="text-2xl font-bold text-white mb-1">LeetCode</h3>
+								<div className="text-sm text-muted-foreground">
+									Problem Solving Skills
+								</div>
 							</div>
 							<div className="grid grid-cols-2 gap-4">
-								<div className="p-3 rounded-xl bg-black/20 border border-yellow-500/10">
-									<div className="text-2xl font-bold text-yellow-500">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-yellow-500/20 transition-colors">
+									<div className="text-3xl font-bold text-yellow-500 mb-1">
 										{stats.leetcode.stats?.solved || 0}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
-										Solved
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+										Problems Solved
 									</div>
 								</div>
-								<div className="p-3 rounded-xl bg-black/20 border border-yellow-500/10">
-									<div className="text-2xl font-bold text-yellow-500">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-yellow-500/20 transition-colors">
+									<div className="text-3xl font-bold text-yellow-500 mb-1">
 										{stats.leetcode.stats?.globalRank || 'N/A'}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
-										Rank
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+										Global Ranking
 									</div>
 								</div>
 							</div>
@@ -160,44 +164,44 @@ export function CodingStatsModule() {
 					{/* Codeforces Card */}
 					<motion.div
 						variants={staggerItem}
-						className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-red-500/30 transition-all"
+						className="group relative overflow-hidden rounded-3xl bg-card/40 border border-white/5 p-6 hover:border-red-500/30 transition-all hover:shadow-2xl hover:-translate-y-1"
 					>
-						<div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-						<div className="flex justify-between items-start mb-4">
-							<div className="p-2 bg-red-500/10 rounded-lg text-red-500">
+						<div className="absolute inset-0 bg-linear-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="flex justify-between items-start mb-6">
+							<div className="p-3 bg-red-500/10 rounded-xl text-red-500">
 								<Trophy className="w-6 h-6" />
 							</div>
 							<a
 								href={stats.codeforces.url}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="text-xs font-mono text-muted-foreground hover:text-red-400 transition-colors"
+								className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-mono text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
 							>
 								@{stats.codeforces.username} ↗
 							</a>
 						</div>
-						<div className="space-y-4">
+						<div className="space-y-6">
 							<div>
-								<h3 className="text-3xl font-bold text-white mb-1">Codeforces</h3>
+								<h3 className="text-2xl font-bold text-white mb-1">Codeforces</h3>
 								<div className="text-sm text-muted-foreground">
 									Competitive Programming
 								</div>
 							</div>
 							<div className="grid grid-cols-2 gap-4">
-								<div className="p-3 rounded-xl bg-black/20 border border-red-500/10">
-									<div className="text-2xl font-bold text-red-500">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-red-500/20 transition-colors">
+									<div className="text-3xl font-bold text-red-500 mb-1">
 										{stats.codeforces.stats?.rating || 0}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
-										Rating
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+										Current Rating
 									</div>
 								</div>
-								<div className="p-3 rounded-xl bg-black/20 border border-red-500/10">
-									<div className="text-sm font-bold text-red-500 truncate">
+								<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-red-500/20 transition-colors">
+									<div className="text-lg font-bold text-red-500 mb-1 truncate leading-loose">
 										{stats.codeforces.stats?.globalRank || 'Unrated'}
 									</div>
-									<div className="text-xs text-muted-foreground uppercase tracking-wider">
-										Rank
+									<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+										Current Rank
 									</div>
 								</div>
 							</div>
@@ -208,45 +212,44 @@ export function CodingStatsModule() {
 					{stats.codechef && (
 						<motion.div
 							variants={staggerItem}
-							className="group relative overflow-hidden rounded-2xl bg-card/30 border border-border/50 p-6 hover:border-orange-500/30 transition-all"
+							className="group relative overflow-hidden rounded-3xl bg-card/40 border border-white/5 p-6 hover:border-orange-500/30 transition-all hover:shadow-2xl hover:-translate-y-1"
 						>
-							<div className="absolute inset-0 bg-linear-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-							<div className="flex justify-between items-start mb-4">
-								<div className="p-2 bg-orange-500/10 rounded-lg text-orange-500">
-									<Terminal className="w-6 h-6" />{' '}
-									{/* Fallback icon, or specific if available */}
+							<div className="absolute inset-0 bg-linear-to-br from-orange-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+							<div className="flex justify-between items-start mb-6">
+								<div className="p-3 bg-orange-500/10 rounded-xl text-orange-500">
+									<Terminal className="w-6 h-6" />
 								</div>
 								<a
 									href={stats.codechef.url}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="text-xs font-mono text-muted-foreground hover:text-orange-400 transition-colors"
+									className="px-3 py-1 rounded-full bg-white/5 border border-white/5 text-xs font-mono text-muted-foreground hover:text-orange-400 hover:bg-orange-500/10 transition-colors"
 								>
 									@{stats.codechef.username} ↗
 								</a>
 							</div>
-							<div className="space-y-4">
+							<div className="space-y-6">
 								<div>
-									<h3 className="text-3xl font-bold text-white mb-1">CodeChef</h3>
+									<h3 className="text-2xl font-bold text-white mb-1">CodeChef</h3>
 									<div className="text-sm text-muted-foreground">
-										Competitive Programming
+										Algorithmic Competitions
 									</div>
 								</div>
 								<div className="grid grid-cols-2 gap-4">
-									<div className="p-3 rounded-xl bg-black/20 border border-orange-500/10">
-										<div className="text-2xl font-bold text-orange-500">
+									<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-orange-500/20 transition-colors">
+										<div className="text-3xl font-bold text-orange-500 mb-1">
 											{stats.codechef.stats?.rating || 0}
 										</div>
-										<div className="text-xs text-muted-foreground uppercase tracking-wider">
-											Rating
+										<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+											Current Rating
 										</div>
 									</div>
-									<div className="p-3 rounded-xl bg-black/20 border border-orange-500/10">
-										<div className="text-sm font-bold text-orange-500 truncate">
+									<div className="p-4 rounded-2xl bg-black/20 border border-white/5 group-hover:border-orange-500/20 transition-colors">
+										<div className="text-lg font-bold text-orange-500 mb-1 truncate leading-loose">
 											{stats.codechef.stats?.globalRank || 'Unrated'}
 										</div>
-										<div className="text-xs text-muted-foreground uppercase tracking-wider">
-											Rank
+										<div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
+											Global Rank
 										</div>
 									</div>
 								</div>
