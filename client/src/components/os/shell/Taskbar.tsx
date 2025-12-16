@@ -1,7 +1,7 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms';
+import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store';
 import { getModuleIcon } from '@/lib/moduleRegistry';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';

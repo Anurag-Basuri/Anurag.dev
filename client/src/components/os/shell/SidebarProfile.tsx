@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSetAtom } from 'jotai';
-import { folderExpansionSignalAtom } from '@/store/atoms';
+import { folderExpansionSignalAtom } from '@/store';
 import { SidebarControls } from '@/components/shared/WindowControls';
 
 interface SidebarProfileProps {

@@ -8,7 +8,7 @@ type BatteryManager = {
 };
 
 import { useAtom } from 'jotai';
-import { mobileSidebarOpenAtom } from '@/store/atoms';
+import { mobileSidebarOpenAtom } from '@/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
 	Menu,
@@ -130,7 +130,7 @@ export function TopBar({
 			>
 				{/* Decorative gradient borders */}
 				<div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
 					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
 					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
 				</div>
@@ -176,7 +176,7 @@ export function TopBar({
 
 					<div className="flex items-center gap-2 group cursor-default">
 						<div
-							className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-gradient-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.7)] transition-all duration-300"
+							className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.7)] transition-all duration-300"
 							aria-hidden="true"
 						/>
 						<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-white/90 group-hover:text-white transition-colors truncate">
