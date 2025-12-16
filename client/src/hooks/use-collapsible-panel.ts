@@ -54,14 +54,14 @@ export function useCollapsiblePanel({
 					defaultSize: layoutState.sidebar.size,
 					collapsedSize: 2,
 					minSize: 5,
-					maxSize: 30,
+					maxSize: 25,
 				};
 			case 'terminal':
 				return {
 					defaultSize: layoutState.terminal.size,
 					collapsedSize: 3,
 					minSize: 4,
-					maxSize: 60,
+					maxSize: 50,
 				};
 			default:
 				throw new Error(`Unknown panel type: ${type}`);
