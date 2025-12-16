@@ -87,9 +87,7 @@ export function useWindowManager() {
 			// If active window is minimized, focus falls to underlying or none
 			if (activeWindowId === id) {
 				setWindowStack(prev => {
-					// Don't remove from stack, just change active ID
 					const remaining = prev.filter(wid => wid !== id);
-					// Actually we keep it in stack to know z-index order, just inactive
 					setActiveWindowId(remaining.at(-1) || null);
 					return prev;
 				});
