@@ -16,6 +16,7 @@ import {
 	X,
 	Info,
 	Layers,
+	Globe,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/lib/animations';
@@ -119,10 +120,10 @@ export function ProjectsModule() {
 				{/* Grid */}
 				<motion.div
 					layout
-					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
-					variants={staggerContainer}
-					initial="hidden"
-					animate="visible"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" // Reverted to original grid layout
 				>
 					<AnimatePresence mode="popLayout">
 						{filteredProjects.map(project => (
@@ -132,59 +133,89 @@ export function ProjectsModule() {
 								variants={staggerItem}
 								initial="hidden"
 								animate="visible"
-								exit={{ opacity: 0, scale: 0.9 }}
-								onClick={() => setSelectedProject(project)}
-								className="group relative bg-card/30 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden hover:border-emerald-500/40 hover:bg-card/40 transition-all cursor-pointer hover:shadow-2xl hover:-translate-y-1 flex flex-col h-full"
+								exit="hidden"
+								className="group relative bg-card/40 border border-white/5 rounded-3xl overflow-hidden hover:border-emerald-500/30 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
 							>
-								{/* Image / Preview Area */}
-								<div className="aspect-video w-full bg-black/40 overflow-hidden relative">
+								{/* Hover Gradient */}
+								<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10" />
+
+								{/* Thumbnail */}
+								<div className="relative h-48 overflow-hidden">
 									{project.thumbnail ? (
 										<Image
 											src={project.thumbnail}
 											alt={project.title}
 											fill
-											className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+											className="object-cover transition-transform duration-700 group-hover:scale-110"
 										/>
 									) : (
-										<div className="w-full h-full flex items-center justify-center bg-linear-to-br from-gray-800 to-black group-hover:from-gray-800/80 group-hover:to-black/80 transition-colors">
-											<Folder className="w-12 h-12 text-muted-foreground/30 group-hover:text-emerald-500/50 transition-colors" />
+										<div className="w-full h-full bg-linear-to-br from-gray-900 to-black flex items-center justify-center">
+											<Folder className="w-12 h-12 text-white/10 group-hover:text-emerald-500/20 transition-colors duration-500" />
 										</div>
 									)}
-
-									{/* Status Badge */}
-									<div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/60 backdrop-blur border border-white/10 text-[10px] font-bold uppercase tracking-wider text-white/80">
-										{project.status === 'completed' ? 'v1.0' : 'WIP'}
+									<div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
+										<button
+											onClick={() => setSelectedProject(project)}
+											className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium hover:bg-white/20 hover:scale-105 transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
+										>
+											View Details
+										</button>
 									</div>
 								</div>
 
 								{/* Content */}
-								<div className="p-5 flex flex-col flex-1">
-									<div className="flex justify-between items-start mb-2">
-										<h3 className="font-bold text-lg text-foreground group-hover:text-emerald-400 transition-colors">
-											{project.title}
-										</h3>
-										<div className="p-1.5 rounded-full bg-white/5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-											<Info className="w-4 h-4 text-emerald-400" />
+								<div className="p-6 relative z-10">
+									<div className="flex justify-between items-start mb-4">
+										<div>
+											<h3 className="text-xl font-bold text-foreground mb-1 group-hover:text-emerald-400 transition-colors">
+												{project.title}
+											</h3>
+											<p className="text-sm text-muted-foreground line-clamp-2">
+												{project.description}
+											</p>
 										</div>
 									</div>
 
-									<p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">
-										{project.description}
-									</p>
-
-									<div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
+									<div className="flex flex-wrap gap-2 mb-4">
 										{project.techStack.slice(0, 3).map(tech => (
 											<span
 												key={tech}
-												className="text-[10px] px-2 py-1 rounded bg-white/5 text-muted-foreground border border-white/5"
+												className="text-[10px] px-2.5 py-1 rounded-md bg-white/5 text-muted-foreground border border-white/5 group-hover:bg-white/10 transition-colors uppercase tracking-wider font-medium"
 											>
 												{tech}
 											</span>
 										))}
 										{project.techStack.length > 3 && (
-											<span className="text-[10px] px-2 py-1 text-muted-foreground">
+											<span className="text-[10px] px-2.5 py-1 rounded-md bg-white/5 text-muted-foreground border border-white/5">
 												+{project.techStack.length - 3}
 											</span>
+										)}
+									</div>
+
+									<div className="flex items-center gap-4 pt-4 border-t border-white/5">
+										{project.liveUrl && ( // Changed from demoUrl to liveUrl
+											<a
+												href={project.liveUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-emerald-400 transition-colors"
+												onClick={e => e.stopPropagation()}
+											>
+												<Globe className="w-4 h-4" />
+												Live Demo
+											</a>
+										)}
+										{project.githubUrl && ( // Changed from repoUrl to githubUrl
+											<a
+												href={project.githubUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-white transition-colors"
+												onClick={e => e.stopPropagation()}
+											>
+												<Github className="w-4 h-4" />
+												Code
+											</a>
 										)}
 									</div>
 								</div>
@@ -216,7 +247,8 @@ export function ProjectsModule() {
 								<div className="h-48 md:h-64 relative shrink-0">
 									<button
 										onClick={() => setSelectedProject(null)}
-										className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 backdrop-blur hover:bg-white/20 text-white transition-all"
+										className="absolute top-4 right-4 z-20 p-3 rounded-full bg-black/50 backdrop-blur hover:bg-white/20 text-white transition-all hover:scale-110 active:scale-95"
+										aria-label="Close modal"
 									>
 										<X className="w-5 h-5" />
 									</button>
@@ -228,8 +260,9 @@ export function ProjectsModule() {
 											className="object-cover opacity-80"
 										/>
 									) : (
-										<div className="w-full h-full bg-linear-to-br from-gray-900 via-black to-emerald-950/20 flex items-center justify-center">
-											<Folder className="w-16 h-16 text-white/10" />
+										<div className="w-full h-full bg-linear-to-br from-gray-900 via-black to-emerald-950/40 flex items-center justify-center relative overflow-hidden">
+											<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+											<Folder className="w-20 h-20 text-white/5 relative z-10" />
 										</div>
 									)}
 									<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#0a0a0a] to-transparent" />
