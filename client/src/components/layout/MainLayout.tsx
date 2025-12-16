@@ -27,7 +27,6 @@ import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 import { windowsAtom, mobileSidebarOpenAtom } from '@/store';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider, useContextMenu } from '@/components/providers/context-menu-provider';
-
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
 export function MainLayout() {
@@ -131,51 +130,51 @@ export function MainLayout() {
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className={`overflow-hidden ${
-						sidebar.isCollapsed ? 'border-r border-white/5' : 'border-r border-white/5'
-					}`}
+					className="overflow-hidden"
 				>
-					<AnimatePresence mode="wait">
-						{sidebar.isCollapsed ? (
-							<motion.div
-								key="collapsed-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="h-full bg-sidebar/50"
-							>
-								<CollapsedSidebar onExpand={sidebar.expand} />
-							</motion.div>
-						) : (
-							<motion.div
-								key="expanded-sidebar"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.2 }}
-								className="h-full bg-sidebar/50 flex flex-col"
-							>
-								<SidebarProfile
-									onCollapse={sidebar.collapse}
-									onExpand={sidebar.maximize}
-								/>
-
-								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-									<FolderTree
-										items={fileSystem}
-										onSelect={handleFileSelect}
-										activeModuleId={activeWindowId}
+					<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden flex flex-col">
+						<AnimatePresence mode="wait">
+							{sidebar.isCollapsed ? (
+								<motion.div
+									key="collapsed-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.15 }}
+									className="h-full bg-sidebar/50"
+								>
+									<CollapsedSidebar onExpand={sidebar.expand} />
+								</motion.div>
+							) : (
+								<motion.div
+									key="expanded-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.2 }}
+									className="h-full bg-sidebar/50 flex flex-col"
+								>
+									<SidebarProfile
+										onCollapse={sidebar.collapse}
+										onExpand={sidebar.maximize}
 									/>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
+
+									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+										<FolderTree
+											items={fileSystem}
+											onSelect={handleFileSelect}
+											activeModuleId={activeWindowId}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
 				</ResizablePanel>
 
 				<ResizableHandle
 					withHandle
-					className="w-px bg-white/10 data-[resize-handle-state=hover]:bg-emerald-500/50 data-[resize-handle-state=drag]:bg-emerald-500 transition-colors"
+					className="w-1 bg-transparent hover:bg-white/5 transition-colors"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -189,7 +188,7 @@ export function MainLayout() {
 								terminal: { ...prev.terminal, size: layout[1] },
 							}));
 						}}
-						className="h-full"
+						className="h-full gap-0.5"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
