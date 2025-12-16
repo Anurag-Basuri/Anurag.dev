@@ -251,7 +251,7 @@ export function BootAnimation() {
 		tl.to(
 			{},
 			{
-				duration: 1.0,
+				duration: 1.25,
 				onStart: () => {
 					setStatus('HELLO, WORLD → PASSION FOR INTELLIGENT SYSTEMS');
 					setPhase(0);
@@ -264,7 +264,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.0,
+					duration: 1.25,
 					onStart: () => {
 						setStatus('MODERN STACK + MERN → CLEAN, SCALABLE, HUMAN-CENTERED UX');
 						setPhase(1);
@@ -278,7 +278,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.0,
+					duration: 1.25,
 					onStart: () => {
 						setStatus('AI/ML • LLMs • NLP → LEARNING, REASONING, ADAPTATION');
 						setPhase(2);
@@ -292,7 +292,7 @@ export function BootAnimation() {
 			.to(
 				{},
 				{
-					duration: 1.0,
+					duration: 1.25,
 					onStart: () => {
 						setStatus('REAL IMPACT OVER JUST CODE → PORTFOLIO READY');
 						setPhase(3);
@@ -309,7 +309,7 @@ export function BootAnimation() {
 				sessionStorage.setItem('booted', '1');
 				setBootComplete(true);
 			}
-		}, 6000);
+		}, 8000);
 
 		return () => {
 			tl.kill();
