@@ -102,19 +102,17 @@ export function JourneyModule() {
 				/>
 
 				<div className="relative">
-					{/* Static Central Line - Simple gradient without scroll animation */}
-					<div className="absolute left-[19px] md:left-1/2 top-4 bottom-0 w-0.5 bg-linear-to-b from-emerald-500 via-cyan-500 to-purple-500 md:-translate-x-1/2 rounded-full opacity-30 hidden md:block" />
+					{/* Static Central Line - Desktop */}
+					<div className="absolute left-1/2 top-4 bottom-0 w-0.5 bg-linear-to-b from-emerald-500 via-cyan-500 to-purple-500 -translate-x-1/2 rounded-full opacity-30 hidden md:block" />
 
-					{/* Mobile Line */}
-					<div className="absolute left-[19px] top-4 bottom-0 w-0.5 bg-border/30 rounded-full md:hidden" />
+					{/* Mobile Line - Perfectly aligned with nodes */}
+					<div className="absolute left-[21px] top-4 bottom-0 w-0.5 bg-linear-to-b from-emerald-500/50 to-purple-500/50 rounded-full md:hidden" />
 
 					<div className="space-y-12">
 						{journey.map((entry, index) => {
 							const config = categoryConfig[entry.type] || categoryConfig.work;
 							const Icon = config.icon;
 							const isLeft = index % 2 === 0;
-
-							// ... (existing code)
 
 							return (
 								<motion.div
@@ -129,20 +127,25 @@ export function JourneyModule() {
 									)}
 								>
 									{/* Content Card */}
-									<div className="flex-1 w-full pl-12 md:pl-0">
+									<div className="flex-1 w-full pl-14 md:pl-0">
 										<div
 											className={cn(
-												'group relative p-6 rounded-2xl border backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-1',
-												'bg-card/30 border-border/50 hover:border-border/80',
-												// config.border,
-												// config.bg
+												'group relative p-6 rounded-2xl border backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden',
+												'bg-card/40 border-white/5 hover:border-white/10',
 											)}
 										>
 											{/* Hover Gradient Glow */}
 											<div
 												className={cn(
-													'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
+													'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
 													'bg-linear-to-br from-white/5 to-transparent',
+												)}
+											/>
+											{/* Colored sheen based on type */}
+											<div
+												className={cn(
+													'absolute inset-0 opacity-0 group-hover:opacity-10 transition-duration-500 pointer-events-none',
+													config.bg,
 												)}
 											/>
 
@@ -150,7 +153,7 @@ export function JourneyModule() {
 											<div className="flex items-center justify-between mb-4 relative z-10">
 												<div
 													className={cn(
-														'flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border',
+														'flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm',
 														config.bg,
 														config.border,
 														config.color,
@@ -159,7 +162,7 @@ export function JourneyModule() {
 													<Icon className="w-3.5 h-3.5" />
 													<span>{entry.type}</span>
 												</div>
-												<div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/80 bg-background/50 px-2 py-1 rounded">
+												<div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/80 bg-black/20 border border-white/5 px-2 py-1 rounded-md">
 													<Calendar className="w-3.5 h-3.5" />
 													<span>{entry.date}</span>
 												</div>
@@ -167,7 +170,7 @@ export function JourneyModule() {
 
 											{/* Body */}
 											<div className="relative z-10">
-												<h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+												<h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-emerald-400 transition-colors">
 													{entry.title}
 												</h3>
 												{entry.company && (
@@ -176,23 +179,25 @@ export function JourneyModule() {
 														{entry.company}
 														{entry.location && (
 															<>
-																<span>•</span>
+																<span className="opacity-30">
+																	•
+																</span>
 																<span>{entry.location}</span>
 															</>
 														)}
 													</div>
 												)}
-												<p className="text-sm text-muted-foreground/80 leading-relaxed">
+												<p className="text-sm text-muted-foreground/90 leading-relaxed">
 													{entry.description}
 												</p>
 
 												{/* Skills/Tags if available */}
 												{entry.skills && entry.skills.length > 0 && (
-													<div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border/30">
+													<div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/5">
 														{entry.skills.map((skill: string) => (
 															<span
 																key={skill}
-																className="text-[10px] px-2 py-0.5 rounded-full bg-primary/5 text-primary/80 border border-primary/10"
+																className="text-[10px] px-2 py-1 rounded-md bg-white/5 text-muted-foreground border border-white/5 hover:bg-white/10 hover:text-white transition-colors"
 															>
 																{skill}
 															</span>
@@ -204,7 +209,7 @@ export function JourneyModule() {
 									</div>
 
 									{/* Timeline Node */}
-									<div className="absolute left-[11px] md:left-1/2 md:-translate-x-1/2 flex items-center justify-center">
+									<div className="absolute left-[12px] md:left-1/2 md:-translate-x-1/2 flex items-center justify-center">
 										<motion.div
 											whileHover={{ scale: 1.2 }}
 											className={cn(
