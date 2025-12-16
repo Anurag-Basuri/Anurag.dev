@@ -64,11 +64,12 @@ export function CommandSuggestions({
 			id="terminal-suggestions"
 			role="listbox"
 			aria-label="Command suggestions"
-			className="flex flex-wrap gap-1.5 px-3 py-2 bg-[#0d1117]/30 backdrop-blur-sm border-t border-white/5"
+			className="flex flex-wrap gap-2 px-4 py-3 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 shadow-2xl"
 		>
-			<span className="text-[10px] text-white/30 uppercase tracking-wider mr-1 self-center">
-				Tab:
-			</span>
+			<div className="flex items-center gap-2 mr-2 text-[10px] font-bold tracking-widest text-emerald-500/50 uppercase select-none">
+				<span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-pulse" />
+				Suggested
+			</div>
 			<AnimatePresence mode="popLayout">
 				{suggestions.map((suggestion, idx) => (
 					<motion.button
@@ -89,18 +90,25 @@ export function CommandSuggestions({
 						animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
 						exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.9 }}
 						transition={{
-							duration: shouldReduceMotion ? 0 : 0.12,
+							duration: shouldReduceMotion ? 0 : 0.15,
 							type: 'spring',
-							stiffness: 500,
-							damping: 30,
+							stiffness: 400,
+							damping: 25,
 						}}
 						className={cn(
-							'px-2.5 py-1 rounded-md border text-xs font-mono transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-emerald-400/50',
+							'px-3 py-1.5 rounded-lg border text-xs font-mono transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 relative overflow-hidden group',
 							idx === activeSuggestionIndex
-								? 'border-emerald-400/60 text-emerald-400 bg-emerald-400/10 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
-								: 'border-white/10 text-white/60 hover:text-white/90 bg-white/5 hover:bg-white/10 hover:border-white/20',
+								? 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)] -translate-y-px'
+								: 'border-white/5 text-muted-foreground bg-white/5 hover:bg-white/10 hover:border-white/10 hover:text-foreground',
 						)}
 					>
+						{/* Active Indicator Dot */}
+						{idx === activeSuggestionIndex && (
+							<motion.span
+								layoutId="active-dot"
+								className="absolute right-1.5 top-1.5 w-1 h-1 rounded-full bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.8)]"
+							/>
+						)}
 						{suggestion}
 					</motion.button>
 				))}

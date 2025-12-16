@@ -42,7 +42,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'min-h-[48px] sm:h-12 px-3 sm:px-4 border-t bg-[#0a0a0a]/80 backdrop-blur-xl shrink-0 flex items-center gap-3 cursor-text transition-all duration-300 group',
+					'min-h-[30px] sm:h-10 px-2 sm:px-4 border-t bg-[#0a0a0a]/80 backdrop-blur-xl shrink-0 flex items-center gap-3 cursor-text transition-all duration-300 group',
 					isFocused
 						? 'border-emerald-500/30 bg-[#0a0a0a]/90 shadow-[0_-1px_20px_rgba(52,211,153,0.05)]'
 						: 'border-white/5 hover:border-white/10 hover:bg-[#0a0a0a]/85',
