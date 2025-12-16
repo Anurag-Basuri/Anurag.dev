@@ -55,7 +55,7 @@ export function EditorArea() {
 								</span>
 							</h1>
 							<p className="text-lg text-white/40 font-medium tracking-wide uppercase text-[10px] sm:text-xs">
-								Personal Portfolio Environment
+								Interactive Developer Experience
 							</p>
 						</div>
 

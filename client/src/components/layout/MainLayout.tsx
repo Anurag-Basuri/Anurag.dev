@@ -53,7 +53,12 @@ export function MainLayout() {
 	const searchParams = useSearchParams();
 
 	// URL -> State: Sync window from URL or open default
+	const [hasInitialized, setHasInitialized] = useState(false);
+
+	// URL -> State: Sync window from URL or open default
 	useEffect(() => {
+		if (hasInitialized) return;
+
 		const appParam = searchParams.get('app');
 
 		if (appParam) {
@@ -65,7 +70,9 @@ export function MainLayout() {
 			openWindow('about');
 			router.replace(`${pathname}?app=about`, { scroll: false });
 		}
-	}, [searchParams, windows, openWindow, router, pathname]);
+
+		setHasInitialized(true);
+	}, [searchParams, windows, openWindow, router, pathname, hasInitialized]);
 
 	// State -> URL: Sync active window changes to URL
 	useEffect(() => {
