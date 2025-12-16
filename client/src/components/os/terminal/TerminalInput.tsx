@@ -42,43 +42,57 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 		return (
 			<div
 				className={cn(
-					'min-h-[44px] sm:h-10 px-2 sm:px-1 border-t bg-card/60 backdrop-blur-xl shrink-0 flex items-center gap-2.5 cursor-text transition-all duration-200',
-					isFocused ? 'border-primary/30 bg-card/70' : 'border-border/60',
+					'min-h-[48px] sm:h-12 px-3 sm:px-4 border-t bg-[#0a0a0a]/80 backdrop-blur-xl shrink-0 flex items-center gap-3 cursor-text transition-all duration-300 group',
+					isFocused
+						? 'border-emerald-500/30 bg-[#0a0a0a]/90 shadow-[0_-1px_20px_rgba(52,211,153,0.05)]'
+						: 'border-white/5 hover:border-white/10 hover:bg-[#0a0a0a]/85',
 				)}
 				onClick={handleContainerClick}
 				role="form"
 				aria-label="Terminal command input"
 			>
 				{/* Prompt Icon */}
-				<ChevronRight
+				<div
 					className={cn(
-						'w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0 transition-all duration-300 drop-shadow',
-						isFocused
-							? 'text-emerald-400 scale-110'
-							: 'text-muted-foreground/40 scale-100',
+						'flex items-center justify-center w-5 h-5 rounded transition-all duration-300',
+						isFocused ? 'bg-emerald-500/10' : 'bg-transparent',
 					)}
-					aria-hidden="true"
-				/>
+				>
+					<ChevronRight
+						className={cn(
+							'w-4 h-4 transition-all duration-300',
+							isFocused
+								? 'text-emerald-400 translate-x-0.5'
+								: 'text-muted-foreground/40',
+						)}
+						aria-hidden="true"
+					/>
+				</div>
 
 				{/* Path */}
-				<span
-					className={cn(
-						'text-xs font-mono shrink-0 font-medium transition-all duration-300',
-						isFocused
-							? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]'
-							: 'text-primary/80',
-					)}
-					aria-label={`Current path: ${currentPath}`}
-				>
-					{currentPath}
-				</span>
+				<div className="flex items-center gap-2 font-mono text-xs sm:text-sm">
+					<span
+						className={cn(
+							'font-semibold tracking-wide transition-all duration-300',
+							isFocused
+								? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]'
+								: 'text-muted-foreground/60 group-hover:text-muted-foreground/80',
+						)}
+						aria-label={`Current path: ${currentPath}`}
+					>
+						{currentPath}
+					</span>
 
-				<span
-					className="text-xs text-muted-foreground/40 shrink-0 font-medium"
-					aria-hidden="true"
-				>
-					$
-				</span>
+					<span
+						className={cn(
+							'font-bold transition-colors duration-300',
+							isFocused ? 'text-emerald-500/80' : 'text-muted-foreground/30',
+						)}
+						aria-hidden="true"
+					>
+						$
+					</span>
+				</div>
 
 				{/* Input Area */}
 				<div className="relative flex-1 min-w-0">
@@ -91,7 +105,7 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 						onSelect={onInputSelect}
 						onFocus={onFocus}
 						onBlur={onBlur}
-						className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none font-mono text-xs sm:text-sm"
+						className="absolute inset-0 w-full h-full bg-transparent text-transparent caret-transparent outline-none font-mono text-xs sm:text-sm tracking-wide"
 						autoComplete="off"
 						autoCorrect="off"
 						autoCapitalize="off"
@@ -105,25 +119,21 @@ export const TerminalInput = forwardRef<HTMLInputElement, TerminalInputProps>(
 					/>
 					<div
 						className={cn(
-							'whitespace-pre text-xs sm:text-sm font-mono leading-tight transition-all duration-200 pointer-events-none',
-							isFocused
-								? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.35)]'
-								: 'text-foreground',
+							'whitespace-pre text-xs sm:text-sm font-mono leading-relaxed transition-all duration-200 pointer-events-none tracking-wide flex items-center',
+							isFocused ? 'text-emerald-100' : 'text-muted-foreground',
 						)}
 						aria-hidden="true"
 					>
 						<span>{input.substring(0, cursorPos)}</span>
 						<span
 							className={cn(
-								'inline-block w-[2px] h-4 align-middle rounded-full transition-all duration-150',
-								isFocused
-									? 'bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.6)]'
-									: 'bg-muted-foreground/20 opacity-40',
-								isFocused && !prefersReducedMotion && 'animate-blink',
+								'inline-block w-[8px] h-[18px] bg-emerald-400/90 align-middle transition-all duration-100 shadow-[0_0_8px_rgba(52,211,153,0.6)]',
+								!isFocused && 'opacity-0',
+								isFocused && !prefersReducedMotion && 'animate-pulse',
 							)}
 							role="presentation"
 						/>
-						<span>{input.substring(cursorPos)}</span>
+						<span className="opacity-50">{input.substring(cursorPos)}</span>
 					</div>
 				</div>
 
