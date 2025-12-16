@@ -126,13 +126,13 @@ export function MainLayout() {
 						sidebar: { ...prev.sidebar, size: layout[0] },
 					}));
 				}}
-				className="h-full gap-1"
+				className="h-full"
 			>
 				<ResizablePanel
 					{...sidebar.panelProps}
 					defaultSize={mainHorizontalSizes[0]}
-					className={`overflow-hidden bg-card/80 ${
-						sidebar.isCollapsed ? '' : 'border border-border'
+					className={`overflow-hidden bg-card/80 backdrop-blur-md ${
+						sidebar.isCollapsed ? 'border-r border-white/5' : 'border-r border-white/5'
 					}`}
 				>
 					<AnimatePresence mode="wait">
@@ -175,7 +175,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
+					className="w-px bg-white/10 data-[resize-handle-state=hover]:bg-emerald-500/50 data-[resize-handle-state=drag]:bg-emerald-500 transition-colors"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -189,26 +189,28 @@ export function MainLayout() {
 								terminal: { ...prev.terminal, size: layout[1] },
 							}));
 						}}
-						className="h-full gap-1"
+						className="h-full"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
 							minSize={40}
-							className="overflow-hidden border border-border bg-card/80"
+							className="overflow-hidden bg-card/80 backdrop-blur-md relative"
 						>
 							<EditorArea />
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
+							className="h-px bg-white/10 data-[resize-handle-state=hover]:bg-emerald-500/50 data-[resize-handle-state=drag]:bg-emerald-500 transition-colors"
 						/>
 
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className={`overflow-hidden bg-card/80 ${
-								terminal.isCollapsed ? '' : 'border border-border'
+							className={`overflow-hidden bg-card/80 backdrop-blur-md ${
+								terminal.isCollapsed
+									? 'border-t border-white/5'
+									: 'border-t border-white/5'
 							}`}
 						>
 							<CLI
