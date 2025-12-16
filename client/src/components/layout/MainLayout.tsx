@@ -196,30 +196,30 @@ export function MainLayout() {
 							minSize={40}
 							className="overflow-hidden relative"
 						>
-							<EditorArea />
+							<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden relative">
+								<EditorArea />
+							</div>
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-px bg-white/10 data-[resize-handle-state=hover]:bg-emerald-500/50 data-[resize-handle-state=drag]:bg-emerald-500 transition-colors"
+							className="h-1 bg-transparent hover:bg-white/5 transition-colors"
 						/>
 
 						<ResizablePanel
 							{...terminal.panelProps}
 							defaultSize={mainVerticalSizes[1]}
-							className={`overflow-hidden ${
-								terminal.isCollapsed
-									? 'border-t border-white/5'
-									: 'border-t border-white/5'
-							}`}
+							className="overflow-hidden"
 						>
-							<CLI
-								onToggleCollapse={terminal.toggle}
-								isCollapsed={terminal.isCollapsed}
-								onMaximize={terminal.maximize}
-								onMinimize={terminal.collapse}
-								onClose={terminal.collapse}
-							/>
+							<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden">
+								<CLI
+									onToggleCollapse={terminal.toggle}
+									isCollapsed={terminal.isCollapsed}
+									onMaximize={terminal.maximize}
+									onMinimize={terminal.collapse}
+									onClose={terminal.collapse}
+								/>
+							</div>
 						</ResizablePanel>
 					</ResizablePanelGroup>
 				</ResizablePanel>
