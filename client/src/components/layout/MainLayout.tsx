@@ -8,6 +8,7 @@ import {
 	activeWindowIdAtom,
 	layoutStateAtom,
 } from '@/store';
+import { cn } from '@/lib/utils';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { CLI } from '@/components/os/terminal/CLI';
 import { EditorArea } from '@/components/os/editor/EditorArea';
@@ -132,7 +133,14 @@ export function MainLayout() {
 					defaultSize={mainHorizontalSizes[0]}
 					className="overflow-hidden"
 				>
-					<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden flex flex-col">
+					<div
+						className={cn(
+							'h-full w-full rounded-sm overflow-hidden flex flex-col transition-all duration-300',
+							sidebar.isCollapsed
+								? 'border-none'
+								: 'border-2 border-white/50 shadow-xl',
+						)}
+					>
 						<AnimatePresence mode="wait">
 							{sidebar.isCollapsed ? (
 								<motion.div
@@ -174,7 +182,7 @@ export function MainLayout() {
 
 				<ResizableHandle
 					withHandle
-					className="w-1 bg-transparent hover:bg-white/5 transition-colors"
+					className="w-1.5 bg-transparent hover:bg-primary/20 active:bg-primary/40 transition-colors z-50 rounded-full"
 				/>
 
 				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
@@ -195,14 +203,14 @@ export function MainLayout() {
 							minSize={40}
 							className="overflow-hidden relative"
 						>
-							<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden relative">
+							<div className="h-full w-full rounded-sm border-2 border-white/50 overflow-hidden relative shadow-2xl">
 								<EditorArea />
 							</div>
 						</ResizablePanel>
 
 						<ResizableHandle
 							withHandle
-							className="h-1 bg-transparent hover:bg-white/5 transition-colors"
+							className="h-1.5 bg-transparent hover:bg-primary/20 active:bg-primary/40 transition-colors z-50 rounded-full"
 						/>
 
 						<ResizablePanel
@@ -210,7 +218,14 @@ export function MainLayout() {
 							defaultSize={mainVerticalSizes[1]}
 							className="overflow-hidden"
 						>
-							<div className="h-full w-full rounded-xl border border-white/10 overflow-hidden">
+							<div
+								className={cn(
+									'h-full w-full rounded-sm overflow-hidden transition-all duration-300',
+									terminal.isCollapsed
+										? 'border-none'
+										: 'border-2 border-white/50 shadow-xl',
+								)}
+							>
 								<CLI
 									onToggleCollapse={terminal.toggle}
 									isCollapsed={terminal.isCollapsed}
