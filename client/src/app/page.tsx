@@ -16,32 +16,20 @@ const MainLayout = dynamic(
 
 export default function Home() {
 	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
-	const [isSessionRestored, setIsSessionRestored] = useState(false);
-
 	useEffect(() => {
-		// On refresh, we always want to boot from scratch
-		// so we just confirm the component is mounted/restored
-		setTimeout(() => setIsSessionRestored(true), 0);
-	}, []);
+		// Clear session storage on page load/refresh to force boot animation
+		sessionStorage.removeItem('booted');
 
-	// Show nothing until we've checked session
-	if (!isSessionRestored) {
-		return (
-			<div className="fixed inset-0 bg-black flex items-center justify-center">
-				<div className="w-8 h-8 border-4 border-[#00ff41]/20 border-t-[#00ff41] rounded-full animate-spin" />
-			</div>
-		);
-	}
-
-	// Check if we should skip boot animation based on session storage
-	const shouldSkipBoot = typeof window !== 'undefined' && sessionStorage.getItem('booted');
+		// Reset boot complete state
+		setBootComplete(false);
+	}, [setBootComplete]);
 
 	return (
 		<>
-			<MainLayout />
 			<AnimatePresence mode="wait">
-				{!bootComplete && !shouldSkipBoot && <BootAnimation key="boot" />}
+				{!bootComplete && <BootAnimation key="boot" />}
 			</AnimatePresence>
+			{bootComplete && <MainLayout key="main" />}
 		</>
 	);
 }
