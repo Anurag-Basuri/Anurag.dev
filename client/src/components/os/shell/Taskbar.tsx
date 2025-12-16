@@ -452,7 +452,7 @@ export function Taskbar() {
 				initial={{ y: 90, opacity: 0 }}
 				animate={{ y: 0, opacity: 1 }}
 				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-				className="w-full shrink-0 h-10 sm:h-8 bg-background/80 backdrop-blur-md border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 shadow-sm relative overflow-hidden"
+				className="w-full shrink-0 h-8 bg-background/80 backdrop-blur-md border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 shadow-sm relative overflow-hidden"
 			>
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/25 to-transparent" />
