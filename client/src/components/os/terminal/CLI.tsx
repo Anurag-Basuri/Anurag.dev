@@ -6,6 +6,7 @@ import { useTerminalState } from './useTerminalState';
 import { TerminalLayout } from './TerminalLayout';
 import { TerminalHistory } from './TerminalHistory';
 import { TerminalPrompt } from './TerminalPrompt';
+import { CollapsedTerminal } from './CollapsedTerminal';
 
 interface CLIProps {
 	onToggleCollapse?: () => void;
@@ -184,15 +185,9 @@ export function CLI({
 					initial="initial"
 					animate="animate"
 					exit="exit"
-					className="h-full w-full bg-sidebar/50 flex items-center justify-center"
+					className="h-full w-full"
 				>
-					<button
-						onClick={onToggleCollapse}
-						className="flex items-center justify-center w-full h-full cursor-pointer group"
-						aria-label="Expand Terminal"
-					>
-						<div className="h-0.5 w-65 rounded-full group-hover:w-100 group-hover:shadow-[0_0_12px_rgba(var(--primary),0.4)] transition-all bg-white" />
-					</button>
+					<CollapsedTerminal onExpand={onToggleCollapse!} />
 				</motion.div>
 			) : (
 				<motion.div
