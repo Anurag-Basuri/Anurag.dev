@@ -18,11 +18,11 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 	const windowStack = useAtomValue(windowStackAtom);
 
 	// Actions
-	const { closeWindow, minimizeWindow, focusWindow } = useWindowManager();
+	const { closeWindow, minimizeWindow, toggleMaximizeWindow, focusWindow } = useWindowManager();
 
-	const { id, title, component, isMinimized } = windowState;
+	const { id, title, component, isMinimized, isMaximized } = windowState;
 
-	const zIndex = windowStack.indexOf(id) + 10;
+	const zIndex = isMaximized ? 100 : windowStackAtom ? windowStack.indexOf(id) + 10 : 10;
 	const isActive = activeWindowId === id;
 
 	const handleFocus = () => {
@@ -35,7 +35,12 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 				<motion.div
 					key={id}
 					initial={{ opacity: 0, scale: 0.98, y: 10 }}
-					animate={{ opacity: 1, scale: 1, y: 0 }}
+					animate={{
+						opacity: 1,
+						scale: 1,
+						y: 0,
+						// Animate between fixed/absolute positioning if possible, though layout animations might be needed for perfect transition
+					}}
 					exit={{ opacity: 0, scale: 0.98, y: 10 }}
 					transition={{
 						duration: 0.25,
@@ -43,8 +48,11 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 					}}
 					style={{ zIndex }}
 					className={cn(
-						'absolute inset-0 flex flex-col overflow-hidden',
+						'flex flex-col overflow-hidden transition-all duration-300',
 						'shadow-2xl',
+						isMaximized
+							? 'fixed inset-0 z-100 rounded-none'
+							: 'absolute inset-0 rounded-none',
 						isActive ? 'z-50' : 'z-40 grayscale-[0.3]',
 					)}
 					onMouseDown={handleFocus}
@@ -61,7 +69,7 @@ export const WindowFrame = memo(function WindowFrame({ windowState }: WindowFram
 							<WindowControls
 								onClose={() => closeWindow(id)}
 								onMinimize={() => minimizeWindow(id)}
-								// maximize is disabled/hidden
+								onMaximize={() => toggleMaximizeWindow(id)}
 							/>
 
 							<div className="h-4 w-px bg-white/10" aria-hidden="true" />

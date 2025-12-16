@@ -92,5 +92,15 @@ export function useWindowManager() {
 		[setWindows, bringToFront],
 	);
 
-	return { openWindow, closeWindow, minimizeWindow, focusWindow };
+	const toggleMaximizeWindow = useCallback(
+		(id: string) => {
+			setWindows(prev =>
+				prev.map(w => (w.id === id ? { ...w, isMaximized: !w.isMaximized } : w)),
+			);
+			bringToFront(id);
+		},
+		[setWindows, bringToFront],
+	);
+
+	return { openWindow, closeWindow, minimizeWindow, toggleMaximizeWindow, focusWindow };
 }
