@@ -302,8 +302,17 @@ export function BootAnimation() {
 				},
 			);
 
+		// Safety timeout to ensure boot completes even if animation hangs
+		const safetyTimer = setTimeout(() => {
+			if (!bootComplete) {
+				sessionStorage.setItem('booted', '1');
+				setBootComplete(true);
+			}
+		}, 8000);
+
 		return () => {
 			tl.kill();
+			clearTimeout(safetyTimer);
 		};
 	}, [setBootComplete]);
 

@@ -7,6 +7,7 @@ import {
 	mainHorizontalSizesAtom,
 	activeWindowIdAtom,
 	layoutStateAtom,
+	bootCompleteAtom,
 } from '@/store';
 import { cn } from '@/lib/utils';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
@@ -54,10 +55,11 @@ export function MainLayout() {
 
 	// URL -> State: Sync window from URL or open default
 	const [hasInitialized, setHasInitialized] = useState(false);
+	const [bootComplete] = useAtom(bootCompleteAtom);
 
 	// URL -> State: Sync window from URL or open default
 	useEffect(() => {
-		if (hasInitialized) return;
+		if (hasInitialized || !bootComplete) return;
 
 		const appParam = searchParams.get('app');
 
@@ -72,7 +74,7 @@ export function MainLayout() {
 		}
 
 		setHasInitialized(true);
-	}, [searchParams, windows, openWindow, router, pathname, hasInitialized]);
+	}, [searchParams, windows, openWindow, router, pathname, hasInitialized, bootComplete]);
 
 	// State -> URL: Sync active window changes to URL
 	useEffect(() => {
