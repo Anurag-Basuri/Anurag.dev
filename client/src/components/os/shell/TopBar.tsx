@@ -170,6 +170,12 @@ export function TopBar({
 										</div>
 									</ScrollArea>
 								</div>
+								<div className="p-4 border-t border-white/10 flex items-center justify-between bg-white/5">
+									<span className="text-xs text-muted-foreground font-medium">
+										Theme
+									</span>
+									<ThemeToggle />
+								</div>
 							</SheetContent>
 						</Sheet>
 					)}

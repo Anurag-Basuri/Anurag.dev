@@ -235,14 +235,41 @@ export function MainLayout() {
 	};
 
 	const renderMobileLayout = () => (
-		<motion.div
-			className="h-full w-full rounded-none border-none bg-[#0d1117]/60 backdrop-blur-sm shadow-none overflow-hidden relative"
-			onPanEnd={handlePanEnd}
-		>
-			<EditorArea />
-			{/* Edge swipe target area */}
-			<div className="absolute top-0 bottom-0 left-0 w-8 z-50" />
-		</motion.div>
+		<div className="relative h-full w-full overflow-hidden">
+			{/* Editor Area (Full Screen) */}
+			<div className="absolute inset-0 z-0">
+				<EditorArea />
+			</div>
+
+			{/* Mobile Terminal Overlay */}
+			<AnimatePresence>
+				{!terminal.isCollapsed && (
+					<motion.div
+						initial={{ y: '100%' }}
+						animate={{ y: 0 }}
+						exit={{ y: '100%' }}
+						transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+						className="absolute inset-x-0 bottom-0 h-[45vh] z-40 bg-zinc-950/95 backdrop-blur-xl border-t border-white/10 shadow-2xl rounded-t-xl overflow-hidden flex flex-col"
+					>
+						<div className="flex-1 overflow-hidden relative">
+							<CLI
+								onToggleCollapse={terminal.toggle}
+								isCollapsed={false}
+								onMaximize={terminal.toggle}
+								onMinimize={terminal.toggle}
+								onClose={terminal.toggle}
+							/>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			{/* Edge swipe target area for Sidebar */}
+			<motion.div
+				className="absolute top-0 bottom-0 left-0 w-8 z-30"
+				onPanEnd={handlePanEnd}
+			/>
+		</div>
 	);
 
 	useKeyboardShortcuts([
