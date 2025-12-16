@@ -56,8 +56,12 @@ export function ProjectsModule() {
 			setError(null);
 			const data = await api.getProjects();
 			setProjects(data);
-		} catch (err: any) {
-			setError(err.message);
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError('An unknown error occurred');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -91,7 +95,7 @@ export function ProjectsModule() {
 							{['All', 'Web', 'App', 'AI'].map(tab => (
 								<button
 									key={tab}
-									onClick={() => setFilter(tab as any)}
+									onClick={() => setFilter(tab as 'All' | 'Web' | 'App' | 'AI')}
 									className={cn(
 										'relative px-4 py-1.5 text-xs font-medium rounded-lg transition-colors z-10',
 										filter === tab
