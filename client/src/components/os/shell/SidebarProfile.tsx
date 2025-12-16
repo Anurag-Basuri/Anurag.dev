@@ -19,7 +19,7 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 	return (
 		<div className="bg-transparent">
 			{/* Header - standardized to h-10 (mobile) / h-8 (desktop) */}
-			<header className="h-10 sm:h-8 px-2 sm:px-3 border-b border-white/5 bg-background/80 backdrop-blur-md flex items-center justify-between shrink-0 select-none">
+			<header className="h-10 sm:h-8 px-2 sm:px-3 border-b border-white/5 flex items-center justify-between shrink-0 select-none">
 				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2.5">
 					{/* macOS Traffic Lights - Hidden on mobile */}
@@ -43,7 +43,7 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 			</header>
 
 			{/* Profile Section - compact */}
-			<div className="p-3 border-b border-sidebar-border/20 bg-card/30 backdrop-blur-sm">
+			<div className="p-3 border-b border-sidebar-border/20">
 				<div className="flex items-center gap-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">

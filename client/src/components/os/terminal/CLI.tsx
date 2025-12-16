@@ -196,7 +196,7 @@ export function CLI({
 					initial="initial"
 					animate="animate"
 					exit="exit"
-					className="h-full w-full bg-sidebar/50 overflow-hidden"
+					className="h-full w-full overflow-hidden"
 				>
 					<TerminalLayout
 						currentPath={terminalState.currentPath}
