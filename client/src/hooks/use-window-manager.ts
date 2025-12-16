@@ -27,10 +27,6 @@ export function useWindowManager() {
 				const existingWindow = prev.find(w => w.id === id);
 
 				if (existingWindow) {
-					// Check if it's minimized, if so, restore it
-					if (existingWindow.isMinimized) {
-						// Bring to front handled below
-					}
 					return prev.map(w =>
 						w.id === id
 							? { ...w, isMinimized: false }
@@ -45,17 +41,15 @@ export function useWindowManager() {
 					component: getModuleComponent(id),
 					isOpen: true,
 					isMinimized: false,
-					isMaximized: true, // Always maximized now
-					isLoading: false, // Removed artificial delay
-					position: { x: 0, y: 0 }, // Not relevant for fullscreen but kept for type
+					isMaximized: true,
+					isLoading: false,
+					position: { x: 0, y: 0 },
 					size: { width: 0, height: 0 },
 				};
 
-				// Minimize others to focus on new one (optional UX choice, keeps view clean)
 				return [...prev.map(w => ({ ...w, isMinimized: true })), newWindow];
 			});
 
-			// Ensure stack updates after state change
 			bringToFront(id);
 		},
 		[setWindows, bringToFront],
@@ -66,14 +60,9 @@ export function useWindowManager() {
 			setWindows(prev => prev.filter(w => w.id !== id));
 			setWindowStack(prev => {
 				const newStack = prev.filter(wid => wid !== id);
-				// Focus the next available window if the active one was closed
 				if (activeWindowId === id) {
 					const nextId = newStack.at(-1);
 					setActiveWindowId(nextId || null);
-					// If we are restoring another window, ensure it's unminimized?
-					// For now, let's just update focus. The user might need to click taskbar to unminimize.
-					// Or better: auto-restore the last window?
-					// Let's stick to standard behavior: just close.
 				}
 				return newStack;
 			});
@@ -84,7 +73,6 @@ export function useWindowManager() {
 	const minimizeWindow = useCallback(
 		(id: string) => {
 			setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-			// If active window is minimized, focus falls to underlying or none
 			if (activeWindowId === id) {
 				setWindowStack(prev => {
 					const remaining = prev.filter(wid => wid !== id);
