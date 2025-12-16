@@ -101,9 +101,23 @@ export function useWindowManager() {
 
 	const toggleMaximizeWindow = useCallback(
 		(id: string) => {
-			setWindows(prev =>
-				prev.map(w => (w.id === id ? { ...w, isMaximized: !w.isMaximized } : w)),
-			);
+			setWindows(prev => {
+				const targetWindow = prev.find(w => w.id === id);
+				if (!targetWindow) return prev;
+
+				const isMaximized = !targetWindow.isMaximized;
+
+				return prev.map(w => {
+					if (w.id === id) {
+						return { ...w, isMaximized };
+					}
+					// If we are maximizing this window, un-maximize all others to ensure exclusive fullscreen
+					if (isMaximized) {
+						return { ...w, isMaximized: false };
+					}
+					return w;
+				});
+			});
 			bringToFront(id);
 		},
 		[setWindows, bringToFront],
