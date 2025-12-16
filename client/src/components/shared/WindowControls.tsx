@@ -35,6 +35,8 @@ interface WindowControlProps {
 	className?: string;
 }
 
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 export function WindowControls({
 	onClose,
 	onMinimize,
@@ -44,72 +46,90 @@ export function WindowControls({
 	className,
 }: WindowControlProps) {
 	return (
-		<div className={cn('flex items-center gap-1.5 group', className)}>
-			{/* Close Button (Red) */}
-			<motion.button
-				whileHover={{ scale: 1.15 }}
-				whileTap={{ scale: 0.95 }}
-				onClick={onClose}
-				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
-				style={{ backgroundColor: COLORS.close.bg }}
-				aria-label="Close"
-				title="Close"
-			>
-				{/* Hover state handled by CSS modules or tailwind group-hover if we generated classes dynamically, 
-				    but inline styles for specific colors are safer for these exact hex matches */}
-				<div
-					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
-					style={{ backgroundColor: COLORS.close.hover }}
-				/>
-				<div className="absolute -inset-2" /> {/* Hit area */}
-				<X
-					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
-					style={{ color: COLORS.close.icon }}
-				/>
-			</motion.button>
+		<TooltipProvider delayDuration={300}>
+			<div className={cn('flex items-center gap-1.5 group', className)}>
+				{/* Close Button (Red) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onClose}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.close.bg }}
+							aria-label="Close"
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.close.hover }}
+							/>
+							<div className="absolute -inset-2" /> {/* Hit area */}
+							<X
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.close.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<p>Close</p>
+					</TooltipContent>
+				</Tooltip>
 
-			{/* Minimize/Action Button (Yellow) */}
-			<motion.button
-				whileHover={{ scale: 1.15 }}
-				whileTap={{ scale: 0.95 }}
-				onClick={onMinimize}
-				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
-				style={{ backgroundColor: COLORS.minimize.bg }}
-				aria-label={minimizeLabel}
-				title={minimizeLabel}
-			>
-				<div
-					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
-					style={{ backgroundColor: COLORS.minimize.hover }}
-				/>
-				<div className="absolute -inset-2" />
-				<MinimizeIcon
-					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
-					style={{ color: COLORS.minimize.icon }}
-				/>
-			</motion.button>
+				{/* Minimize/Action Button (Yellow) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onMinimize}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.minimize.bg }}
+							aria-label={minimizeLabel}
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.minimize.hover }}
+							/>
+							<div className="absolute -inset-2" />
+							<MinimizeIcon
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.minimize.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<p>{minimizeLabel}</p>
+					</TooltipContent>
+				</Tooltip>
 
-			{/* Maximize Button (Green) */}
-			<motion.button
-				whileHover={{ scale: 1.15 }}
-				whileTap={{ scale: 0.95 }}
-				onClick={onMaximize}
-				className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
-				style={{ backgroundColor: COLORS.maximize.bg }}
-				aria-label="Maximize"
-				title="Maximize"
-			>
-				<div
-					className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
-					style={{ backgroundColor: COLORS.maximize.hover }}
-				/>
-				<div className="absolute -inset-2" />
-				<Maximize2
-					className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
-					style={{ color: COLORS.maximize.icon }}
-				/>
-			</motion.button>
-		</div>
+				{/* Maximize Button (Green) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onMaximize}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.maximize.bg }}
+							aria-label="Fullscreen"
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.maximize.hover }}
+							/>
+							<div className="absolute -inset-2" />
+							<Maximize2
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.maximize.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent>
+						<p>Fullscreen</p>
+					</TooltipContent>
+				</Tooltip>
+			</div>
+		</TooltipProvider>
 	);
 }
 
