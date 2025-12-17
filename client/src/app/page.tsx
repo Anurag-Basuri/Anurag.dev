@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import { useEffect, useState, memo, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Session storage key constant
 const BOOT_SESSION_KEY = 'anuragos-boot-complete';
@@ -81,12 +81,18 @@ function Home() {
 			{/* Boot Animation - Always visible when not complete */}
 			<AnimatePresence>{!bootComplete && <BootAnimation key="boot" />}</AnimatePresence>
 
-			<div
-				style={{
-					// Force GPU context initialization by rendering but hiding via opacity
+			{/* Main Desktop - Animates in as Boot animates out */}
+			<motion.div
+				initial={{ opacity: 0, scale: 0.96, filter: 'blur(10px)' }}
+				animate={{
 					opacity: bootComplete ? 1 : 0,
+					scale: bootComplete ? 1 : 0.96,
+					filter: bootComplete ? 'blur(0px)' : 'blur(10px)',
+				}}
+				transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+				style={{
 					pointerEvents: bootComplete ? 'auto' : 'none',
-					position: bootComplete ? 'relative' : 'fixed',
+					position: 'absolute',
 					top: 0,
 					left: 0,
 					width: '100%',
@@ -97,7 +103,7 @@ function Home() {
 				<Suspense fallback={<LoadingFallback />}>
 					<MainLayout key="main" />
 				</Suspense>
-			</div>
+			</motion.div>
 		</div>
 	);
 }
