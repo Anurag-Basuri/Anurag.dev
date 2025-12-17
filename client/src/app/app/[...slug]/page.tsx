@@ -29,7 +29,7 @@ export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
 
 // Generate metadata for each route
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-	const { slug } = params;
+	const { slug } = await params;
 	const moduleId = resolveModuleFromSlug(slug);
 
 	if (!moduleId) {
@@ -63,12 +63,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 // Server component for better performance
 export default async function ModulePage({ params }: PageProps) {
-	const { slug } = params;
-
-	// Resolve the module ID from the slug (server-side)
+	const { slug } = await params;
 	const moduleId = resolveModuleFromSlug(slug);
 
-	// Validate the module exists
 	if (!moduleId) {
 		notFound();
 	}
@@ -81,4 +78,4 @@ export default async function ModulePage({ params }: PageProps) {
 }
 
 // Enable static generation with ISR
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
