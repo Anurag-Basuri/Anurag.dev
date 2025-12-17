@@ -9,11 +9,15 @@ import { JotaiProvider } from '@/components/providers/jotai-provider';
 const geistSans = Geist({
 	variable: '--font-geist-sans',
 	subsets: ['latin'],
+	display: 'swap',
+	preload: true,
 });
 
 const geistMono = Geist_Mono({
 	variable: '--font-geist-mono',
 	subsets: ['latin'],
+	display: 'swap',
+	preload: true,
 });
 
 export const metadata: Metadata = {
@@ -47,6 +51,9 @@ export default function RootLayout({
 					name="viewport"
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
 				/>
+				{/* Resource hints for better performance */}
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -59,7 +66,17 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						<ErrorBoundary>{children}</ErrorBoundary>
+						<ErrorBoundary>
+							<Suspense
+								fallback={
+									<div className="fixed inset-0 bg-black flex items-center justify-center">
+										<div className="w-8 h-8 border-4 border-[#00ff41]/20 border-t-[#00ff41] rounded-full animate-spin" />
+									</div>
+								}
+							>
+								{children}
+							</Suspense>
+						</ErrorBoundary>
 					</ThemeProvider>
 				</JotaiProvider>
 			</body>
