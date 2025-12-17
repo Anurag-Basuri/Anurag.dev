@@ -157,7 +157,7 @@ export function MainLayout() {
 						sidebar: { ...prev.sidebar, size: layout[0] },
 					}));
 				}}
-				className="h-full gap-1"
+				className="h-full w-full gap-1"
 			>
 				<ResizablePanel
 					{...sidebar.panelProps}
@@ -222,7 +222,7 @@ export function MainLayout() {
 								terminal: { ...prev.terminal, size: layout[1] },
 							}));
 						}}
-						className="h-full gap-1"
+						className="h-full w-full gap-1"
 					>
 						<ResizablePanel
 							defaultSize={mainVerticalSizes[0]}
@@ -264,7 +264,7 @@ export function MainLayout() {
 		if (!isMobile) return null;
 
 		return (
-			<div className="h-full flex flex-col overflow-hidden">
+			<div className="h-full w-full flex flex-col overflow-hidden">
 				<div className="flex-1 overflow-hidden border border-border bg-card/80">
 					<Suspense fallback={<ComponentLoader />}>
 						<EditorArea />
@@ -285,7 +285,7 @@ export function MainLayout() {
 	return (
 		<ErrorBoundary>
 			<ContextMenuProvider>
-				<div className="h-screen w-screen flex flex-col overflow-hidden bg-background relative">
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
 					{/* Background */}
 					<Suspense fallback={null}>
 						<Background3D />
@@ -308,7 +308,7 @@ export function MainLayout() {
 					</Suspense>
 
 					{/* Main Content */}
-					<div className="flex-1 min-h-0 overflow-hidden relative z-10">
+					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
 						{renderDesktopLayout()}
 						{renderMobileLayout()}
 					</div>
