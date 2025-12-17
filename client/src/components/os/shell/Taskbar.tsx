@@ -1,15 +1,14 @@
 'use client';
 
 import { useAtom } from 'jotai';
-import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store';
+import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms/window';
 import { getModuleIcon } from '@/lib/moduleRegistry';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import {
 	Power,
-	Settings,
 	Briefcase,
 	Map,
 	Mail,
@@ -19,7 +18,6 @@ import {
 	Twitter,
 	X,
 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/shared/HelpButton';
@@ -48,8 +46,6 @@ const TaskbarItem = memo(function TaskbarItem({
 	onClose: (e: React.MouseEvent) => void;
 	Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }) {
-	const isLoading = window.isLoading || false;
-
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -109,7 +105,6 @@ const TaskbarItem = memo(function TaskbarItem({
 						/>
 					)}
 
-					{/* Close Button on Hover */}
 					{/* Close Button */}
 					<button
 						onClick={onClose}
@@ -179,8 +174,8 @@ export function Taskbar() {
 	}, [isStartOpen]);
 
 	// Trap Tab inside the menu when open
-	const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-		if (!isStartOpen || !stateMenuRef.current) return;
+	const handleMenuKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+		if (!stateMenuRef.current) return;
 		if (e.key !== 'Tab') return;
 
 		const focusableSelectors = [
@@ -209,92 +204,67 @@ export function Taskbar() {
 			e.preventDefault();
 			last.focus();
 		}
-	};
+	}, []);
 
-	const handleTaskbarClick = (id: string) => {
-		setWindows(prev => {
-			const window = prev.find(w => w.id === id);
-			if (!window) return prev;
+	const handleTaskbarClick = useCallback(
+		(id: string) => {
+			const window = windows.find(w => w.id === id);
+			if (!window) return;
 
 			if (id === activeWindowId && !window.isMinimized) {
 				// If clicking the active window, minimize it
-				setWindowStack(stack => stack.filter(wid => wid !== id));
-				setWindowStack(stack => {
-					const nextActiveId = stack.at(-1) || null;
-					setActiveWindowId(nextActiveId);
-					return stack;
-				});
-				return prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w));
+				setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
+				setWindowStack(prev => prev.filter(wid => wid !== id));
+				const newStack = windowStack.filter(wid => wid !== id);
+				setActiveWindowId(newStack.at(-1) || null);
 			} else {
-				// Show loading briefly, then open window
-				const updated = prev.map(w => ({
-					...w,
-					isMinimized: w.id !== id,
-					isLoading: w.id === id ? true : false,
-				}));
-
-				// Clear loading after transition
-				setTimeout(() => {
-					setWindows(current => current.map(w => ({ ...w, isLoading: false })));
-				}, 250);
-
+				// Show and activate the window
+				setWindows(prev =>
+					prev.map(w => ({
+						...w,
+						isMinimized: w.id === id ? false : w.isMinimized,
+					})),
+				);
 				setActiveWindowId(id);
-				setWindowStack(stack => [...stack.filter(wid => wid !== id), id]);
-				return updated;
+				setWindowStack(prev => [...prev.filter(wid => wid !== id), id]);
 			}
-		});
-	};
+		},
+		[activeWindowId, windows, windowStack, setWindows, setActiveWindowId, setWindowStack],
+	);
 
-	const handleOpenModule = (id: string) => {
-		setIsStartOpen(false);
-		openWindow(id);
-	};
+	const handleOpenModule = useCallback(
+		(id: string) => {
+			setIsStartOpen(false);
+			openWindow(id);
+		},
+		[openWindow],
+	);
 
-	const handleReorder = (newOrder: WindowState[]) => {
-		setWindows(newOrder);
-		setWindowStack(newOrder.map(w => w.id));
-	};
+	const handleReorder = useCallback(
+		(newOrder: WindowState[]) => {
+			setWindows(newOrder);
+			setWindowStack(newOrder.map(w => w.id));
+		},
+		[setWindows, setWindowStack],
+	);
 
-	const handleCloseWindow = (id: string, e: React.MouseEvent) => {
-		e.stopPropagation();
+	const handleCloseWindow = useCallback(
+		(id: string, e: React.MouseEvent) => {
+			e.stopPropagation();
 
-		setWindows(prev => {
-			const windowToClose = prev.find(w => w.id === id);
-			if (!windowToClose) return prev;
+			// Remove from windows
+			setWindows(prev => prev.filter(w => w.id !== id));
 
-			setWindowStack(stack => {
-				const remainingStack = stack.filter(wid => wid !== id);
-				const nextActiveId = remainingStack.at(-1) || null;
-
-				// Smooth close sequence
-				if (id === activeWindowId && nextActiveId) {
-					// First: Mark next window as loading
-					setWindows(current =>
-						current.map(w => (w.id === nextActiveId ? { ...w, isLoading: true } : w)),
-					);
-
-					// Second: After brief delay, remove current and show next
-					setTimeout(() => {
-						setWindows(current =>
-							current
-								.map(w =>
-									w.id === nextActiveId
-										? { ...w, isMinimized: false, isLoading: false }
-										: w,
-								)
-								.filter(w => w.id !== id),
-						);
-					}, 200);
-				}
-
+			// Update stack and active window
+			setWindowStack(prev => {
+				const newStack = prev.filter(wid => wid !== id);
+				const nextActiveId = newStack.at(-1) || null;
 				setActiveWindowId(nextActiveId);
-				return remainingStack;
+				return newStack;
 			});
-
-			// Return filtered windows immediately if not active, or wait for setTimeout if active
-			return id !== activeWindowId ? prev.filter(w => w.id !== id) : prev;
-		});
-	};
+		},
+		[setWindows, setWindowStack, setActiveWindowId],
+	);
 
 	const menuItems = [
 		{ id: 'about', label: 'About Me', icon: UserIcon },
@@ -322,7 +292,7 @@ export function Taskbar() {
 	];
 
 	return (
-		<TooltipProvider delayDuration={0}>
+		<TooltipProvider delayDuration={500} skipDelayDuration={200}>
 			{/* Start Menu Overlay */}
 			<AnimatePresence>
 				{isStartOpen && (
@@ -347,7 +317,7 @@ export function Taskbar() {
 							onKeyDown={handleMenuKeyDown}
 							className="absolute bottom-14 sm:bottom-12 left-2 right-2 sm:right-auto w-auto sm:w-80 z-50 bg-black/60 backdrop-blur-3xl border border-white/10 shadow-[0_10px_50px_-10px_rgba(0,0,0,0.5)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
 						>
-							<div className="absolute inset-x-0 top-0 h-[120px] bg-linear-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
+							<div className="absolute inset-x-0 top-0 h-[120px] bg-gradient-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
 
 							<div className="relative z-10">
 								<div className="flex items-center gap-4 mb-6">
@@ -395,7 +365,7 @@ export function Taskbar() {
 											</span>
 
 											{/* Hover sheen */}
-											<motion.div className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+											<motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
 										</motion.button>
 									))}
 								</div>
@@ -455,7 +425,7 @@ export function Taskbar() {
 				className="w-full shrink-0 h-8 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 shadow-sm relative overflow-hidden"
 			>
 				<div className="absolute inset-0 pointer-events-none">
-					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/25 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent" />
 					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
 					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
 				</div>
