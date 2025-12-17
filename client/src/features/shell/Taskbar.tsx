@@ -402,7 +402,15 @@ export function Taskbar() {
 				{/* Right Side Actions */}
 				<div className="hidden sm:flex items-center gap-2">
 					<div className="h-6 px-3 rounded-md bg-white/7 border border-white/14 shadow-inner flex items-center">
-						<HelpButton placement="taskbar" />
+						<HelpButton
+							content={
+								<div className="space-y-1">
+									<p className="font-bold">Shortcuts</p>
+									<p>Ctrl+K: Terminal</p>
+									<p>Ctrl+B: Sidebar</p>
+								</div>
+							}
+						/>
 					</div>
 				</div>
 			</motion.div>
