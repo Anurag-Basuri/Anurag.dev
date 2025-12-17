@@ -24,7 +24,7 @@ export interface FileIconProps {
 	className?: string;
 }
 
-const getIconForFile = (name: string): LucideIcon => {
+export const getIconForFile = (name: string): LucideIcon => {
 	const ext = name.split('.').pop()?.toLowerCase();
 
 	switch (ext) {
