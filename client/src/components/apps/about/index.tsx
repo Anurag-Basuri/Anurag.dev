@@ -113,7 +113,7 @@ const HeroBackground = memo(function HeroBackground() {
 	return (
 		<div className="absolute inset-0 bg-black overflow-hidden">
 			{/* Gradient Overlay */}
-			<div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+			<div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black via-transparent to-transparent z-10" />
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-emerald-900/40 via-black to-black opacity-80" />
 
 			{/* Grid Pattern */}
@@ -167,7 +167,7 @@ const ProfileAvatar = memo(function ProfileAvatar({
 			transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
 			className="relative shrink-0"
 		>
-			<div className="w-40 h-40 rounded-4xl p-1.5 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
+			<div className="w-40 h-40 rounded-4xl p-1.5 bg-linear-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
 				<div className="w-full h-full rounded-[1.7rem] overflow-hidden bg-black relative">
 					<Image
 						src={avatarUrl || '/logo.png'}
@@ -222,7 +222,7 @@ const QuickStat = memo(function QuickStat({
 		>
 			<div
 				className={cn(
-					'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
+					'absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
 					`${gradientFrom} to-transparent`,
 				)}
 			/>

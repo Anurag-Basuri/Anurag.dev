@@ -28,7 +28,15 @@ const LEETCODE_MAX_PROBLEMS = 3000;
 const ANIMATION_DURATION = 1.5;
 const PROGRESS_BAR_DURATION = 1;
 
-const STAT_CARD_CONFIG = [
+const STAT_CARD_CONFIG: Array<{
+	key: string;
+	label: string;
+	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	bgClass: string;
+	iconBgClass: string;
+	iconTextClass: string;
+	getValue: (stats: CodingStats) => string | number;
+}> = [
 	{
 		key: 'solved',
 		label: 'Problems Solved',
@@ -65,7 +73,7 @@ const STAT_CARD_CONFIG = [
 		iconTextClass: 'text-blue-500',
 		getValue: (stats: CodingStats) => stats.github.stats?.linesOfCode || 0,
 	},
-] as const;
+];
 
 const DIFFICULTY_CONFIG = {
 	easy: {
@@ -190,7 +198,7 @@ const QuickStatCard = memo(function QuickStatCard({
 }: {
 	label: string;
 	value: string | number;
-	icon: React.ElementType;
+	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 	bgClass: string;
 	iconBgClass: string;
 	iconTextClass: string;
@@ -201,7 +209,7 @@ const QuickStatCard = memo(function QuickStatCard({
 			variants={staggerItem}
 			custom={index}
 			whileHover={{ y: -5, transition: { duration: 0.2 } }}
-			className="relative p-6 rounded-3xl bg-gradient-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
+			className="relative p-6 rounded-3xl bg-linear-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
 		>
 			<div
 				className={cn(
@@ -296,12 +304,12 @@ const PlatformCard = memo(function PlatformCard({
 			{/* Header */}
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-2xl', iconBg, iconColor)}>
+					<div className={cn('p-3 rounded-2xl', iconBg as string, iconColor as string)}>
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
 						<h2 className="text-2xl font-bold text-white">{title}</h2>
-						<p className={cn('text-sm font-medium', usernameBg)}>@{username}</p>
+						<p className={cn('text-sm font-medium', usernameBg as string)}>@{username}</p>
 					</div>
 				</div>
 				<motion.button
