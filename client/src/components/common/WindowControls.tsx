@@ -1,14 +1,42 @@
 'use client';
 
 import React from 'react';
-import { X, Minus, Square, Maximize2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, Minus, Maximize2, Minimize2, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+// Standard MacOS Colors
+const COLORS = {
+	close: {
+		bg: '#ff5f57',
+		hover: '#ff6961',
+		icon: '#990000',
+	},
+	minimize: {
+		bg: '#febc2e',
+		hover: '#ffc940',
+		icon: '#985700',
+	},
+	maximize: {
+		bg: '#28c840',
+		hover: '#35d14b',
+		icon: '#006500',
+	},
+} as const;
 
 export interface WindowControlsProps {
 	onClose?: () => void;
 	onMinimize?: () => void;
 	onMaximize?: () => void;
 	isMaximized?: boolean;
+
+	// Optional overrides for specific behaviors
+	minimizeIcon?: React.ElementType<{ className?: string; style?: React.CSSProperties }>;
+	maximizeIcon?: React.ElementType<{ className?: string; style?: React.CSSProperties }>;
+	closeLabel?: string;
+	maximizeLabel?: string;
+	minimizeLabel?: string;
 	className?: string;
 }
 
@@ -16,73 +44,140 @@ export function WindowControls({
 	onClose,
 	onMinimize,
 	onMaximize,
-	isMaximized,
+	isMaximized = false,
+	minimizeIcon: CustomMinimizeIcon,
+	maximizeIcon: CustomMaximizeIcon,
+	closeLabel = 'Close',
+	minimizeLabel = 'Minimize',
+	maximizeLabel = 'Fullscreen',
 	className,
 }: WindowControlsProps) {
+	// Determine icons based on state and props
+	const MinIcon = CustomMinimizeIcon || Minus;
+	const MaxIcon = CustomMaximizeIcon || (isMaximized ? Minimize2 : Maximize2);
+	const maxLabel = isMaximized ? 'Restore' : maximizeLabel;
+
 	return (
-		<div className={cn('flex items-center gap-2', className)}>
-			{/* Close (Red) */}
-			<button
-				onClick={onClose}
-				className="group relative w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] flex items-center justify-center hover:bg-[#FF5F56]/80 transition-colors"
-				aria-label="Close"
-			>
-				<X className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-			</button>
+		<TooltipProvider delayDuration={300}>
+			<div className={cn('flex items-center gap-1.5 group', className)}>
+				{/* Close Button (Red) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onClose}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.close.bg }}
+							aria-label={closeLabel}
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.close.hover }}
+							/>
+							<div className="absolute -inset-2" /> {/* Hit area */}
+							<X
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.close.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						<p>{closeLabel}</p>
+					</TooltipContent>
+				</Tooltip>
 
-			{/* Minimize (Yellow) */}
-			<button
-				onClick={onMinimize}
-				className="group relative w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] flex items-center justify-center hover:bg-[#FFBD2E]/80 transition-colors"
-				aria-label="Minimize"
-			>
-				<Minus className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-			</button>
+				{/* Minimize/Action Button (Yellow) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onMinimize}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.minimize.bg }}
+							aria-label={minimizeLabel}
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.minimize.hover }}
+							/>
+							<div className="absolute -inset-2" />
+							<MinIcon
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.minimize.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						<p>{minimizeLabel}</p>
+					</TooltipContent>
+				</Tooltip>
 
-			{/* Maximize (Green) */}
-			<button
-				onClick={onMaximize}
-				className="group relative w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] flex items-center justify-center hover:bg-[#27C93F]/80 transition-colors"
-				aria-label={isMaximized ? 'Restore' : 'Maximize'}
-			>
-				{isMaximized ? (
-					<MinimizeIcon className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-				) : (
-					<MaximizeIcon className="w-2 h-2 text-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
-				)}
-			</button>
-		</div>
+				{/* Maximize Button (Green) */}
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<motion.button
+							whileHover={{ scale: 1.15 }}
+							whileTap={{ scale: 0.95 }}
+							onClick={onMaximize}
+							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							style={{ backgroundColor: COLORS.maximize.bg }}
+							aria-label={maxLabel}
+						>
+							<div
+								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+								style={{ backgroundColor: COLORS.maximize.hover }}
+							/>
+							<div className="absolute -inset-2" />
+							<MaxIcon
+								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
+								style={{ color: COLORS.maximize.icon }}
+							/>
+						</motion.button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom">
+						<p>{maxLabel}</p>
+					</TooltipContent>
+				</Tooltip>
+			</div>
+		</TooltipProvider>
 	);
 }
 
-// Helper icons
-const MaximizeIcon = ({ className }: { className?: string }) => (
-	<svg
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="4"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-		className={className}
-	>
-		<polyline points="15 3 21 3 21 9" />
-		<polyline points="9 21 3 21 3 15" />
-		<line x1="21" y1="3" x2="14" y2="10" />
-		<line x1="3" y1="21" x2="10" y2="14" />
-	</svg>
+// Export pre-configured variants for common use cases
+export const SidebarControls = ({
+	onClose,
+	onToggleFolders,
+	onMaximize,
+}: {
+	onClose?: () => void;
+	onToggleFolders?: () => void;
+	onMaximize?: () => void;
+}) => (
+	<WindowControls
+		onClose={onClose}
+		onMinimize={onToggleFolders}
+		onMaximize={onMaximize}
+		minimizeIcon={ChevronsUpDown}
+		minimizeLabel="Toggle All Folders"
+	/>
 );
 
-const MinimizeIcon = ({ className }: { className?: string }) => (
-	<svg
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		strokeWidth="4"
-		strokeLinecap="round"
-		strokeLinejoin="round"
-		className={className}
-	>
-		<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-	</svg>
+export const TerminalControls = ({
+	onClose,
+	onClearHistory,
+	onMaximize,
+}: {
+	onClose?: () => void;
+	onClearHistory?: () => void;
+	onMaximize?: () => void;
+}) => (
+	<WindowControls
+		onClose={onClose}
+		onMinimize={onClearHistory}
+		onMaximize={onMaximize}
+		minimizeIcon={Trash2}
+		minimizeLabel="Clear History"
+	/>
 );
