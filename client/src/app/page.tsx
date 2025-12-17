@@ -34,12 +34,15 @@ export default function HomePage() {
 	const router = useRouter();
 	const [bootComplete] = useAtom(bootCompleteAtom);
 
+	// Constants
+	const BOOT_REDIRECT_DELAY = 500;
+
 	useEffect(() => {
 		if (bootComplete) {
 			// Redirect to app when boot completes
 			const timeout = setTimeout(() => {
 				router.push('/app');
-			}, 500);
+			}, BOOT_REDIRECT_DELAY);
 			return () => clearTimeout(timeout);
 		}
 	}, [bootComplete, router]);
