@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import Image from 'next/image';
 import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -31,15 +31,56 @@ import {
 	ExternalLink,
 	Mail,
 	Server,
+	Rocket,
+	TrendingUp,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '@/lib/animations';
 
-function AboutSkeleton() {
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const SOCIAL_ICON_MAP: Record<string, React.ElementType> = {
+	GitHub: Github,
+	LinkedIn: Linkedin,
+	Twitter: Twitter,
+	Email: Mail,
+};
+
+const TECH_STACK_CONFIG = {
+	frontend: {
+		icon: Layers,
+		color: 'indigo',
+		gradient: 'from-indigo-500/10 to-blue-500/5',
+		borderHover: 'hover:border-indigo-500/30',
+		label: 'Frontend',
+	},
+	backend: {
+		icon: Server,
+		color: 'emerald',
+		gradient: 'from-emerald-500/10 to-teal-500/5',
+		borderHover: 'hover:border-emerald-500/30',
+		label: 'Backend',
+	},
+	ml: {
+		icon: Cpu,
+		color: 'purple',
+		gradient: 'from-purple-500/10 to-pink-500/5',
+		borderHover: 'hover:border-purple-500/30',
+		label: 'AI & ML',
+	},
+} as const;
+
+// ============================================================================
+// MEMOIZED COMPONENTS
+// ============================================================================
+
+const AboutSkeleton = memo(function AboutSkeleton() {
 	return (
 		<div className="p-4 sm:p-6 space-y-8 animate-pulse max-w-7xl mx-auto">
 			<div className="h-64 sm:h-80 bg-muted/20 rounded-[2.5rem]" />
@@ -51,20 +92,275 @@ function AboutSkeleton() {
 				<div className="h-4 bg-muted/40 rounded-xl w-1/2 mx-auto" />
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<div className="h-32 bg-muted/20 rounded-3xl" />
-				<div className="h-32 bg-muted/20 rounded-3xl" />
-				<div className="h-32 bg-muted/20 rounded-3xl" />
+				{[1, 2, 3].map(i => (
+					<div key={i} className="h-32 bg-muted/20 rounded-3xl" />
+				))}
 			</div>
 		</div>
 	);
-}
+});
 
-const socialIconMap: Record<string, React.ElementType> = {
-	GitHub: Github,
-	LinkedIn: Linkedin,
-	Twitter: Twitter,
-	Email: Mail,
-};
+const HeroBackground = memo(function HeroBackground() {
+	const shouldReduceMotion = useReducedMotion();
+
+	return (
+		<div className="absolute inset-0 bg-black overflow-hidden">
+			{/* Gradient Overlay */}
+			<div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-emerald-900/40 via-black to-black opacity-80" />
+
+			{/* Grid Pattern */}
+			<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+
+			{/* Animated Blobs */}
+			{!shouldReduceMotion && (
+				<>
+					<motion.div
+						className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px]"
+						animate={{
+							scale: [1, 1.2, 1],
+							opacity: [0.3, 0.5, 0.3],
+						}}
+						transition={{
+							duration: 8,
+							repeat: Infinity,
+							ease: 'easeInOut',
+						}}
+					/>
+					<motion.div
+						className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px]"
+						animate={{
+							scale: [1, 1.3, 1],
+							opacity: [0.3, 0.5, 0.3],
+						}}
+						transition={{
+							duration: 10,
+							repeat: Infinity,
+							ease: 'easeInOut',
+							delay: 1,
+						}}
+					/>
+				</>
+			)}
+		</div>
+	);
+});
+
+const ProfileAvatar = memo(function ProfileAvatar({
+	avatarUrl,
+	name,
+}: {
+	avatarUrl?: string;
+	name: string;
+}) {
+	return (
+		<motion.div
+			initial={{ scale: 0, opacity: 0 }}
+			animate={{ scale: 1, opacity: 1 }}
+			transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+			className="relative shrink-0"
+		>
+			<div className="w-40 h-40 rounded-4xl p-1.5 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
+				<div className="w-full h-full rounded-[1.7rem] overflow-hidden bg-black relative">
+					<Image
+						src={avatarUrl || '/logo.png'}
+						alt={name}
+						fill
+						className="object-cover"
+						priority
+						sizes="160px"
+					/>
+				</div>
+			</div>
+			{/* Online Status Indicator */}
+			<motion.div
+				className="absolute -bottom-2 -right-2 bg-[#0a0a0a] rounded-xl p-1.5 border border-white/10"
+				initial={{ scale: 0 }}
+				animate={{ scale: 1 }}
+				transition={{ delay: 0.5, type: 'spring' }}
+			>
+				<motion.div
+					className="w-4 h-4 rounded-lg bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+					animate={{ opacity: [1, 0.5, 1] }}
+					transition={{ duration: 2, repeat: Infinity }}
+				/>
+			</motion.div>
+		</motion.div>
+	);
+});
+
+const QuickStat = memo(function QuickStat({
+	value,
+	label,
+	icon: Icon,
+	color,
+	delay = 0,
+}: {
+	value: string | number;
+	label: string;
+	icon: React.ElementType;
+	color: string;
+	delay?: number;
+}) {
+	return (
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: true, margin: '-50px' }}
+			transition={{ delay, duration: 0.5 }}
+			whileHover={{ y: -5, transition: { duration: 0.2 } }}
+			className="group relative p-8 rounded-4xl bg-card/20 border border-white/5 hover:bg-card/40 transition-all duration-500"
+		>
+			<div
+				className={cn(
+					'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
+					`from-${color}-500/5 to-transparent`,
+				)}
+			/>
+			<div className="text-5xl font-black text-white mb-2 tracking-tighter">{value}</div>
+			<div
+				className={cn(
+					'flex items-center gap-2 text-sm font-bold uppercase tracking-widest',
+					`text-${color}-500`,
+				)}
+			>
+				<Icon className="w-4 h-4" />
+				{label}
+			</div>
+		</motion.div>
+	);
+});
+
+const TechStackCard = memo(function TechStackCard({
+	category,
+	skills,
+	config,
+	delay = 0,
+}: {
+	category: string;
+	skills: Array<{ name: string; level?: string }>;
+	config: (typeof TECH_STACK_CONFIG)[keyof typeof TECH_STACK_CONFIG];
+	delay?: number;
+}) {
+	const Icon = config.icon;
+
+	return (
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: true, margin: '-50px' }}
+			transition={{ delay, duration: 0.5 }}
+			whileHover={{ y: -5, transition: { duration: 0.2 } }}
+			className={cn(
+				'p-8 rounded-4xl bg-card/20 border border-white/5 transition-all group',
+				config.borderHover,
+			)}
+		>
+			<div
+				className={cn(
+					'w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110',
+					`bg-${config.color}-500/10 text-${config.color}-400`,
+				)}
+			>
+				<Icon className="w-6 h-6" />
+			</div>
+			<h3 className="text-xl font-bold text-white mb-6">{config.label}</h3>
+			<div className="flex flex-wrap gap-2">
+				{skills.map(skill => (
+					<motion.span
+						key={skill.name}
+						whileHover={{ scale: 1.05 }}
+						className={cn(
+							'px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors',
+							`bg-${config.color}-500/10 border-${config.color}-500/10 text-${config.color}-300`,
+							`hover:bg-${config.color}-500/20 hover:border-${config.color}-500/30`,
+						)}
+					>
+						{skill.name}
+					</motion.span>
+				))}
+			</div>
+		</motion.div>
+	);
+});
+
+const CodingStatsCard = memo(function CodingStatsCard({
+	codingStats,
+	openWindow,
+}: {
+	codingStats: CodingStats | null;
+	openWindow: (id: string) => void;
+}) {
+	if (!codingStats) return null;
+
+	return (
+		<motion.div
+			initial={{ opacity: 0, x: 20 }}
+			whileInView={{ opacity: 1, x: 0 }}
+			viewport={{ once: true }}
+			transition={{ delay: 0.2 }}
+			className="p-6 rounded-4xl bg-card/20 border border-white/5 space-y-6 hover:border-emerald-500/20 transition-all"
+		>
+			<div className="flex items-center justify-between">
+				<h3 className="text-lg font-bold text-white flex items-center gap-2">
+					<Terminal className="w-5 h-5 text-emerald-500" />
+					Coding Stats
+				</h3>
+				<button
+					onClick={() => openWindow('coding-stats')}
+					className="text-xs font-bold text-muted-foreground hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 group"
+				>
+					View All
+					<ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+				</button>
+			</div>
+
+			<div className="space-y-4">
+				{/* LeetCode */}
+				<motion.div
+					whileHover={{ scale: 1.02 }}
+					className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5 hover:border-yellow-500/30 transition-all cursor-pointer"
+				>
+					<div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+						<Code className="w-5 h-5" />
+					</div>
+					<div className="flex-1">
+						<div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+							LeetCode
+						</div>
+						<div className="text-sm font-bold text-white">
+							{codingStats.leetcode.stats?.solved || '0'} Solved
+						</div>
+					</div>
+					<ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+				</motion.div>
+
+				{/* GitHub */}
+				<motion.div
+					whileHover={{ scale: 1.02 }}
+					className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5 hover:border-white/20 transition-all cursor-pointer"
+				>
+					<div className="p-2 bg-white/10 rounded-lg text-white">
+						<Github className="w-5 h-5" />
+					</div>
+					<div className="flex-1">
+						<div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+							GitHub
+						</div>
+						<div className="text-sm font-bold text-white">
+							{codingStats.github.stats?.stars || '0'} Stars
+						</div>
+					</div>
+					<ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+				</motion.div>
+			</div>
+		</motion.div>
+	);
+});
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
 
 export function AboutModule() {
 	const [about, setAbout] = useState<AboutData | null>(null);
@@ -73,7 +369,8 @@ export function AboutModule() {
 	const [error, setError] = useState<string | null>(null);
 	const { openWindow } = useWindowManager();
 
-	const fetchData = async () => {
+	// Fetch data with error handling
+	const fetchData = useCallback(async () => {
 		try {
 			setLoading(true);
 			setError(null);
@@ -92,45 +389,58 @@ export function AboutModule() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
 	useEffect(() => {
 		fetchData();
+	}, [fetchData]);
+
+	// Memoize computed values
+	const socialLinks = useMemo(() => about?.socials || [], [about?.socials]);
+	const focusAreas = useMemo(() => about?.focusAreas || [], [about?.focusAreas]);
+	const languages = useMemo(() => about?.languages || [], [about?.languages]);
+	const hobbies = useMemo(() => about?.hobbies || [], [about?.hobbies]);
+
+	// Handle social link clicks
+	const handleSocialClick = useCallback((url: string) => {
+		window.open(url, '_blank', 'noopener,noreferrer');
 	}, []);
 
+	// Loading state
 	if (loading) return <AboutSkeleton />;
 
+	// Error state
 	if (error) {
 		return <ModuleError message={error} onRetry={fetchData} />;
 	}
 
+	// No data state
 	if (!about) return null;
 
 	return (
 		<ScrollArea className="h-full">
 			<div className="max-w-7xl mx-auto pb-24">
-				{/* Hero Section */}
+				{/* ============================================================
+                    HERO SECTION
+                    ============================================================ */}
 				<div className="relative mb-20">
+					{/* Hero Background */}
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
 						className="relative h-64 sm:h-80 md:h-96 rounded-b-[3rem] overflow-hidden mx-2 sm:mx-4"
 					>
-						{/* Dynamic Background */}
-						<div className="absolute inset-0 bg-black">
-							<div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black via-transparent to-transparent z-10" />
-							<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-emerald-900/40 via-black to-black opacity-80" />
-
-							{/* Grid and Patterns */}
-							<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
-							<div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] animate-pulse" />
-							<div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[100px] animate-pulse delay-1000" />
-						</div>
+						<HeroBackground />
 
 						{/* Resume Button */}
 						{about.resumeUrl && (
-							<div className="absolute top-6 right-6 z-20">
+							<motion.div
+								initial={{ opacity: 0, y: -20 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{ delay: 0.3 }}
+								className="absolute top-6 right-6 z-20"
+							>
 								<a
 									href={about.resumeUrl}
 									target="_blank"
@@ -142,7 +452,7 @@ export function AboutModule() {
 										Resume
 									</span>
 								</a>
-							</div>
+							</motion.div>
 						)}
 					</motion.div>
 
@@ -151,27 +461,7 @@ export function AboutModule() {
 						<div className="bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 max-w-5xl mx-auto">
 							<div className="flex flex-col md:flex-row items-center md:items-start gap-8">
 								{/* Avatar */}
-								<motion.div
-									initial={{ scale: 0, opacity: 0 }}
-									animate={{ scale: 1, opacity: 1 }}
-									transition={{ delay: 0.2, type: 'spring' }}
-									className="relative shrink-0"
-								>
-									<div className="w-40 h-40 rounded-4xl p-1.5 bg-linear-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
-										<div className="w-full h-full rounded-[1.7rem] overflow-hidden bg-black relative">
-											<Image
-												src={about.avatarUrl || '/logo.png'}
-												alt={about.name}
-												fill
-												className="object-cover"
-												priority
-											/>
-										</div>
-									</div>
-									<div className="absolute -bottom-2 -right-2 bg-[#0a0a0a] rounded-xl p-1.5 border border-white/10">
-										<div className="w-4 h-4 rounded-lg bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-									</div>
-								</motion.div>
+								<ProfileAvatar avatarUrl={about.avatarUrl} name={about.name} />
 
 								{/* Info */}
 								<div className="flex-1 text-center md:text-left space-y-4 pt-2">
@@ -179,6 +469,7 @@ export function AboutModule() {
 										<motion.h1
 											initial={{ opacity: 0, y: 10 }}
 											animate={{ opacity: 1, y: 0 }}
+											transition={{ delay: 0.1 }}
 											className="text-4xl sm:text-5xl font-black text-white mb-2 tracking-tight"
 										>
 											{about.name}
@@ -186,7 +477,7 @@ export function AboutModule() {
 										<motion.p
 											initial={{ opacity: 0, y: 10 }}
 											animate={{ opacity: 1, y: 0 }}
-											transition={{ delay: 0.1 }}
+											transition={{ delay: 0.2 }}
 											className="text-xl text-emerald-400 font-medium"
 										>
 											{about.role}
@@ -196,14 +487,19 @@ export function AboutModule() {
 									<motion.p
 										initial={{ opacity: 0, y: 10 }}
 										animate={{ opacity: 1, y: 0 }}
-										transition={{ delay: 0.2 }}
+										transition={{ delay: 0.3 }}
 										className="text-muted-foreground leading-relaxed max-w-2xl"
 									>
 										{about.tagline}
 									</motion.p>
 
 									{/* Quick Links & Status */}
-									<div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2">
+									<motion.div
+										initial={{ opacity: 0, y: 10 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ delay: 0.4 }}
+										className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2"
+									>
 										{about.location && (
 											<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-xs font-medium text-white/70">
 												<MapPin className="w-3.5 h-3.5 text-emerald-500" />
@@ -219,77 +515,75 @@ export function AboutModule() {
 
 										<div className="w-px h-4 bg-white/10 mx-2 hidden sm:block" />
 
+										{/* Social Links */}
 										<div className="flex items-center gap-2">
-											{about.socials?.map(social => {
+											{socialLinks.map(social => {
 												const Icon =
-													socialIconMap[social.platform] || Globe;
+													SOCIAL_ICON_MAP[social.platform] || Globe;
 												return (
-													<a
+													<motion.button
 														key={social.platform}
-														href={social.url}
-														target="_blank"
-														rel="noopener noreferrer"
+														whileHover={{ scale: 1.1 }}
+														whileTap={{ scale: 0.95 }}
+														onClick={() =>
+															handleSocialClick(social.url)
+														}
 														className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors"
+														aria-label={`Visit ${social.platform}`}
 													>
 														<Icon className="w-4 h-4" />
-													</a>
+													</motion.button>
 												);
 											})}
 										</div>
-									</div>
+									</motion.div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Content Grid */}
+				{/* ============================================================
+                    CONTENT GRID
+                    ============================================================ */}
 				<div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-16">
 					{/* Highlights */}
 					{about.highlights && (
-						<motion.div
-							variants={staggerContainer}
-							initial="hidden"
-							whileInView="visible"
-							viewport={{ once: true, margin: '-50px' }}
-							className="grid grid-cols-1 md:grid-cols-3 gap-6"
-						>
-							<div className="group relative p-8 rounded-4xl bg-card/20 border border-white/5 hover:bg-card/40 transition-all duration-500 hover:-translate-y-1">
-								<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl" />
-								<div className="text-5xl font-black text-white mb-2 tracking-tighter">
-									{about.experienceYears}+
-								</div>
-								<div className="flex items-center gap-2 text-emerald-500 text-sm font-bold uppercase tracking-widest">
-									<Briefcase className="w-4 h-4" /> Years Exp.
-								</div>
-							</div>
-
-							<div className="group relative p-8 rounded-4xl bg-card/20 border border-white/5 hover:bg-card/40 transition-all duration-500 hover:-translate-y-1">
-								<div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl" />
-								<div className="text-5xl font-black text-white mb-2 tracking-tighter">
-									{about.projectsCount}+
-								</div>
-								<div className="flex items-center gap-2 text-blue-500 text-sm font-bold uppercase tracking-widest">
-									<Code2 className="w-4 h-4" /> Projects
-								</div>
-							</div>
-
-							<div className="group relative p-8 rounded-4xl bg-card/20 border border-white/5 hover:bg-card/40 transition-all duration-500 hover:-translate-y-1">
-								<div className="absolute inset-0 bg-linear-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl" />
-								<div className="text-5xl font-black text-white mb-2 tracking-tighter">
-									100%
-								</div>
-								<div className="flex items-center gap-2 text-purple-500 text-sm font-bold uppercase tracking-widest">
-									<Target className="w-4 h-4" /> Commitment
-								</div>
-							</div>
-						</motion.div>
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+							<QuickStat
+								value={`${about.experienceYears}+`}
+								label="Years Exp."
+								icon={Briefcase}
+								color="emerald"
+								delay={0}
+							/>
+							<QuickStat
+								value={`${about.projectsCount}+`}
+								label="Projects"
+								icon={Code2}
+								color="blue"
+								delay={0.1}
+							/>
+							<QuickStat
+								value="100%"
+								label="Commitment"
+								icon={Target}
+								color="purple"
+								delay={0.2}
+							/>
+						</div>
 					)}
 
-					{/* About Bio */}
+					{/* About Bio & Sidebar */}
 					<div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+						{/* Main Content */}
 						<div className="lg:col-span-8 space-y-8">
-							<div className="space-y-6">
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true }}
+								className="space-y-6"
+							>
 								<h2 className="text-3xl font-bold text-white flex items-center gap-3">
 									<User className="w-6 h-6 text-emerald-500" />
 									About Me
@@ -300,189 +594,141 @@ export function AboutModule() {
 										<div className="whitespace-pre-line mt-4">{about.bio}</div>
 									)}
 								</div>
-							</div>
+							</motion.div>
 
-							{about.focusAreas && about.focusAreas.length > 0 && (
-								<div className="pt-6">
+							{/* Focus Areas */}
+							{focusAreas.length > 0 && (
+								<motion.div
+									initial={{ opacity: 0, y: 20 }}
+									whileInView={{ opacity: 1, y: 0 }}
+									viewport={{ once: true }}
+									transition={{ delay: 0.1 }}
+									className="pt-6"
+								>
 									<h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
 										Core Focus
 									</h3>
 									<div className="flex flex-wrap gap-3">
-										{about.focusAreas.map(area => (
-											<span
+										{focusAreas.map((area, index) => (
+											<motion.span
 												key={area}
+												initial={{ opacity: 0, scale: 0.8 }}
+												whileInView={{ opacity: 1, scale: 1 }}
+												viewport={{ once: true }}
+												transition={{ delay: index * 0.05 }}
+												whileHover={{ scale: 1.05 }}
 												className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-sm font-medium text-white/80 hover:border-emerald-500/30 hover:text-emerald-400 transition-colors cursor-default"
 											>
 												{area}
-											</span>
+											</motion.span>
 										))}
 									</div>
-								</div>
+								</motion.div>
 							)}
 						</div>
 
 						{/* Sidebar Stats */}
 						<div className="lg:col-span-4 space-y-6">
-							{codingStats && (
-								<div className="p-6 rounded-4xl bg-card/20 border border-white/5 space-y-6">
-									<div className="flex items-center justify-between">
-										<h3 className="text-lg font-bold text-white flex items-center gap-2">
-											<Terminal className="w-5 h-5 text-emerald-500" />
-											Coding Stats
-										</h3>
-										<button
-											onClick={() => openWindow('profiles')}
-											className="text-xs font-bold text-muted-foreground hover:text-white transition-colors uppercase tracking-widest"
-										>
-											View All
-										</button>
-									</div>
-
-									<div className="space-y-4">
-										{/* LeetCode Mini */}
-										<div className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5">
-											<div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
-												<Code className="w-5 h-5" />
-											</div>
-											<div>
-												<div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-													LeetCode
-												</div>
-												<div className="text-sm font-bold text-white">
-													{codingStats.leetcode.stats?.solved || '0'}{' '}
-													Solved
-												</div>
-											</div>
-										</div>
-
-										{/* GitHub Mini */}
-										<div className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5">
-											<div className="p-2 bg-white/10 rounded-lg text-white">
-												<Github className="w-5 h-5" />
-											</div>
-											<div>
-												<div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-													GitHub
-												</div>
-												<div className="text-sm font-bold text-white">
-													{codingStats.github.stats?.stars || '0'} Stars
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							)}
+							<CodingStatsCard codingStats={codingStats} openWindow={openWindow} />
 						</div>
 					</div>
 
 					{/* Tech Stack */}
 					<div className="space-y-8">
-						<h2 className="text-3xl font-bold text-white flex items-center gap-3">
+						<motion.h2
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true }}
+							className="text-3xl font-bold text-white flex items-center gap-3"
+						>
 							<Cpu className="w-6 h-6 text-emerald-500" />
 							Technical Arsenal
-						</h2>
+						</motion.h2>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{/* Frontend */}
-							<motion.div
-								whileHover={{ y: -5 }}
-								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-indigo-500/30 transition-all group"
-							>
-								<div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-400 group-hover:scale-110 transition-transform">
-									<Layers className="w-6 h-6" />
-								</div>
-								<h3 className="text-xl font-bold text-white mb-6">Frontend</h3>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.frontend.map(skill => (
-										<span
-											key={skill.name}
-											className="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/10 text-xs font-bold text-indigo-300"
-										>
-											{skill.name}
-										</span>
-									))}
-								</div>
-							</motion.div>
-
-							{/* Backend */}
-							<motion.div
-								whileHover={{ y: -5 }}
-								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-emerald-500/30 transition-all group"
-							>
-								<div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 text-emerald-400 group-hover:scale-110 transition-transform">
-									<Server className="w-6 h-6" />
-								</div>
-								<h3 className="text-xl font-bold text-white mb-6">Backend</h3>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.backend.map(skill => (
-										<span
-											key={skill.name}
-											className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/10 text-xs font-bold text-emerald-300"
-										>
-											{skill.name}
-										</span>
-									))}
-								</div>
-							</motion.div>
-
-							{/* AI / ML */}
-							<motion.div
-								whileHover={{ y: -5 }}
-								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-purple-500/30 transition-all group"
-							>
-								<div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 text-purple-400 group-hover:scale-110 transition-transform">
-									<Box className="w-6 h-6" />
-								</div>
-								<h3 className="text-xl font-bold text-white mb-6">AI & ML</h3>
-								<div className="flex flex-wrap gap-2">
-									{about.skills.ml.map(skill => (
-										<span
-											key={skill.name}
-											className="px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/10 text-xs font-bold text-purple-300"
-										>
-											{skill.name}
-										</span>
-									))}
-								</div>
-							</motion.div>
+							<TechStackCard
+								category="frontend"
+								skills={about.skills.frontend}
+								config={TECH_STACK_CONFIG.frontend}
+								delay={0}
+							/>
+							<TechStackCard
+								category="backend"
+								skills={about.skills.backend}
+								config={TECH_STACK_CONFIG.backend}
+								delay={0.1}
+							/>
+							<TechStackCard
+								category="ml"
+								skills={about.skills.ml}
+								config={TECH_STACK_CONFIG.ml}
+								delay={0.2}
+							/>
 						</div>
 					</div>
 
 					{/* Personal Section */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-12">
-						<div className="p-8 rounded-4xl bg-card/20 border border-white/5">
-							<h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-								<Globe className="w-5 h-5 text-blue-400" />
-								Languages
-							</h3>
-							<div className="flex flex-wrap gap-3">
-								{about.languages?.map(lang => (
-									<span
-										key={lang}
-										className="px-4 py-2 rounded-xl bg-background/50 border border-white/5 text-sm font-medium text-white/80"
-									>
-										{lang}
-									</span>
-								))}
-							</div>
-						</div>
+						{/* Languages */}
+						{languages.length > 0 && (
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true }}
+								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-blue-500/20 transition-all"
+							>
+								<h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+									<Globe className="w-5 h-5 text-blue-400" />
+									Languages
+								</h3>
+								<div className="flex flex-wrap gap-3">
+									{languages.map((lang, index) => (
+										<motion.span
+											key={lang}
+											initial={{ opacity: 0, scale: 0.8 }}
+											whileInView={{ opacity: 1, scale: 1 }}
+											viewport={{ once: true }}
+											transition={{ delay: index * 0.05 }}
+											whileHover={{ scale: 1.05 }}
+											className="px-4 py-2 rounded-xl bg-background/50 border border-white/5 text-sm font-medium text-white/80 hover:border-blue-500/30 transition-colors"
+										>
+											{lang}
+										</motion.span>
+									))}
+								</div>
+							</motion.div>
+						)}
 
-						<div className="p-8 rounded-4xl bg-card/20 border border-white/5">
-							<h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-								<Sparkles className="w-5 h-5 text-yellow-400" />
-								Interests
-							</h3>
-							<div className="flex flex-wrap gap-3">
-								{about.hobbies?.map(hobby => (
-									<span
-										key={hobby}
-										className="px-4 py-2 rounded-xl bg-background/50 border border-white/5 text-sm font-medium text-white/80"
-									>
-										{hobby}
-									</span>
-								))}
-							</div>
-						</div>
+						{/* Interests */}
+						{hobbies.length > 0 && (
+							<motion.div
+								initial={{ opacity: 0, y: 20 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								viewport={{ once: true }}
+								transition={{ delay: 0.1 }}
+								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-yellow-500/20 transition-all"
+							>
+								<h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+									<Sparkles className="w-5 h-5 text-yellow-400" />
+									Interests
+								</h3>
+								<div className="flex flex-wrap gap-3">
+									{hobbies.map((hobby, index) => (
+										<motion.span
+											key={hobby}
+											initial={{ opacity: 0, scale: 0.8 }}
+											whileInView={{ opacity: 1, scale: 1 }}
+											viewport={{ once: true }}
+											transition={{ delay: index * 0.05 }}
+											whileHover={{ scale: 1.05 }}
+											className="px-4 py-2 rounded-xl bg-background/50 border border-white/5 text-sm font-medium text-white/80 hover:border-yellow-500/30 transition-colors"
+										>
+											{hobby}
+										</motion.span>
+									))}
+								</div>
+							</motion.div>
+						)}
 					</div>
 				</div>
 			</div>
