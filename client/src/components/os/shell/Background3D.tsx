@@ -518,8 +518,10 @@ export function Background3D() {
 						logarithmicDepthBuffer: true,
 					}}
 					onCreated={({ gl }) => {
-						gl.setClearAlpha(0);
-						gl.setClearColor('#000000', 0);
+						/* Shooting stars removed for cleaner look */ gl.setClearColor(
+							'#000000',
+							0,
+						);
 					}}
 					shadows={false}
 				>
