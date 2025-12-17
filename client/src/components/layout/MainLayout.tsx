@@ -285,14 +285,14 @@ export function MainLayout() {
 	return (
 		<ErrorBoundary>
 			<ContextMenuProvider>
-				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background h-full w-full">
 					{/* Background */}
 					<Suspense fallback={null}>
 						<Background3D />
 					</Suspense>
 
 					{/* Top Bar */}
-					<Suspense fallback={<ComponentLoader height="h-8" />}>
+					{/* <Suspense fallback={<ComponentLoader height="h-8" />}>
 						<TopBar
 							isMobile={isMobile}
 							sidebarCollapsed={sidebar.isCollapsed}
@@ -305,18 +305,18 @@ export function MainLayout() {
 							}
 							onFileSelect={handleFileSelect}
 						/>
-					</Suspense>
+					</Suspense> */}
 
 					{/* Main Content */}
-					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
+					{/* <div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
 						{renderDesktopLayout()}
 						{renderMobileLayout()}
-					</div>
+					</div> */}
 
 					{/* Taskbar */}
-					<Suspense fallback={<ComponentLoader height="h-9" />}>
+					{/* <Suspense fallback={<ComponentLoader height="h-9" />}>
 						<Taskbar />
-					</Suspense>
+					</Suspense> */}
 
 					{/* Toast Notifications */}
 					<Toaster

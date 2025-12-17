@@ -14,9 +14,9 @@ import { BlendFunction } from 'postprocessing';
 // --- Configuration ---
 const CONFIG = {
 	STARS: {
-		DISTANT: { count: 3000, radius: 100, size: 0.015, opacity: 0.15, rotationSpeed: 0.004 },
-		MEDIUM: { count: 1000, radius: 50, size: 0.025, opacity: 0.25, rotationSpeed: 0.008 },
-		CLOSE: { count: 300, radius: 25, size: 0.05, opacity: 0.35, rotationSpeed: 0.015 },
+		DISTANT: { count: 3000, radius: 300, size: 0.015, opacity: 0.15, rotationSpeed: 0.004 },
+		MEDIUM: { count: 1000, radius: 150, size: 0.025, opacity: 0.25, rotationSpeed: 0.008 },
+		CLOSE: { count: 300, radius: 80, size: 0.05, opacity: 0.35, rotationSpeed: 0.015 },
 	},
 	CAMERA: {
 		defaultPosition: [0, 2, 5] as [number, number, number],
@@ -226,7 +226,7 @@ const NebulaField = React.memo(function NebulaField({ reducedMotion }: { reduced
 	});
 
 	return (
-		<mesh ref={meshRef} position={[0, 0, -15]} scale={[100, 60, 1]}>
+		<mesh ref={meshRef} position={[0, 0, -15]} scale={[300, 160, 1]}>
 			<planeGeometry args={[1, 1, 32, 32]} />
 			<shaderMaterial
 				ref={materialRef}
@@ -444,7 +444,7 @@ const AnimatedGrid = React.memo(function AnimatedGrid({
 
 	return (
 		<mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
-			<planeGeometry args={[100, 100, 50, 50]} />
+			<planeGeometry args={[400, 400, 150, 150]} />
 			<shaderMaterial
 				ref={materialRef}
 				{...gridShader}
