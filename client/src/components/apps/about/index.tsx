@@ -55,24 +55,39 @@ const SOCIAL_ICON_MAP: Record<string, React.ElementType> = {
 const TECH_STACK_CONFIG = {
 	frontend: {
 		icon: Layers,
-		color: 'indigo',
-		gradient: 'from-indigo-500/10 to-blue-500/5',
-		borderHover: 'hover:border-indigo-500/30',
 		label: 'Frontend',
+		iconBg: 'bg-indigo-500/10',
+		iconColor: 'text-indigo-400',
+		borderHover: 'hover:border-indigo-500/30',
+		pillBg: 'bg-indigo-500/10',
+		pillBorder: 'border-indigo-500/10',
+		pillText: 'text-indigo-300',
+		pillHoverBg: 'hover:bg-indigo-500/20',
+		pillHoverBorder: 'hover:border-indigo-500/30',
 	},
 	backend: {
 		icon: Server,
-		color: 'emerald',
-		gradient: 'from-emerald-500/10 to-teal-500/5',
-		borderHover: 'hover:border-emerald-500/30',
 		label: 'Backend',
+		iconBg: 'bg-emerald-500/10',
+		iconColor: 'text-emerald-400',
+		borderHover: 'hover:border-emerald-500/30',
+		pillBg: 'bg-emerald-500/10',
+		pillBorder: 'border-emerald-500/10',
+		pillText: 'text-emerald-300',
+		pillHoverBg: 'hover:bg-emerald-500/20',
+		pillHoverBorder: 'hover:border-emerald-500/30',
 	},
 	ml: {
 		icon: Cpu,
-		color: 'purple',
-		gradient: 'from-purple-500/10 to-pink-500/5',
-		borderHover: 'hover:border-purple-500/30',
 		label: 'AI & ML',
+		iconBg: 'bg-purple-500/10',
+		iconColor: 'text-purple-400',
+		borderHover: 'hover:border-purple-500/30',
+		pillBg: 'bg-purple-500/10',
+		pillBorder: 'border-purple-500/10',
+		pillText: 'text-purple-300',
+		pillHoverBg: 'hover:bg-purple-500/20',
+		pillHoverBorder: 'hover:border-purple-500/30',
 	},
 } as const;
 
@@ -106,7 +121,7 @@ const HeroBackground = memo(function HeroBackground() {
 	return (
 		<div className="absolute inset-0 bg-black overflow-hidden">
 			{/* Gradient Overlay */}
-			<div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black via-transparent to-transparent z-10" />
+			<div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black via-transparent to-transparent z-10" />
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-emerald-900/40 via-black to-black opacity-80" />
 
 			{/* Grid Pattern */}
@@ -160,7 +175,7 @@ const ProfileAvatar = memo(function ProfileAvatar({
 			transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
 			className="relative shrink-0"
 		>
-			<div className="w-40 h-40 rounded-4xl p-1.5 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
+			<div className="w-40 h-40 rounded-4xl p-1.5 bg-linear-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
 				<div className="w-full h-full rounded-[1.7rem] overflow-hidden bg-black relative">
 					<Image
 						src={avatarUrl || '/logo.png'}
@@ -193,14 +208,16 @@ const QuickStat = memo(function QuickStat({
 	value,
 	label,
 	icon: Icon,
-	color,
 	delay = 0,
+	gradientFrom,
+	textColor,
 }: {
 	value: string | number;
 	label: string;
 	icon: React.ElementType;
-	color: string;
 	delay?: number;
+	gradientFrom: string;
+	textColor: string;
 }) {
 	return (
 		<motion.div
@@ -213,15 +230,15 @@ const QuickStat = memo(function QuickStat({
 		>
 			<div
 				className={cn(
-					'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
-					`from-${color}-500/5 to-transparent`,
+					'absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
+					`${gradientFrom} to-transparent`,
 				)}
 			/>
 			<div className="text-5xl font-black text-white mb-2 tracking-tighter">{value}</div>
 			<div
 				className={cn(
 					'flex items-center gap-2 text-sm font-bold uppercase tracking-widest',
-					`text-${color}-500`,
+					textColor,
 				)}
 			>
 				<Icon className="w-4 h-4" />
@@ -259,7 +276,8 @@ const TechStackCard = memo(function TechStackCard({
 			<div
 				className={cn(
 					'w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110',
-					`bg-${config.color}-500/10 text-${config.color}-400`,
+					config.iconBg,
+					config.iconColor,
 				)}
 			>
 				<Icon className="w-6 h-6" />
@@ -272,8 +290,11 @@ const TechStackCard = memo(function TechStackCard({
 						whileHover={{ scale: 1.05 }}
 						className={cn(
 							'px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors',
-							`bg-${config.color}-500/10 border-${config.color}-500/10 text-${config.color}-300`,
-							`hover:bg-${config.color}-500/20 hover:border-${config.color}-500/30`,
+							config.pillBg,
+							config.pillBorder,
+							config.pillText,
+							config.pillHoverBg,
+							config.pillHoverBorder,
 						)}
 					>
 						{skill.name}
@@ -554,21 +575,24 @@ export function AboutModule() {
 								value={`${about.experienceYears}+`}
 								label="Years Exp."
 								icon={Briefcase}
-								color="emerald"
+								gradientFrom="from-emerald-500/5"
+								textColor="text-emerald-500"
 								delay={0}
 							/>
 							<QuickStat
 								value={`${about.projectsCount}+`}
 								label="Projects"
 								icon={Code2}
-								color="blue"
+								gradientFrom="from-blue-500/5"
+								textColor="text-blue-500"
 								delay={0.1}
 							/>
 							<QuickStat
 								value="100%"
 								label="Commitment"
 								icon={Target}
-								color="purple"
+								gradientFrom="from-purple-500/5"
+								textColor="text-purple-500"
 								delay={0.2}
 							/>
 						</div>

@@ -149,6 +149,7 @@ export interface PlatformStats {
 	username: string;
 	url: string;
 	stats?: {
+		linesOfCode: number;
 		rating?: number;
 		globalRank?: string | number;
 		stars?: number;
