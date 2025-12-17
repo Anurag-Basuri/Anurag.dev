@@ -35,28 +35,36 @@ const STAT_CARD_CONFIG = [
 		key: 'solved',
 		label: 'Problems Solved',
 		icon: Code2,
-		color: 'emerald',
+		bgClass: 'bg-emerald-500/5',
+		iconBgClass: 'bg-emerald-500/10',
+		iconTextClass: 'text-emerald-500',
 		getValue: (stats: CodingStats) => stats.leetcode.stats?.solved || 0,
 	},
 	{
 		key: 'stars',
 		label: 'Stars Earned',
 		icon: Star,
-		color: 'yellow',
+		bgClass: 'bg-yellow-500/5',
+		iconBgClass: 'bg-yellow-500/10',
+		iconTextClass: 'text-yellow-500',
 		getValue: (stats: CodingStats) => stats.github.stats?.stars || 0,
 	},
 	{
 		key: 'rating',
 		label: 'Peak Rating',
 		icon: Trophy,
-		color: 'red',
+		bgClass: 'bg-red-500/5',
+		iconBgClass: 'bg-red-500/10',
+		iconTextClass: 'text-red-500',
 		getValue: (stats: CodingStats) => stats.codeforces.stats?.maxRating || 'N/A',
 	},
 	{
 		key: 'loc',
 		label: 'Lines of Code',
 		icon: GitCommit,
-		color: 'blue',
+		bgClass: 'bg-blue-500/5',
+		iconBgClass: 'bg-blue-500/10',
+		iconTextClass: 'text-blue-500',
 		getValue: (stats: CodingStats) => stats.github.stats?.linesOfCode || 0,
 	},
 ] as const;
@@ -177,13 +185,17 @@ const QuickStatCard = memo(function QuickStatCard({
 	label,
 	value,
 	icon: Icon,
-	color,
+	bgClass,
+	iconBgClass,
+	iconTextClass,
 	index,
 }: {
 	label: string;
 	value: string | number;
 	icon: React.ElementType;
-	color: string;
+	bgClass: string;
+	iconBgClass: string;
+	iconTextClass: string;
 	index: number;
 }) {
 	return (
@@ -191,19 +203,20 @@ const QuickStatCard = memo(function QuickStatCard({
 			variants={staggerItem}
 			custom={index}
 			whileHover={{ y: -5, transition: { duration: 0.2 } }}
-			className="relative p-6 rounded-3xl bg-gradient-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
+			className="relative p-6 rounded-3xl bg-linear-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
 		>
 			<div
 				className={cn(
 					'absolute top-0 right-0 w-32 h-32 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110',
-					`bg-${color}-500/5`,
+					bgClass,
 				)}
 			/>
 			<div className="relative z-10 flex flex-col gap-4">
 				<div
 					className={cn(
 						'w-10 h-10 rounded-2xl flex items-center justify-center',
-						`bg-${color}-500/10 text-${color}-500`,
+						iconBgClass,
+						iconTextClass,
 					)}
 				>
 					<Icon className="w-5 h-5" />
@@ -461,7 +474,9 @@ export function CodingStatsModule() {
 							label={config.label}
 							value={config.getValue(stats)}
 							icon={config.icon}
-							color={config.color}
+							bgClass={config.bgClass}
+							iconBgClass={config.iconBgClass}
+							iconTextClass={config.iconTextClass}
 							index={index}
 						/>
 					))}
