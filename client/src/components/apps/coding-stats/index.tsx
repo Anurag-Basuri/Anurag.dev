@@ -288,7 +288,7 @@ const PlatformCard = memo(function PlatformCard({
 	title: string;
 	username: string;
 	url: string;
-	icon: React.ElementType;
+	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 	iconBg: string;
 	iconColor: string;
 	usernameBg: string;
@@ -304,12 +304,12 @@ const PlatformCard = memo(function PlatformCard({
 			{/* Header */}
 			<div className="flex items-center justify-between mb-8">
 				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-2xl', iconBg as string, iconColor as string)}>
+					<div className={cn('p-3 rounded-2xl', iconBg, iconColor)}>
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
 						<h2 className="text-2xl font-bold text-white">{title}</h2>
-						<p className={cn('text-sm font-medium', usernameBg as string)}>@{username}</p>
+						<p className={cn('text-sm font-medium', usernameBg)}>@{username}</p>
 					</div>
 				</div>
 				<motion.button
@@ -344,7 +344,7 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 }: {
 	title: string;
 	username: string;
-	icon: React.ElementType;
+	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 	iconBg: string;
 	iconColor: string;
 	usernameBg: string;
@@ -365,8 +365,8 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 					<Icon className="w-6 h-6" />
 				</div>
 				<div>
-					<h2 className="text-xl font-bold text-white">{title}</h2>
-					<p className={cn('text-sm font-medium', usernameBg)}>@{username}</p>
+					<h3 className="text-lg font-bold text-white">{title}</h3>
+					<p className={cn('text-xs font-medium', usernameBg)}>@{username}</p>
 				</div>
 			</div>
 
@@ -374,7 +374,6 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 				{stats.map(stat => (
 					<motion.div
 						key={stat.label}
-						whileHover={{ scale: 1.02 }}
 						className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-white/10 transition-colors"
 					>
 						<div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">
