@@ -13,8 +13,6 @@ import {
 	Github,
 	Code,
 	ExternalLink,
-	TrendingUp,
-	Flame,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
@@ -203,7 +201,7 @@ const QuickStatCard = memo(function QuickStatCard({
 			variants={staggerItem}
 			custom={index}
 			whileHover={{ y: -5, transition: { duration: 0.2 } }}
-			className="relative p-6 rounded-3xl bg-linear-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
+			className="relative p-6 rounded-3xl bg-gradient-to-br from-[#0a0a0a] to-[#111] border border-white/5 shadow-2xl overflow-hidden group"
 		>
 			<div
 				className={cn(
