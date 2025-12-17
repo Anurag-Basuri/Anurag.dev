@@ -216,12 +216,12 @@ const InteractiveParticles = memo(function InteractiveParticles() {
 		canvas.height = height;
 
 		const particles: { x: number; y: number; vx: number; vy: number; size: number }[] = [];
-		for (let i = 0; i < 50; i++) {
+		for (let i = 0; i < 40; i++) {
 			particles.push({
 				x: Math.random() * width,
 				y: Math.random() * height,
-				vx: (Math.random() - 0.5) * 0.5,
-				vy: (Math.random() - 0.5) * 0.5,
+				vx: (Math.random() - 0.5) * 0.3, // Slower natural movement
+				vy: (Math.random() - 0.5) * 0.3,
 				size: Math.random() * 2 + 0.5,
 			});
 		}
@@ -234,8 +234,8 @@ const InteractiveParticles = memo(function InteractiveParticles() {
 		let animationFrame: number;
 
 		const animate = () => {
+			if (!ctx || !canvas) return;
 			ctx.clearRect(0, 0, width, height);
-			// Use emerald tint for particles
 			ctx.fillStyle = '#10b981';
 
 			particles.forEach(p => {
@@ -246,17 +246,22 @@ const InteractiveParticles = memo(function InteractiveParticles() {
 				const dy = mouseRef.current.y - p.y;
 				const distance = Math.sqrt(dx * dx + dy * dy);
 
+				// Gentle repulsion
 				if (distance < 200) {
 					const angle = Math.atan2(dy, dx);
 					const force = (200 - distance) / 200;
-					p.vx -= Math.cos(angle) * force * 0.02;
-					p.vy -= Math.sin(angle) * force * 0.02;
+					p.vx -= Math.cos(angle) * force * 0.05; // Smoother force
+					p.vy -= Math.sin(angle) * force * 0.05;
 				}
 
 				if (p.x < 0 || p.x > width) p.vx *= -1;
 				if (p.y < 0 || p.y > height) p.vy *= -1;
 
-				ctx.globalAlpha = Math.max(0.1, 1 - distance / 300);
+				// Friction to prevent indefinite acceleration
+				p.vx *= 0.99;
+				p.vy *= 0.99;
+
+				ctx.globalAlpha = Math.max(0.05, 1 - distance / 250) * 0.5;
 				ctx.beginPath();
 				ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
 				ctx.fill();
@@ -269,8 +274,8 @@ const InteractiveParticles = memo(function InteractiveParticles() {
 					const dx = p.x - p2.x;
 					const dy = p.y - p2.y;
 					const dist = Math.sqrt(dx * dx + dy * dy);
-					if (dist < 100) {
-						ctx.globalAlpha = (1 - dist / 100) * 0.15;
+					if (dist < 150) {
+						ctx.globalAlpha = (1 - dist / 150) * 0.1;
 						ctx.beginPath();
 						ctx.moveTo(p.x, p.y);
 						ctx.lineTo(p2.x, p2.y);
@@ -419,7 +424,7 @@ export function BootAnimation() {
 			aria-label="Booting Portfolio"
 			initial={{ opacity: 1 }}
 			exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
-			transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+			transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
 		>
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/15 via-[#020202] to-black opacity-90" />
 			<MatrixRain />
@@ -440,7 +445,7 @@ export function BootAnimation() {
 							<h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white/90 uppercase">
 								Anurag&apos;s
 							</h1>
-							<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400 animate-gradient-x">
+							<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400 animate-gradient-x">
 								<GlitchText text="PORTFOLIO" />
 							</div>
 						</div>
