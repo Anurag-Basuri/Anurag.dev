@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
-import { bootCompleteAtom } from '../';
+import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
 import { motion } from 'framer-motion';
 
