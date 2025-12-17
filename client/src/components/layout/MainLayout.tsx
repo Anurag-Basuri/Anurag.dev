@@ -185,7 +185,7 @@ export function MainLayout() {
 	if (!isLayoutReady) {
 		return (
 			<div className="h-screen w-screen flex items-center justify-center bg-background relative overflow-hidden">
-				<div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+				<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
 				<div className="flex flex-col items-center gap-6 relative z-10">
 					<div className="relative">
 						<div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />

@@ -30,7 +30,7 @@ const LoadingFallback = memo(function LoadingFallback() {
 
 // Lazy load MainLayout with optimizations
 const MainLayout = dynamic(
-	() => import('../components/layout/MainLayout').then(mod => mod.MainLayout),
+	() => import('@/components/layout/MainLayout').then(mod => mod.MainLayout),
 	{
 		ssr: false,
 		loading: () => <LoadingFallback />,
@@ -40,7 +40,7 @@ const MainLayout = dynamic(
 function Home() {
 	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
 	const [isHydrated, setIsHydrated] = useState(false);
-	const [shouldPreload, setShouldPreload] = useState(false);
+	const [isPreloaded, setIsPreloaded] = useState(false);
 
 	// Initialize boot state on mount
 	useEffect(() => {
@@ -72,15 +72,37 @@ function Home() {
 		};
 	}, [setBootComplete]);
 
-	// Preload MainLayout after boot animation starts (50% through first phase)
+	// Intelligent preloading strategy:
+	// Start preloading MainLayout early during boot animation
+	// This ensures instant display when boot completes
 	useEffect(() => {
 		if (!isHydrated) return;
 
-		const preloadTimer = setTimeout(() => {
-			setShouldPreload(true);
-			// Preload the module
-			import('@/components/layout/MainLayout');
-		}, 625); // 625ms = 50% of first phase (1.25s)
+		// Start preloading after a short delay (during first boot phase)
+		const preloadTimer = setTimeout(
+			async () => {
+				try {
+					// Preload MainLayout module
+					await import('@/components/layout/MainLayout');
+
+					// Also preload critical dependencies in parallel
+					await Promise.all([
+						import('@/components/os/terminal/CLI'),
+						import('@/components/os/editor/EditorArea'),
+						import('@/components/os/shell/TopBar'),
+						import('@/components/os/shell/Taskbar'),
+					]);
+
+					setIsPreloaded(true);
+					console.log('✅ MainLayout preloaded successfully');
+				} catch (error) {
+					console.warn('Failed to preload MainLayout:', error);
+					// Still mark as preloaded to continue
+					setIsPreloaded(true);
+				}
+			},
+			400, // Start preloading 400ms into boot animation
+		);
 
 		return () => clearTimeout(preloadTimer);
 	}, [isHydrated]);
@@ -92,15 +114,30 @@ function Home() {
 
 	return (
 		<>
+			{/* Boot Animation - Always visible when not complete */}
 			<AnimatePresence mode="wait">
 				{!bootComplete && <BootAnimation key="boot" />}
 			</AnimatePresence>
-			{/* Only render MainLayout after boot completes or start preloading */}
-			{(bootComplete || shouldPreload) && (
+
+			{/* 
+                MainLayout - Rendered early for preloading but hidden until boot complete
+                This ensures it's fully loaded and ready when boot animation finishes
+            */}
+			<div
+				style={{
+					visibility: bootComplete ? 'visible' : 'hidden',
+					position: bootComplete ? 'relative' : 'fixed',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: '100%',
+					zIndex: bootComplete ? 'auto' : -1,
+				}}
+			>
 				<Suspense fallback={<LoadingFallback />}>
-					{bootComplete && <MainLayout key="main" />}
+					<MainLayout key="main" />
 				</Suspense>
-			)}
+			</div>
 		</>
 	);
 }
