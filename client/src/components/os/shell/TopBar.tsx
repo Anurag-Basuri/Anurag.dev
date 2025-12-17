@@ -227,7 +227,7 @@ export function TopBar({
 									</span>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>System Time</TooltipContent>
+							<TooltipContent side="bottom">System Time</TooltipContent>
 						</Tooltip>
 					</div>
 				)}
@@ -271,7 +271,7 @@ export function TopBar({
 									</span>
 								</div>
 							</TooltipTrigger>
-							<TooltipContent>
+							<TooltipContent side="bottom">
 								{isOnline ? 'System Online' : 'System Offline'}
 							</TooltipContent>
 						</Tooltip>
@@ -295,7 +295,7 @@ export function TopBar({
 									)}
 								</button>
 							</TooltipTrigger>
-							<TooltipContent>
+							<TooltipContent side="bottom">
 								{isOnline ? 'Connected' : 'Disconnected'}
 							</TooltipContent>
 						</Tooltip>
@@ -321,7 +321,9 @@ export function TopBar({
 										</span>
 									</button>
 								</TooltipTrigger>
-								<TooltipContent>Battery: {batteryLevel}%</TooltipContent>
+								<TooltipContent side="bottom">
+									Battery: {batteryLevel}%
+								</TooltipContent>
 							</Tooltip>
 						)}
 					</div>
@@ -350,7 +352,7 @@ export function TopBar({
 										Contact
 									</motion.button>
 								</TooltipTrigger>
-								<TooltipContent>Get in touch</TooltipContent>
+								<TooltipContent side="bottom">Get in touch</TooltipContent>
 							</Tooltip>
 
 							<div className="w-px h-3.5 bg-white/10 mx-1" aria-hidden="true" />
@@ -424,7 +426,7 @@ export function TopBar({
 										)}
 									</motion.button>
 								</TooltipTrigger>
-								<TooltipContent>
+								<TooltipContent side="bottom">
 									{terminalCollapsed ? 'Expand Terminal' : 'Collapse Terminal'}
 								</TooltipContent>
 							</Tooltip>

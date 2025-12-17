@@ -97,7 +97,7 @@ export function WindowControls({
 							/>
 						</motion.button>
 					</TooltipTrigger>
-					<TooltipContent>
+					<TooltipContent side="bottom">
 						<p>{minimizeLabel}</p>
 					</TooltipContent>
 				</Tooltip>
@@ -124,7 +124,7 @@ export function WindowControls({
 							/>
 						</motion.button>
 					</TooltipTrigger>
-					<TooltipContent>
+					<TooltipContent side="bottom">
 						<p>Fullscreen</p>
 					</TooltipContent>
 				</Tooltip>
