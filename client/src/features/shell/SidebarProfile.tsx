@@ -6,7 +6,7 @@ import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { WindowControls } from '@/components/common/WindowControls';
+import { SidebarControls } from '@/components/common/WindowControls';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
@@ -24,19 +24,11 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 				<div className="flex items-center gap-2">
 					{/* macOS Traffic Lights - Hidden on mobile */}
 					<div className="hidden md:flex items-center gap-1.5 group">
-						<WindowControls
+						<SidebarControls
 							onClose={onCollapse}
 							onMaximize={onExpand}
-							isMaximized={false}
-							onMinimize={onCollapse}
+							onToggleFolders={() => setFolderSignal(prev => prev + 1)}
 						/>
-						<button
-							onClick={() => setFolderSignal(prev => prev + 1)}
-							className="ml-2 p-1 hover:bg-white/10 rounded transition-colors"
-							title="Toggle Folders"
-						>
-							<FolderOpen className="w-3 h-3 text-muted-foreground" />
-						</button>
 					</div>
 
 					{/* Separator */}

@@ -341,7 +341,7 @@ function FolderTreeItem({
 							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-500 transition-colors" />
 						)
 					) : (
-						<FileIcon name={item.name} className="w-4 h-4" />
+						<FileIcon name={item.name} moduleId={item.moduleId} className="w-4 h-4" />
 					)}
 				</span>
 

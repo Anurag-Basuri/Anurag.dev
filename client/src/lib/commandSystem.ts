@@ -205,12 +205,9 @@ class CommandRegistryImpl implements CommandRegistry {
 				}
 				return { type: 'success', content: '' };
 			} else {
-				const errorResult = result as { ok: false; error: string; hint?: string };
 				return {
 					type: 'error',
-					content: `${errorResult.error}${
-						errorResult.hint ? `\nHint: ${errorResult.hint}` : ''
-					}`,
+					content: `${result.error}${result.hint ? `\nHint: ${result.hint}` : ''}`,
 				};
 			}
 		} catch (error) {
