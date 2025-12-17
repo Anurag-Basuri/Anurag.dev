@@ -206,7 +206,7 @@ const QuickStat = memo(function QuickStat({
 }: {
 	value: string | number;
 	label: string;
-	icon: React.ElementType;
+	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 	delay?: number;
 	gradientFrom: string;
 	textColor: string;
@@ -535,7 +535,11 @@ export function AboutModule() {
 										<div className="flex items-center gap-2">
 											{socialLinks.map(social => {
 												const Icon =
-													SOCIAL_ICON_MAP[social.platform] || Globe;
+													(SOCIAL_ICON_MAP[
+														social.platform as keyof typeof SOCIAL_ICON_MAP
+													] as React.ComponentType<
+														React.SVGProps<SVGSVGElement>
+													>) || Globe;
 												return (
 													<motion.button
 														key={social.platform}
@@ -667,19 +671,49 @@ export function AboutModule() {
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							<TechStackCard
 								category="frontend"
-								skills={about.skills.frontend}
+								skills={about.skills.frontend.map(skill =>
+									typeof skill === 'string'
+										? skill
+										: {
+												...skill,
+												level:
+													skill.level !== undefined
+														? String(skill.level)
+														: undefined,
+										  },
+								)}
 								config={TECH_STACK_CONFIG.frontend}
 								delay={0}
 							/>
 							<TechStackCard
 								category="backend"
-								skills={about.skills.backend}
+								skills={about.skills.backend.map(skill =>
+									typeof skill === 'string'
+										? skill
+										: {
+												...skill,
+												level:
+													skill.level !== undefined
+														? String(skill.level)
+														: undefined,
+										  },
+								)}
 								config={TECH_STACK_CONFIG.backend}
 								delay={0.1}
 							/>
 							<TechStackCard
 								category="ml"
-								skills={about.skills.ml}
+								skills={about.skills.ml.map(skill =>
+									typeof skill === 'string'
+										? skill
+										: {
+												...skill,
+												level:
+													skill.level !== undefined
+														? String(skill.level)
+														: undefined,
+										  },
+								)}
 								config={TECH_STACK_CONFIG.ml}
 								delay={0.2}
 							/>
