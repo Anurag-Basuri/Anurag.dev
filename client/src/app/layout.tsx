@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { ErrorBoundary } from '../components/shared/error-boundary';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { JotaiProvider } from '@/components/providers/jotai-provider';
 

@@ -1,8 +1,8 @@
 'use client';
 
-import { BootAnimation } from '@/components/layout/BootAnimation';
+import { BootAnimation } from '../components/layout/BootAnimation';
 import { useAtom } from 'jotai';
-import { bootCompleteAtom } from '@/store';
+import { bootCompleteAtom } from '../store';
 import { useEffect, useState, memo, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { AnimatePresence } from 'framer-motion';
@@ -30,7 +30,7 @@ const LoadingFallback = memo(function LoadingFallback() {
 
 // Lazy load MainLayout with optimizations
 const MainLayout = dynamic(
-	() => import('@/components/layout/MainLayout').then(mod => mod.MainLayout),
+	() => import('../components/layout/MainLayout').then(mod => mod.MainLayout),
 	{
 		ssr: false,
 		loading: () => <LoadingFallback />,
