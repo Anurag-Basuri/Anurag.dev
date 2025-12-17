@@ -3,7 +3,7 @@
 import { ChevronRight, File, Folder } from 'lucide-react';
 import { Fragment } from 'react';
 import { cn } from '@/lib/utils';
-import { getFileIcon } from '@/lib/editorUtils';
+import { getIconForFile } from '@/components/common/FileIcon';
 
 interface BreadcrumbsProps {
 	path: string; // e.g., "src/components/EditorArea.tsx"
@@ -14,7 +14,7 @@ export function Breadcrumbs({ path, className }: BreadcrumbsProps) {
 	// Simple path split. In a real app we might traverse the tree to get folder names.
 	const segments = path.split('/');
 	const filename = segments[segments.length - 1];
-	const FileIcon = getFileIcon(filename);
+	const FileIcon = getIconForFile(filename);
 
 	return (
 		<div
