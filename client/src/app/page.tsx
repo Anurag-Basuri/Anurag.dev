@@ -1,112 +1,56 @@
 'use client';
 
-import { BootAnimation } from '@/components/layout/BootAnimation';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
-import { useEffect, useState, memo, Suspense } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { AnimatePresence, motion } from 'framer-motion';
 
-// Session storage key constant
-const BOOT_SESSION_KEY = 'anuragos-boot-complete';
-
-// Loading fallback component
-const LoadingFallback = memo(function LoadingFallback() {
-	return (
-		<div className="fixed inset-0 bg-black flex items-center justify-center">
-			<div className="flex flex-col items-center gap-4">
-				<div
-					className="w-12 h-12 border-4 border-[#00ff41]/20 border-t-[#00ff41] rounded-full animate-spin"
-					role="status"
-					aria-label="Loading system"
-				/>
-				<div className="text-[#00ff41] text-sm font-mono animate-pulse">
-					LOADING SYSTEM...
-				</div>
-			</div>
-		</div>
-	);
-});
-
-// Lazy load MainLayout with optimizations
-const MainLayout = dynamic(
-	() => import('@/components/layout/MainLayout').then(mod => mod.MainLayout),
+// Dynamically import BootAnimation to avoid SSR issues
+const BootAnimation = dynamic(
+	() => import('@/components/layout/BootAnimation').then(mod => ({ default: mod.BootAnimation })),
 	{
 		ssr: false,
-		loading: () => <LoadingFallback />,
+		loading: () => (
+			<div className="fixed inset-0 bg-black flex items-center justify-center">
+				<div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+			</div>
+		),
 	},
 );
 
-function Home() {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
-	const [isHydrated, setIsHydrated] = useState(false);
+export default function HomePage() {
+	const router = useRouter();
+	const [bootComplete] = useAtom(bootCompleteAtom);
 
-	// Initialize boot state on mount
 	useEffect(() => {
-		let mounted = true;
-
-		const initialize = async () => {
-			try {
-				// Clear session storage to force boot animation on page refresh
-				sessionStorage.removeItem(BOOT_SESSION_KEY);
-
-				// Reset boot complete state
-				if (mounted) {
-					setBootComplete(false);
-					setIsHydrated(true);
-				}
-			} catch (error) {
-				// Handle sessionStorage not available (private browsing, etc.)
-				console.warn('SessionStorage not available:', error);
-				if (mounted) {
-					setIsHydrated(true);
-				}
-			}
-		};
-
-		initialize();
-
-		return () => {
-			mounted = false;
-		};
-	}, [setBootComplete]);
-
-	// Prevent flash of content during hydration
-	if (!isHydrated) {
-		return <LoadingFallback />;
-	}
+		if (bootComplete) {
+			// Redirect to app when boot completes
+			const timeout = setTimeout(() => {
+				router.push('/app');
+			}, 500);
+			return () => clearTimeout(timeout);
+		}
+	}, [bootComplete, router]);
 
 	return (
-		<div className="fixed inset-0">
-			{/* Boot Animation - Always visible when not complete */}
-			<AnimatePresence>{!bootComplete && <BootAnimation key="boot" />}</AnimatePresence>
+		<div className="fixed inset-0 bg-black">
+			<AnimatePresence mode="wait">
+				{!bootComplete && <BootAnimation key="boot" />}
+			</AnimatePresence>
 
-			{/* Main Desktop - Animates in as Boot animates out */}
-			<motion.div
-				initial={{ opacity: 0, scale: 0.96, filter: 'blur(10px)' }}
-				animate={{
-					opacity: bootComplete ? 1 : 0,
-					scale: bootComplete ? 1 : 0.96,
-					filter: bootComplete ? 'blur(0px)' : 'blur(10px)',
-				}}
-				transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-				style={{
-					pointerEvents: bootComplete ? 'auto' : 'none',
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
-					zIndex: 0,
-				}}
-			>
-				<Suspense fallback={<LoadingFallback />}>
-					<MainLayout key="main" />
-				</Suspense>
-			</motion.div>
+			{/* Loading state after boot completes */}
+			{bootComplete && (
+				<div className="fixed inset-0 flex items-center justify-center">
+					<div className="flex flex-col items-center gap-4">
+						<div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+						<div className="text-emerald-500 text-sm font-mono">
+							INITIALIZING DESKTOP...
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
-
-// Export memoized component to prevent unnecessary re-renders
-export default memo(Home);
