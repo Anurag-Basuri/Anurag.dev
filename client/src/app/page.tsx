@@ -77,7 +77,7 @@ function Home() {
 	}
 
 	return (
-		<>
+		<div className="fixed inset-0">
 			{/* Boot Animation - Always visible when not complete */}
 			<AnimatePresence mode="wait">
 				{!bootComplete && <BootAnimation key="boot" />}
@@ -85,6 +85,7 @@ function Home() {
 
 			<div
 				style={{
+					// Force GPU context initialization by rendering but hiding via opacity
 					opacity: bootComplete ? 1 : 0,
 					pointerEvents: bootComplete ? 'auto' : 'none',
 					position: bootComplete ? 'relative' : 'fixed',
@@ -99,7 +100,7 @@ function Home() {
 					<MainLayout key="main" />
 				</Suspense>
 			</div>
-		</>
+		</div>
 	);
 }
 
