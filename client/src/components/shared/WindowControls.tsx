@@ -28,9 +28,12 @@ interface WindowControlProps {
 	onClose?: () => void;
 	onMinimize?: () => void;
 	onMaximize?: () => void;
+	isMaximized?: boolean;
 
 	// Optional overrides for specific behaviors
 	minimizeIcon?: React.ElementType<{ className?: string; style?: React.CSSProperties }>;
+	closeLabel?: string;
+	maximizeLabel?: string;
 	minimizeLabel?: string;
 	className?: string;
 }

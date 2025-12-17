@@ -9,7 +9,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 export function ThemeToggle() {
 	const { theme, setTheme } = useTheme();
 	const [mounted, setMounted] = React.useState(false);
-	const [showTooltip, setShowTooltip] = React.useState(false);
 
 	React.useEffect(() => {
 		setMounted(true);
@@ -23,7 +22,7 @@ export function ThemeToggle() {
 
 	return (
 		<div className="relative">
-			<TooltipProvider delayDuration={0}>
+			<TooltipProvider delayDuration={500} skipDelayDuration={200}>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<motion.button
