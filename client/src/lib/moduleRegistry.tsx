@@ -13,28 +13,28 @@ import {
 
 // Lazy load all app modules for better performance
 const AboutModule = lazy(() =>
-	import('@/components/apps/about').then(m => ({ default: m.AboutModule })),
+	import('@/modules/about').then(m => ({ default: m.AboutModule })),
 );
 const ProjectsModule = lazy(() =>
-	import('@/components/apps/projects').then(m => ({ default: m.ProjectsModule })),
+	import('@/modules/projects').then(m => ({ default: m.ProjectsModule })),
 );
 const JourneyModule = lazy(() =>
-	import('@/components/apps/journey').then(m => ({ default: m.JourneyModule })),
+	import('@/modules/journey').then(m => ({ default: m.JourneyModule })),
 );
 const CertificationModule = lazy(() =>
-	import('@/components/apps/certifications').then(m => ({ default: m.CertificationModule })),
+	import('@/modules/certifications').then(m => ({ default: m.CertificationModule })),
 );
 const AILabModule = lazy(() =>
-	import('@/components/apps/ai-lab').then(m => ({ default: m.AILabModule })),
+	import('@/modules/ai-lab').then(m => ({ default: m.AILabModule })),
 );
 const BlogModule = lazy(() =>
-	import('@/components/apps/blog').then(m => ({ default: m.BlogModule })),
+	import('@/modules/blog').then(m => ({ default: m.BlogModule })),
 );
 const ContactModule = lazy(() =>
-	import('@/components/apps/contact').then(m => ({ default: m.ContactModule })),
+	import('@/modules/contact').then(m => ({ default: m.ContactModule })),
 );
 const CodingStatsModule = lazy(() =>
-	import('@/components/apps/coding-stats').then(m => ({ default: m.CodingStatsModule })),
+	import('@/modules/coding-stats').then(m => ({ default: m.CodingStatsModule })),
 );
 
 // Loading fallback component
@@ -92,4 +92,8 @@ export function getModuleIcon(id: string): LucideIcon {
 
 export function getModuleTitle(id: string): string {
 	return moduleMeta[id]?.title || moduleMeta.default.title;
+}
+
+export function isValidModuleId(id: string): boolean {
+	return id in moduleRegistry;
 }

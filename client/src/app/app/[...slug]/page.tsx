@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { resolveModuleFromSlug, type ModuleId, getModuleMetadata } from '@/lib/routes';
-import { ModuleLoader } from '@/components/shared/ModuleLoader';
+import { ModuleLoader } from '@/components/common/ModuleLoader';
 
 interface PageProps {
 	params: { slug: string[] };

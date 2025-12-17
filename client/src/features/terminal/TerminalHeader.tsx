@@ -2,7 +2,7 @@
 
 import { Terminal, ChevronDown, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { TerminalControls } from '@/components/shared/WindowControls';
+import { TerminalControls } from '@/components/common/WindowControls';
 
 interface TerminalHeaderProps {
 	currentPath: string;

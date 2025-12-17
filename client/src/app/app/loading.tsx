@@ -1,4 +1,4 @@
-import { ModuleLoader } from '@/components/shared/ModuleLoader';
+import { ModuleLoader } from '@/components/common/ModuleLoader';
 
 export default function AppLoading() {
 	return <ModuleLoader message="Initializing module..." />;

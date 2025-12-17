@@ -12,7 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -23,14 +23,14 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
-import { CLI } from '@/components/os/terminal/CLI';
-import { EditorArea } from '@/components/os/editor/EditorArea';
-import { FolderTree } from '@/components/os/file-system/FolderTree';
-import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
-import { Taskbar } from '@/components/os/shell/Taskbar';
-import { TopBar } from '@/components/os/shell/TopBar';
-import { Background3D } from '@/components/os/shell/Background3D';
-import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
+import { CLI } from '@/features/terminal/CLI';
+import { EditorArea } from '@/features/editor/EditorArea';
+import { FolderTree } from '@/features/filesystem/FolderTree';
+import { SidebarProfile } from '@/features/shell/SidebarProfile';
+import { Taskbar } from '@/features/shell/Taskbar';
+import { TopBar } from '@/features/shell/TopBar';
+import { Background3D } from '@/features/shell/Background3D';
+import { CollapsedSidebar } from '@/features/shell/CollapsedSidebar';
 
 // Lightweight loading placeholder (kept for Suspense boundaries if needed elsewhere)
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
@@ -285,7 +285,7 @@ export function MainLayout() {
 	return (
 		<ErrorBoundary>
 			<ContextMenuProvider>
-				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background h-full w-full">
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-black">
 					{/* Background */}
 					<Suspense fallback={null}>
 						<Background3D />

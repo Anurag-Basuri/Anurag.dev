@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState, useCallback, MutableRefObj
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Line, Float } from '@react-three/drei';
 import { useTheme } from 'next-themes';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import type { Points as ThreePoints, Vector3 } from 'three';
 import * as THREE from 'three';
 import { useThemeColor } from '@/hooks/use-theme-colors';
@@ -503,11 +503,12 @@ export function Background3D() {
 
 	return (
 		<div
-			className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000 ease-in-out overflow-hidden"
+			className="fixed inset-0 w-screen h-screen z-0 pointer-events-none overflow-hidden"
 			aria-hidden="true"
 		>
 			<ErrorBoundary>
 				<Canvas
+					className="w-full h-full"
 					dpr={dpr}
 					frameloop={reducedMotion ? 'demand' : 'always'}
 					camera={{ position: [0, 2, 5], fov: 75, near: 0.1, far: 200 }}

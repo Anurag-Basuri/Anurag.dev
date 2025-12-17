@@ -1,27 +1,15 @@
 'use client';
 
-import { useAtom } from 'jotai';
-import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store/atoms/window';
-import { getModuleIcon } from '@/lib/moduleRegistry';
+import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
+import { taskbarModules, navigationItems, getModulePath, type ModuleId } from '@/lib/routes';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import {
-	Power,
-	Briefcase,
-	Map,
-	Mail,
-	User as UserIcon,
-	Github,
-	Linkedin,
-	Twitter,
-	X,
-} from 'lucide-react';
-import { useWindowManager } from '@/hooks/use-window-manager';
+import { Power, Github, Linkedin, Twitter } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { HelpButton } from '@/components/shared/HelpButton';
-import { WindowState } from '@/types/window';
+import { HelpButton } from '@/components/common/HelpButton';
 import React, { memo } from 'react';
 
 // A simple logo component
@@ -33,40 +21,25 @@ const Logo = () => (
 	</div>
 );
 
-const TaskbarItem = memo(function TaskbarItem({
-	window,
+// Taskbar navigation item based on routes
+const TaskbarNavItem = memo(function TaskbarNavItem({
+	moduleId,
 	isActive,
 	onClick,
-	onClose,
-	Icon,
 }: {
-	window: WindowState;
+	moduleId: string;
 	isActive: boolean;
 	onClick: () => void;
-	onClose: (e: React.MouseEvent) => void;
-	Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }) {
+	const Icon = getModuleIcon(moduleId);
+	const title = getModuleTitle(moduleId);
+
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<motion.div
-					layout
-					initial={{ opacity: 0, scale: 0.9, y: 5 }}
-					animate={{
-						opacity: 1,
-						scale: 1,
-						y: 0,
-					}}
-					exit={{
-						opacity: 0,
-						scale: 0.9,
-						y: 5,
-					}}
-					transition={{
-						type: 'spring',
-						stiffness: 400,
-						damping: 30,
-					}}
+				<motion.button
+					whileHover={{ scale: 1.05 }}
+					whileTap={{ scale: 0.95 }}
 					onClick={onClick}
 					className={cn(
 						'relative h-7 sm:h-6 px-2.5 rounded-md flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm',
@@ -86,14 +59,14 @@ const TaskbarItem = memo(function TaskbarItem({
 
 					<span
 						className={cn(
-							'text-[11px] font-semibold transition-colors max-w-[120px] truncate tracking-wide',
+							'text-[11px] font-semibold transition-colors max-w-[120px] truncate tracking-wide hidden sm:block',
 							isActive ? 'text-white' : 'text-white/75 group-hover:text-white',
 						)}
 					>
-						{window.title}
+						{title}
 					</span>
 
-					{/* Active Indicator (Glowing Pill Underneath) */}
+					{/* Active Indicator */}
 					{isActive && (
 						<motion.div
 							layoutId="active-pill"
@@ -104,34 +77,28 @@ const TaskbarItem = memo(function TaskbarItem({
 							className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-emerald-300 rounded-full shadow-[0_0_10px_2px_rgba(52,211,153,0.6)]"
 						/>
 					)}
-
-					{/* Close Button */}
-					<button
-						onClick={onClose}
-						className="ml-1 p-0.5 sm:p-0.5 rounded-full bg-white/6 hover:bg-red-500/25 text-white/70 hover:text-white transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0 border border-white/12"
-						aria-label="Close window"
-						type="button"
-					>
-						<X className="w-3 h-3 sm:w-2.5 sm:h-2.5" />
-					</button>
-				</motion.div>
+				</motion.button>
 			</TooltipTrigger>
 			<TooltipContent side="top" className="text-xs font-medium">
-				{window.title}
+				{title}
 			</TooltipContent>
 		</Tooltip>
 	);
 });
 
 export function Taskbar() {
-	const [windows, setWindows] = useAtom(windowsAtom);
-	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
-	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
+	const router = useRouter();
+	const pathname = usePathname();
 	const [isStartOpen, setIsStartOpen] = useState(false);
-	const { openWindow } = useWindowManager();
 	const stateMenuRef = useRef<HTMLDivElement>(null);
 	const startButtonRef = useRef<HTMLButtonElement>(null);
 	const firstMenuItemRef = useRef<HTMLButtonElement>(null);
+
+	// Get current module from pathname
+	const currentModule = useMemo(() => {
+		const path = pathname.replace('/app/', '').replace(/^\/+/, '');
+		return path || 'about';
+	}, [pathname]);
 
 	// Close with Escape and restore focus to trigger
 	useEffect(() => {
@@ -173,7 +140,6 @@ export function Taskbar() {
 		};
 	}, [isStartOpen]);
 
-	// Trap Tab inside the menu when open
 	const handleMenuKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (!stateMenuRef.current) return;
 		if (e.key !== 'Tab') return;
@@ -206,72 +172,19 @@ export function Taskbar() {
 		}
 	}, []);
 
-	const handleTaskbarClick = useCallback(
-		(id: string) => {
-			const window = windows.find(w => w.id === id);
-			if (!window) return;
-
-			if (id === activeWindowId && !window.isMinimized) {
-				// If clicking the active window, minimize it
-				setWindows(prev => prev.map(w => (w.id === id ? { ...w, isMinimized: true } : w)));
-				setWindowStack(prev => prev.filter(wid => wid !== id));
-				const newStack = windowStack.filter(wid => wid !== id);
-				setActiveWindowId(newStack.at(-1) || null);
-			} else {
-				// Show and activate the window
-				setWindows(prev =>
-					prev.map(w => ({
-						...w,
-						isMinimized: w.id === id ? false : w.isMinimized,
-					})),
-				);
-				setActiveWindowId(id);
-				setWindowStack(prev => [...prev.filter(wid => wid !== id), id]);
-			}
-		},
-		[activeWindowId, windows, windowStack, setWindows, setActiveWindowId, setWindowStack],
-	);
-
-	const handleOpenModule = useCallback(
-		(id: string) => {
+	const handleNavigate = useCallback(
+		(moduleId: ModuleId) => {
 			setIsStartOpen(false);
-			openWindow(id);
+			router.push(getModulePath(moduleId));
 		},
-		[openWindow],
+		[router],
 	);
 
-	const handleReorder = useCallback(
-		(newOrder: WindowState[]) => {
-			setWindows(newOrder);
-			setWindowStack(newOrder.map(w => w.id));
-		},
-		[setWindows, setWindowStack],
-	);
-
-	const handleCloseWindow = useCallback(
-		(id: string, e: React.MouseEvent) => {
-			e.stopPropagation();
-
-			// Remove from windows
-			setWindows(prev => prev.filter(w => w.id !== id));
-
-			// Update stack and active window
-			setWindowStack(prev => {
-				const newStack = prev.filter(wid => wid !== id);
-				const nextActiveId = newStack.at(-1) || null;
-				setActiveWindowId(nextActiveId);
-				return newStack;
-			});
-		},
-		[setWindows, setWindowStack, setActiveWindowId],
-	);
-
-	const menuItems = [
-		{ id: 'about', label: 'About Me', icon: UserIcon },
-		{ id: 'projects', label: 'My Work', icon: Briefcase },
-		{ id: 'journey', label: 'My Journey', icon: Map },
-		{ id: 'contact', label: 'Get in Touch', icon: Mail },
-	];
+	// Menu items from centralized config with icons
+	const menuItemsWithIcons = navigationItems.map(item => ({
+		...item,
+		icon: getModuleIcon(item.id),
+	}));
 
 	const socialLinks = [
 		{
@@ -344,30 +257,38 @@ export function Taskbar() {
 								</div>
 
 								<div className="grid gap-1.5 mb-5">
-									{menuItems.map((item, index) => (
-										<motion.button
-											layout
-											whileHover={{
-												x: 6,
-												backgroundColor: 'rgba(255,255,255,0.06)',
-											}}
-											whileTap={{ scale: 0.98 }}
-											key={item.id}
-											ref={index === 0 ? firstMenuItemRef : null}
-											onClick={() => handleOpenModule(item.id)}
-											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 transition-colors text-sm flex items-center gap-3 group relative overflow-hidden"
-										>
-											<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors shadow-sm">
-												<item.icon className="w-4 h-4" />
-											</div>
-											<span className="font-medium tracking-wide">
-												{item.label}
-											</span>
+									{menuItemsWithIcons.map((item, index) => {
+										const IconComponent = item.icon;
+										return (
+											<motion.button
+												layout
+												whileHover={{
+													x: 6,
+													backgroundColor: 'rgba(255,255,255,0.06)',
+												}}
+												whileTap={{ scale: 0.98 }}
+												key={item.id}
+												ref={index === 0 ? firstMenuItemRef : null}
+												onClick={() => handleNavigate(item.id)}
+												className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 transition-colors text-sm flex items-center gap-3 group relative overflow-hidden"
+											>
+												<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors shadow-sm">
+													<IconComponent className="w-4 h-4" />
+												</div>
+												<div className="flex flex-col">
+													<span className="font-medium tracking-wide">
+														{item.label}
+													</span>
+													<span className="text-xs text-white/40">
+														{item.description}
+													</span>
+												</div>
 
-											{/* Hover sheen */}
-											<motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
-										</motion.button>
-									))}
+												{/* Hover sheen */}
+												<motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-shimmer" />
+											</motion.button>
+										);
+									})}
 								</div>
 
 								<div className="pt-4 border-t border-white/10 flex items-center justify-between">
@@ -398,7 +319,9 @@ export function Taskbar() {
 												<motion.button
 													whileHover={{ scale: 1.05 }}
 													whileTap={{ scale: 0.95 }}
-													onClick={() => window.location.reload()}
+													onClick={() => {
+														router.push('/');
+													}}
 													className="h-9 px-4 flex items-center gap-2 rounded-xl text-white/40 hover:text-white hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider group"
 												>
 													<Power className="w-3.5 h-3.5 group-hover:text-red-400 transition-colors" />
@@ -460,42 +383,23 @@ export function Taskbar() {
 					</Tooltip>
 
 					{/* Divider */}
-					{windows.length > 0 && <div className="h-4 w-px bg-white/10 shrink-0" />}
+					<div className="h-4 w-px bg-white/10 shrink-0" />
 
-					{/* Window Icons (Mac Dock Style) */}
-					<Reorder.Group
-						axis="x"
-						values={windows}
-						onReorder={handleReorder}
-						className="flex items-center gap-2 h-full pl-1"
-						as="div"
-					>
-						{windows.map(window => {
-							const Icon = getModuleIcon(window.id);
-							return (
-								<Reorder.Item
-									key={window.id}
-									value={window}
-									as="div"
-									initial={false}
-									className="flex shrink-0"
-								>
-									<TaskbarItem
-										window={window}
-										isActive={
-											window.id === activeWindowId && !window.isMinimized
-										}
-										onClick={() => handleTaskbarClick(window.id)}
-										onClose={e => handleCloseWindow(window.id, e)}
-										Icon={Icon}
-									/>
-								</Reorder.Item>
-							);
-						})}
-					</Reorder.Group>
+					<div className="flex items-center gap-2 h-full">
+						<AnimatePresence>
+							{taskbarModules.map(moduleId => (
+								<TaskbarNavItem
+									key={moduleId}
+									moduleId={moduleId}
+									isActive={currentModule === moduleId}
+									onClick={() => handleNavigate(moduleId)}
+								/>
+							))}
+						</AnimatePresence>
+					</div>
 				</div>
 
-				{/* Right Side Actions - Hidden on mobile to save space, redundant with TopBar */}
+				{/* Right Side Actions */}
 				<div className="hidden sm:flex items-center gap-2">
 					<div className="h-6 px-3 rounded-md bg-white/7 border border-white/14 shadow-inner flex items-center">
 						<HelpButton placement="taskbar" />

@@ -1,4 +1,4 @@
-import { Background3D } from '@/components/os/shell/Background3D';
+import { Background3D } from '@/features/shell/Background3D';
 
 export default function BackgroundOnlyPage() {
 	return (

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { FileIcon } from '@/components/shared/FileIcon';
+import { FileIcon } from '@/components/common/FileIcon';
 
 interface FolderTreeProps {
 	items: FileSystemItem[];

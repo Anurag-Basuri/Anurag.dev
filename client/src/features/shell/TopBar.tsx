@@ -24,8 +24,8 @@ import {
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree } from '@/components/os/file-system/FolderTree';
-import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
+import { FolderTree } from '@/features/filesystem/FolderTree';
+import { SidebarProfile } from '@/features/shell/SidebarProfile';
 import { INITIAL_FILE_SYSTEM, FileSystemItem } from '@/data/filesystem';
 import { cn } from '@/lib/utils';
 import { useState, useEffect, useCallback } from 'react';

@@ -4,7 +4,7 @@ import { WindowState } from '@/types/window';
 import { activeWindowIdAtom, windowStackAtom } from '@/store';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { WindowControls } from '@/components/shared/WindowControls';
+import { WindowControls } from '@/components/common/WindowControls';
 import { useWindowManager } from '@/hooks/use-window-manager';
 
 interface WindowFrameProps {

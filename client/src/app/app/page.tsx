@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata } from '@/lib/routes';
-import { ModuleLoader } from '@/components/shared/ModuleLoader';
+import { ModuleLoader } from '@/components/common/ModuleLoader';
 
 // Generate metadata for the default page
 export async function generateMetadata(): Promise<Metadata> {
