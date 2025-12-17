@@ -23,33 +23,16 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 
-// Lazy load heavy components
-const CLI = lazy(() => import('@/components/os/terminal/CLI').then(mod => ({ default: mod.CLI })));
-const EditorArea = lazy(() =>
-	import('@/components/os/editor/EditorArea').then(mod => ({ default: mod.EditorArea })),
-);
-const FolderTree = lazy(() =>
-	import('@/components/os/file-system/FolderTree').then(mod => ({ default: mod.FolderTree })),
-);
-const SidebarProfile = lazy(() =>
-	import('@/components/os/shell/SidebarProfile').then(mod => ({ default: mod.SidebarProfile })),
-);
-const Taskbar = lazy(() =>
-	import('@/components/os/shell/Taskbar').then(mod => ({ default: mod.Taskbar })),
-);
-const TopBar = lazy(() =>
-	import('@/components/os/shell/TopBar').then(mod => ({ default: mod.TopBar })),
-);
-const Background3D = lazy(() =>
-	import('@/components/os/shell/Background3D').then(mod => ({ default: mod.Background3D })),
-);
-const CollapsedSidebar = lazy(() =>
-	import('@/components/os/shell/CollapsedSidebar').then(mod => ({
-		default: mod.CollapsedSidebar,
-	})),
-);
+import { CLI } from '@/components/os/terminal/CLI';
+import { EditorArea } from '@/components/os/editor/EditorArea';
+import { FolderTree } from '@/components/os/file-system/FolderTree';
+import { SidebarProfile } from '@/components/os/shell/SidebarProfile';
+import { Taskbar } from '@/components/os/shell/Taskbar';
+import { TopBar } from '@/components/os/shell/TopBar';
+import { Background3D } from '@/components/os/shell/Background3D';
+import { CollapsedSidebar } from '@/components/os/shell/CollapsedSidebar';
 
-// Lightweight loading placeholder
+// Lightweight loading placeholder (kept for Suspense boundaries if needed elsewhere)
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
 		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />

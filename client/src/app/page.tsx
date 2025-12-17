@@ -40,7 +40,6 @@ const MainLayout = dynamic(
 function Home() {
 	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
 	const [isHydrated, setIsHydrated] = useState(false);
-	const [isPreloaded, setIsPreloaded] = useState(false);
 
 	// Initialize boot state on mount
 	useEffect(() => {
@@ -72,41 +71,6 @@ function Home() {
 		};
 	}, [setBootComplete]);
 
-	// Intelligent preloading strategy:
-	// Start preloading MainLayout early during boot animation
-	// This ensures instant display when boot completes
-	useEffect(() => {
-		if (!isHydrated) return;
-
-		// Start preloading after a short delay (during first boot phase)
-		const preloadTimer = setTimeout(
-			async () => {
-				try {
-					// Preload MainLayout module
-					await import('@/components/layout/MainLayout');
-
-					// Also preload critical dependencies in parallel
-					await Promise.all([
-						import('@/components/os/terminal/CLI'),
-						import('@/components/os/editor/EditorArea'),
-						import('@/components/os/shell/TopBar'),
-						import('@/components/os/shell/Taskbar'),
-					]);
-
-					setIsPreloaded(true);
-					console.log('✅ MainLayout preloaded successfully');
-				} catch (error) {
-					console.warn('Failed to preload MainLayout:', error);
-					// Still mark as preloaded to continue
-					setIsPreloaded(true);
-				}
-			},
-			400, // Start preloading 400ms into boot animation
-		);
-
-		return () => clearTimeout(preloadTimer);
-	}, [isHydrated]);
-
 	// Prevent flash of content during hydration
 	if (!isHydrated) {
 		return <LoadingFallback />;
@@ -119,19 +83,16 @@ function Home() {
 				{!bootComplete && <BootAnimation key="boot" />}
 			</AnimatePresence>
 
-			{/* 
-                MainLayout - Rendered early for preloading but hidden until boot complete
-                This ensures it's fully loaded and ready when boot animation finishes
-            */}
 			<div
 				style={{
-					visibility: bootComplete ? 'visible' : 'hidden',
+					opacity: bootComplete ? 1 : 0,
+					pointerEvents: bootComplete ? 'auto' : 'none',
 					position: bootComplete ? 'relative' : 'fixed',
 					top: 0,
 					left: 0,
 					width: '100%',
 					height: '100%',
-					zIndex: bootComplete ? 'auto' : -1,
+					zIndex: 0,
 				}}
 			>
 				<Suspense fallback={<LoadingFallback />}>
