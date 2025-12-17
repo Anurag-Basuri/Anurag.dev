@@ -9,7 +9,17 @@ import dynamic from 'next/dynamic';
 
 // Dynamically import BootAnimation to avoid SSR issues
 const BootAnimation = dynamic(
-	() => import('@/components/layout/BootAnimation').then(mod => ({ default: mod.BootAnimation })),
+	() =>
+		import('@/components/layout/BootAnimation')
+			.then(mod => ({ default: mod.BootAnimation }))
+			.catch(() => ({
+				default: () => {
+					// Fallback if boot animation fails to load
+					const [, setBootComplete] = useAtom(bootCompleteAtom);
+					useEffect(() => setBootComplete(true), [setBootComplete]);
+					return null;
+				},
+			})),
 	{
 		ssr: false,
 		loading: () => (

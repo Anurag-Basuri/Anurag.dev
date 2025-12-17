@@ -1,7 +1,5 @@
 'use client';
 
-// Force HMR refresh
-
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
