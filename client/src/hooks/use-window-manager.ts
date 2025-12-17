@@ -6,9 +6,7 @@ import { useCallback } from 'react';
 
 export function useWindowManager() {
 	const [windows, setWindows] = useAtom(windowsAtom);
-	const [activeWindowId, setActiveWindowId] = useAtom<string | null, [string | null], void>(
-		activeWindowIdAtom,
-	);
+	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
 	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
 
 	// Helper to handle z-index stack

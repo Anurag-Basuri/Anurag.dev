@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, File, Folder } from 'lucide-react';
+import { ChevronRight, Folder } from 'lucide-react';
 import { Fragment } from 'react';
 import { cn } from '@/lib/utils';
 import { getIconForFile } from '@/components/common/FileIcon';
@@ -14,7 +14,7 @@ export function Breadcrumbs({ path, className }: BreadcrumbsProps) {
 	// Simple path split. In a real app we might traverse the tree to get folder names.
 	const segments = path.split('/');
 	const filename = segments[segments.length - 1];
-	const FileIcon = getIconForFile(filename);
+	const FileIconComponent = getIconForFile(filename);
 
 	return (
 		<div
@@ -26,7 +26,7 @@ export function Breadcrumbs({ path, className }: BreadcrumbsProps) {
 			{segments.map((segment, index) => {
 				const isLast = index === segments.length - 1;
 				// First segments are generally folders
-				const Icon = isLast ? FileIcon : Folder;
+				const Icon = isLast ? FileIconComponent : Folder;
 
 				return (
 					<Fragment key={index}>
