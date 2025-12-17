@@ -5,22 +5,23 @@ import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 // Constants
 const BOOT_SESSION_KEY = 'anuragos-boot-complete';
 const ANIMATION_DURATION = 1.25; // seconds per phase
-const BURST_DELAY = 600; // milliseconds
-const MATRIX_CHARS = '01अआइईउऊएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसहक्षज्ञ';
-const MATRIX_FONT_SIZE = 14;
-const MATRIX_INTERVAL = 50; // milliseconds
-const PARTICLE_COUNT = 80;
+const BURST_DELAY = 400; // milliseconds
+const MATRIX_CHARS = '01XYZπΩΣ∆';
+const MATRIX_FONT_SIZE = 12;
+const MATRIX_INTERVAL = 60; // milliseconds
+const PARTICLE_COUNT = 60;
 
-// Boot phases configuration
+// Boot phases configuration - More Technical/OS flavored
 const BOOT_PHASES = [
-	{ label: 'HELLO', status: 'HELLO, WORLD → PASSION FOR INTELLIGENT SYSTEMS' },
-	{ label: 'FULL‑STACK UX', status: 'MODERN STACK + MERN → CLEAN, SCALABLE, HUMAN-CENTERED UX' },
-	{ label: 'AI/ML + LLMs', status: 'AI/ML • LLMs • NLP → LEARNING, REASONING, ADAPTATION' },
-	{ label: 'REAL IMPACT', status: 'REAL IMPACT OVER JUST CODE → PORTFOLIO READY' },
+	{ label: 'BIOS', status: 'INITIALIZING KERNEL...' },
+	{ label: 'SYSTEM', status: 'LOADING MODULES...' },
+	{ label: 'USER', status: 'STARTING INTERFACE...' },
+	{ label: 'READY', status: 'SYSTEM READY' },
 ] as const;
 
 interface Particle {
@@ -32,7 +33,7 @@ interface Particle {
 	maxLife: number;
 }
 
-// Matrix Rain Effect Component
+// Matrix Rain Effect Component - Subtle Background
 const MatrixRain = memo(function MatrixRain() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const animRef = useRef<number | null>(null);
@@ -70,23 +71,33 @@ const MatrixRain = memo(function MatrixRain() {
 
 			lastTime = timestamp;
 
+			// Reset on resize
 			const newColumns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
 			if (newColumns !== columns) {
 				columns = newColumns;
 				drops = Array.from({ length: columns }, () => Math.random() * -100);
 			}
 
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
+			// Fade out trail
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-			ctx.fillStyle = '#00ff41';
-			ctx.font = `${MATRIX_FONT_SIZE}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+			ctx.fillStyle = '#059669'; // Emerald-600 (Darker, more subtle)
+			ctx.font = `${MATRIX_FONT_SIZE}px "Geist Mono", monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
 				const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-				ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
 
-				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.975) {
+				// Randomly brighter characters
+				if (Math.random() > 0.98) {
+					ctx.fillStyle = '#34d399'; // Emerald-400 (Bright)
+					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
+					ctx.fillStyle = '#059669'; // Reset
+				} else {
+					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
+				}
+
+				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.985) {
 					drops[i] = 0;
 				}
 
@@ -106,29 +117,30 @@ const MatrixRain = memo(function MatrixRain() {
 		};
 	}, []);
 
-	return <canvas ref={canvasRef} className="absolute inset-0 opacity-10" aria-hidden="true" />;
+	return (
+		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.07]" aria-hidden="true" />
+	);
 });
 
 // Hexagon Grid Component
 const HexGrid = memo(function HexGrid({ opacity }: { opacity: number }) {
-	const clampedOpacity = Math.max(0, Math.min(1, opacity * 0.6));
-
 	return (
 		<div
-			className="absolute inset-0 pointer-events-none transition-opacity duration-700"
-			style={{ opacity: clampedOpacity }}
+			className="absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out"
+			style={{ opacity: opacity * 0.4 }} // Lower base opacity
 			aria-hidden="true"
 		>
 			<div
 				className="w-full h-full"
 				style={{
 					backgroundImage: `
-                        linear-gradient(30deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
-                        linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
-                        linear-gradient(30deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
-                        linear-gradient(150deg, #00ff4130 12%, transparent 12.5%, transparent 87%, #00ff4130 87.5%, #00ff4130),
-                        linear-gradient(60deg, #00ff4120 25%, transparent 25.5%, transparent 75%, #00ff4120 75%, #00ff4120),
-                        linear-gradient(60deg, #00ff4120 25%, transparent 25.5%, transparent 75%, #00ff4120 75%, #00ff4120)
+						radial-gradient(circle at center, transparent 0%, #000 90%),
+                        linear-gradient(30deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
+                        linear-gradient(150deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
+                        linear-gradient(30deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
+                        linear-gradient(150deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
+                        linear-gradient(60deg, #10b98110 25%, transparent 25.5%, transparent 75%, #10b98110 75%, #10b98110),
+                        linear-gradient(60deg, #10b98110 25%, transparent 25.5%, transparent 75%, #10b98110 75%, #10b98110)
                     `,
 					backgroundSize: '80px 140px',
 					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
@@ -149,7 +161,7 @@ const ParticleBurst = memo(function ParticleBurst({ active }: { active: boolean 
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 
-		const ctx = canvas.getContext('2d', { alpha: true });
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
 		canvas.width = window.innerWidth;
@@ -157,7 +169,7 @@ const ParticleBurst = memo(function ParticleBurst({ active }: { active: boolean 
 
 		const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, (_, i) => {
 			const angle = (Math.PI * 2 * i) / PARTICLE_COUNT;
-			const speed = Math.random() * 3 + 2;
+			const speed = Math.random() * 8 + 4; // Faster burst
 
 			return {
 				x: canvas.width / 2,
@@ -165,29 +177,26 @@ const ParticleBurst = memo(function ParticleBurst({ active }: { active: boolean 
 				vx: Math.cos(angle) * speed,
 				vy: Math.sin(angle) * speed,
 				life: 1,
-				maxLife: Math.random() * 0.5 + 0.5,
+				maxLife: 1,
 			};
 		});
 
 		const draw = () => {
 			if (!ctx || !canvas) return;
 
-			ctx.globalAlpha = 1;
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-			ctx.fillStyle = '#00ff41';
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			let stillAlive = false;
 
 			particles.forEach(particle => {
 				particle.x += particle.vx;
 				particle.y += particle.vy;
-				particle.life -= 0.01;
+				particle.life -= 0.02; // Faster fade
 
 				if (particle.life > 0) {
 					stillAlive = true;
-					ctx.globalAlpha = Math.max(0, particle.life);
+					ctx.globalAlpha = particle.life;
+					ctx.fillStyle = '#34d399';
 					ctx.beginPath();
 					ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
 					ctx.fill();
@@ -210,17 +219,21 @@ const ParticleBurst = memo(function ParticleBurst({ active }: { active: boolean 
 
 	if (!active) return null;
 
-	return <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />;
+	return (
+		<canvas
+			ref={canvasRef}
+			className="absolute inset-0 z-20 pointer-events-none"
+			aria-hidden="true"
+		/>
+	);
 });
 
 // Main Boot Animation Component
 export function BootAnimation() {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
-	const [phase, setPhase] = useState(0);
-	const [status, setStatus] = useState('INITIALIZING SYSTEM');
+	const [status, setStatus] = useState('INITIALIZING...');
 	const [progress, setProgress] = useState(0);
 	const [showBurst, setShowBurst] = useState(false);
-	const [hexOpacity, setHexOpacity] = useState(0);
 	const [isCompleting, setIsCompleting] = useState(false);
 
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
@@ -238,36 +251,31 @@ export function BootAnimation() {
 			try {
 				sessionStorage.setItem(BOOT_SESSION_KEY, '1');
 			} catch (error) {
-				console.warn('Failed to set sessionStorage:', error);
+				// Ignore
 			}
 			setBootComplete(true);
 		}, BURST_DELAY);
 	}, [isCompleting, setBootComplete]);
 
-	// Skip animation on keyboard input
+	// Skip animation
 	useEffect(() => {
 		const handleKeyPress = (event: KeyboardEvent) => {
-			const skipKeys = [' ', 'Enter', 'Escape'];
-
-			if (skipKeys.includes(event.key)) {
+			if ([' ', 'Enter', 'Escape'].includes(event.key)) {
 				event.preventDefault();
-
-				if (timelineRef.current) {
-					timelineRef.current.kill();
-				}
-
+				timelineRef.current?.kill();
 				completeBoot();
 			}
 		};
-
 		window.addEventListener('keydown', handleKeyPress);
-
-		return () => {
-			window.removeEventListener('keydown', handleKeyPress);
-		};
+		return () => window.removeEventListener('keydown', handleKeyPress);
 	}, [completeBoot]);
 
-	// Main animation sequence
+	const handleSkipClick = useCallback(() => {
+		timelineRef.current?.kill();
+		completeBoot();
+	}, [completeBoot]);
+
+	// Animation Sequence
 	useEffect(() => {
 		const timeline = gsap.timeline({
 			onComplete: completeBoot,
@@ -285,16 +293,16 @@ export function BootAnimation() {
 					duration: ANIMATION_DURATION,
 					onStart: () => {
 						setStatus(bootPhase.status);
-						setPhase(index);
-
-						// Set hex opacity based on phase
-						if (index === 1) setHexOpacity(0.6);
-						if (index === 2) setHexOpacity(1);
 					},
 					onUpdate: function () {
 						const phaseProgress = this.progress();
-						setProgress(Math.floor(progressStart + phaseProgress * progressRange));
+						const currentProgress = Math.min(
+							100,
+							Math.floor(progressStart + phaseProgress * progressRange),
+						);
+						setProgress(currentProgress);
 					},
+					ease: 'power2.inOut',
 				},
 			);
 		});
@@ -304,204 +312,81 @@ export function BootAnimation() {
 		};
 	}, [completeBoot]);
 
-	// Cleanup on unmount
+	// Cleanup
 	useEffect(() => {
 		return () => {
-			if (timelineRef.current) {
-				timelineRef.current.kill();
-			}
-			if (completionTimeoutRef.current) {
-				clearTimeout(completionTimeoutRef.current);
-			}
+			if (completionTimeoutRef.current) clearTimeout(completionTimeoutRef.current);
 		};
 	}, []);
 
-	const handleSkipClick = useCallback(() => {
-		if (timelineRef.current) {
-			timelineRef.current.kill();
-		}
-		completeBoot();
-	}, [completeBoot]);
-
-	const phaseTransform = `perspective(600px) rotateX(${Math.sin(phase * 0.5) * 2}deg)`;
-
 	return (
 		<motion.div
-			className="fixed inset-0 z-50 bg-black text-[#00ff41] font-mono overflow-hidden"
-			aria-label="Boot animation loading screen"
-			role="dialog"
-			aria-live="polite"
+			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-wait flex items-center justify-center"
+			aria-label="Booting System"
 			initial={{ opacity: 1 }}
-			exit={{ opacity: 0, scale: 1.05, filter: 'blur(20px)' }}
-			transition={{ duration: 0.8, ease: 'easeInOut' }}
+			exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+			transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Smooth "Apple-like" exit
 		>
-			{/* Background layers */}
+			{/* Ambient Background */}
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black opacity-50" />
 			<MatrixRain />
-			<HexGrid opacity={hexOpacity} />
+			<HexGrid opacity={isCompleting ? 0 : 1} />
 			<ParticleBurst active={showBurst} />
 
-			{/* Main content */}
-			<div className="absolute inset-0 grid place-items-center pointer-events-none z-10">
-				<div className="w-full max-w-6xl px-3 sm:px-5 md:px-8">
-					<div className="py-6 sm:py-10 md:py-16 space-y-5 sm:space-y-7 md:space-y-10">
-						{/* Title */}
-						<div
-							className="text-center select-none"
-							style={{
-								transform: phaseTransform,
-								transition: 'transform 350ms ease-out',
-							}}
-						>
-							<h1
-								className="font-extrabold tracking-[0.12em] md:tracking-[0.18em]"
-								style={{
-									fontSize: 'clamp(1.8rem, 4.2vw + 0.5rem, 4.5rem)',
-									color: '#00ff41',
-									textShadow: '0 0 6px rgba(0,255,65,.2)',
-									lineHeight: 1.08,
-								}}
-							>
-								ANURAG BASURI
-							</h1>
-							<p
-								className="mt-2 sm:mt-3 text-[#bdfccf]/85"
-								style={{ fontSize: 'clamp(0.85rem, 1.1vw + 0.35rem, 1.1rem)' }}
-							>
-								Building at the intersection of full‑stack engineering and machine
-								intelligence.
-							</p>
+			{/* Main Content Container */}
+			<div className="relative z-10 flex flex-col items-center w-full max-w-lg p-8">
+				{/* Logo / Title Area */}
+				<div className="mb-12 relative group">
+					<div className="absolute -inset-4 bg-emerald-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-pulse" />
+					<div className="relative flex flex-col items-center">
+						<div className="w-16 h-16 mb-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)] backdrop-blur-sm">
+							<div className="w-8 h-8 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
 						</div>
 
-						{/* Status */}
-						<div className="text-center">
-							<div
-								className="inline-flex items-center gap-2 uppercase tracking-wider"
-								style={{
-									fontSize: 'clamp(0.75rem, 0.9vw + 0.25rem, 1rem)',
-									textShadow: '0 0 6px #00ff4128',
-								}}
-								aria-live="polite"
-							>
-								<span
-									className="inline-block w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#00ff41]"
-									aria-hidden="true"
-								/>
-								{status}
-							</div>
-							<div className="mx-auto mt-2 h-px w-36 sm:w-56 md:w-64 bg-[#00ff41]/35" />
-						</div>
-
-						{/* Progress bar */}
-						<div className="space-y-2">
-							<div className="w-full max-w-xl mx-auto">
-								<div className="relative h-1.5 md:h-2 bg-[#00ff41]/18 rounded-full overflow-hidden">
-									<div
-										className="absolute left-0 top-0 h-full rounded-full bg-[#00ff41] shadow-[0_0_10px_rgba(0,255,65,0.45)] transition-[width] duration-300 ease-out"
-										style={{ width: `${progress}%` }}
-										aria-valuenow={progress}
-										aria-valuemin={0}
-										aria-valuemax={100}
-										role="progressbar"
-										aria-label="Boot progress"
-									/>
-									<div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
-								</div>
-							</div>
-
-							<div
-								className="text-center font-mono tabular-nums opacity-80"
-								style={{ fontSize: 'clamp(0.7rem, 0.85vw + 0.25rem, 0.95rem)' }}
-								aria-live="polite"
-							>
-								<span className="text-[#00ff41]">[</span>
-								{progress.toString().padStart(3, '0')}%
-								<span className="text-[#00ff41]">]</span>
-								<span className="ml-2 hidden sm:inline">BOOTING SYSTEM</span>
-								<span className="ml-2 inline sm:hidden animate-pulse">BOOT...</span>
-							</div>
-						</div>
-
-						{/* Phase indicators */}
-						<div className="mx-auto w-full max-w-xl">
-							<div className="flex flex-wrap justify-center gap-4 xs:gap-5 sm:gap-7 md:gap-9">
-								{BOOT_PHASES.map((bootPhase, index) => (
-									<div
-										key={bootPhase.label}
-										className="flex flex-col items-center"
-									>
-										<div
-											className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-transform duration-300 ${
-												phase >= index ? 'bg-[#00ff41]' : 'bg-[#00ff41]/30'
-											}`}
-											style={{
-												transform:
-													phase === index ? 'scale(1.15)' : 'scale(1)',
-											}}
-											aria-label={`Phase ${index + 1}: ${bootPhase.label}`}
-											role="status"
-										/>
-										<span className="mt-2 text-[10px] sm:text-xs opacity-80 text-center">
-											{bootPhase.label}
-										</span>
-									</div>
-								))}
-							</div>
-						</div>
-
-						{/* Bio description */}
-						<div
-							className="mx-auto w-full max-w-3xl px-2 sm:px-0"
-							style={{ fontSize: 'clamp(0.8rem, 1vw + 0.25rem, 1rem)' }}
-						>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 sm:gap-x-10 gap-y-2 sm:gap-y-3 text-center text-[#bdfccf]/85">
-								<div className="space-y-1 leading-relaxed sm:justify-self-end sm:text-right max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
-									<div>Clean, scalable UX with Next.js & MERN</div>
-									<div>AI/ML, LLMs, NLP — learning, reasoning, adaptation</div>
-								</div>
-								<div className="space-y-1 leading-relaxed sm:justify-self-start sm:text-left max-w-[30ch] sm:max-w-[32ch] mx-auto sm:mx-0">
-									<div>LeetCode 450+ • consistency that compounds</div>
-									<div>Exploring internships & freelancing • real impact</div>
-								</div>
-							</div>
-						</div>
+						<h1 className="text-4xl font-bold tracking-[0.2em] text-white mb-2 text-center select-none">
+							ANURAG<span className="text-emerald-500">OS</span>
+						</h1>
+						<p className="text-xs uppercase tracking-[0.3em] text-emerald-500/60 font-medium">
+							System Environment v2.4
+						</p>
 					</div>
 				</div>
 
-				{/* Skip button */}
-				<div className="pointer-events-auto">
-					<button
-						type="button"
-						onClick={handleSkipClick}
-						disabled={isCompleting}
-						className="absolute bottom-5 sm:bottom-6 md:bottom-8 right-5 sm:right-6 md:right-8 px-4 py-2 md:px-6 md:py-3 bg-black/25 text-[#00ff41] hover:bg-black/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 uppercase tracking-wider text-xs md:text-sm z-20 font-bold rounded-sm focus:outline-none focus:ring-2 focus:ring-[#00ff41]/50"
-						aria-label="Skip boot animation and enter system"
-					>
-						SKIP BOOT{' '}
-						<span className="ml-1" aria-hidden="true">
-							›
-						</span>
-					</button>
+				{/* Progress Section */}
+				<div className="w-full space-y-4">
+					{/* Status Text */}
+					<div className="flex justify-between items-end text-xs uppercase tracking-wider font-semibold">
+						<span className="text-emerald-400/80 animate-pulse">{status}</span>
+						<span className="text-white/40 tabular-nums">{progress}%</span>
+					</div>
+
+					{/* Progress Bar */}
+					<div className="h-1 w-full bg-white/5 rounded-full overflow-hidden relative">
+						<div
+							className="absolute h-full bg-emerald-500 shadow-[0_0_15px_2px_rgba(16,185,129,0.5)] transition-all duration-100 ease-linear rounded-full"
+							style={{ width: `${progress}%` }}
+						/>
+					</div>
+
+					{/* Footer Metadata */}
+					<div className="flex justify-between text-[10px] text-white/20 font-mono pt-2">
+						<span>MEM: 64GB OK</span>
+						<span>CPU: QUANTUM-CORE OK</span>
+						<span>GPU: ONLINE</span>
+					</div>
 				</div>
 
-				{/* Keyboard hint */}
-				<div className="absolute bottom-5 sm:bottom-6 md:bottom-8 left-5 sm:left-6 md:left-8 text-[10px] sm:text-xs text-[#00ff41]/60 pointer-events-none">
-					Press{' '}
-					<kbd className="px-1.5 py-0.5 bg-[#00ff41]/10 rounded border border-[#00ff41]/20">
-						ESC
-					</kbd>{' '}
-					or{' '}
-					<kbd className="px-1.5 py-0.5 bg-[#00ff41]/10 rounded border border-[#00ff41]/20">
-						SPACE
-					</kbd>{' '}
-					to skip
-				</div>
+				{/* Skip Button (Subtle) */}
+				<button
+					onClick={handleSkipClick}
+					className="absolute bottom-[-80px] text-[10px] uppercase tracking-widest text-white/10 hover:text-emerald-400 transition-colors duration-300"
+				>
+					Press Space to Skip
+				</button>
 			</div>
 
-			{/* Scanline effect */}
-			<div
-				className="scanlines pointer-events-none absolute inset-0 z-30"
-				aria-hidden="true"
-			/>
+			{/* Vignette */}
+			<div className="absolute inset-0 bg-[radial-gradient(transparent_0%,_#000_90%)] pointer-events-none" />
 		</motion.div>
 	);
 }

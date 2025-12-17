@@ -79,9 +79,7 @@ function Home() {
 	return (
 		<div className="fixed inset-0">
 			{/* Boot Animation - Always visible when not complete */}
-			<AnimatePresence mode="wait">
-				{!bootComplete && <BootAnimation key="boot" />}
-			</AnimatePresence>
+			<AnimatePresence>{!bootComplete && <BootAnimation key="boot" />}</AnimatePresence>
 
 			<div
 				style={{
