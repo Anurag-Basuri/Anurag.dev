@@ -115,8 +115,8 @@ const TiltCard = ({ children }: { children: React.ReactNode }) => {
 	const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
 	const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
 
-	const rotateX = useTransform(mouseY, [-0.5, 0.5], ['15deg', '-15deg']);
-	const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-15deg', '15deg']);
+	const rotateX = useTransform(mouseY, [-0.5, 0.5], ['25deg', '-25deg']);
+	const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-25deg', '25deg']);
 
 	const handleMouseMove = (e: React.MouseEvent) => {
 		const rect = e.currentTarget.getBoundingClientRect();
@@ -200,6 +200,142 @@ const Typewriter = ({ texts }: { texts: string[] }) => {
 	);
 };
 
+// Interactive Particle Field
+const InteractiveParticles = memo(function InteractiveParticles() {
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const mouseRef = useRef({ x: 0, y: 0 });
+
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		let width = window.innerWidth;
+		let height = window.innerHeight;
+		canvas.width = width;
+		canvas.height = height;
+
+		const particles: { x: number; y: number; vx: number; vy: number; size: number }[] = [];
+		for (let i = 0; i < 50; i++) {
+			particles.push({
+				x: Math.random() * width,
+				y: Math.random() * height,
+				vx: (Math.random() - 0.5) * 0.5,
+				vy: (Math.random() - 0.5) * 0.5,
+				size: Math.random() * 2 + 0.5,
+			});
+		}
+
+		const handleMove = (e: MouseEvent) => {
+			mouseRef.current = { x: e.clientX, y: e.clientY };
+		};
+		window.addEventListener('mousemove', handleMove);
+
+		let animationFrame: number;
+
+		const animate = () => {
+			ctx.clearRect(0, 0, width, height);
+			// Use emerald tint for particles
+			ctx.fillStyle = '#10b981';
+
+			particles.forEach(p => {
+				p.x += p.vx;
+				p.y += p.vy;
+
+				const dx = mouseRef.current.x - p.x;
+				const dy = mouseRef.current.y - p.y;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+
+				if (distance < 200) {
+					const angle = Math.atan2(dy, dx);
+					const force = (200 - distance) / 200;
+					p.vx -= Math.cos(angle) * force * 0.02;
+					p.vy -= Math.sin(angle) * force * 0.02;
+				}
+
+				if (p.x < 0 || p.x > width) p.vx *= -1;
+				if (p.y < 0 || p.y > height) p.vy *= -1;
+
+				ctx.globalAlpha = Math.max(0.1, 1 - distance / 300);
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+				ctx.fill();
+			});
+
+			ctx.strokeStyle = '#10b981';
+			particles.forEach((p, i) => {
+				for (let j = i + 1; j < particles.length; j++) {
+					const p2 = particles[j];
+					const dx = p.x - p2.x;
+					const dy = p.y - p2.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist < 100) {
+						ctx.globalAlpha = (1 - dist / 100) * 0.15;
+						ctx.beginPath();
+						ctx.moveTo(p.x, p.y);
+						ctx.lineTo(p2.x, p2.y);
+						ctx.stroke();
+					}
+				}
+			});
+
+			animationFrame = requestAnimationFrame(animate);
+		};
+		animate();
+
+		return () => {
+			window.removeEventListener('mousemove', handleMove);
+			cancelAnimationFrame(animationFrame);
+		};
+	}, []);
+
+	return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />;
+});
+
+// Glitch Text Effect
+const GlitchText = ({ text }: { text: string }) => {
+	const [displayText, setDisplayText] = useState(text);
+
+	useEffect(() => {
+		let interval: NodeJS.Timeout;
+		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+
+		const scramble = () => {
+			let iterations = 0;
+			clearInterval(interval);
+
+			interval = setInterval(() => {
+				setDisplayText(prev =>
+					text
+						.split('')
+						.map((char, index) => {
+							if (index < iterations) return text[index];
+							return chars[Math.floor(Math.random() * chars.length)];
+						})
+						.join(''),
+				);
+
+				if (iterations >= text.length) clearInterval(interval);
+				iterations += 1 / 3;
+			}, 30);
+		};
+
+		const randomTrigger = setInterval(() => {
+			if (Math.random() > 0.8) scramble();
+		}, 3000);
+
+		scramble();
+
+		return () => {
+			clearInterval(interval);
+			clearInterval(randomTrigger);
+		};
+	}, [text]);
+
+	return <span className="font-black tracking-tight">{displayText}</span>;
+};
+
 export function BootAnimation() {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
 	const [status, setStatus] = useState('INITIALIZING...');
@@ -280,7 +416,7 @@ export function BootAnimation() {
 
 	return (
 		<motion.div
-			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-move flex items-center justify-center perspective-[1000px]"
+			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-move flex items-center justify-center perspective-distant"
 			aria-label="Booting Portfolio"
 			initial={{ opacity: 1 }}
 			exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
@@ -288,6 +424,7 @@ export function BootAnimation() {
 		>
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black opacity-80" />
 			<MatrixRain />
+			<InteractiveParticles />
 			<HexGrid opacity={isCompleting ? 0 : 1} />
 
 			<div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
@@ -303,8 +440,8 @@ export function BootAnimation() {
 						{/* Main Title */}
 						<h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-2">
 							ANURAG
-							<span className="text-transparent bg-clip-text bg-linear-to-tr from-emerald-400 to-cyan-400">
-								BASURI
+							<span className="text-transparent bg-clip-text bg-linear-to-tr from-emerald-400 to-cyan-400 ml-3">
+								<GlitchText text="BASURI" />
 							</span>
 						</h1>
 
@@ -332,12 +469,29 @@ export function BootAnimation() {
 					</div>
 				</TiltCard>
 
-				<button
+				{/* Skip / Enter Button */}
+				<motion.button
 					onClick={handleSkipClick}
-					className="mt-8 text-[10px] uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors"
+					className="absolute bottom-12 sm:bottom-16 group"
+					whileHover={{ scale: 1.05 }}
+					whileTap={{ scale: 0.95 }}
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 2, duration: 1 }}
 				>
-					Click to Enter
-				</button>
+					<div className="flex flex-col items-center gap-3">
+						<div className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md group-hover:bg-white/10 group-hover:border-emerald-500/30 transition-all duration-300 shadow-[0_0_20px_-10px_rgba(16,185,129,0.5)] flex items-center gap-3">
+							<span className="text-[10px] font-bold tracking-[0.2em] text-white/90 group-hover:text-white uppercase">
+								Enter System
+							</span>
+							<span className="w-px h-3 bg-white/20" />
+							<span className="text-[10px] font-mono text-emerald-500/80 group-hover:text-emerald-400">
+								SPACE
+							</span>
+						</div>
+						<div className="h-px w-0 group-hover:w-full bg-linear-to-r from-transparent via-emerald-500 to-transparent transition-all duration-500 opacity-50" />
+					</div>
+				</motion.button>
 			</div>
 		</motion.div>
 	);
