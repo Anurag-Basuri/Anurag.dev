@@ -66,7 +66,6 @@ export function MainLayout() {
 	const [layoutState, setLayoutState] = useAtom(layoutStateAtom);
 	const [bootComplete] = useAtom(bootCompleteAtom);
 
-	const [isLayoutReady, setIsLayoutReady] = useState(false);
 	const [hasInitialized, setHasInitialized] = useState(false);
 
 	const { openWindow } = useWindowManager();
@@ -77,20 +76,9 @@ export function MainLayout() {
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
-	// Progressive layout initialization
-	useEffect(() => {
-		if (!bootComplete) return;
-
-		const timer = setTimeout(() => {
-			setIsLayoutReady(true);
-		}, 50); // Small delay for smooth transition
-
-		return () => clearTimeout(timer);
-	}, [bootComplete]);
-
 	// URL -> State: Sync window from URL or open default
 	useEffect(() => {
-		if (hasInitialized || !bootComplete || !isLayoutReady) return;
+		if (hasInitialized || !bootComplete) return;
 
 		const appParam = searchParams.get('app');
 
@@ -104,18 +92,9 @@ export function MainLayout() {
 			router.replace(`${pathname}?app=about`, { scroll: false });
 		}
 
-		const timer = setTimeout(() => setHasInitialized(true), 0);
-		return () => clearTimeout(timer);
-	}, [
-		searchParams,
-		windows,
-		openWindow,
-		router,
-		pathname,
-		hasInitialized,
-		bootComplete,
-		isLayoutReady,
-	]);
+		// Mark initialized immediately
+		setHasInitialized(true);
+	}, [searchParams, windows, openWindow, router, pathname, hasInitialized, bootComplete]);
 
 	// State -> URL: Sync active window changes to URL
 	useEffect(() => {
@@ -180,32 +159,6 @@ export function MainLayout() {
 		},
 		[openWindow],
 	);
-
-	// Show minimal loading state
-	if (!isLayoutReady) {
-		return (
-			<div className="h-screen w-screen flex items-center justify-center bg-background relative overflow-hidden">
-				<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
-				<div className="flex flex-col items-center gap-6 relative z-10">
-					<div className="relative">
-						<div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
-						<div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin relative z-10" />
-						<div className="absolute inset-0 flex items-center justify-center">
-							<div className="w-2 h-2 bg-primary rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
-						</div>
-					</div>
-					<div className="flex flex-col items-center gap-1">
-						<div className="text-sm font-bold tracking-[0.2em] text-primary animate-pulse uppercase">
-							System Initializing
-						</div>
-						<div className="text-[10px] text-muted-foreground font-mono tracking-widest">
-							LOADING MODULES...
-						</div>
-					</div>
-				</div>
-			</div>
-		);
-	}
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
