@@ -4,36 +4,35 @@ import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { User, Code, Smartphone, Globe } from 'lucide-react';
 
 // Constants
 const BOOT_SESSION_KEY = 'anuragos-boot-complete';
-const ANIMATION_DURATION = 1.25; // seconds per phase
-const BURST_DELAY = 400; // milliseconds
+const ANIMATION_DURATION = 1.25;
+const BURST_DELAY = 400;
 const MATRIX_CHARS = '01XYZπΩΣ∆';
 const MATRIX_FONT_SIZE = 12;
-const MATRIX_INTERVAL = 60; // milliseconds
+const MATRIX_INTERVAL = 60;
 const PARTICLE_COUNT = 60;
 
-// Boot phases configuration - More Technical/OS flavored
 const BOOT_PHASES = [
-	{ label: 'BIOS', status: 'INITIALIZING KERNEL...' },
-	{ label: 'SYSTEM', status: 'LOADING MODULES...' },
-	{ label: 'USER', status: 'STARTING INTERFACE...' },
-	{ label: 'READY', status: 'SYSTEM READY' },
+	{ label: 'CORE', status: 'LOADING EXPERIENCE...' },
+	{ label: 'ASSETS', status: 'FETCHING PORTFOLIO DATA...' },
+	{ label: 'GPU', status: 'INITIALIZING 3D ENVIRONMENT...' },
+	{ label: 'READY', status: 'WELCOME' },
 ] as const;
 
-interface Particle {
-	x: number;
-	y: number;
-	vx: number;
-	vy: number;
-	life: number;
-	maxLife: number;
-}
+const ROLES = [
+	'Full Stack Engineer',
+	'AI and ML Enthusiast',
+	'Creative Developer',
+	'UI/UX Enthusiast',
+];
 
-// Matrix Rain Effect Component - Subtle Background
+// --- Sub-components ---
+
 const MatrixRain = memo(function MatrixRain() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const animRef = useRef<number | null>(null);
@@ -41,218 +40,184 @@ const MatrixRain = memo(function MatrixRain() {
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
-
 		const ctx = canvas.getContext('2d', { alpha: false });
 		if (!ctx) return;
 
-		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 		const resize = () => {
-			if (!canvas) return;
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 		};
-
 		resize();
-		window.addEventListener('resize', resize, { passive: true });
+		window.addEventListener('resize', resize);
 
 		let columns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
 		let drops: number[] = Array.from({ length: columns }, () => Math.random() * -100);
-
 		let lastTime = 0;
 
 		const draw = (timestamp: number) => {
 			if (!ctx || !canvas) return;
-
 			if (timestamp - lastTime < MATRIX_INTERVAL) {
 				animRef.current = requestAnimationFrame(draw);
 				return;
 			}
-
 			lastTime = timestamp;
 
-			// Reset on resize
-			const newColumns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
-			if (newColumns !== columns) {
-				columns = newColumns;
-				drops = Array.from({ length: columns }, () => Math.random() * -100);
-			}
-
-			// Fade out trail
-			ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+			ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; // Hard fade
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-			ctx.fillStyle = '#059669'; // Emerald-600 (Darker, more subtle)
+			ctx.fillStyle = '#059669';
 			ctx.font = `${MATRIX_FONT_SIZE}px "Geist Mono", monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
 				const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-
-				// Randomly brighter characters
 				if (Math.random() > 0.98) {
-					ctx.fillStyle = '#34d399'; // Emerald-400 (Bright)
+					ctx.fillStyle = '#34d399';
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
-					ctx.fillStyle = '#059669'; // Reset
+					ctx.fillStyle = '#059669';
 				} else {
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
 				}
-
-				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.985) {
+				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.985)
 					drops[i] = 0;
-				}
-
-				drops[i] += prefersReducedMotion ? 0.5 : 1;
+				drops[i]++;
 			}
-
 			animRef.current = requestAnimationFrame(draw);
 		};
-
 		animRef.current = requestAnimationFrame(draw);
-
 		return () => {
-			if (animRef.current) {
-				cancelAnimationFrame(animRef.current);
-			}
+			if (animRef.current) cancelAnimationFrame(animRef.current);
 			window.removeEventListener('resize', resize);
 		};
 	}, []);
 
 	return (
-		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.07]" aria-hidden="true" />
+		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.05]" aria-hidden="true" />
 	);
 });
 
-// Hexagon Grid Component
 const HexGrid = memo(function HexGrid({ opacity }: { opacity: number }) {
 	return (
 		<div
 			className="absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out"
-			style={{ opacity: opacity * 0.4 }} // Lower base opacity
+			style={{ opacity: opacity * 0.3 }}
 			aria-hidden="true"
 		>
-			<div
-				className="w-full h-full"
-				style={{
-					backgroundImage: `
-						radial-gradient(circle at center, transparent 0%, #000 90%),
-                        linear-gradient(30deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
-                        linear-gradient(150deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
-                        linear-gradient(30deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
-                        linear-gradient(150deg, #10b98115 12%, transparent 12.5%, transparent 87%, #10b98115 87.5%, #10b98115),
-                        linear-gradient(60deg, #10b98110 25%, transparent 25.5%, transparent 75%, #10b98110 75%, #10b98110),
-                        linear-gradient(60deg, #10b98110 25%, transparent 25.5%, transparent 75%, #10b98110 75%, #10b98110)
-                    `,
-					backgroundSize: '80px 140px',
-					backgroundPosition: '0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px',
-				}}
-			/>
+			<div className="w-full h-full bg-[radial-gradient(#10b98115_1px,transparent_1px)] bg-size-[24px_24px]" />
 		</div>
 	);
 });
 
-// Particle Burst Component
-const ParticleBurst = memo(function ParticleBurst({ active }: { active: boolean }) {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const animRef = useRef<number | null>(null);
+// 3D Tilt Card Component
+const TiltCard = ({ children }: { children: React.ReactNode }) => {
+	const x = useMotionValue(0);
+	const y = useMotionValue(0);
 
-	useEffect(() => {
-		if (!active) return;
+	const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
+	const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
 
-		const canvas = canvasRef.current;
-		if (!canvas) return;
+	const rotateX = useTransform(mouseY, [-0.5, 0.5], ['15deg', '-15deg']);
+	const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-15deg', '15deg']);
 
-		const ctx = canvas.getContext('2d');
-		if (!ctx) return;
+	const handleMouseMove = (e: React.MouseEvent) => {
+		const rect = e.currentTarget.getBoundingClientRect();
+		const width = rect.width;
+		const height = rect.height;
+		const mouseXPct = (e.clientX - rect.left) / width - 0.5;
+		const mouseYPct = (e.clientY - rect.top) / height - 0.5;
+		x.set(mouseXPct);
+		y.set(mouseYPct);
+	};
 
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
-
-		const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, (_, i) => {
-			const angle = (Math.PI * 2 * i) / PARTICLE_COUNT;
-			const speed = Math.random() * 8 + 4; // Faster burst
-
-			return {
-				x: canvas.width / 2,
-				y: canvas.height / 2,
-				vx: Math.cos(angle) * speed,
-				vy: Math.sin(angle) * speed,
-				life: 1,
-				maxLife: 1,
-			};
-		});
-
-		const draw = () => {
-			if (!ctx || !canvas) return;
-
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-			let stillAlive = false;
-
-			particles.forEach(particle => {
-				particle.x += particle.vx;
-				particle.y += particle.vy;
-				particle.life -= 0.02; // Faster fade
-
-				if (particle.life > 0) {
-					stillAlive = true;
-					ctx.globalAlpha = particle.life;
-					ctx.fillStyle = '#34d399';
-					ctx.beginPath();
-					ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
-					ctx.fill();
-				}
-			});
-
-			if (stillAlive) {
-				animRef.current = requestAnimationFrame(draw);
-			}
-		};
-
-		animRef.current = requestAnimationFrame(draw);
-
-		return () => {
-			if (animRef.current) {
-				cancelAnimationFrame(animRef.current);
-			}
-		};
-	}, [active]);
-
-	if (!active) return null;
+	const handleMouseLeave = () => {
+		x.set(0);
+		y.set(0);
+	};
 
 	return (
-		<canvas
-			ref={canvasRef}
-			className="absolute inset-0 z-20 pointer-events-none"
-			aria-hidden="true"
-		/>
-	);
-});
+		<motion.div
+			onMouseMove={handleMouseMove}
+			onMouseLeave={handleMouseLeave}
+			style={{
+				rotateX,
+				rotateY,
+				transformStyle: 'preserve-3d',
+			}}
+			className="relative z-20 cursor-default"
+		>
+			<div className="bg-black/40 backdrop-blur-md border border-white/10 p-8 sm:p-12 rounded-3xl shadow-2xl relative overflow-hidden group">
+				{/* Inner Glow */}
+				<div
+					className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+					style={{ transform: 'translateZ(1px)' }}
+				/>
 
-// Main Boot Animation Component
+				{/* Content Lifted in 3D */}
+				<div style={{ transform: 'translateZ(20px)' }}>{children}</div>
+
+				{/* Shine Effect */}
+				<motion.div
+					className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent skew-x-12 translate-x-[-200%]"
+					animate={{ translateX: ['200%'] }}
+					transition={{ repeat: Infinity, duration: 3, delay: 1, ease: 'linear' }}
+				/>
+			</div>
+		</motion.div>
+	);
+};
+
+// Typewriter Component
+const Typewriter = ({ texts }: { texts: string[] }) => {
+	const [index, setIndex] = useState(0);
+	const [displayText, setDisplayText] = useState('');
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	useEffect(() => {
+		const currentText = texts[index];
+		const speed = isDeleting ? 30 : 50;
+		const delay = isDeleting ? 0 : 2000;
+
+		const timeout = setTimeout(() => {
+			if (!isDeleting && displayText === currentText) {
+				setTimeout(() => setIsDeleting(true), delay);
+			} else if (isDeleting && displayText === '') {
+				setIsDeleting(false);
+				setIndex(prev => (prev + 1) % texts.length);
+			} else {
+				setDisplayText(
+					currentText.substring(0, displayText.length + (isDeleting ? -1 : 1)),
+				);
+			}
+		}, speed);
+
+		return () => clearTimeout(timeout);
+	}, [displayText, isDeleting, index, texts]);
+
+	return (
+		<span className="inline-block min-w-[200px] text-emerald-400 font-bold">
+			{displayText}
+			<span className="animate-pulse">_</span>
+		</span>
+	);
+};
+
 export function BootAnimation() {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
 	const [status, setStatus] = useState('INITIALIZING...');
 	const [progress, setProgress] = useState(0);
-	const [showBurst, setShowBurst] = useState(false);
 	const [isCompleting, setIsCompleting] = useState(false);
 
 	const timelineRef = useRef<gsap.core.Timeline | null>(null);
 	const completionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-	// Complete boot animation
 	const completeBoot = useCallback(() => {
 		if (isCompleting) return;
-
 		setIsCompleting(true);
 		setProgress(100);
-		setShowBurst(true);
 
 		completionTimeoutRef.current = setTimeout(() => {
 			try {
 				sessionStorage.setItem(BOOT_SESSION_KEY, '1');
-			} catch (error) {
-				// Ignore
-			}
+			} catch (e) {}
 			setBootComplete(true);
 		}, BURST_DELAY);
 	}, [isCompleting, setBootComplete]);
@@ -275,12 +240,8 @@ export function BootAnimation() {
 		completeBoot();
 	}, [completeBoot]);
 
-	// Animation Sequence
 	useEffect(() => {
-		const timeline = gsap.timeline({
-			onComplete: completeBoot,
-		});
-
+		const timeline = gsap.timeline({ onComplete: completeBoot });
 		timelineRef.current = timeline;
 
 		BOOT_PHASES.forEach((bootPhase, index) => {
@@ -291,16 +252,15 @@ export function BootAnimation() {
 				{},
 				{
 					duration: ANIMATION_DURATION,
-					onStart: () => {
-						setStatus(bootPhase.status);
-					},
+					onStart: () => setStatus(bootPhase.status),
 					onUpdate: function () {
 						const phaseProgress = this.progress();
-						const currentProgress = Math.min(
-							100,
-							Math.floor(progressStart + phaseProgress * progressRange),
+						setProgress(
+							Math.min(
+								100,
+								Math.floor(progressStart + phaseProgress * progressRange),
+							),
 						);
-						setProgress(currentProgress);
 					},
 					ease: 'power2.inOut',
 				},
@@ -312,7 +272,6 @@ export function BootAnimation() {
 		};
 	}, [completeBoot]);
 
-	// Cleanup
 	useEffect(() => {
 		return () => {
 			if (completionTimeoutRef.current) clearTimeout(completionTimeoutRef.current);
@@ -321,72 +280,65 @@ export function BootAnimation() {
 
 	return (
 		<motion.div
-			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-wait flex items-center justify-center"
-			aria-label="Booting System"
+			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-move flex items-center justify-center perspective-[1000px]"
+			aria-label="Booting Portfolio"
 			initial={{ opacity: 1 }}
 			exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
-			transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Smooth "Apple-like" exit
+			transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
 		>
-			{/* Ambient Background */}
-			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black opacity-50" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black opacity-80" />
 			<MatrixRain />
 			<HexGrid opacity={isCompleting ? 0 : 1} />
-			<ParticleBurst active={showBurst} />
 
-			{/* Main Content Container */}
-			<div className="relative z-10 flex flex-col items-center w-full max-w-lg p-8">
-				{/* Logo / Title Area */}
-				<div className="mb-12 relative group">
-					<div className="absolute -inset-4 bg-emerald-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-pulse" />
-					<div className="relative flex flex-col items-center">
-						<div className="w-16 h-16 mb-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)] backdrop-blur-sm">
-							<div className="w-8 h-8 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
+			<div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
+				<TiltCard>
+					<div className="flex flex-col items-center text-center">
+						{/* Icons */}
+						<div className="flex gap-4 mb-6 text-emerald-500/50">
+							<Code className="w-5 h-5" />
+							<User className="w-5 h-5 text-emerald-400" />
+							<Smartphone className="w-5 h-5" />
 						</div>
 
-						<h1 className="text-4xl font-bold tracking-[0.2em] text-white mb-2 text-center select-none">
-							ANURAG<span className="text-emerald-500">OS</span>
+						{/* Main Title */}
+						<h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-2">
+							ANURAG
+							<span className="text-transparent bg-clip-text bg-linear-to-tr from-emerald-400 to-cyan-400">
+								BASURI
+							</span>
 						</h1>
-						<p className="text-xs uppercase tracking-[0.3em] text-emerald-500/60 font-medium">
-							System Environment v2.4
-						</p>
-					</div>
-				</div>
 
-				{/* Progress Section */}
-				<div className="w-full space-y-4">
-					{/* Status Text */}
-					<div className="flex justify-between items-end text-xs uppercase tracking-wider font-semibold">
-						<span className="text-emerald-400/80 animate-pulse">{status}</span>
-						<span className="text-white/40 tabular-nums">{progress}%</span>
-					</div>
+						{/* Cycling Intro */}
+						<div className="h-6 sm:h-8 mb-8 text-sm sm:text-base font-medium tracking-widest uppercase text-emerald-500/80">
+							<Typewriter texts={ROLES} />
+						</div>
 
-					{/* Progress Bar */}
-					<div className="h-1 w-full bg-white/5 rounded-full overflow-hidden relative">
-						<div
-							className="absolute h-full bg-emerald-500 shadow-[0_0_15px_2px_rgba(16,185,129,0.5)] transition-all duration-100 ease-linear rounded-full"
-							style={{ width: `${progress}%` }}
-						/>
-					</div>
+						{/* Divider */}
+						<div className="w-12 h-1 bg-emerald-500/30 rounded-full mb-8" />
 
-					{/* Footer Metadata */}
-					<div className="flex justify-between text-[10px] text-white/20 font-mono pt-2">
-						<span>MEM: 64GB OK</span>
-						<span>CPU: QUANTUM-CORE OK</span>
-						<span>GPU: ONLINE</span>
+						{/* Progress Bar */}
+						<div className="w-full max-w-[240px] space-y-3">
+							<div className="flex justify-between text-[10px] font-bold tracking-widest text-emerald-500/60 uppercase">
+								<span>{status}</span>
+								<span>{progress}%</span>
+							</div>
+							<div className="h-0.5 w-full bg-emerald-900/40 rounded-full overflow-hidden">
+								<motion.div
+									className="h-full bg-linear-to-r from-emerald-500 to-cyan-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+									style={{ width: `${progress}%` }}
+								/>
+							</div>
+						</div>
 					</div>
-				</div>
+				</TiltCard>
 
-				{/* Skip Button (Subtle) */}
 				<button
 					onClick={handleSkipClick}
-					className="absolute bottom-[-80px] text-[10px] uppercase tracking-widest text-white/10 hover:text-emerald-400 transition-colors duration-300"
+					className="mt-8 text-[10px] uppercase tracking-[0.2em] text-white/20 hover:text-white/50 transition-colors"
 				>
-					Press Space to Skip
+					Click to Enter
 				</button>
 			</div>
-
-			{/* Vignette */}
-			<div className="absolute inset-0 bg-[radial-gradient(transparent_0%,_#000_90%)] pointer-events-none" />
 		</motion.div>
 	);
 }
