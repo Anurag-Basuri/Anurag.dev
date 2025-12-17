@@ -12,29 +12,21 @@ import {
 	Sparkles,
 	Cpu,
 	Layers,
-	Box,
 	Github,
 	Code,
-	Trophy,
 	ArrowRight,
 	Globe,
 	Briefcase,
-	Clock,
-	CheckCircle,
-	Star,
 	Target,
 	Zap,
-	Award,
 	Download,
 	Linkedin,
 	Twitter,
 	ExternalLink,
 	Mail,
 	Server,
-	Rocket,
-	TrendingUp,
 } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ModuleHeader } from '@/components/apps/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
@@ -121,7 +113,7 @@ const HeroBackground = memo(function HeroBackground() {
 	return (
 		<div className="absolute inset-0 bg-black overflow-hidden">
 			{/* Gradient Overlay */}
-			<div className="absolute inset-x-0 bottom-0 h-full bg-linear-to-t from-black via-transparent to-transparent z-10" />
+			<div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black via-transparent to-transparent z-10" />
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-emerald-900/40 via-black to-black opacity-80" />
 
 			{/* Grid Pattern */}
@@ -175,7 +167,7 @@ const ProfileAvatar = memo(function ProfileAvatar({
 			transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
 			className="relative shrink-0"
 		>
-			<div className="w-40 h-40 rounded-4xl p-1.5 bg-linear-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
+			<div className="w-40 h-40 rounded-4xl p-1.5 bg-gradient-to-br from-emerald-500 via-blue-500 to-purple-500 shadow-xl">
 				<div className="w-full h-full rounded-[1.7rem] overflow-hidden bg-black relative">
 					<Image
 						src={avatarUrl || '/logo.png'}
@@ -230,7 +222,7 @@ const QuickStat = memo(function QuickStat({
 		>
 			<div
 				className={cn(
-					'absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
+					'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none rounded-4xl',
 					`${gradientFrom} to-transparent`,
 				)}
 			/>
@@ -255,7 +247,7 @@ const TechStackCard = memo(function TechStackCard({
 	delay = 0,
 }: {
 	category: string;
-	skills: Array<{ name: string; level?: string }>;
+	skills: Array<{ name: string; level?: string } | string>;
 	config: (typeof TECH_STACK_CONFIG)[keyof typeof TECH_STACK_CONFIG];
 	delay?: number;
 }) {
@@ -284,22 +276,25 @@ const TechStackCard = memo(function TechStackCard({
 			</div>
 			<h3 className="text-xl font-bold text-white mb-6">{config.label}</h3>
 			<div className="flex flex-wrap gap-2">
-				{skills.map(skill => (
-					<motion.span
-						key={skill.name}
-						whileHover={{ scale: 1.05 }}
-						className={cn(
-							'px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors',
-							config.pillBg,
-							config.pillBorder,
-							config.pillText,
-							config.pillHoverBg,
-							config.pillHoverBorder,
-						)}
-					>
-						{skill.name}
-					</motion.span>
-				))}
+				{skills.map(skill => {
+					const skillName = typeof skill === 'string' ? skill : skill.name;
+					return (
+						<motion.span
+							key={skillName}
+							whileHover={{ scale: 1.05 }}
+							className={cn(
+								'px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors',
+								config.pillBg,
+								config.pillBorder,
+								config.pillText,
+								config.pillHoverBg,
+								config.pillHoverBorder,
+							)}
+						>
+							{skillName}
+						</motion.span>
+					);
+				})}
 			</div>
 		</motion.div>
 	);
