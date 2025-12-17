@@ -19,6 +19,34 @@ interface FileIconProps {
 	className?: string;
 }
 
+/**
+ * Get the appropriate icon and color for a file based on its name
+ * @param name - File name (including extension)
+ * @param moduleId - Optional module ID for .app files
+ * @returns Icon component and color class
+ */
+export function getIconForFile(name: string, moduleId?: string): LucideIcon {
+	// App shortcuts
+	if (name.endsWith('.app')) {
+		if (moduleId === 'projects') return LayoutDashboard;
+		if (moduleId === 'ailab') return Terminal;
+		if (moduleId === 'profiles') return Database;
+		if (moduleId === 'blog') return Globe;
+		return Terminal;
+	}
+
+	// File extensions
+	if (name.endsWith('.json')) return FileJson;
+	if (name.endsWith('.md') || name.endsWith('.txt')) return FileText;
+	if (name.endsWith('.tsx') || name.endsWith('.ts')) return FileCode;
+	if (name.endsWith('.js') || name.endsWith('.jsx')) return FileCode;
+	if (name.endsWith('.css') || name.endsWith('.scss')) return FileCode;
+	if (name.endsWith('.pdf')) return File;
+	if (name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.svg')) return ImageIcon;
+
+	return File;
+}
+
 export function FileIcon({ name, moduleId, className }: FileIconProps) {
 	const getIcon = () => {
 		// App shortcuts
