@@ -297,7 +297,7 @@ function FolderTreeItem({
 				aria-selected={isFocused}
 				aria-expanded={isFolder ? isExpanded : undefined}
 				className={cn(
-					'flex items-center py-1 px-2 cursor-pointer select-none text-[13px] transition-all duration-200 rounded-md group relative my-0.5 outline-none',
+					'flex items-center py-1 px-2 cursor-pointer select-none text-md transition-all duration-200 rounded-md group relative my-0.5 outline-none',
 					isActive ? 'text-emerald-300' : 'text-white/70 hover:text-white',
 					level > 0 && 'ml-3.5',
 					isFocused && 'bg-white/10 ring-1 ring-inset ring-white/20',

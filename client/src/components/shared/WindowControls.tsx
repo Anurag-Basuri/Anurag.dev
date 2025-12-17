@@ -70,7 +70,7 @@ export function WindowControls({
 							/>
 						</motion.button>
 					</TooltipTrigger>
-					<TooltipContent>
+					<TooltipContent side="bottom">
 						<p>Close</p>
 					</TooltipContent>
 				</Tooltip>

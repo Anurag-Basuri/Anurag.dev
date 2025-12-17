@@ -385,7 +385,7 @@ export function TopBar({
 										)}
 									</motion.button>
 								</TooltipTrigger>
-								<TooltipContent>
+								<TooltipContent side="bottom">
 									{sidebarCollapsed
 										? 'Expand Sidebar (Ctrl+B)'
 										: 'Collapse Sidebar (Ctrl+B)'}
