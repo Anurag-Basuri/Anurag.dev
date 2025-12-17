@@ -6,7 +6,7 @@ import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { SidebarControls } from '@/components/common/WindowControls';
+import { WindowControls } from '@/components/common/WindowControls';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
