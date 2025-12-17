@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useAtom } from 'jotai';
 import {
 	mainVerticalSizesAtom,
@@ -75,8 +75,8 @@ export function MainLayout() {
 			router.replace(`${pathname}?app=about`, { scroll: false });
 		}
 
-		// Mark initialized immediately
-		setHasInitialized(true);
+		// Mark initialized after effect completes to avoid cascading renders
+		setTimeout(() => setHasInitialized(true), 0);
 	}, [searchParams, windows, openWindow, router, pathname, hasInitialized, bootComplete]);
 
 	// State -> URL: Sync active window changes to URL
