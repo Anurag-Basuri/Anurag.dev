@@ -24,11 +24,19 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 				<div className="flex items-center gap-2">
 					{/* macOS Traffic Lights - Hidden on mobile */}
 					<div className="hidden md:flex items-center gap-1.5 group">
-						<SidebarControls
+						<WindowControls
 							onClose={onCollapse}
 							onMaximize={onExpand}
-							onToggleFolders={() => setFolderSignal(prev => prev + 1)}
+							isMaximized={false}
+							onMinimize={onCollapse}
 						/>
+						<button
+							onClick={() => setFolderSignal(prev => prev + 1)}
+							className="ml-2 p-1 hover:bg-white/10 rounded transition-colors"
+							title="Toggle Folders"
+						>
+							<FolderOpen className="w-3 h-3 text-muted-foreground" />
+						</button>
 					</div>
 
 					{/* Separator */}
