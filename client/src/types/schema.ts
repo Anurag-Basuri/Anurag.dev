@@ -149,12 +149,18 @@ export interface PlatformStats {
 	username: string;
 	url: string;
 	stats?: {
-		linesOfCode: number;
+		solved?: number;
+		easy?: number;
+		medium?: number;
+		hard?: number;
+		linesOfCode?: number;
 		rating?: number;
+		maxRating?: number;
 		globalRank?: string | number;
 		stars?: number;
 		followers?: number;
-		solved?: number;
+		prs?: number;
+		issues?: number;
 	};
 }
 
