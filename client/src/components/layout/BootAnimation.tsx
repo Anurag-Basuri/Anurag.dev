@@ -6,29 +6,32 @@ import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { User, Code, Smartphone, Globe } from 'lucide-react';
+import { User, Code, Smartphone, Rocket, Brain, Terminal } from 'lucide-react';
 
 // Constants
-const BOOT_SESSION_KEY = 'anuragos-boot-complete';
-const ANIMATION_DURATION = 1.25;
+const BOOT_SESSION_KEY = 'anurag-portfolio-boot';
+const ANIMATION_DURATION = 1.6; // Slightly longer for dramatic effect
 const BURST_DELAY = 400;
-const MATRIX_CHARS = '01XYZπΩΣ∆';
-const MATRIX_FONT_SIZE = 12;
-const MATRIX_INTERVAL = 60;
+// Sanskrit characters from tech terms: संगणक, दत्त, यंत्र, तर्क, जाल, संकेत, विधि, स्मृति
+// Mixed with some binary for the hacker feel
+const MATRIX_CHARS = 'संगणकदात्तयंत्रतर्कजालसंकेतविधिस्मृति01';
+const MATRIX_FONT_SIZE = 14;
+const MATRIX_INTERVAL = 50;
 const PARTICLE_COUNT = 60;
 
 const BOOT_PHASES = [
-	{ label: 'CORE', status: 'LOADING EXPERIENCE...' },
-	{ label: 'ASSETS', status: 'FETCHING PORTFOLIO DATA...' },
-	{ label: 'GPU', status: 'INITIALIZING 3D ENVIRONMENT...' },
-	{ label: 'READY', status: 'WELCOME' },
+	{ label: 'YANTRA', status: 'INITIALIZING YANTRA...' },
+	{ label: 'SMRITI', status: 'ALLOCATING MEMORY...' },
+	{ label: 'TARK', status: 'LOADING LOGIC MODULES...' },
+	{ label: 'JAL', status: 'CONNECTING TO NETWORK...' },
+	{ label: 'READY', status: 'SYSTEM READY' },
 ] as const;
 
 const ROLES = [
-	'Full Stack Engineer',
+	'Full Stack Developer',
 	'AI and ML Enthusiast',
-	'Creative Developer',
-	'UI/UX Enthusiast',
+	'Problem Solver',
+	'Creative Technologist',
 ];
 
 // --- Sub-components ---
@@ -62,22 +65,25 @@ const MatrixRain = memo(function MatrixRain() {
 			}
 			lastTime = timestamp;
 
-			ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; // Hard fade
+			ctx.fillStyle = 'rgba(5, 5, 5, 0.08)'; // Slightly more trail
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 			ctx.fillStyle = '#059669';
-			ctx.font = `${MATRIX_FONT_SIZE}px "Geist Mono", monospace`;
+			// Using a font that likely supports Devanagari
+			ctx.font = `${MATRIX_FONT_SIZE}px "Geist Mono", "Noto Sans Devanagari", monospace`;
 
 			for (let i = 0; i < drops.length; i++) {
 				const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+				// Random brightness for "glint" effect
 				if (Math.random() > 0.98) {
-					ctx.fillStyle = '#34d399';
+					ctx.fillStyle = '#6ee7b7'; // Brighter emerald
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
-					ctx.fillStyle = '#059669';
+					ctx.fillStyle = '#059669'; // Reset
 				} else {
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
 				}
-				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.985)
+
+				if (drops[i] * MATRIX_FONT_SIZE > canvas.height && Math.random() > 0.975)
 					drops[i] = 0;
 				drops[i]++;
 			}
@@ -91,7 +97,7 @@ const MatrixRain = memo(function MatrixRain() {
 	}, []);
 
 	return (
-		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.05]" aria-hidden="true" />
+		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.12]" aria-hidden="true" />
 	);
 });
 
@@ -99,10 +105,10 @@ const HexGrid = memo(function HexGrid({ opacity }: { opacity: number }) {
 	return (
 		<div
 			className="absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out"
-			style={{ opacity: opacity * 0.3 }}
+			style={{ opacity: opacity * 0.2 }}
 			aria-hidden="true"
 		>
-			<div className="w-full h-full bg-[radial-gradient(#10b98115_1px,transparent_1px)] bg-size-[24px_24px]" />
+			<div className="w-full h-full bg-[radial-gradient(#10b98115_1px,transparent_1px)] bg-size-[32px_32px]" />
 		</div>
 	);
 });
@@ -115,8 +121,8 @@ const TiltCard = ({ children }: { children: React.ReactNode }) => {
 	const mouseX = useSpring(x, { stiffness: 150, damping: 15 });
 	const mouseY = useSpring(y, { stiffness: 150, damping: 15 });
 
-	const rotateX = useTransform(mouseY, [-0.5, 0.5], ['25deg', '-25deg']);
-	const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-25deg', '25deg']);
+	const rotateX = useTransform(mouseY, [-0.5, 0.5], ['15deg', '-15deg']);
+	const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-15deg', '15deg']);
 
 	const handleMouseMove = (e: React.MouseEvent) => {
 		const rect = e.currentTarget.getBoundingClientRect();
@@ -142,24 +148,17 @@ const TiltCard = ({ children }: { children: React.ReactNode }) => {
 				rotateY,
 				transformStyle: 'preserve-3d',
 			}}
-			className="relative z-20 cursor-default"
+			className="relative z-20 cursor-default px-4 w-full flex justify-center"
 		>
-			<div className="bg-black/40 backdrop-blur-md border border-white/10 p-8 sm:p-12 rounded-3xl shadow-2xl relative overflow-hidden group">
+			<div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 p-8 sm:p-14 rounded-2xl shadow-[0_0_50px_-10px_rgba(16,185,129,0.15)] relative overflow-hidden group w-full max-w-xl">
 				{/* Inner Glow */}
 				<div
-					className="absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+					className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
 					style={{ transform: 'translateZ(1px)' }}
 				/>
 
 				{/* Content Lifted in 3D */}
-				<div style={{ transform: 'translateZ(20px)' }}>{children}</div>
-
-				{/* Shine Effect */}
-				<motion.div
-					className="absolute inset-0 bg-linear-to-r from-transparent via-white/5 to-transparent skew-x-12 translate-x-[-200%]"
-					animate={{ translateX: ['200%'] }}
-					transition={{ repeat: Infinity, duration: 3, delay: 1, ease: 'linear' }}
-				/>
+				<div style={{ transform: 'translateZ(30px)' }}>{children}</div>
 			</div>
 		</motion.div>
 	);
@@ -193,9 +192,9 @@ const Typewriter = ({ texts }: { texts: string[] }) => {
 	}, [displayText, isDeleting, index, texts]);
 
 	return (
-		<span className="inline-block min-w-[200px] text-emerald-400 font-bold">
+		<span className="inline-block text-emerald-400 font-bold min-h-[1.5em]">
 			{displayText}
-			<span className="animate-pulse">_</span>
+			<span className="animate-pulse ml-1 inline-block w-2.5 h-4 bg-emerald-500 align-middle"></span>
 		</span>
 	);
 };
@@ -322,7 +321,7 @@ const GlitchText = ({ text }: { text: string }) => {
 		};
 
 		const randomTrigger = setInterval(() => {
-			if (Math.random() > 0.8) scramble();
+			if (Math.random() > 0.85) scramble();
 		}, 3000);
 
 		scramble();
@@ -333,7 +332,7 @@ const GlitchText = ({ text }: { text: string }) => {
 		};
 	}, [text]);
 
-	return <span className="font-black tracking-tight">{displayText}</span>;
+	return <span>{displayText}</span>;
 };
 
 export function BootAnimation() {
@@ -398,7 +397,7 @@ export function BootAnimation() {
 							),
 						);
 					},
-					ease: 'power2.inOut',
+					ease: 'power1.inOut',
 				},
 			);
 		});
@@ -416,52 +415,55 @@ export function BootAnimation() {
 
 	return (
 		<motion.div
-			className="fixed inset-0 z-50 bg-[#050505] text-emerald-500 font-mono overflow-hidden cursor-move flex items-center justify-center perspective-distant"
+			className="fixed inset-0 z-50 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center"
 			aria-label="Booting Portfolio"
 			initial={{ opacity: 1 }}
-			exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+			exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }}
 			transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
 		>
-			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/10 via-black to-black opacity-80" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/15 via-[#020202] to-black opacity-90" />
 			<MatrixRain />
-			<InteractiveParticles />
 			<HexGrid opacity={isCompleting ? 0 : 1} />
 
-			<div className="relative z-10 flex flex-col items-center w-full max-w-2xl px-4">
+			<div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">
 				<TiltCard>
 					<div className="flex flex-col items-center text-center">
 						{/* Icons */}
-						<div className="flex gap-4 mb-6 text-emerald-500/50">
-							<Code className="w-5 h-5" />
-							<User className="w-5 h-5 text-emerald-400" />
-							<Smartphone className="w-5 h-5" />
+						<div className="flex gap-6 mb-8 text-emerald-500/60">
+							<Terminal className="w-6 h-6 animate-pulse" />
+							<Rocket className="w-6 h-6 text-emerald-400" />
+							<Brain className="w-6 h-6" />
 						</div>
 
 						{/* Main Title */}
-						<h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-2">
-							ANURAG
-							<span className="text-transparent bg-clip-text bg-linear-to-tr from-emerald-400 to-cyan-400 ml-3">
-								<GlitchText text="BASURI" />
-							</span>
-						</h1>
+						<div className="flex flex-col items-center gap-2 mb-4">
+							<h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white/90 uppercase">
+								Anurag&apos;s
+							</h1>
+							<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400 animate-gradient-x">
+								<GlitchText text="PORTFOLIO" />
+							</div>
+						</div>
 
 						{/* Cycling Intro */}
-						<div className="h-6 sm:h-8 mb-8 text-sm sm:text-base font-medium tracking-widest uppercase text-emerald-500/80">
-							<Typewriter texts={ROLES} />
+						<div className="h-8 sm:h-10 mb-8 sm:mb-12 flex items-center justify-center">
+							<p className="text-sm sm:text-lg font-medium tracking-[0.2em] uppercase text-emerald-500/80">
+								<Typewriter texts={ROLES} />
+							</p>
 						</div>
 
 						{/* Divider */}
-						<div className="w-12 h-1 bg-emerald-500/30 rounded-full mb-8" />
+						<div className="w-24 h-px bg-linear-to-r from-transparent via-emerald-500/50 to-transparent mb-10" />
 
 						{/* Progress Bar */}
-						<div className="w-full max-w-[240px] space-y-3">
-							<div className="flex justify-between text-[10px] font-bold tracking-widest text-emerald-500/60 uppercase">
-								<span>{status}</span>
+						<div className="w-full max-w-xs space-y-4">
+							<div className="flex justify-between text-[11px] font-bold tracking-[0.15em] text-emerald-500/60 uppercase font-mono">
+								<span className="w-24 text-left truncate">{status}</span>
 								<span>{progress}%</span>
 							</div>
-							<div className="h-0.5 w-full bg-emerald-900/40 rounded-full overflow-hidden">
+							<div className="h-1 w-full bg-emerald-950/50 rounded-full overflow-hidden border border-emerald-500/10">
 								<motion.div
-									className="h-full bg-linear-to-r from-emerald-500 to-cyan-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+									className="h-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)]"
 									style={{ width: `${progress}%` }}
 								/>
 							</div>
@@ -469,29 +471,28 @@ export function BootAnimation() {
 					</div>
 				</TiltCard>
 
-				{/* Skip / Enter Button */}
-				<motion.button
-					onClick={handleSkipClick}
-					className="absolute bottom-12 sm:bottom-16 group"
-					whileHover={{ scale: 1.05 }}
-					whileTap={{ scale: 0.95 }}
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ delay: 2, duration: 1 }}
+				{/* Skip Instructions */}
+				<motion.div
+					className="absolute bottom-[-100px] sm:bottom-[-120px] w-full flex flex-col items-center gap-4"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 1.5, duration: 1 }}
 				>
-					<div className="flex flex-col items-center gap-3">
-						<div className="px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md group-hover:bg-white/10 group-hover:border-emerald-500/30 transition-all duration-300 shadow-[0_0_20px_-10px_rgba(16,185,129,0.5)] flex items-center gap-3">
-							<span className="text-[10px] font-bold tracking-[0.2em] text-white/90 group-hover:text-white uppercase">
-								Enter System
-							</span>
-							<span className="w-px h-3 bg-white/20" />
-							<span className="text-[10px] font-mono text-emerald-500/80 group-hover:text-emerald-400">
-								SPACE
-							</span>
-						</div>
-						<div className="h-px w-0 group-hover:w-full bg-linear-to-r from-transparent via-emerald-500 to-transparent transition-all duration-500 opacity-50" />
-					</div>
-				</motion.button>
+					<button
+						onClick={handleSkipClick}
+						className="group flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:border-emerald-500/30 transition-all duration-300"
+					>
+						<span className="text-[10px] font-bold tracking-widest text-emerald-500/70 group-hover:text-emerald-400 uppercase">
+							Skip Sequence
+						</span>
+						<span className="text-xs text-emerald-500/40 group-hover:text-emerald-400 mb-0.5">
+							↵
+						</span>
+					</button>
+					<p className="text-[10px] text-emerald-500/20 font-mono tracking-widest uppercase">
+						Press [SPACE] to Initialize
+					</p>
+				</motion.div>
 			</div>
 		</motion.div>
 	);
