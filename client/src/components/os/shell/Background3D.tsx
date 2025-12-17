@@ -226,7 +226,7 @@ const NebulaField = React.memo(function NebulaField({ reducedMotion }: { reduced
 	});
 
 	return (
-		<mesh ref={meshRef} position={[0, 0, -15]} scale={[25, 15, 1]}>
+		<mesh ref={meshRef} position={[0, 0, -15]} scale={[100, 60, 1]}>
 			<planeGeometry args={[1, 1, 32, 32]} />
 			<shaderMaterial
 				ref={materialRef}
