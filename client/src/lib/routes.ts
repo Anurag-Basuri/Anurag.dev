@@ -69,7 +69,7 @@ const moduleMetadata: Record<ModuleId, ModuleMetadata> = {
 };
 
 // Route segments to module ID mapping
-// Handles both direct routes (/app/about) and nested routes (/app/bio/about)
+// Handles both direct routes (/portfolio/about) and nested routes (/portfolio/bio/about)
 const routeToModuleMap: Record<string, ModuleId> = {
 	// Direct routes
 	about: 'about',

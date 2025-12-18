@@ -9,7 +9,6 @@ type BatteryManager = {
 
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
 	Menu,
 	PanelLeftOpen,
@@ -137,11 +136,8 @@ export function TopBar({
 
 	return (
 		<TooltipProvider delayDuration={300}>
-			<motion.header
-				initial={{ y: -80, opacity: 0 }}
-				animate={{ y: 0, opacity: 1 }}
-				transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-				className="h-8 px-3 sm:px-4 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden"
+			<header
+				className="h-8 px-3 sm:px-4 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
 				role="banner"
 			>
 				{/* Decorative gradient borders */}
@@ -156,14 +152,12 @@ export function TopBar({
 					{isMobile && (
 						<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 							<SheetTrigger asChild>
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
+								<button
 									className="p-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400/40 min-h-[44px] min-w-[44px] flex items-center justify-center"
 									aria-label="Open file explorer"
 								>
 									<Menu className="w-5 h-5" aria-hidden="true" />
-								</motion.button>
+								</button>
 							</SheetTrigger>
 							<SheetContent
 								side="left"
@@ -242,30 +236,20 @@ export function TopBar({
 									className="flex items-center gap-1.5 cursor-help"
 									role="status"
 								>
-									<AnimatePresence mode="wait">
-										{isOnline ? (
-											<motion.span
-												key="online"
-												initial={{ scale: 0 }}
-												animate={{ scale: 1 }}
-												exit={{ scale: 0 }}
-												className="relative flex h-2.5 w-2.5"
-												aria-label="System online"
-											>
-												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-												<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-											</motion.span>
-										) : (
-											<motion.span
-												key="offline"
-												initial={{ scale: 0 }}
-												animate={{ scale: 1 }}
-												exit={{ scale: 0 }}
-												className="relative flex h-2.5 w-2.5 bg-red-500 rounded-full"
-												aria-label="System offline"
-											/>
-										)}
-									</AnimatePresence>
+									{isOnline ? (
+										<span
+											className="relative flex h-2.5 w-2.5"
+											aria-label="System online"
+										>
+											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+											<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+										</span>
+									) : (
+										<span
+											className="relative flex h-2.5 w-2.5 bg-red-500 rounded-full"
+											aria-label="System offline"
+										/>
+									)}
 									<span className="text-[9px] uppercase font-bold tracking-[0.15em] text-white/65">
 										{isOnline ? 'Online' : 'Offline'}
 									</span>
@@ -342,15 +326,13 @@ export function TopBar({
 						>
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<motion.button
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
+									<button
 										onClick={handleContactClick}
-										className="h-6 px-2.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-[9px] font-bold uppercase tracking-wider text-emerald-200 transition-colors border border-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+										className="h-6 px-2.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-[9px] font-bold uppercase tracking-wider text-emerald-200 transition-colors border border-emerald-500/20 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 active:scale-95"
 										aria-label="Open contact form"
 									>
 										Contact
-									</motion.button>
+									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">Get in touch</TooltipContent>
 							</Tooltip>
@@ -359,12 +341,10 @@ export function TopBar({
 
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<motion.button
-										whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
-										whileTap={{ scale: 0.95 }}
+									<button
 										onClick={onToggleSidebar}
 										className={cn(
-											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/60',
+											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 active:scale-95',
 											sidebarCollapsed
 												? 'text-white/45 hover:text-white/70'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
@@ -385,7 +365,7 @@ export function TopBar({
 												aria-hidden="true"
 											/>
 										)}
-									</motion.button>
+									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">
 									{sidebarCollapsed
@@ -396,12 +376,10 @@ export function TopBar({
 
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<motion.button
-										whileHover={{ backgroundColor: 'rgba(255,255,255,0.12)' }}
-										whileTap={{ scale: 0.95 }}
+									<button
 										onClick={onToggleTerminal}
 										className={cn(
-											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/60',
+											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 active:scale-95',
 											terminalCollapsed
 												? 'text-white/45 hover:text-white/70'
 												: 'text-emerald-300 bg-white/10 shadow-[0_0_10px_rgba(52,211,153,0.25)]',
@@ -424,7 +402,7 @@ export function TopBar({
 												aria-hidden="true"
 											/>
 										)}
-									</motion.button>
+									</button>
 								</TooltipTrigger>
 								<TooltipContent side="bottom">
 									{terminalCollapsed ? 'Expand Terminal' : 'Collapse Terminal'}
@@ -433,7 +411,7 @@ export function TopBar({
 						</nav>
 					)}
 				</div>
-			</motion.header>
+			</header>
 		</TooltipProvider>
 	);
 }
