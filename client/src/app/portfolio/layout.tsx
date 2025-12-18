@@ -3,9 +3,8 @@
 import React, { Suspense, useCallback, useMemo } from 'react';
 import { useAtom } from 'jotai';
 import { useRouter, usePathname } from 'next/navigation';
-import { mainVerticalSizesAtom, mainHorizontalSizesAtom, layoutStateAtom } from '@/store';
+import { layoutStateAtom } from '@/store';
 import { cn } from '@/lib/utils';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -14,6 +13,7 @@ import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
+import { ResizableLayout } from '@/components/layout/ResizableLayout';
 
 import { CLI } from '@/features/terminal/CLI';
 import { FolderTree } from '@/features/filesystem/FolderTree';
@@ -35,8 +35,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
-	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
 	const [layoutState, setLayoutState] = useAtom(layoutStateAtom);
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
@@ -101,102 +99,63 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
-		return (
-			<ResizablePanelGroup
-				direction="horizontal"
-				onLayout={layout => {
-					setMainHorizontalSizes(layout);
-					setLayoutState(prev => ({
-						...prev,
-						main: { ...prev.main, horizontal: layout },
-						sidebar: { ...prev.sidebar, size: layout[0] },
-					}));
-				}}
-				className="h-full w-full gap-1"
-			>
-				<ResizablePanel
-					{...sidebar.panelProps}
-					defaultSize={mainHorizontalSizes[0]}
+		const sidebarContent = (
+			<Suspense fallback={<ComponentLoader />}>
+				<div
 					className={cn(
-						'overflow-hidden bg-card/80',
+						'h-full overflow-hidden bg-card/80',
 						sidebar.isCollapsed ? '' : 'border border-border',
 					)}
 				>
-					<Suspense fallback={<ComponentLoader />}>
-						<div className="h-full w-full">
-							{sidebar.isCollapsed ? (
-								<div className="h-full bg-sidebar/50 animate-in fade-in duration-150">
-									<CollapsedSidebar onExpand={sidebar.expand} />
-								</div>
-							) : (
-								<div className="h-full bg-sidebar/50 flex flex-col animate-in fade-in duration-200">
-									<SidebarProfile
-										onCollapse={sidebar.collapse}
-										onExpand={sidebar.maximize}
-									/>
-									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-										<FolderTree
-											items={fileSystem}
-											onSelect={handleFileSelect}
-											activeModuleId={currentModule}
-										/>
-									</div>
-								</div>
-							)}
+					{sidebar.isCollapsed ? (
+						<div className="h-full bg-sidebar/50 animate-in fade-in duration-150">
+							<CollapsedSidebar onExpand={sidebar.expand} />
 						</div>
-					</Suspense>
-				</ResizablePanel>
-
-				<ResizableHandle
-					withHandle
-					className="w-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
-				/>
-
-				<ResizablePanel defaultSize={mainHorizontalSizes[1]} minSize={30}>
-					<ResizablePanelGroup
-						direction="vertical"
-						onLayout={layout => {
-							setMainVerticalSizes(layout);
-							setLayoutState(prev => ({
-								...prev,
-								main: { ...prev.main, vertical: layout },
-								terminal: { ...prev.terminal, size: layout[1] },
-							}));
-						}}
-						className="h-full w-full gap-1"
-					>
-						<ResizablePanel
-							defaultSize={mainVerticalSizes[0]}
-							minSize={40}
-							className="overflow-hidden border border-border bg-card/80"
-						>
-							{/* Route content renders here */}
-							{children}
-						</ResizablePanel>
-
-						<ResizableHandle
-							withHandle
-							className="h-[2px] bg-border data-[resize-handle-state=hover]:bg-primary/80 data-[resize-handle-state=drag]:bg-primary"
-						/>
-
-						<ResizablePanel
-							{...terminal.panelProps}
-							defaultSize={mainVerticalSizes[1]}
-							className="overflow-hidden border border-border bg-card/80"
-						>
-							<Suspense fallback={<ComponentLoader height="h-32" />}>
-								<CLI
-									onToggleCollapse={terminal.collapse}
-									isCollapsed={terminal.isCollapsed}
-									onMaximize={terminal.maximize}
-									onMinimize={terminal.collapse}
-									onClose={terminal.collapse}
+					) : (
+						<div className="h-full bg-sidebar/50 flex flex-col animate-in fade-in duration-200">
+							<SidebarProfile
+								onCollapse={sidebar.collapse}
+								onExpand={sidebar.maximize}
+							/>
+							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+								<FolderTree
+									items={fileSystem}
+									onSelect={handleFileSelect}
+									activeModuleId={currentModule}
 								/>
-							</Suspense>
-						</ResizablePanel>
-					</ResizablePanelGroup>
-				</ResizablePanel>
-			</ResizablePanelGroup>
+							</div>
+						</div>
+					)}
+				</div>
+			</Suspense>
+		);
+
+		const mainContent = (
+			<div className="h-full overflow-hidden border border-border bg-card/80">{children}</div>
+		);
+
+		const terminalContent = (
+			<Suspense fallback={<ComponentLoader height="h-32" />}>
+				<div className="h-full overflow-hidden border border-border bg-card/80">
+					<CLI
+						onToggleCollapse={terminal.collapse}
+						isCollapsed={terminal.isCollapsed}
+						onMaximize={terminal.maximize}
+						onMinimize={terminal.collapse}
+						onClose={terminal.collapse}
+					/>
+				</div>
+			</Suspense>
+		);
+
+		return (
+			<ResizableLayout
+				sidebar={sidebarContent}
+				main={mainContent}
+				terminal={terminalContent}
+				sidebarCollapsed={sidebar.isCollapsed}
+				terminalCollapsed={terminal.isCollapsed}
+			/>
 		);
 	};
 
