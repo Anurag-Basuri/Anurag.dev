@@ -6,7 +6,7 @@ import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { WindowControls } from '@/components/common/WindowControls';
+import { SidebarControls } from '@/components/common/WindowControls';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
@@ -20,35 +20,25 @@ export const SidebarProfile = memo(function SidebarProfile({
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
 
 	return (
-		<div className="bg-transparent">
-			{/* Header - standardized to h-10 (mobile) / h-8 (desktop) */}
+		<div className="bg-transparent h-full flex flex-col min-h-0">
+			{/* Header - standardized to h-7 */}
 			<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
-				{/* Left: Traffic Lights + Title */}
 				<div className="flex items-center gap-2">
-					{/* macOS Traffic Lights - Hidden on mobile */}
-					<div className="hidden md:flex items-center gap-1.5 group">
-						<WindowControls
-							onClose={onCollapse}
-							onMaximize={onExpand}
-							isMaximized={false}
-							onMinimize={onCollapse}
-						/>
-						<button
-							onClick={() => setFolderSignal(prev => prev + 1)}
-							className="ml-2 p-1 hover:bg-white/10 rounded transition-colors"
-							title="Toggle Folders"
-						>
-							<FolderOpen className="w-3 h-3 text-muted-foreground" />
-						</button>
-					</div>
+					<SidebarControls
+						onClose={onCollapse}
+						onMaximize={onExpand}
+						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
+					/>
 
 					{/* Separator */}
-					<div className="h-4 w-px bg-border/40" aria-hidden="true" />
+					<div className="h-3.5 w-px bg-white/10" aria-hidden="true" />
 
 					{/* Explorer Title */}
 					<div className="flex items-center gap-1.5 text-xs font-mono">
-						<FolderOpen className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
-						<span className="text-muted-foreground font-medium">Explorer</span>
+						<FolderOpen className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+						<span className="text-emerald-300 font-medium tracking-tight">
+							EXPLORER
+						</span>
 					</div>
 				</div>
 			</header>

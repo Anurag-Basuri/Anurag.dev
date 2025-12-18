@@ -27,43 +27,23 @@ export function CLI({
 	const terminalState = useTerminalState();
 	const { handleKeyDown } = useCLI(terminalState);
 
+	if (externalIsCollapsed) {
+		return <CollapsedTerminal onExpand={onToggleCollapse!} />;
+	}
+
 	return (
-		<AnimatePresence mode="wait">
-			{externalIsCollapsed ? (
-				<motion.div
-					key="collapsed"
-					variants={collapsedVariants}
-					initial="initial"
-					animate="animate"
-					exit="exit"
-					className="h-full w-full"
-				>
-					<CollapsedTerminal onExpand={onToggleCollapse!} />
-				</motion.div>
-			) : (
-				<motion.div
-					key="expanded"
-					variants={expandedVariants}
-					initial="initial"
-					animate="animate"
-					exit="exit"
-					className="h-full w-full overflow-hidden"
-				>
-					<TerminalLayout
-						currentPath={terminalState.currentPath}
-						historyLength={terminalState.history.length}
-						onClearHistory={terminalState.clearHistory}
-						onToggleCollapse={onToggleCollapse}
-						onMaximize={onMaximize}
-						onMinimize={onMinimize}
-						onClose={onClose}
-						isFocused={terminalState.isFocused}
-					>
-						<TerminalHistory history={terminalState.history} />
-						<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
-					</TerminalLayout>
-				</motion.div>
-			)}
-		</AnimatePresence>
+		<TerminalLayout
+			currentPath={terminalState.currentPath}
+			historyLength={terminalState.history.length}
+			onClearHistory={terminalState.clearHistory}
+			onToggleCollapse={onToggleCollapse}
+			onMaximize={onMaximize}
+			onMinimize={onMinimize}
+			onClose={onClose}
+			isFocused={terminalState.isFocused}
+		>
+			<TerminalHistory history={terminalState.history} />
+			<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
+		</TerminalLayout>
 	);
 }
