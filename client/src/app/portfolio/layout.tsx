@@ -13,7 +13,7 @@ import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
-import { ResizableLayout } from '@/components/layout/ResizableLayout';
+import { WorkspaceLayout } from '@/components/layout/WorkspaceLayout';
 
 import { CLI } from '@/features/terminal/CLI';
 import { FolderTree } from '@/features/filesystem/FolderTree';
@@ -149,7 +149,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 		);
 
 		return (
-			<ResizableLayout
+			<WorkspaceLayout
 				sidebar={sidebarContent}
 				main={mainContent}
 				terminal={terminalContent}
