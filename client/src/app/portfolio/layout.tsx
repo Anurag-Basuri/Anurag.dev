@@ -1,9 +1,14 @@
 'use client';
 
-import React, { Suspense, useCallback, useMemo } from 'react';
+import React, { Suspense, useCallback, useMemo, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { useRouter, usePathname } from 'next/navigation';
-import { mainVerticalSizesAtom, mainHorizontalSizesAtom, layoutStateAtom } from '@/store';
+import {
+	mainVerticalSizesAtom,
+	mainHorizontalSizesAtom,
+	layoutStateAtom,
+	bootCompleteAtom,
+} from '@/store';
 import { cn } from '@/lib/utils';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
@@ -13,6 +18,7 @@ import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import dynamic from 'next/dynamic';
 
 import { CLI } from '@/features/terminal/CLI';
 import { FolderTree } from '@/features/filesystem/FolderTree';
@@ -20,6 +26,7 @@ import { SidebarProfile } from '@/features/shell/SidebarProfile';
 import { Taskbar } from '@/features/shell/Taskbar';
 import { Background3D } from '@/features/shell/Background3D';
 import { CollapsedSidebar } from '@/features/shell/CollapsedSidebar';
+import { TopBar } from '@/features/shell/TopBar';
 
 // Loading placeholder
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
@@ -28,11 +35,34 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	</div>
 );
 
+// Dynamically import Introduction to avoid SSR issues and circular deps
+const BootAnimation = dynamic(
+	() =>
+		import('@/components/layout/Introduction')
+			.then(mod => ({ default: mod.Introduction }))
+			.catch(() => ({
+				default: () => {
+					const [, setBootComplete] = useAtom(bootCompleteAtom);
+					useEffect(() => setBootComplete(true), [setBootComplete]);
+					return null;
+				},
+			})),
+	{
+		ssr: false,
+		loading: () => (
+			<div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+				<div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+			</div>
+		),
+	},
+);
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const [bootComplete] = useAtom(bootCompleteAtom);
 	const [mainVerticalSizes, setMainVerticalSizes] = useAtom(mainVerticalSizesAtom);
 	const [mainHorizontalSizes, setMainHorizontalSizes] = useAtom(mainHorizontalSizesAtom);
 	const [layoutState, setLayoutState] = useAtom(layoutStateAtom);
@@ -218,6 +248,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 		);
 	};
 
+	if (!bootComplete) {
+		return <BootAnimation />;
+	}
+
 	return (
 		<ErrorBoundary>
 			<ContextMenuProvider>
@@ -225,6 +259,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 					{/* Background */}
 					<Suspense fallback={null}>
 						<Background3D />
+					</Suspense>
+
+					{/* Top Bar */}
+					<Suspense fallback={<ComponentLoader height="h-8" />}>
+						<TopBar
+							isMobile={isMobile}
+							sidebarCollapsed={sidebar.isCollapsed}
+							terminalCollapsed={terminal.isCollapsed}
+							onToggleSidebar={
+								sidebar.isCollapsed ? sidebar.expand : sidebar.collapse
+							}
+							onToggleTerminal={
+								terminal.isCollapsed ? terminal.expand : terminal.collapse
+							}
+							onFileSelect={handleFileSelect}
+						/>
 					</Suspense>
 
 					{/* Main Content */}

@@ -1,62 +1,12 @@
-'use client';
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAtom } from 'jotai';
-import { bootCompleteAtom } from '@/store';
-import dynamic from 'next/dynamic';
-
-// Dynamically import BootAnimation to avoid SSR issues
-const BootAnimation = dynamic(
-	() =>
-		import('@/components/layout/Introduction')
-			.then(mod => ({ default: mod.Introduction }))
-			.catch(() => ({
-				default: () => {
-					// Fallback if boot animation fails to load
-					const [, setBootComplete] = useAtom(bootCompleteAtom);
-					useEffect(() => setBootComplete(true), [setBootComplete]);
-					return null;
-				},
-			})),
-	{
-		ssr: false,
-		loading: () => (
-			<div className="fixed inset-0 bg-black flex items-center justify-center">
-				<div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-			</div>
-		),
-	},
-);
 
 export default function HomePage() {
 	const router = useRouter();
-	const [bootComplete] = useAtom(bootCompleteAtom);
-	const BOOT_REDIRECT_DELAY = 500;
 
 	useEffect(() => {
-		if (bootComplete) {
-			const timeout = setTimeout(() => {
-				router.push('/portfolio');
-			}, BOOT_REDIRECT_DELAY);
-			return () => clearTimeout(timeout);
-		}
-	}, [bootComplete, router]);
+		router.replace('/portfolio');
+	}, [router]);
 
-	return (
-		<div className="fixed inset-0 bg-black">
-			{!bootComplete && <BootAnimation />}
-
-			{bootComplete && (
-				<div className="fixed inset-0 flex items-center justify-center">
-					<div className="flex flex-col items-center gap-4">
-						<div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-						<div className="text-emerald-500 text-sm font-mono">
-							INITIALIZING DESKTOP...
-						</div>
-					</div>
-				</div>
-			)}
-		</div>
-	);
+	return null;
 }
