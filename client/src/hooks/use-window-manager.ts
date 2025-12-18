@@ -1,13 +1,16 @@
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom, useAtomValue } from 'jotai';
 import { windowsAtom, activeWindowIdAtom, windowStackAtom } from '@/store';
 import { getModuleComponent, getModuleTitle } from '@/lib/moduleRegistry';
 import { WindowState } from '@/types/window';
 import { useCallback } from 'react';
 
 export function useWindowManager() {
-	const [windows, setWindows] = useAtom(windowsAtom);
-	const [activeWindowId, setActiveWindowId] = useAtom(activeWindowIdAtom);
-	const [windowStack, setWindowStack] = useAtom(windowStackAtom);
+	const windows = useAtomValue(windowsAtom);
+	const setWindows = useSetAtom(windowsAtom);
+	const activeWindowId = useAtomValue(activeWindowIdAtom);
+	const setActiveWindowId = useSetAtom(activeWindowIdAtom);
+	const windowStack = useAtomValue(windowStackAtom);
+	const setWindowStack = useSetAtom(windowStackAtom);
 
 	// Helper to handle z-index stack
 	const bringToFront = useCallback(

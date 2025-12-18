@@ -1,5 +1,5 @@
 import { atomWithStorage } from 'jotai/utils';
-import { atom } from 'jotai';
+import { atom, PrimitiveAtom } from 'jotai';
 import { WindowState } from '@/types/window';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 
@@ -47,4 +47,4 @@ const windowsStorage = {
 
 export const windowsAtom = atomWithStorage<WindowState[]>('windows', [], windowsStorage);
 export const windowStackAtom = atomWithStorage<string[]>('window-stack', []);
-export const activeWindowIdAtom = atom<string | null>(null);
+export const activeWindowIdAtom: PrimitiveAtom<string | null> = atom<string | null>(null);
