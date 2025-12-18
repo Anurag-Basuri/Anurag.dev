@@ -37,7 +37,7 @@ export default function HomePage() {
 	useEffect(() => {
 		if (bootComplete) {
 			const timeout = setTimeout(() => {
-				router.push('/app');
+				router.push('/portfolio');
 			}, BOOT_REDIRECT_DELAY);
 			return () => clearTimeout(timeout);
 		}
