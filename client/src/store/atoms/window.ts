@@ -47,4 +47,4 @@ const windowsStorage = {
 
 export const windowsAtom = atomWithStorage<WindowState[]>('windows', [], windowsStorage);
 export const windowStackAtom = atomWithStorage<string[]>('window-stack', []);
-export const activeWindowIdAtom: PrimitiveAtom<string | null> = atom<string | null>(null);
+export const activeWindowIdAtom = atom<string | null>(null) as PrimitiveAtom<string | null>;
