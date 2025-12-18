@@ -96,7 +96,7 @@ export function Taskbar() {
 
 	// Get current module from pathname
 	const currentModule = useMemo(() => {
-		const path = pathname.replace('/app/', '').replace(/^\/+/, '');
+		const path = pathname.replace('/portfolio/', '').replace(/^\/+/, '');
 		return path || 'about';
 	}, [pathname]);
 

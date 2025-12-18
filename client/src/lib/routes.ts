@@ -118,7 +118,7 @@ export function resolveModuleFromSlug(slug: string[]): ModuleId | null {
  * @returns The URL path for the module
  */
 export function getModulePath(moduleId: ModuleId): string {
-	return `/app/${moduleId}`;
+	return `/portfolio/${moduleId}`;
 }
 
 /**
