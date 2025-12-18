@@ -1,8 +1,6 @@
-'use client';
-
-import { Terminal, ChevronDown, Trash2 } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { WindowControls } from '@/components/common/WindowControls';
+import { TerminalControls } from '@/components/common/WindowControls';
 
 interface TerminalHeaderProps {
 	currentPath: string;
@@ -32,22 +30,11 @@ export function TerminalHeader({
 		<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
 			{/* Left: Traffic Lights + Title + Path */}
 			<div className="flex items-center gap-2">
-				{/* macOS Traffic Lights */}
-				<div className="flex items-center gap-1.5 group">
-					<WindowControls
-						onClose={onClose}
-						onMaximize={onMaximize}
-						onMinimize={onMinimize}
-						isMaximized={false}
-					/>
-					<button
-						onClick={onClearHistory}
-						className="ml-1 p-1 hover:bg-white/10 rounded transition-colors group/trash"
-						title="Clear History"
-					>
-						<Trash2 className="w-3 h-3 text-muted-foreground group-hover/trash:text-red-400" />
-					</button>
-				</div>
+				<TerminalControls
+					onClose={onClose}
+					onMaximize={onMaximize}
+					onClearHistory={onClearHistory}
+				/>
 
 				{/* Separator */}
 				<div className="h-3.5 w-px bg-white/10" aria-hidden="true" />
@@ -106,23 +93,11 @@ export function TerminalHeader({
 
 			{/* Right: Actions */}
 			<div className="flex items-center gap-2">
-				{/* Clear History Button */}
-
 				{historyLength > 0 && (
 					<span className="text-[10px] font-mono text-muted-foreground/60 tabular-nums px-1.5 py-0.5 rounded bg-muted/40">
 						{historyLength}
 					</span>
 				)}
-				<motion.button
-					whileHover={{ backgroundColor: 'rgba(var(--primary), 0.1)' }}
-					whileTap={{ scale: 0.95 }}
-					onClick={onToggleCollapse}
-					className="p-1 rounded transition-colors"
-					aria-label="Collapse"
-					title="Collapse terminal"
-				>
-					<ChevronDown className="w-3.5 h-3.5 text-muted-foreground hover:text-foreground transition-colors" />
-				</motion.button>
 			</div>
 		</header>
 	);

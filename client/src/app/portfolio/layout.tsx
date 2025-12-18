@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAtom } from 'jotai';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -50,7 +51,7 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	</div>
 );
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function PortfolioLayout({ children }: { children: React.ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
@@ -103,55 +104,79 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
 		return (
 			<div className="h-full w-full flex">
-				{/* Sidebar - Fixed width */}
-				<div
-					className={cn(
-						'shrink-0 transition-all duration-200 overflow-hidden bg-card/80',
-						sidebar.isCollapsed ? 'w-12' : 'w-64 border-r border-border',
-					)}
+				{/* Sidebar */}
+				<motion.div
+					initial={false}
+					animate={{
+						width: sidebar.isCollapsed ? 48 : 256,
+						borderRightWidth: sidebar.isCollapsed ? 0 : 1,
+					}}
+					transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+					className="shrink-0 overflow-hidden bg-card/80 border-border"
 				>
 					<Suspense fallback={<ComponentLoader />}>
-						{sidebar.isCollapsed ? (
-							<div className="h-full bg-sidebar/50">
-								<CollapsedSidebar onExpand={sidebar.expand} />
-							</div>
-						) : (
-							<div className="h-full bg-sidebar/50 flex flex-col">
-								<SidebarProfile
-									onCollapse={sidebar.collapse}
-									onExpand={sidebar.maximize}
-								/>
-								<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-									<FolderTree
-										items={fileSystem}
-										onSelect={handleFileSelect}
-										activeModuleId={currentModule}
+						<AnimatePresence mode="wait">
+							{sidebar.isCollapsed ? (
+								<motion.div
+									key="collapsed"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									className="h-full bg-sidebar/50"
+								>
+									<CollapsedSidebar onExpand={sidebar.expand} />
+								</motion.div>
+							) : (
+								<motion.div
+									key="expanded"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									className="h-full bg-sidebar/50 flex flex-col"
+								>
+									<SidebarProfile
+										onCollapse={sidebar.collapse}
+										onExpand={sidebar.maximize}
 									/>
-								</div>
-							</div>
-						)}
+									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+										<FolderTree
+											items={fileSystem}
+											onSelect={handleFileSelect}
+											activeModuleId={currentModule}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</Suspense>
-				</div>
+				</motion.div>
 
-				{/* Main Content + Terminal */}
-				<div className="flex-1 min-w-0 flex flex-col">
+				{/* Main Content + Terminal Area */}
+				<div className="flex-1 min-w-0 flex flex-col relative">
 					{/* Main Content */}
-					<div className="flex-1 min-h-0 border border-border bg-card/80">{children}</div>
+					<div className="flex-1 min-h-0 border-x border-border bg-card/80 relative z-0">
+						{children}
+					</div>
 
-					{/* Terminal - Fixed height when open */}
-					{!terminal.isCollapsed && (
-						<div className="h-52 shrink-0 border-t border-border bg-card/80">
-							<Suspense fallback={<ComponentLoader height="h-32" />}>
-								<CLI
-									onToggleCollapse={terminal.collapse}
-									isCollapsed={terminal.isCollapsed}
-									onMaximize={terminal.maximize}
-									onMinimize={terminal.collapse}
-									onClose={terminal.collapse}
-								/>
-							</Suspense>
-						</div>
-					)}
+					{/* Terminal Container */}
+					<motion.div
+						initial={false}
+						animate={{
+							height: terminal.isCollapsed ? 28 : 208, // 28px is h-7 for the header/collapsed bar
+						}}
+						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+						className="shrink-0 border-t border-border bg-card/80 overflow-hidden"
+					>
+						<Suspense fallback={<ComponentLoader height="h-32" />}>
+							<CLI
+								onToggleCollapse={terminal.collapse}
+								isCollapsed={terminal.isCollapsed}
+								onMaximize={terminal.maximize}
+								onMinimize={terminal.collapse}
+								onClose={terminal.collapse}
+							/>
+						</Suspense>
+					</motion.div>
 				</div>
 			</div>
 		);
