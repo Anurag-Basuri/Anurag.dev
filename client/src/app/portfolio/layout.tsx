@@ -13,13 +13,36 @@ import { ContextMenuProvider } from '@/components/providers/context-menu-provide
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 
-import { CLI } from '@/features/terminal/CLI';
-import { FolderTree } from '@/features/filesystem/FolderTree';
-import { SidebarProfile } from '@/features/shell/SidebarProfile';
-import { Taskbar } from '@/features/shell/Taskbar';
-import { Background3D } from '@/features/shell/Background3D';
-import { CollapsedSidebar } from '@/features/shell/CollapsedSidebar';
-import { TopBar } from '@/features/shell/TopBar';
+import dynamic from 'next/dynamic';
+
+const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
+	ssr: false,
+	loading: () => <ComponentLoader height="h-32" />,
+});
+const FolderTree = dynamic(
+	() => import('@/features/filesystem/FolderTree').then(mod => mod.FolderTree),
+	{ ssr: false },
+);
+const SidebarProfile = dynamic(
+	() => import('@/features/shell/SidebarProfile').then(mod => mod.SidebarProfile),
+	{ ssr: false },
+);
+const Taskbar = dynamic(() => import('@/features/shell/Taskbar').then(mod => mod.Taskbar), {
+	ssr: false,
+	loading: () => <ComponentLoader height="h-9" />,
+});
+const Background3D = dynamic(
+	() => import('@/features/shell/Background3D').then(mod => mod.Background3D),
+	{ ssr: false },
+);
+const CollapsedSidebar = dynamic(
+	() => import('@/features/shell/CollapsedSidebar').then(mod => mod.CollapsedSidebar),
+	{ ssr: false },
+);
+const TopBar = dynamic(() => import('@/features/shell/TopBar').then(mod => mod.TopBar), {
+	ssr: false,
+	loading: () => <ComponentLoader height="h-8" />,
+});
 
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
