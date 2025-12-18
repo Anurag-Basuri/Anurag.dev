@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useTerminalState } from '../useTerminalState';
+import { useTerminalState } from '../features/terminal/useTerminalState';
 
 export function useCLI(terminalState: ReturnType<typeof useTerminalState>) {
 	const handleKeyDown = useCallback(

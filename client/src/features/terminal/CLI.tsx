@@ -6,7 +6,7 @@ import { TerminalLayout } from './TerminalLayout';
 import { TerminalHistory } from './TerminalHistory';
 import { TerminalPrompt } from './TerminalPrompt';
 import { CollapsedTerminal } from './CollapsedTerminal';
-import { useCLI } from './hooks/useCLI';
+import { useCLI } from '../../hooks/useCLI';
 import { collapsedVariants, expandedVariants } from './utils/variants';
 
 interface CLIProps {
