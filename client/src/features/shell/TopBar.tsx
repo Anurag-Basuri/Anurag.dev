@@ -7,6 +7,7 @@ type BatteryManager = {
 	removeEventListener: (type: 'levelchange', listener: () => void) => void;
 };
 
+import { useState, useEffect, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
 import {
@@ -27,7 +28,6 @@ import { FolderTree } from '@/features/filesystem/FolderTree';
 import { SidebarProfile } from '@/features/shell/SidebarProfile';
 import { INITIAL_FILE_SYSTEM, FileSystemItem } from '@/data/filesystem';
 import { cn } from '@/lib/utils';
-import { useState, useEffect, useCallback } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TopBarProps {
@@ -39,7 +39,7 @@ interface TopBarProps {
 	onFileSelect: (item: FileSystemItem) => void;
 }
 
-export function TopBar({
+export const TopBar = memo(function TopBar({
 	isMobile,
 	sidebarCollapsed,
 	terminalCollapsed,
@@ -414,4 +414,4 @@ export function TopBar({
 			</header>
 		</TooltipProvider>
 	);
-}
+});

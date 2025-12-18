@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import Image from 'next/image';
 import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -13,7 +13,10 @@ interface SidebarProfileProps {
 	onExpand?: () => void;
 }
 
-export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
+export const SidebarProfile = memo(function SidebarProfile({
+	onCollapse,
+	onExpand,
+}: SidebarProfileProps) {
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
 
 	return (
@@ -108,7 +111,7 @@ export function SidebarProfile({ onCollapse, onExpand }: SidebarProfileProps) {
 			</div>
 		</div>
 	);
-}
+});
 
 function SocialButton({
 	href,

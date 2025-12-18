@@ -76,7 +76,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 	);
 });
 
-export function Taskbar() {
+export const Taskbar = memo(function Taskbar() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isStartOpen, setIsStartOpen] = useState(false);
@@ -365,4 +365,4 @@ export function Taskbar() {
 			</div>
 		</TooltipProvider>
 	);
-}
+});
