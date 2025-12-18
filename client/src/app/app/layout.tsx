@@ -9,7 +9,6 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
@@ -122,27 +121,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 					)}
 				>
 					<Suspense fallback={<ComponentLoader />}>
-						<AnimatePresence mode="wait">
+						<div className="h-full w-full">
 							{sidebar.isCollapsed ? (
-								<motion.div
-									key="collapsed-sidebar"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									transition={{ duration: 0.15 }}
-									className="h-full bg-sidebar/50"
-								>
+								<div className="h-full bg-sidebar/50 animate-in fade-in duration-150">
 									<CollapsedSidebar onExpand={sidebar.expand} />
-								</motion.div>
+								</div>
 							) : (
-								<motion.div
-									key="expanded-sidebar"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									transition={{ duration: 0.2 }}
-									className="h-full bg-sidebar/50 flex flex-col"
-								>
+								<div className="h-full bg-sidebar/50 flex flex-col animate-in fade-in duration-200">
 									<SidebarProfile
 										onCollapse={sidebar.collapse}
 										onExpand={sidebar.maximize}
@@ -154,9 +139,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 											activeModuleId={currentModule}
 										/>
 									</div>
-								</motion.div>
+								</div>
 							)}
-						</AnimatePresence>
+						</div>
 					</Suspense>
 				</ResizablePanel>
 
