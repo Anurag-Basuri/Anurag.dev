@@ -21,12 +21,22 @@ const CLI = dynamic(() => import('@/features/terminal').then(mod => mod.CLI), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-32" />,
 });
+const CollapsedTerminal = dynamic(
+	() => import('@/features/terminal').then(mod => mod.CollapsedTerminal),
+	{ ssr: false },
+);
 const FolderTree = dynamic(() => import('@/features/sidebar').then(mod => mod.FolderTree), {
 	ssr: false,
 });
 const SidebarProfile = dynamic(() => import('@/features/sidebar').then(mod => mod.SidebarProfile), {
 	ssr: false,
 });
+const CollapsedSidebar = dynamic(
+	() => import('@/features/sidebar').then(mod => mod.CollapsedSidebar),
+	{
+		ssr: false,
+	},
+);
 const Taskbar = dynamic(() => import('@/features/shell').then(mod => mod.Taskbar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
@@ -36,9 +46,6 @@ const TopBar = dynamic(() => import('@/features/shell').then(mod => mod.TopBar),
 	loading: () => <ComponentLoader height="h-8" />,
 });
 const Background3D = dynamic(() => import('@/features/shell').then(mod => mod.Background3D), {
-	ssr: false,
-});
-const NavRail = dynamic(() => import('@/features/sidebar').then(mod => mod.NavRail), {
 	ssr: false,
 });
 
