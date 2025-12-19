@@ -1,3 +1,3 @@
-export * from './components/TopBar';
-export * from './components/Taskbar';
-export * from './components/Background3D';
+export { TopBar } from './components/TopBar';
+export { Taskbar } from './components/Taskbar';
+export { Background3D } from './components/Background3D';

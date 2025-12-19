@@ -1,3 +1,3 @@
-export * from './SidebarProfile';
-export * from './CollapsedSidebar';
-export * from './FolderTree';
+export { SidebarProfile } from './SidebarProfile';
+export { CollapsedSidebar } from './CollapsedSidebar';
+export { FolderTree } from './FolderTree';
