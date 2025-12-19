@@ -1,12 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTerminalState } from './useTerminalState';
-import { TerminalLayout } from './TerminalLayout';
-import { TerminalHistory } from './TerminalHistory';
-import { TerminalPrompt } from './TerminalPrompt';
-import { CollapsedTerminal } from './CollapsedTerminal';
-import { useCLI } from '../../hooks/useCLI';
+import { useTerminalState } from './hooks/useTerminalState';
+import { TerminalLayout } from './components/TerminalLayout';
+import { TerminalHistory } from './components/TerminalHistory';
+import { TerminalPrompt } from './components/TerminalPrompt';
+import { CollapsedTerminal } from './components/CollapsedTerminal';
+import { useCLI } from './hooks/useCLI';
 import { collapsedVariants, expandedVariants } from './utils/variants';
 
 interface CLIProps {

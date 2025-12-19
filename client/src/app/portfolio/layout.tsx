@@ -16,31 +16,28 @@ import { BootGuard } from '@/components/layout/BootGuard';
 
 import dynamic from 'next/dynamic';
 
-const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
+const CLI = dynamic(() => import('@/features/terminal').then(mod => mod.CLI), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-32" />,
 });
-const FolderTree = dynamic(
-	() => import('@/features/filesystem/FolderTree').then(mod => mod.FolderTree),
-	{ ssr: false },
-);
-const SidebarProfile = dynamic(
-	() => import('@/features/shell/SidebarProfile').then(mod => mod.SidebarProfile),
-	{ ssr: false },
-);
-const Taskbar = dynamic(() => import('@/features/shell/Taskbar').then(mod => mod.Taskbar), {
+const FolderTree = dynamic(() => import('@/features/sidebar').then(mod => mod.FolderTree), {
+	ssr: false,
+});
+const SidebarProfile = dynamic(() => import('@/features/sidebar').then(mod => mod.SidebarProfile), {
+	ssr: false,
+});
+const Taskbar = dynamic(() => import('@/features/shell').then(mod => mod.Taskbar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
 });
-const TopBar = dynamic(() => import('@/features/shell/TopBar').then(mod => mod.TopBar), {
+const TopBar = dynamic(() => import('@/features/shell').then(mod => mod.TopBar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
 });
-const Background3D = dynamic(
-	() => import('@/features/shell/Background3D').then(mod => mod.Background3D),
-	{ ssr: false },
-);
-const NavRail = dynamic(() => import('@/features/shell/NavRail').then(mod => mod.NavRail), {
+const Background3D = dynamic(() => import('@/features/shell').then(mod => mod.Background3D), {
+	ssr: false,
+});
+const NavRail = dynamic(() => import('@/features/sidebar').then(mod => mod.NavRail), {
 	ssr: false,
 });
 
