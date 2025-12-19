@@ -2,7 +2,6 @@
 
 import React, { Suspense, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAtom } from 'jotai';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
@@ -50,7 +49,6 @@ const Background3D = dynamic(() => import('@/features/shell').then(mod => mod.Ba
 });
 
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
-	// ... existing loader ...
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
 		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
 	</div>
