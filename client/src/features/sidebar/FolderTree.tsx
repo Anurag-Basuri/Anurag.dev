@@ -37,9 +37,13 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 		const defaults = new Set<string>();
 		const initExpand = (items: FileSystemItem[]) => {
 			items.forEach(item => {
-				if (item.type === 'folder' && (item.name === 'src' || item.name === 'components')) {
+				// Expand root folders by default to improve discoverability
+				if (
+					item.type === 'folder' &&
+					['bio', 'work', 'connect', 'src', 'components'].includes(item.name)
+				) {
 					defaults.add(item.id);
-					if (item.children) initExpand(item.children);
+					// Not recursive by default for cleaner view
 				}
 			});
 		};

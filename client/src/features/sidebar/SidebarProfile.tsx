@@ -20,7 +20,7 @@ export const SidebarProfile = memo(function SidebarProfile({
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
 
 	return (
-		<div className="bg-transparent h-full flex flex-col min-h-0">
+		<div className="bg-transparent flex flex-col shrink-0">
 			{/* Header - standardized to h-7 */}
 			<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
 				<div className="flex items-center gap-2">
