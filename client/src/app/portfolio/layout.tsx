@@ -12,6 +12,7 @@ import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
+import { resolveModuleFromSlug } from '@/lib/routes';
 import { BootGuard } from '@/components/layout/BootGuard';
 
 import dynamic from 'next/dynamic';
@@ -57,8 +58,11 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 
 	const currentModule = useMemo(() => {
-		const path = pathname.replace('/portfolio', '').replace(/^\/+/, '').replace(/\/+$/, '');
-		return path || 'about';
+		const segments = pathname
+			.split('/')
+			.filter(Boolean)
+			.filter(s => s !== 'portfolio');
+		return resolveModuleFromSlug(segments) || 'about';
 	}, [pathname]);
 
 	useKeyboardShortcuts([
