@@ -30,22 +30,22 @@ const SidebarProfile = dynamic(
 );
 const Taskbar = dynamic(() => import('@/features/shell/Taskbar').then(mod => mod.Taskbar), {
 	ssr: false,
-	loading: () => <ComponentLoader height="h-9" />,
+	loading: () => <ComponentLoader height="h-8" />,
+});
+const TopBar = dynamic(() => import('@/features/shell/TopBar').then(mod => mod.TopBar), {
+	ssr: false,
+	loading: () => <ComponentLoader height="h-8" />,
 });
 const Background3D = dynamic(
 	() => import('@/features/shell/Background3D').then(mod => mod.Background3D),
 	{ ssr: false },
 );
-const CollapsedSidebar = dynamic(
-	() => import('@/features/shell/CollapsedSidebar').then(mod => mod.CollapsedSidebar),
-	{ ssr: false },
-);
-const TopBar = dynamic(() => import('@/features/shell/TopBar').then(mod => mod.TopBar), {
+const NavRail = dynamic(() => import('@/features/shell/NavRail').then(mod => mod.NavRail), {
 	ssr: false,
-	loading: () => <ComponentLoader height="h-8" />,
 });
 
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
+	// ... existing loader ...
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
 		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
 	</div>
@@ -104,65 +104,58 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 		return (
 			<div className="h-full w-full flex">
-				{/* Sidebar */}
+				{/* Unified Navigation Rail */}
+				<Suspense
+					fallback={<div className="w-12 h-full bg-black/20 border-r border-white/5" />}
+				>
+					<NavRail
+						sidebarCollapsed={sidebar.isCollapsed}
+						terminalCollapsed={terminal.isCollapsed}
+						onToggleSidebar={sidebar.isCollapsed ? sidebar.expand : sidebar.collapse}
+						onToggleTerminal={
+							terminal.isCollapsed ? terminal.expand : terminal.collapse
+						}
+					/>
+				</Suspense>
+
+				{/* Sidebar Content Area */}
 				<motion.div
 					initial={false}
 					animate={{
-						width: sidebar.isCollapsed ? 48 : 256,
-						borderRightWidth: sidebar.isCollapsed ? 0 : 1,
+						width: sidebar.isCollapsed ? 0 : 208,
+						opacity: sidebar.isCollapsed ? 0 : 1,
 					}}
 					transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-					className="shrink-0 overflow-hidden bg-card/80 border-border"
+					className="shrink-0 overflow-hidden bg-sidebar/50 border-r border-border"
 				>
 					<Suspense fallback={<ComponentLoader />}>
-						<AnimatePresence mode="wait">
-							{sidebar.isCollapsed ? (
-								<motion.div
-									key="collapsed"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									className="h-full bg-sidebar/50"
-								>
-									<CollapsedSidebar onExpand={sidebar.expand} />
-								</motion.div>
-							) : (
-								<motion.div
-									key="expanded"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									className="h-full bg-sidebar/50 flex flex-col"
-								>
-									<SidebarProfile
-										onCollapse={sidebar.collapse}
-										onExpand={sidebar.maximize}
-									/>
-									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-										<FolderTree
-											items={fileSystem}
-											onSelect={handleFileSelect}
-											activeModuleId={currentModule}
-										/>
-									</div>
-								</motion.div>
-							)}
-						</AnimatePresence>
+						<div className="h-full w-[208px] flex flex-col">
+							<SidebarProfile
+								onCollapse={sidebar.collapse}
+								onExpand={sidebar.maximize}
+							/>
+							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+								<FolderTree
+									items={fileSystem}
+									onSelect={handleFileSelect}
+									activeModuleId={currentModule}
+								/>
+							</div>
+						</div>
 					</Suspense>
 				</motion.div>
 
 				{/* Main Content + Terminal Area */}
 				<div className="flex-1 min-w-0 flex flex-col relative">
 					{/* Main Content */}
-					<div className="flex-1 min-h-0 border-x border-border bg-card/80 relative z-0">
-						{children}
-					</div>
+					<div className="flex-1 min-h-0 bg-card/80 relative z-0">{children}</div>
 
 					{/* Terminal Container */}
 					<motion.div
 						initial={false}
 						animate={{
-							height: terminal.isCollapsed ? 28 : 208, // 28px is h-7 for the header/collapsed bar
+							height: terminal.isCollapsed ? 0 : 208,
+							opacity: terminal.isCollapsed ? 0 : 1,
 						}}
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
 						className="shrink-0 border-t border-border bg-card/80 overflow-hidden"

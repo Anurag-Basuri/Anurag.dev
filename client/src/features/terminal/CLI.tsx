@@ -27,10 +27,7 @@ export function CLI({
 	const terminalState = useTerminalState();
 	const { handleKeyDown } = useCLI(terminalState);
 
-	if (externalIsCollapsed) {
-		return <CollapsedTerminal onExpand={onToggleCollapse!} />;
-	}
-
+	/* The container height is managed by the layout (NavRail + Motion.div) */
 	return (
 		<TerminalLayout
 			currentPath={terminalState.currentPath}
