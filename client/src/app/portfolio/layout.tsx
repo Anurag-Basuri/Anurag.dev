@@ -112,44 +112,51 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 		return (
 			<div className="h-full w-full flex">
-				{/* Unified Navigation Rail */}
-				<Suspense
-					fallback={<div className="w-12 h-full bg-black/20 border-r border-white/5" />}
-				>
-					<NavRail
-						sidebarCollapsed={sidebar.isCollapsed}
-						terminalCollapsed={terminal.isCollapsed}
-						onToggleSidebar={sidebar.isCollapsed ? sidebar.expand : sidebar.collapse}
-						onToggleTerminal={
-							terminal.isCollapsed ? terminal.expand : terminal.collapse
-						}
-					/>
-				</Suspense>
-
-				{/* Sidebar Content Area */}
+				{/* Sidebar Container - shows line when collapsed */}
 				<motion.div
 					initial={false}
 					animate={{
-						width: sidebar.isCollapsed ? 0 : 208,
-						opacity: sidebar.isCollapsed ? 0 : 1,
+						width: sidebar.isCollapsed ? 12 : 208,
 					}}
 					transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-					className="shrink-0 overflow-hidden bg-sidebar/50 border-r border-border"
+					className="shrink-0 overflow-hidden bg-sidebar/50 border-r border-border relative z-20"
 				>
 					<Suspense fallback={<ComponentLoader />}>
-						<div className="h-full w-[208px] flex flex-col">
-							<SidebarProfile
-								onCollapse={sidebar.collapse}
-								onExpand={sidebar.maximize}
-							/>
-							<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-								<FolderTree
-									items={fileSystem}
-									onSelect={handleFileSelect}
-									activeModuleId={currentModule}
-								/>
-							</div>
-						</div>
+						<AnimatePresence mode="wait">
+							{sidebar.isCollapsed ? (
+								<motion.div
+									key="collapsed-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.2 }}
+									className="h-full w-full"
+								>
+									<CollapsedSidebar onExpand={sidebar.expand} />
+								</motion.div>
+							) : (
+								<motion.div
+									key="expanded-sidebar"
+									initial={{ opacity: 0 }}
+									animate={{ opacity: 1 }}
+									exit={{ opacity: 0 }}
+									transition={{ duration: 0.2 }}
+									className="h-full w-[208px] flex flex-col"
+								>
+									<SidebarProfile
+										onCollapse={sidebar.collapse}
+										onExpand={sidebar.maximize}
+									/>
+									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
+										<FolderTree
+											items={fileSystem}
+											onSelect={handleFileSelect}
+											activeModuleId={currentModule}
+										/>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</Suspense>
 				</motion.div>
 
@@ -158,24 +165,47 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 					{/* Main Content */}
 					<div className="flex-1 min-h-0 bg-card/80 relative z-0">{children}</div>
 
-					{/* Terminal Container */}
+					{/* Terminal Container - shows line when collapsed */}
 					<motion.div
 						initial={false}
 						animate={{
-							height: terminal.isCollapsed ? 0 : 208,
-							opacity: terminal.isCollapsed ? 0 : 1,
+							height: terminal.isCollapsed ? 12 : 208,
 						}}
 						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
 						className="shrink-0 border-t border-border bg-card/80 overflow-hidden"
 					>
 						<Suspense fallback={<ComponentLoader height="h-32" />}>
-							<CLI
-								onToggleCollapse={terminal.collapse}
-								isCollapsed={terminal.isCollapsed}
-								onMaximize={terminal.maximize}
-								onMinimize={terminal.collapse}
-								onClose={terminal.collapse}
-							/>
+							<AnimatePresence mode="wait">
+								{terminal.isCollapsed ? (
+									<motion.div
+										key="collapsed-terminal"
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										exit={{ opacity: 0 }}
+										transition={{ duration: 0.2 }}
+										className="h-full w-full"
+									>
+										<CollapsedTerminal onExpand={terminal.expand} />
+									</motion.div>
+								) : (
+									<motion.div
+										key="expanded-terminal"
+										initial={{ opacity: 0 }}
+										animate={{ opacity: 1 }}
+										exit={{ opacity: 0 }}
+										transition={{ duration: 0.2 }}
+										className="h-full"
+									>
+										<CLI
+											onToggleCollapse={terminal.collapse}
+											isCollapsed={terminal.isCollapsed}
+											onMaximize={terminal.maximize}
+											onMinimize={terminal.collapse}
+											onClose={terminal.collapse}
+										/>
+									</motion.div>
+								)}
+							</AnimatePresence>
 						</Suspense>
 					</motion.div>
 				</div>
