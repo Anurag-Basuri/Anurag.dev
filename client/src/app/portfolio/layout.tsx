@@ -184,6 +184,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	};
 
 	return (
+		<ErrorBoundary>
 			<BootGuard>
 				<ContextMenuProvider>
 					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black">
@@ -226,5 +227,6 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 					</div>
 				</ContextMenuProvider>
 			</BootGuard>
+		</ErrorBoundary>
 	);
 }

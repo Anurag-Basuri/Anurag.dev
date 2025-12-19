@@ -1,9 +1,6 @@
-import { FileSystemItem } from '@/types/file-system';
-export type { FileSystemItem };
+import type { FileSystemItem } from '@/types/file-system';
+export type { FileSystemItem } from '@/types/file-system';
 import { FileSystemBuilder as fs } from '@/lib/filesystem-builder';
-
-// The root ID is intentionally implicit for top-level items, or we can define them explicitly.
-// Here we define the structure.
 
 export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
 	// Let's manually create the root readme to match exact ID 'root/readme'.
