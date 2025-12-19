@@ -1,17 +1,16 @@
 'use client';
 
-import React, { Suspense, useCallback, useMemo } from 'react';
+import React, { Suspense, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
+import type { FileSystemItem } from '@/data/filesystem';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
-import { resolveModuleFromSlug } from '@/lib/routes';
 import { BootGuard } from '@/components/layout/BootGuard';
 
 import dynamic from 'next/dynamic';
@@ -27,22 +26,9 @@ const CollapsedTerminal = dynamic(
 		),
 	{ ssr: false },
 );
-const FolderTree = dynamic(
-	() => import('@/features/sidebar/FolderTree').then(mod => mod.FolderTree),
-	{
-		ssr: false,
-	},
-);
-const SidebarProfile = dynamic(
-	() => import('@/features/sidebar/SidebarProfile').then(mod => mod.SidebarProfile),
-	{
-		ssr: false,
-	},
-);
-const CollapsedSidebar = dynamic(
-	() => import('@/features/sidebar/CollapsedSidebar').then(mod => mod.CollapsedSidebar),
-	{ ssr: false },
-);
+const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => mod.Sidebar), {
+	ssr: false,
+});
 const Taskbar = dynamic(
 	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
 	{
@@ -54,12 +40,6 @@ const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
 });
-const Background3D = dynamic(
-	() => import('@/features/shell/components/Background3D').then(mod => mod.Background3D),
-	{
-		ssr: false,
-	},
-);
 
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
@@ -70,18 +50,9 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 export default function PortfolioLayout({ children }: { children: React.ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
-	const pathname = usePathname();
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
-
-	const currentModule = useMemo(() => {
-		const segments = pathname
-			.split('/')
-			.filter(Boolean)
-			.filter(s => s !== 'portfolio');
-		return resolveModuleFromSlug(segments) || 'about';
-	}, [pathname]);
 
 	useKeyboardShortcuts([
 		{
@@ -134,39 +105,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 				>
 					<Suspense fallback={<ComponentLoader />}>
 						<AnimatePresence mode="wait">
-							{sidebar.isCollapsed ? (
-								<motion.div
-									key="collapsed-sidebar"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									transition={{ duration: 0.2 }}
-									className="h-full w-full"
-								>
-									<CollapsedSidebar onExpand={sidebar.expand} />
-								</motion.div>
-							) : (
-								<motion.div
-									key="expanded-sidebar"
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									exit={{ opacity: 0 }}
-									transition={{ duration: 0.2 }}
-									className="h-full w-[208px] flex flex-col"
-								>
-									<SidebarProfile
-										onCollapse={sidebar.collapse}
-										onExpand={sidebar.maximize}
-									/>
-									<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-										<FolderTree
-											items={fileSystem}
-											onSelect={handleFileSelect}
-											activeModuleId={currentModule}
-										/>
-									</div>
-								</motion.div>
-							)}
+							<Sidebar />
 						</AnimatePresence>
 					</Suspense>
 				</motion.div>
@@ -245,13 +184,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	};
 
 	return (
-		<ErrorBoundary>
 			<BootGuard>
 				<ContextMenuProvider>
 					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black">
-						<Suspense fallback={null}>
-							<Background3D />
-						</Suspense>
 
 						<Suspense fallback={<ComponentLoader height="h-8" />}>
 							<TopBar
@@ -291,6 +226,5 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 					</div>
 				</ContextMenuProvider>
 			</BootGuard>
-		</ErrorBoundary>
 	);
 }
