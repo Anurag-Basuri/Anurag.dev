@@ -44,7 +44,7 @@ export const SidebarProfile = memo(function SidebarProfile({
 			</header>
 
 			{/* Profile Section - compact with better grouping */}
-			<div className="p-3 border-b border-sidebar-border/20 bg-white/[0.02]">
+			<div className="p-3 border-b border-sidebar-border/20 bg-white/2">
 				<div className="flex items-center gap-3 mb-2">
 					{/* Avatar */}
 					<div className="relative shrink-0">

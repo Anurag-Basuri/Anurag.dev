@@ -16,9 +16,9 @@ export function CollapsedTerminal({ onExpand }: CollapsedTerminalProps) {
 			>
 				{/* Horizontal line that grows on hover with pulsing hint */}
 				<div className="relative">
-					<div className="h-1 w-96 rounded-full bg-white/30 group-hover:bg-emerald-400 group-hover:h-3 group-hover:w-[32rem] group-hover:shadow-[0_0_16px_rgba(52,211,153,0.8)] transition-all duration-300 ease-out animate-pulse group-hover:animate-none" />
+					<div className="h-1 w-96 rounded-full bg-white/30 group-hover:bg-emerald-400 group-hover:h-3 group-hover:w-lg group-hover:shadow-[0_0_16px_rgba(52,211,153,0.8)] transition-all duration-300 ease-out animate-pulse group-hover:animate-none" />
 					{/* Glow effect */}
-					<div className="absolute inset-0 h-1 w-96 rounded-full bg-emerald-400/20 blur-sm group-hover:h-3 group-hover:w-[32rem] transition-all duration-300" />
+					<div className="absolute inset-0 h-1 w-96 rounded-full bg-emerald-400/20 blur-sm group-hover:h-3 group-hover:w-lg transition-all duration-300" />
 				</div>
 			</button>
 		</div>
