@@ -43,12 +43,12 @@ export const SidebarProfile = memo(function SidebarProfile({
 				</div>
 			</header>
 
-			{/* Profile Section - compact */}
-			<div className="p-3 border-b border-sidebar-border/20">
-				<div className="flex items-center gap-3">
+			{/* Profile Section - compact with better grouping */}
+			<div className="p-3 border-b border-sidebar-border/20 bg-white/[0.02]">
+				<div className="flex items-center gap-3 mb-2">
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/40">
+						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/40 ring-1 ring-emerald-400/20">
 							<Image
 								src="/logo.png"
 								alt="AnuragOS Logo"
@@ -59,7 +59,7 @@ export const SidebarProfile = memo(function SidebarProfile({
 							/>
 						</div>
 						{/* Online indicator */}
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full border-2 border-background" />
+						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-primary rounded-full border-2 border-background shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse" />
 					</div>
 
 					{/* Info */}
@@ -73,8 +73,8 @@ export const SidebarProfile = memo(function SidebarProfile({
 					</div>
 				</div>
 
-				{/* Action Buttons - minimal */}
-				<div className="mt-3 grid gap-2 relative z-10" onClick={e => e.stopPropagation()}>
+				{/* Action Buttons - grouped closer */}
+				<div className="grid gap-1.5 relative z-10" onClick={e => e.stopPropagation()}>
 					<a
 						href="/resume.pdf"
 						target="_blank"
@@ -117,7 +117,7 @@ function SocialButton({
 			href={href}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="flex-1 flex items-center justify-center h-7 rounded border border-border/40 bg-card/50 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white hover:-translate-y-0.5 hover:shadow-sm"
+			className="group flex-1 flex items-center justify-center h-7 rounded border border-border/40 bg-card/50 hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all text-muted-foreground hover:text-emerald-400 hover:-translate-y-0.5 hover:shadow-[0_0_8px_rgba(52,211,153,0.3)]"
 			title={label}
 		>
 			<Icon className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
