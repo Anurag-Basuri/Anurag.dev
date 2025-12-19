@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { FileSystemItem } from '@/types/file-system';
+import type { FileSystemItem } from '@/types/file-system';
 import { Folder, FolderOpen, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -72,17 +72,17 @@ export function FolderTree({ items, level = 0, onSelect, activeModuleId }: Folde
 			};
 			collectFolders(items);
 
-			setExpandedFolders(prev => {
-				// If all folders are currently expanded, we collapse all
-				// Otherwise (some closed or all closed), we expand all
-				const areAllExpanded = Array.from(allFolderIds).every(id => prev.has(id));
+			setTimeout(() => {
+				setExpandedFolders(prev => {
+					const areAllExpanded = Array.from(allFolderIds).every(id => prev.has(id));
 
-				if (areAllExpanded) {
-					return new Set();
-				} else {
-					return allFolderIds;
-				}
-			});
+					if (areAllExpanded) {
+						return new Set();
+					} else {
+						return allFolderIds;
+					}
+				});
+			}, 0);
 		}
 	}, [expansionSignal, items]);
 

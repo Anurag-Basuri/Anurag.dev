@@ -1,5 +1,5 @@
-import { FileSystemItem } from '@/types/file-system';
-import { AppModuleId, getModuleTitle } from '@/lib/moduleRegistry';
+import type { FileSystemItem } from '@/types/file-system';
+import { getModuleTitle, type AppModuleId } from '@/lib/moduleRegistry';
 
 // Helper to sanitize paths
 const joinPath = (parent: string, child: string) => {
