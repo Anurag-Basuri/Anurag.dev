@@ -45,6 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 	};
 }
 
+import { ContentWindow } from '@/features/editor/components/ContentWindow';
+
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 	const moduleId = resolveModuleFromSlug(slug || []);
@@ -56,9 +58,11 @@ export default async function PortfolioModulePage({ params }: PageProps) {
 	const displayTitle = getModuleMetadata(moduleId).title;
 
 	return (
-		<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
-			<div className="h-full w-full overflow-auto">{getModuleComponent(moduleId)}</div>
-		</Suspense>
+		<ContentWindow title={displayTitle}>
+			<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
+				{getModuleComponent(moduleId)}
+			</Suspense>
+		</ContentWindow>
 	);
 }
 
