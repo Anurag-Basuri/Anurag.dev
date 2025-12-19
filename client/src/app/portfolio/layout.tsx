@@ -16,37 +16,50 @@ import { BootGuard } from '@/components/layout/BootGuard';
 
 import dynamic from 'next/dynamic';
 
-const CLI = dynamic(() => import('@/features/terminal').then(mod => mod.CLI), {
+const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-32" />,
 });
 const CollapsedTerminal = dynamic(
-	() => import('@/features/terminal').then(mod => mod.CollapsedTerminal),
+	() =>
+		import('@/features/terminal/components/CollapsedTerminal').then(
+			mod => mod.CollapsedTerminal,
+		),
 	{ ssr: false },
 );
-const FolderTree = dynamic(() => import('@/features/sidebar').then(mod => mod.FolderTree), {
-	ssr: false,
-});
-const SidebarProfile = dynamic(() => import('@/features/sidebar').then(mod => mod.SidebarProfile), {
-	ssr: false,
-});
-const CollapsedSidebar = dynamic(
-	() => import('@/features/sidebar').then(mod => mod.CollapsedSidebar),
+const FolderTree = dynamic(
+	() => import('@/features/sidebar/FolderTree').then(mod => mod.FolderTree),
 	{
 		ssr: false,
 	},
 );
-const Taskbar = dynamic(() => import('@/features/shell').then(mod => mod.Taskbar), {
+const SidebarProfile = dynamic(
+	() => import('@/features/sidebar/SidebarProfile').then(mod => mod.SidebarProfile),
+	{
+		ssr: false,
+	},
+);
+const CollapsedSidebar = dynamic(
+	() => import('@/features/sidebar/CollapsedSidebar').then(mod => mod.CollapsedSidebar),
+	{ ssr: false },
+);
+const Taskbar = dynamic(
+	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
+	{
+		ssr: false,
+		loading: () => <ComponentLoader height="h-8" />,
+	},
+);
+const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(mod => mod.TopBar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
 });
-const TopBar = dynamic(() => import('@/features/shell').then(mod => mod.TopBar), {
-	ssr: false,
-	loading: () => <ComponentLoader height="h-8" />,
-});
-const Background3D = dynamic(() => import('@/features/shell').then(mod => mod.Background3D), {
-	ssr: false,
-});
+const Background3D = dynamic(
+	() => import('@/features/shell/components/Background3D').then(mod => mod.Background3D),
+	{
+		ssr: false,
+	},
+);
 
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
