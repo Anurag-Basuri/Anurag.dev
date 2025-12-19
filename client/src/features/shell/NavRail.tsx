@@ -18,8 +18,8 @@ export function NavRail({
 	onToggleTerminal,
 }: NavRailProps) {
 	return (
-		<div className="w-12 h-full flex flex-col items-center py-4 gap-4 bg-black/20 border-r border-white/5 relative z-20">
-			{/* Sidebar Indicator */}
+		<div className="w-12 h-full flex flex-col items-center py-4 bg-black/20 border-r border-white/5 relative z-20">
+			{/* Sidebar Indicator - Top */}
 			<RailIndicator
 				isActive={sidebarCollapsed}
 				onClick={onToggleSidebar}
@@ -27,7 +27,10 @@ export function NavRail({
 				shortcut="Ctrl+B"
 			/>
 
-			{/* Terminal Indicator */}
+			{/* Spacer */}
+			<div className="flex-1" />
+
+			{/* Terminal Indicator - Bottom */}
 			<RailIndicator
 				isActive={terminalCollapsed}
 				onClick={onToggleTerminal}
