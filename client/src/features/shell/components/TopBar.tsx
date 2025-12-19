@@ -1,31 +1,23 @@
 'use client';
-
-// Add BatteryManager type for TypeScript
-type BatteryManager = {
-	level: number;
-	addEventListener: (type: 'levelchange', listener: () => void) => void;
-	removeEventListener: (type: 'levelchange', listener: () => void) => void;
-};
-
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
 import {
 	Menu,
-	PanelLeftOpen,
-	PanelLeftClose,
 	Terminal as TerminalIcon,
 	ChevronDown,
 	Clock,
 	Wifi,
+	WifiOff,
 	Battery,
-	Signal,
+	Folder,
+	FolderOpen,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree, SidebarProfile } from '@/features/sidebar';
-import { INITIAL_FILE_SYSTEM, FileSystemItem } from '@/data/filesystem';
+import { INITIAL_FILE_SYSTEM, type FileSystemItem } from '@/data/filesystem';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -48,10 +40,8 @@ export const TopBar = memo(function TopBar({
 }: TopBarProps) {
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
-	const [batteryLevel, setBatteryLevel] = useState(100);
-	const [isOnline, setIsOnline] = useState(
-		typeof navigator !== 'undefined' ? navigator.onLine : true,
-	);
+	const [batteryLevel] = useState(100);
+	const [isOnline] = useState(true);
 
 	// Update time
 	useEffect(() => {
@@ -70,55 +60,13 @@ export const TopBar = memo(function TopBar({
 		return () => clearInterval(interval);
 	}, []);
 
-	// Monitor online status
-	useEffect(() => {
-		const handleOnline = () => setIsOnline(true);
-		const handleOffline = () => setIsOnline(false);
-
-		window.addEventListener('online', handleOnline);
-		window.addEventListener('offline', handleOffline);
-
-		return () => {
-			window.removeEventListener('online', handleOnline);
-			window.removeEventListener('offline', handleOffline);
-		};
-	}, []);
-
-	// Battery API (if supported)
-	useEffect(() => {
-		let battery: BatteryManager | null = null;
-		let handleChange: (() => void) | null = null;
-
-		if ('getBattery' in navigator) {
-			(navigator as Navigator & { getBattery?: () => Promise<BatteryManager> }).getBattery!()
-				.then((b: BatteryManager) => {
-					battery = b;
-					handleChange = () => setBatteryLevel(Math.round(b.level * 100));
-					handleChange();
-
-					// Safely add listener
-					if (b.addEventListener) {
-						b.addEventListener('levelchange', handleChange);
-					}
-				})
-				.catch(() => {
-					// Ignore battery errors
-				});
-		}
-
-		return () => {
-			if (battery && handleChange && battery.removeEventListener) {
-				battery.removeEventListener('levelchange', handleChange);
-			}
-		};
-	}, []);
-
 	const handleContactClick = useCallback(() => {
-		const contactItem = {
+		const contactItem: FileSystemItem = {
 			id: 'contact',
 			name: 'contact',
 			type: 'file',
-		} as FileSystemItem;
+			moduleId: 'contact',
+		};
 		onFileSelect(contactItem);
 	}, [onFileSelect]);
 
@@ -136,7 +84,7 @@ export const TopBar = memo(function TopBar({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<header
-				className="h-8 px-3 sm:px-4 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
+				className="h-8 px-5 sm:px-1 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
 				role="banner"
 			>
 				{/* Decorative gradient borders */}
@@ -189,15 +137,18 @@ export const TopBar = memo(function TopBar({
 						</Sheet>
 					)}
 
-					<div className="flex items-center gap-2 group cursor-default">
-						<div
-							className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.7)] transition-all duration-300"
-							aria-hidden="true"
-						/>
-						<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-white/90 group-hover:text-white transition-colors truncate">
-							ANURAG<span className="text-emerald-400">OS</span>
-						</span>
-					</div>
+					{/* Branding */}
+					{!isMobile && (
+						<div className="flex items-center gap-2 group cursor-default">
+							<div
+								className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_12px_rgba(52,211,153,0.7)] transition-all duration-300"
+								aria-hidden="true"
+							/>
+							<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-white/90 group-hover:text-white transition-colors truncate">
+								ANURAG&apos;S <span className="text-emerald-400">PORTFOLIO</span>
+							</span>
+						</div>
+					)}
 				</div>
 
 				{/* Center Section: Clock (Hidden on mobile to save space) */}
@@ -271,7 +222,7 @@ export const TopBar = memo(function TopBar({
 											aria-hidden="true"
 										/>
 									) : (
-										<Signal
+										<WifiOff
 											className="w-3 h-3 text-red-400/60"
 											aria-hidden="true"
 										/>
@@ -311,7 +262,7 @@ export const TopBar = memo(function TopBar({
 						)}
 					</div>
 
-					{/* Theme Toggle - Desktop only */}
+					{/* Theme Toggle */}
 					<div className="hidden sm:flex items-center">
 						<ThemeToggle />
 					</div>
@@ -354,12 +305,9 @@ export const TopBar = memo(function TopBar({
 										aria-pressed={!sidebarCollapsed}
 									>
 										{sidebarCollapsed ? (
-											<PanelLeftOpen
-												className="w-3.5 h-3.5"
-												aria-hidden="true"
-											/>
+											<Folder className="w-3.5 h-3.5" aria-hidden="true" />
 										) : (
-											<PanelLeftClose
+											<FolderOpen
 												className="w-3.5 h-3.5"
 												aria-hidden="true"
 											/>
