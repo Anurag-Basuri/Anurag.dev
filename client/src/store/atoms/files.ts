@@ -1,8 +1,12 @@
 import { atom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
 
 export interface OpenFile {
 	moduleId: string;
 	openedAt: number;
 }
 
-export const openFilesAtom = atom<OpenFile[]>([]);
+// Initialize with 'about' as the default file
+export const openFilesAtom = atomWithStorage<OpenFile[]>('open-files', [
+	{ moduleId: 'about', openedAt: Date.now() },
+]);

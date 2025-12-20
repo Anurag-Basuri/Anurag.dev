@@ -85,16 +85,23 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	const pathname = usePathname();
 	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
-	// Track navigation to add files to open list
+	// Track navigation to add files to open list - improved synchronization
 	useEffect(() => {
-		const path = pathname.replace('/portfolio/', '').replace(/^\+/, '');
-		const moduleId = path || 'about';
+		// Extract module ID from pathname
+		const pathParts = pathname.split('/').filter(Boolean);
+		const moduleId = pathParts[pathParts.length - 1] || 'about';
 
-		// Add to open files if not already there
-		if (moduleId && moduleId !== '') {
+		// Only track valid module IDs (not 'portfolio' itself)
+		if (moduleId && moduleId !== 'portfolio') {
 			setOpenFiles(prev => {
+				// Check if already open
 				const exists = prev.some(f => f.moduleId === moduleId);
-				if (exists) return prev;
+				if (exists) {
+					// Move to end (most recently accessed)
+					const filtered = prev.filter(f => f.moduleId !== moduleId);
+					return [...filtered, { moduleId, openedAt: Date.now() }];
+				}
+				// Add new file
 				return [...prev, { moduleId, openedAt: Date.now() }];
 			});
 		}

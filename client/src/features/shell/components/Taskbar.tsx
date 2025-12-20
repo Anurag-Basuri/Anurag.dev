@@ -237,7 +237,9 @@ export const Taskbar = memo(function Taskbar({
 			// If closing the active module, navigate to another open file or default
 			if (currentModule === moduleId) {
 				const remaining = openFiles.filter(f => f.moduleId !== moduleId);
-				const targetModule = remaining[remaining.length - 1]?.moduleId || 'about';
+				// If no files remaining, navigate to 'about' which will be auto-added
+				const targetModule =
+					remaining.length > 0 ? remaining[remaining.length - 1].moduleId : 'about';
 				router.push(`/portfolio/${targetModule}`);
 			}
 		},
@@ -422,7 +424,7 @@ export const Taskbar = memo(function Taskbar({
 								moduleId={moduleId}
 								isActive={currentModule === moduleId}
 								onClick={() => handleNavigate(moduleId)}
-								onClose={openFiles.length > 1 ? handleCloseItem : undefined}
+								onClose={handleCloseItem}
 							/>
 						))}
 					</div>
