@@ -85,7 +85,7 @@ export const TopBar = memo(function TopBar({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<header
-				className="h-8 px-20 sm:px-20 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
+				className="h-8 px-4 sm:px-8 lg:px-20 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
 				role="banner"
 			>
 				{/* Decorative gradient borders */}
@@ -96,7 +96,7 @@ export const TopBar = memo(function TopBar({
 				</div>
 
 				{/* Left Section */}
-				<div className="flex items-center gap-2.5 min-w-0">
+				<div className="flex items-center gap-2 md:gap-2.5 min-w-0">
 					{isMobile && (
 						<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 							<SheetTrigger asChild>
@@ -151,7 +151,7 @@ export const TopBar = memo(function TopBar({
 
 					{/* Branding */}
 					{!isMobile && (
-						<div className="flex items-center gap-2 group cursor-default">
+						<div className="flex items-center gap-1.5 md:gap-2 group cursor-default">
 							<div
 								className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_16px_rgba(52,211,153,0.8)] transition-all duration-300 group-hover:scale-110"
 								aria-hidden="true"
@@ -163,9 +163,9 @@ export const TopBar = memo(function TopBar({
 					)}
 				</div>
 
-				{/* Center Section: Clock (Hidden on mobile to save space) */}
+				{/* Center Section: Clock (Desktop centered, Mobile in right section) */}
 				{!isMobile && (
-					<div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+					<div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div
@@ -191,9 +191,33 @@ export const TopBar = memo(function TopBar({
 				)}
 
 				{/* Right Section */}
-				<div className="flex items-center gap-1.5 sm:gap-2">
-					{/* System Status Indicators - Desktop only */}
-					<div className="hidden sm:flex items-center gap-2.5 px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 h-6 hover:bg-white/8 transition-colors duration-200">
+				<div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
+					{/* Mobile Clock - Compact version */}
+					{isMobile && (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<div
+									className="flex md:hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/5 border border-white/5 h-6 cursor-default"
+									role="timer"
+									aria-live="polite"
+								>
+									<Clock
+										className="w-3 h-3 text-emerald-300"
+										aria-hidden="true"
+									/>
+									<span className="text-[10px] font-medium text-white/90 font-mono tracking-wider tabular-nums">
+										{currentTime}
+									</span>
+								</div>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>System Time</p>
+							</TooltipContent>
+						</Tooltip>
+					)}
+
+					{/* System Status Indicators - Tablet/Desktop */}
+					<div className="hidden md:flex items-center gap-2 lg:gap-2.5 px-2 lg:px-2.5 py-0.5 rounded-full bg-white/5 border border-white/5 h-6 hover:bg-white/8 transition-colors duration-200">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<div
@@ -278,15 +302,15 @@ export const TopBar = memo(function TopBar({
 						)}
 					</div>
 
-					{/* Theme Toggle */}
+					{/* Theme Toggle - Hidden on mobile */}
 					<div className="hidden sm:flex items-center">
 						<ThemeToggle />
 					</div>
 
-					{/* Control Panel - Desktop only */}
+					{/* Control Panel - Tablet/Desktop */}
 					{!isMobile && (
 						<nav
-							className="flex items-center gap-1 bg-white/6 p-1 rounded-lg border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.18)]"
+							className="flex items-center gap-0.5 sm:gap-1 bg-white/6 p-0.5 sm:p-1 rounded-lg border border-white/10 shadow-[0_6px_18px_rgba(0,0,0,0.18)]"
 							role="navigation"
 							aria-label="View controls"
 						>
@@ -294,7 +318,7 @@ export const TopBar = memo(function TopBar({
 								<TooltipTrigger asChild>
 									<button
 										onClick={handleContactClick}
-										className="h-6 px-2.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 hover:shadow-[0_0_12px_rgba(52,211,153,0.3)] text-[9px] font-bold uppercase tracking-wider text-emerald-200 hover:text-emerald-100 transition-all duration-200 border border-emerald-500/20 hover:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 active:scale-95 hover:scale-105"
+										className="h-6 px-2 sm:px-2.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 hover:shadow-[0_0_12px_rgba(52,211,153,0.3)] text-[9px] font-bold uppercase tracking-wider text-emerald-200 hover:text-emerald-100 transition-all duration-200 border border-emerald-500/20 hover:border-emerald-500/30 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 active:scale-95 hover:scale-105"
 										aria-label="Open contact form"
 									>
 										Contact
@@ -305,7 +329,10 @@ export const TopBar = memo(function TopBar({
 								</TooltipContent>
 							</Tooltip>
 
-							<div className="w-px h-3.5 bg-white/10 mx-1" aria-hidden="true" />
+							<div
+								className="w-px h-3.5 bg-white/10 mx-0.5 sm:mx-1"
+								aria-hidden="true"
+							/>
 
 							<Tooltip>
 								<TooltipTrigger asChild>
