@@ -80,6 +80,7 @@ const routeToModuleMap: Record<string, ModuleId> = {
 	contact: 'contact',
 	ailab: 'ailab',
 	profiles: 'profiles',
+
 	// Nested route aliases (folder/file structure)
 	bio: 'about',
 	work: 'projects',
@@ -94,28 +95,20 @@ const routeToModuleMap: Record<string, ModuleId> = {
  */
 export function resolveModuleFromSlug(slug: string[]): ModuleId | null {
 	if (!slug || slug.length === 0) {
-		return 'about'; // Default module
+		return 'about'; // default module *when you are resolving*
 	}
 
-	// Try the last segment first (most specific)
 	const lastSegment = slug[slug.length - 1];
-	if (lastSegment in routeToModuleMap) {
-		return routeToModuleMap[lastSegment];
-	}
+	if (lastSegment in routeToModuleMap) return routeToModuleMap[lastSegment];
 
-	// Try the first segment (folder)
 	const firstSegment = slug[0];
-	if (firstSegment in routeToModuleMap) {
-		return routeToModuleMap[firstSegment];
-	}
+	if (firstSegment in routeToModuleMap) return routeToModuleMap[firstSegment];
 
 	return null;
 }
 
 /**
  * Gets the canonical URL path for a module
- * @param moduleId - The module identifier
- * @returns The URL path for the module
  */
 export function getModulePath(moduleId: ModuleId): string {
 	return `/portfolio/${moduleId}`;
@@ -123,8 +116,6 @@ export function getModulePath(moduleId: ModuleId): string {
 
 /**
  * Gets the metadata for a module
- * @param moduleId - The module identifier
- * @returns The module metadata
  */
 export function getModuleMetadata(moduleId: ModuleId): ModuleMetadata {
 	return moduleMetadata[moduleId];
