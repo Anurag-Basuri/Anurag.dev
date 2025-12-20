@@ -229,6 +229,25 @@ export const Taskbar = memo(function Taskbar({
 		[router],
 	);
 
+	/**
+	 * Determine which file to navigate to after closing the current one.
+	 * Prefers the most recently used file, falls back to empty string (root).
+	 */
+	const getNavigationTarget = useCallback(
+		(closingModuleId: string): string => {
+			const remainingFiles = openFiles.filter(f => f.moduleId !== closingModuleId);
+
+			// If files remain, go to most recent (last in array)
+			if (remainingFiles.length > 0) {
+				return remainingFiles[remainingFiles.length - 1].moduleId;
+			}
+
+			// No files left - return empty string to go to root
+			return '';
+		},
+		[openFiles],
+	);
+
 	const handleCloseItem = useCallback(
 		(moduleId: string) => {
 			// Remove from open files
@@ -236,14 +255,16 @@ export const Taskbar = memo(function Taskbar({
 
 			// If closing the active module, navigate to another open file or default
 			if (currentModule === moduleId) {
-				const remaining = openFiles.filter(f => f.moduleId !== moduleId);
-				// If no files remaining, navigate to 'about' which will be auto-added
-				const targetModule =
-					remaining.length > 0 ? remaining[remaining.length - 1].moduleId : 'about';
-				router.push(`/portfolio/${targetModule}`);
+				const targetModule = getNavigationTarget(moduleId);
+				// If target is empty, navigate to root, otherwise to module
+				if (targetModule) {
+					router.push(`/portfolio/${targetModule}`);
+				} else {
+					router.push('/portfolio');
+				}
 			}
 		},
-		[currentModule, openFiles, router, setOpenFilesState],
+		[currentModule, getNavigationTarget, router, setOpenFilesState],
 	);
 
 	// Menu items from centralized config with icons
