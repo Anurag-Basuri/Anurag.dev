@@ -46,13 +46,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 import { ContentWindow } from '@/features/editor/components/ContentWindow';
+import { EmptyState } from '@/components/editor/EmptyState';
 
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 	const moduleId = resolveModuleFromSlug(slug || []);
 
 	if (!moduleId) {
-		return notFound();
+		return <EmptyState />;
 	}
 
 	const displayTitle = getModuleMetadata(moduleId).title;

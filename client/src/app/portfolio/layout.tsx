@@ -87,14 +87,18 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 	/**
 	 * Extract module ID from the current pathname.
-	 * Returns the last segment of the path, or 'about' as fallback.
+	 * Returns the last segment of the path, or null if at root.
 	 */
-	const getModuleIdFromPathname = useCallback((path: string): string => {
+	const getModuleIdFromPathname = useCallback((path: string): string | null => {
 		const segments = path.split('/').filter(Boolean);
 		const moduleId = segments[segments.length - 1];
 
-		// Return 'about' if no module or if at portfolio root
-		return moduleId && moduleId !== 'portfolio' ? moduleId : 'about';
+		// Return null if no module or if at portfolio root
+		if (!moduleId || moduleId === 'portfolio') {
+			return null;
+		}
+
+		return moduleId;
 	}, []);
 
 	/**
@@ -105,6 +109,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		const moduleId = getModuleIdFromPathname(pathname);
 
 		setOpenFiles(prev => {
+			// If no module ID (root path), don't add anything
+			if (!moduleId) return prev;
+
 			// Check if file is already open
 			const existingIndex = prev.findIndex(f => f.moduleId === moduleId);
 
