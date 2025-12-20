@@ -136,7 +136,7 @@ export const Taskbar = memo(function Taskbar({
 }) {
 	const router = useRouter();
 	const pathname = usePathname();
-	const [, setOpenFilesState] = useAtom(openFilesAtom);
+	const [openFilesState, setOpenFilesState] = useAtom(openFilesAtom);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 	const stateMenuRef = useRef<HTMLDivElement>(null);
 	const startButtonRef = useRef<HTMLButtonElement>(null);
@@ -229,25 +229,6 @@ export const Taskbar = memo(function Taskbar({
 		[router],
 	);
 
-	/**
-	 * Determine which file to navigate to after closing the current one.
-	 * Prefers the most recently used file, falls back to empty string (root).
-	 */
-	const getNavigationTarget = useCallback(
-		(closingModuleId: string): string => {
-			const remainingFiles = openFiles.filter(f => f.moduleId !== closingModuleId);
-
-			// If files remain, go to most recent (last in array)
-			if (remainingFiles.length > 0) {
-				return remainingFiles[remainingFiles.length - 1].moduleId;
-			}
-
-			// No files left - return empty string to go to root
-			return '';
-		},
-		[openFiles],
-	);
-
 	const handleCloseItem = useCallback(
 		(moduleId: string) => {
 			// Remove from open files
@@ -255,16 +236,12 @@ export const Taskbar = memo(function Taskbar({
 
 			// If closing the active module, navigate to another open file or default
 			if (currentModule === moduleId) {
-				const targetModule = getNavigationTarget(moduleId);
-				// If target is empty, navigate to root, otherwise to module
-				if (targetModule) {
-					router.push(`/portfolio/${targetModule}`);
-				} else {
-					router.push('/portfolio');
-				}
+				const remaining = openFiles.filter(f => f.moduleId !== moduleId);
+				const targetModule = remaining[remaining.length - 1]?.moduleId || 'about';
+				router.push(`/portfolio/${targetModule}`);
 			}
 		},
-		[currentModule, getNavigationTarget, router, setOpenFilesState],
+		[currentModule, openFiles, router, setOpenFilesState],
 	);
 
 	// Menu items from centralized config with icons
@@ -445,7 +422,7 @@ export const Taskbar = memo(function Taskbar({
 								moduleId={moduleId}
 								isActive={currentModule === moduleId}
 								onClick={() => handleNavigate(moduleId)}
-								onClose={handleCloseItem}
+								onClose={openFiles.length > 1 ? handleCloseItem : undefined}
 							/>
 						))}
 					</div>

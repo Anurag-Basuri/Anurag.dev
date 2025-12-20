@@ -5,14 +5,18 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { WindowControls } from '@/components/common/WindowControls';
+import { useAtom } from 'jotai';
+import { openFilesAtom } from '@/store';
 
 interface ContentWindowProps {
 	title: string;
+	moduleId: string;
 	children: React.ReactNode;
 }
 
-export function ContentWindow({ title, children }: ContentWindowProps) {
+export function ContentWindow({ title, moduleId, children }: ContentWindowProps) {
 	const router = useRouter();
+	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 	const [isMaximized, setIsMaximized] = useState(false);
 
 	// Escape key handler to exit fullscreen
@@ -30,13 +34,15 @@ export function ContentWindow({ title, children }: ContentWindowProps) {
 	}, [isMaximized]);
 
 	const handleClose = () => {
-		// Navigate to root (desktop view) to "close" the file
-		router.push('/portfolio');
+		const remaining = openFiles.filter(f => f.moduleId !== moduleId);
+		setOpenFiles(remaining);
+
+		const target = remaining.length > 0 ? remaining[remaining.length - 1].moduleId : '';
+		router.push(target ? `/portfolio/${target}` : '/portfolio');
 	};
 
 	const handleMinimize = () => {
-		// "Minimize" in this context also returns to desktop,
-		// but functionally hides the current view.
+		// keep file open, just “desktop”
 		router.push('/portfolio');
 	};
 

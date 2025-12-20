@@ -16,7 +16,7 @@ const createFileEntry = (moduleId: string): OpenFile => ({
 });
 
 // Helper function for default initial state
-const getDefaultOpenFiles = (): OpenFile[] => [createFileEntry(DEFAULT_MODULE_ID)];
+const getDefaultOpenFiles = (): OpenFile[] => [];
 
 /**
  * Atom to track currently open files in the application.

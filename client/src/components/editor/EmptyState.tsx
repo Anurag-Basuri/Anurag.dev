@@ -21,8 +21,8 @@ export function EmptyState() {
 			description: 'View my work',
 		},
 		{
-			label: 'Experience',
-			moduleId: 'experience',
+			label: 'Journey',
+			moduleId: 'journey',
 			icon: FileText,
 			description: 'See my journey',
 		},
