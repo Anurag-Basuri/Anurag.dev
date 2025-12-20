@@ -188,7 +188,6 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 			<BootGuard>
 				<ContextMenuProvider>
 					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black">
-
 						<Suspense fallback={<ComponentLoader height="h-8" />}>
 							<TopBar
 								isMobile={isMobile}
