@@ -1,8 +1,8 @@
 'use client';
 
-import React, { Suspense, useCallback } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import type { FileSystemItem } from '@/data/filesystem';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
@@ -12,6 +12,8 @@ import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
+import { useAtom } from 'jotai';
+import { openFilesAtom, type OpenFile } from '@/store';
 
 import dynamic from 'next/dynamic';
 
@@ -29,13 +31,13 @@ const CollapsedTerminal = dynamic(
 const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => mod.Sidebar), {
 	ssr: false,
 });
-const Taskbar = dynamic(
-	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
-	{
-		ssr: false,
-		loading: () => <ComponentLoader height="h-8" />,
-	},
-);
+// const Taskbar = dynamic(
+// 	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
+// 	{
+// 		ssr: false,
+// 		loading: () => <ComponentLoader height="h-8" />,
+// 	},
+// );
 const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(mod => mod.TopBar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
@@ -79,6 +81,24 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 			description: 'Focus terminal',
 		},
 	]);
+
+	const pathname = usePathname();
+	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
+
+	// Track navigation to add files to open list
+	useEffect(() => {
+		const path = pathname.replace('/portfolio/', '').replace(/^\+/, '');
+		const moduleId = path || 'about';
+
+		// Add to open files if not already there
+		if (moduleId && moduleId !== '') {
+			setOpenFiles(prev => {
+				const exists = prev.some(f => f.moduleId === moduleId);
+				if (exists) return prev;
+				return [...prev, { moduleId, openedAt: Date.now() }];
+			});
+		}
+	}, [pathname, setOpenFiles]);
 
 	const handleFileSelect = useCallback(
 		(item: FileSystemItem) => {
@@ -208,9 +228,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 							{renderMobileLayout()}
 						</div>
 
-						<Suspense fallback={<ComponentLoader height="h-9" />}>
-							<Taskbar />
-						</Suspense>
+						{/* <Suspense fallback={<ComponentLoader height="h-9" />}>
+							<Taskbar openFiles={openFiles} isMobile={isMobile} />
+						</Suspense> */}
 
 						<Toaster
 							position="top-right"
