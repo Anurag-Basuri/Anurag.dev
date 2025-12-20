@@ -31,13 +31,13 @@ const CollapsedTerminal = dynamic(
 const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => mod.Sidebar), {
 	ssr: false,
 });
-// const Taskbar = dynamic(
-// 	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
-// 	{
-// 		ssr: false,
-// 		loading: () => <ComponentLoader height="h-8" />,
-// 	},
-// );
+const Taskbar = dynamic(
+	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
+	{
+		ssr: false,
+		loading: () => <ComponentLoader height="h-8" />,
+	},
+);
 const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(mod => mod.TopBar), {
 	ssr: false,
 	loading: () => <ComponentLoader height="h-8" />,
@@ -228,9 +228,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 							{renderMobileLayout()}
 						</div>
 
-						{/* <Suspense fallback={<ComponentLoader height="h-9" />}>
+						<Suspense fallback={<ComponentLoader height="h-9" />}>
 							<Taskbar openFiles={openFiles} isMobile={isMobile} />
-						</Suspense> */}
+						</Suspense>
 
 						<Toaster
 							position="top-right"

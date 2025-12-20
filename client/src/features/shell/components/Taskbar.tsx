@@ -3,13 +3,14 @@
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { taskbarModules, navigationItems, getModulePath, type ModuleId } from '@/lib/routes';
 import { cn } from '@/lib/utils';
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Power, Github, Linkedin, Twitter, X } from 'lucide-react';
+import { Power, Github, Linkedin, Twitter, X, type LucideIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/common/HelpButton';
-import React, { memo } from 'react';
+import { useAtom } from 'jotai';
+import { openFilesAtom, type OpenFile } from '@/store';
 
 // A simple logo component
 const Logo = () => (
@@ -19,6 +20,32 @@ const Logo = () => (
 		</div>
 	</div>
 );
+
+const VALID_MODULE_IDS = new Set<ModuleId>([
+	...taskbarModules,
+	...navigationItems.map(item => item.id),
+]);
+
+const normalizeModuleId = (id: string): ModuleId => {
+	return VALID_MODULE_IDS.has(id as ModuleId) ? (id as ModuleId) : 'about';
+};
+
+type ModuleIconComponent = LucideIcon;
+
+const MODULE_ICON_BY_ID: Record<ModuleId, ModuleIconComponent> = (() => {
+	const icons = {} as Record<ModuleId, ModuleIconComponent>;
+
+	for (const id of VALID_MODULE_IDS) {
+		icons[id] = getModuleIcon(id);
+	}
+
+	return icons;
+})();
+
+const MENU_ITEMS_WITH_ICONS = navigationItems.map(item => ({
+	...item,
+	icon: MODULE_ICON_BY_ID[item.id],
+}));
 
 // Taskbar navigation item based on routes
 const TaskbarNavItem = memo(function TaskbarNavItem({
@@ -32,8 +59,9 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 	onClick: () => void;
 	onClose?: (moduleId: string) => void;
 }) {
-	const Icon = getModuleIcon(moduleId);
-	const title = getModuleTitle(moduleId);
+	const safeModuleId = normalizeModuleId(moduleId);
+	const IconComponent = MODULE_ICON_BY_ID[safeModuleId];
+	const title = getModuleTitle(safeModuleId);
 
 	return (
 		<Tooltip>
@@ -47,7 +75,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 							: 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10 hover:shadow-[0_0_12px_rgba(52,211,153,0.3)]',
 					)}
 				>
-					<Icon
+					<IconComponent
 						className={cn(
 							'w-3.5 h-3.5 transition-colors duration-200',
 							isActive
@@ -72,7 +100,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								<button
 									onClick={e => {
 										e.stopPropagation();
-										onClose(moduleId);
+										onClose(safeModuleId);
 									}}
 									className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white/10 hover:bg-red-500/20 border border-white/20 hover:border-red-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-150 hover:scale-110 z-10"
 									aria-label={`Close ${title}`}
@@ -99,9 +127,16 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 	);
 });
 
-export const Taskbar = memo(function Taskbar() {
+export const Taskbar = memo(function Taskbar({
+	openFiles = [],
+	isMobile = false,
+}: {
+	openFiles?: OpenFile[];
+	isMobile?: boolean;
+}) {
 	const router = useRouter();
 	const pathname = usePathname();
+	const [, setOpenFilesState] = useAtom(openFilesAtom);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 	const stateMenuRef = useRef<HTMLDivElement>(null);
 	const startButtonRef = useRef<HTMLButtonElement>(null);
@@ -186,30 +221,31 @@ export const Taskbar = memo(function Taskbar() {
 	}, []);
 
 	const handleNavigate = useCallback(
-		(moduleId: ModuleId) => {
+		(moduleId: string) => {
+			const safeModuleId = normalizeModuleId(moduleId);
 			setIsStartOpen(false);
-			router.push(getModulePath(moduleId));
+			router.push(getModulePath(safeModuleId));
 		},
 		[router],
 	);
 
 	const handleCloseItem = useCallback(
 		(moduleId: string) => {
-			// If closing the active module, navigate to default (about)
+			// Remove from open files
+			setOpenFilesState(prev => prev.filter(f => f.moduleId !== moduleId));
+
+			// If closing the active module, navigate to another open file or default
 			if (currentModule === moduleId) {
-				router.push('/portfolio/about');
+				const remaining = openFiles.filter(f => f.moduleId !== moduleId);
+				const targetModule = remaining[remaining.length - 1]?.moduleId || 'about';
+				router.push(`/portfolio/${targetModule}`);
 			}
-			// Note: In a full implementation, you might want to maintain a separate
-			// state for open items and filter it here
 		},
-		[currentModule, router],
+		[currentModule, openFiles, router, setOpenFilesState],
 	);
 
 	// Menu items from centralized config with icons
-	const menuItemsWithIcons = navigationItems.map(item => ({
-		...item,
-		icon: getModuleIcon(item.id),
-	}));
+	const menuItemsWithIcons = MENU_ITEMS_WITH_ICONS;
 
 	const socialLinks = [
 		{
@@ -364,7 +400,7 @@ export const Taskbar = memo(function Taskbar() {
 								)}
 							>
 								<Logo />
-								<span className="text-[10px] font-extrabold tracking-[0.22em] uppercase hidden sm:block">
+								<span className="text-[10px] font-extrabold tracking-[0.22em] uppercase hidden lg:block">
 									Start
 								</span>
 								{/* Bottom glow on hover */}
@@ -380,24 +416,24 @@ export const Taskbar = memo(function Taskbar() {
 					<div className="h-4 w-px bg-white/10 shrink-0" />
 
 					<div className="flex items-center gap-1.5 sm:gap-2 h-full">
-						{taskbarModules.map(moduleId => (
+						{openFiles.map(({ moduleId }) => (
 							<TaskbarNavItem
 								key={moduleId}
 								moduleId={moduleId}
 								isActive={currentModule === moduleId}
 								onClick={() => handleNavigate(moduleId)}
-								onClose={handleCloseItem}
+								onClose={openFiles.length > 1 ? handleCloseItem : undefined}
 							/>
 						))}
 					</div>
 				</div>
 
 				{/* Right Side Actions */}
-				<div className="hidden sm:flex items-center gap-2">
-					<div className="h-6 px-3 rounded-md bg-white/7 border border-white/14 shadow-inner flex items-center">
+				{!isMobile && (
+					<div className="flex items-center gap-2">
 						<HelpButton placement="taskbar" />
 					</div>
-				</div>
+				)}
 			</div>
 		</TooltipProvider>
 	);
