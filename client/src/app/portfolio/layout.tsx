@@ -85,27 +85,40 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	const pathname = usePathname();
 	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
-	// Track navigation to add files to open list - improved synchronization
-	useEffect(() => {
-		// Extract module ID from pathname
-		const pathParts = pathname.split('/').filter(Boolean);
-		const moduleId = pathParts[pathParts.length - 1] || 'about';
+	/**
+	 * Extract module ID from the current pathname.
+	 * Returns the last segment of the path, or 'about' as fallback.
+	 */
+	const getModuleIdFromPathname = useCallback((path: string): string => {
+		const segments = path.split('/').filter(Boolean);
+		const moduleId = segments[segments.length - 1];
 
-		// Only track valid module IDs (not 'portfolio' itself)
-		if (moduleId && moduleId !== 'portfolio') {
-			setOpenFiles(prev => {
-				// Check if already open
-				const exists = prev.some(f => f.moduleId === moduleId);
-				if (exists) {
-					// Move to end (most recently accessed)
-					const filtered = prev.filter(f => f.moduleId !== moduleId);
-					return [...filtered, { moduleId, openedAt: Date.now() }];
-				}
-				// Add new file
-				return [...prev, { moduleId, openedAt: Date.now() }];
-			});
-		}
-	}, [pathname, setOpenFiles]);
+		// Return 'about' if no module or if at portfolio root
+		return moduleId && moduleId !== 'portfolio' ? moduleId : 'about';
+	}, []);
+
+	/**
+	 * Synchronize open files with navigation.
+	 * Adds newly visited files and maintains MRU (Most Recently Used) ordering.
+	 */
+	useEffect(() => {
+		const moduleId = getModuleIdFromPathname(pathname);
+
+		setOpenFiles(prev => {
+			// Check if file is already open
+			const existingIndex = prev.findIndex(f => f.moduleId === moduleId);
+
+			if (existingIndex !== -1) {
+				// File exists - move to end (MRU) with updated timestamp
+				const updated = [...prev];
+				const [existing] = updated.splice(existingIndex, 1);
+				return [...updated, { ...existing, openedAt: Date.now() }];
+			}
+
+			// New file - add to end
+			return [...prev, { moduleId, openedAt: Date.now() }];
+		});
+	}, [pathname, getModuleIdFromPathname, setOpenFiles]);
 
 	const handleFileSelect = useCallback(
 		(item: FileSystemItem) => {
