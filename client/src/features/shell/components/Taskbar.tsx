@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Power, Github, Linkedin, Twitter } from 'lucide-react';
+import { Power, Github, Linkedin, Twitter, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/common/HelpButton';
 import React, { memo } from 'react';
@@ -25,10 +25,12 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 	moduleId,
 	isActive,
 	onClick,
+	onClose,
 }: {
 	moduleId: string;
 	isActive: boolean;
 	onClick: () => void;
+	onClose?: (moduleId: string) => void;
 }) {
 	const Icon = getModuleIcon(moduleId);
 	const title = getModuleTitle(moduleId);
@@ -39,15 +41,15 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 				<button
 					onClick={onClick}
 					className={cn(
-						'relative h-7 sm:h-6 px-2.5 rounded-md flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm',
+						'relative h-7 sm:h-6 px-2.5 rounded-md flex items-center gap-2 transition-all duration-200 group border cursor-pointer backdrop-blur-sm hover:scale-105 active:scale-95',
 						isActive
-							? 'bg-white/10 border-white/10 shadow-sm'
-							: 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10',
+							? 'bg-white/10 border-emerald-500/20 shadow-[0_0_16px_rgba(52,211,153,0.4)]'
+							: 'bg-white/5 border-white/5 hover:border-white/10 hover:bg-white/10 hover:shadow-[0_0_12px_rgba(52,211,153,0.3)]',
 					)}
 				>
 					<Icon
 						className={cn(
-							'w-3.5 h-3.5 transition-colors duration-300',
+							'w-3.5 h-3.5 transition-colors duration-200',
 							isActive
 								? 'text-emerald-300'
 								: 'text-white/75 group-hover:text-emerald-300',
@@ -56,12 +58,33 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 
 					<span
 						className={cn(
-							'text-[11px] font-semibold transition-colors max-w-[120px] truncate tracking-wide hidden sm:block',
+							'text-[11px] font-semibold transition-colors duration-200 max-w-[120px] truncate tracking-wide hidden sm:block',
 							isActive ? 'text-white' : 'text-white/75 group-hover:text-white',
 						)}
 					>
 						{title}
 					</span>
+
+					{/* Close Button - Appears on hover */}
+					{onClose && (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<button
+									onClick={e => {
+										e.stopPropagation();
+										onClose(moduleId);
+									}}
+									className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white/10 hover:bg-red-500/20 border border-white/20 hover:border-red-500/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-150 hover:scale-110 z-10"
+									aria-label={`Close ${title}`}
+								>
+									<X className="w-2.5 h-2.5 text-white/60 hover:text-red-400 transition-colors" />
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="top" className="text-xs">
+								Close {title}
+							</TooltipContent>
+						</Tooltip>
+					)}
 
 					{/* Active Indicator */}
 					{isActive && (
@@ -168,6 +191,18 @@ export const Taskbar = memo(function Taskbar() {
 			router.push(getModulePath(moduleId));
 		},
 		[router],
+	);
+
+	const handleCloseItem = useCallback(
+		(moduleId: string) => {
+			// If closing the active module, navigate to default (about)
+			if (currentModule === moduleId) {
+				router.push('/portfolio/about');
+			}
+			// Note: In a full implementation, you might want to maintain a separate
+			// state for open items and filter it here
+		},
+		[currentModule, router],
 	);
 
 	// Menu items from centralized config with icons
@@ -307,14 +342,14 @@ export const Taskbar = memo(function Taskbar() {
 			)}
 
 			{/* Main Bar */}
-			<div className="w-full shrink-0 h-8 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 shadow-sm relative overflow-hidden animate-in slide-in-from-bottom-2 duration-500">
+			<div className="w-full shrink-0 h-8 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 flex items-center justify-between z-40 px-4 sm:px-8 lg:px-20 shadow-sm relative overflow-hidden animate-in slide-in-from-bottom-2 duration-500">
 				<div className="absolute inset-0 pointer-events-none">
 					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/25 to-transparent" />
 					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
 					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
 				</div>
 
-				<div className="flex items-center gap-2.5 sm:gap-3.5 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide px-1.5">
+				<div className="flex items-center gap-2 md:gap-2.5 lg:gap-3.5 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide px-1.5">
 					{/* Start Button */}
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -344,13 +379,14 @@ export const Taskbar = memo(function Taskbar() {
 					{/* Divider */}
 					<div className="h-4 w-px bg-white/10 shrink-0" />
 
-					<div className="flex items-center gap-2 h-full">
+					<div className="flex items-center gap-1.5 sm:gap-2 h-full">
 						{taskbarModules.map(moduleId => (
 							<TaskbarNavItem
 								key={moduleId}
 								moduleId={moduleId}
 								isActive={currentModule === moduleId}
 								onClick={() => handleNavigate(moduleId)}
+								onClose={handleCloseItem}
 							/>
 						))}
 					</div>
