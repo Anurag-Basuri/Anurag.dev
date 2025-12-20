@@ -85,7 +85,7 @@ export const TopBar = memo(function TopBar({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<header
-				className="h-8 px-4 sm:px-8 lg:px-20 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
+				className="h-8 px-5 sm:px-4 lg:px-10 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
 				role="banner"
 			>
 				{/* Decorative gradient borders */}
@@ -302,8 +302,8 @@ export const TopBar = memo(function TopBar({
 						)}
 					</div>
 
-					{/* Theme Toggle - Hidden on mobile */}
-					<div className="hidden sm:flex items-center">
+					{/* Theme Toggle - visible on every screen size */}
+					<div className="flex items-center">
 						<ThemeToggle />
 					</div>
 
