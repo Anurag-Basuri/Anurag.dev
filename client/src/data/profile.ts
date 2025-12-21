@@ -13,7 +13,6 @@ export const PROFILE: AboutData = {
 	When I'm not pushing commits, you can find me exploring new AI technologies, reading sci-fi novels, or capturing moments through my camera lens.`,
 	location: 'San Francisco, CA',
 	avatarUrl: '/logo.png',
-	resumeUrl: '/resume.pdf',
 	coverUrl: '/about-cover.jpg',
 	experienceYears: 2,
 	projectsCount: 15,

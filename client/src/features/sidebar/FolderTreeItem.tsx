@@ -129,27 +129,18 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 						transition={{ duration: 0.2, ease: 'easeOut' }}
 						className="overflow-hidden"
 					>
-						<RecursiveFolderTree items={item.children} level={level + 1} />
+						<div className="relative">
+							<div
+								className="absolute left-[11px] top-0 bottom-0 w-px bg-border/40"
+								aria-hidden="true"
+							/>
+							{item.children.map(child => (
+								<FolderTreeItem key={child.id} item={child} level={level + 1} />
+							))}
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
 		</div>
 	);
 });
-
-// Recursive tree renderer
-function RecursiveFolderTree({ items, level }: { items: FileSystemItem[]; level: number }) {
-	return (
-		<div className="relative">
-			{level > 0 && (
-				<div
-					className="absolute left-[11px] top-0 bottom-0 w-px bg-border/40"
-					aria-hidden="true"
-				/>
-			)}
-			{items.map(item => (
-				<FolderTreeItem key={item.id} item={item} level={level} />
-			))}
-		</div>
-	);
-}
