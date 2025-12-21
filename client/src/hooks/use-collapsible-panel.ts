@@ -1,8 +1,15 @@
+'use client';
+
 import { useCallback } from 'react';
 import { useAtom } from 'jotai';
-import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
+import {
+	sidebarCollapsedAtom,
+	terminalCollapsedAtom,
+	moduleMaximizedAtom,
+	moduleMinimizedAtom,
+} from '@/store';
 
-export type PanelType = 'sidebar' | 'terminal';
+export type PanelType = 'sidebar' | 'terminal' | 'module';
 
 export interface CollapsiblePanelConfig {
 	type: PanelType;
@@ -12,10 +19,12 @@ export interface CollapsiblePanelConfig {
 
 export interface CollapsiblePanelReturn {
 	isCollapsed: boolean;
+	isMaximized?: boolean;
 	toggle: () => void;
 	expand: () => void;
 	collapse: () => void;
 	maximize: () => void;
+	restore: () => void;
 }
 
 export function useCollapsiblePanel({
@@ -23,40 +32,67 @@ export function useCollapsiblePanel({
 	onCollapse,
 	onExpand,
 }: CollapsiblePanelConfig): CollapsiblePanelReturn {
-	const [isCollapsed, setIsCollapsed] = useAtom(
-		type === 'sidebar' ? sidebarCollapsedAtom : terminalCollapsedAtom,
-	);
+	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
+	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
+	const [moduleMinimized, setModuleMinimized] = useAtom(moduleMinimizedAtom);
+	const [moduleMaximized, setModuleMaximized] = useAtom(moduleMaximizedAtom);
+
+	const isCollapsed =
+		type === 'sidebar'
+			? sidebarCollapsed
+			: type === 'terminal'
+			? terminalCollapsed
+			: moduleMinimized;
+
+	const setIsCollapsed = (val: boolean) => {
+		if (type === 'sidebar') setSidebarCollapsed(val);
+		else if (type === 'terminal') setTerminalCollapsed(val);
+		else setModuleMinimized(val);
+	};
 
 	const toggle = useCallback(() => {
-		setIsCollapsed(!isCollapsed);
-		if (!isCollapsed) {
+		const next = !isCollapsed;
+		setIsCollapsed(next);
+		if (next) {
 			onCollapse?.();
 		} else {
 			onExpand?.();
 		}
-	}, [isCollapsed, setIsCollapsed, onCollapse, onExpand]);
+	}, [isCollapsed, onCollapse, onExpand, type]);
 
 	const expand = useCallback(() => {
 		setIsCollapsed(false);
 		onExpand?.();
-	}, [setIsCollapsed, onExpand]);
+	}, [onExpand, type]);
 
 	const collapse = useCallback(() => {
 		setIsCollapsed(true);
 		onCollapse?.();
-	}, [setIsCollapsed, onCollapse]);
+	}, [onCollapse, type]);
 
 	const maximize = useCallback(() => {
-		// In fixed layout, maximize just means expand
-		setIsCollapsed(false);
+		if (type === 'module') {
+			setModuleMaximized(true);
+			setModuleMinimized(false);
+		} else {
+			setIsCollapsed(false);
+		}
 		onExpand?.();
-	}, [setIsCollapsed, onExpand]);
+	}, [onExpand, type, setModuleMaximized, setModuleMinimized]);
+
+	const restore = useCallback(() => {
+		if (type === 'module') {
+			setModuleMaximized(false);
+		}
+	}, [setModuleMaximized, type]);
 
 	return {
 		isCollapsed,
+		isMaximized: type === 'module' ? moduleMaximized : false,
 		toggle,
 		expand,
 		collapse,
 		maximize,
+		restore,
 	};
 }
