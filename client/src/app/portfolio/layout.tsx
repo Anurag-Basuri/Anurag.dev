@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useCallback, useEffect } from 'react';
+import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -51,7 +51,7 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	</div>
 );
 
-export default function PortfolioLayout({ children }: { children: React.ReactNode }) {
+export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
@@ -62,6 +62,42 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+
+	const parsePanelLayout = (layout: unknown): number[] | null => {
+		if (Array.isArray(layout)) {
+			const values = layout
+				.map(v => (typeof v === 'number' ? v : Number(v)))
+				.filter(v => Number.isFinite(v));
+			return values.length ? values : null;
+		}
+
+		if (layout && typeof layout === 'object') {
+			const values = Object.values(layout as Record<string, unknown>)
+				.map(v => (typeof v === 'number' ? v : Number(v)))
+				.filter(v => Number.isFinite(v));
+			return values.length ? values : null;
+		}
+
+		return null;
+	};
+
+	const handleHorizontalLayoutChange = useCallback(
+		(layout: unknown) => {
+			const next = parsePanelLayout(layout);
+			if (!next) return;
+			setHSizes(next);
+		},
+		[setHSizes],
+	);
+
+	const handleVerticalLayoutChange = useCallback(
+		(layout: unknown) => {
+			const next = parsePanelLayout(layout);
+			if (!next) return;
+			setVSizes(next);
+		},
+		[setVSizes],
+	);
 
 	useKeyboardShortcuts([
 		{
@@ -89,7 +125,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		},
 	]);
 
-	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
+	const [, setOpenFiles] = useAtom(openFilesAtom);
 
 	const getModuleIdFromPathname = useCallback((path: string): string | null => {
 		const segments = path.split('/').filter(Boolean);
@@ -145,7 +181,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 					icon={Icon}
 					title={title}
 					isMaximized={modulePanel.isMaximized}
-					onMaximize={modulePanel.isMaximized ? modulePanel.restore : modulePanel.maximize}
+					onMaximize={
+						modulePanel.isMaximized ? modulePanel.restore : modulePanel.maximize
+					}
 					onMinimize={modulePanel.toggle}
 					onClose={() => router.push('/portfolio')}
 				/>
@@ -160,7 +198,11 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		if (isMobile) return null;
 
 		return (
-			<PanelGroup direction="horizontal" onLayout={setHSizes} className="h-full w-full">
+			<PanelGroup
+				orientation="horizontal"
+				onLayoutChange={handleHorizontalLayoutChange}
+				className="h-full w-full"
+			>
 				{/* Sidebar Panel */}
 				<ResizablePanel
 					defaultSize={hSizes[0]}
@@ -180,7 +222,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 				{/* Content + Terminal PanelGroup */}
 				<ResizablePanel defaultSize={hSizes[1]}>
-					<PanelGroup direction="vertical" onLayout={setVSizes}>
+					<PanelGroup orientation="vertical" onLayoutChange={handleVerticalLayoutChange}>
 						{/* Main Content Panel */}
 						<ResizablePanel defaultSize={vSizes[0]} minSize={30}>
 							<div className="h-full w-full bg-card/80 relative z-0">
