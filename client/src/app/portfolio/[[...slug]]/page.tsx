@@ -3,7 +3,8 @@ import { Metadata } from 'next';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
 import { ModuleLoader } from '@/components/common/ModuleLoader';
-import { notFound } from 'next/navigation';
+import { ContentWindow } from '@/features/editor/components/ContentWindow';
+import { EmptyState } from '@/components/editor/EmptyState';
 
 interface PageProps {
 	params: Promise<{
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 	const metadata = getModuleMetadata(moduleId);
 
 	return {
-		title: `${metadata.title} | Anurag Basuri - Full Stack Engineer`,
+		title: `${metadata.title} | Anurag Basuri - Software Developer`,
 		description: metadata.description,
 		keywords: metadata.keywords,
 		authors: [{ name: 'Anurag Basuri' }],
@@ -45,9 +46,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 	};
 }
 
-import { ContentWindow } from '@/features/editor/components/ContentWindow';
-import { EmptyState } from '@/components/editor/EmptyState';
-
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 	const moduleId = resolveModuleFromSlug(slug || []);
@@ -59,7 +57,7 @@ export default async function PortfolioModulePage({ params }: PageProps) {
 	const displayTitle = getModuleMetadata(moduleId).title;
 
 	return (
-		<ContentWindow title={displayTitle}>
+		<ContentWindow title={displayTitle} moduleId={moduleId}>
 			<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
 				{getModuleComponent(moduleId)}
 			</Suspense>

@@ -136,6 +136,28 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		[router],
 	);
 
+	const handleTabClick = useCallback(
+		(moduleId: string) => {
+			router.push(`/portfolio/${moduleId}`);
+		},
+		[router],
+	);
+
+	const handleTabClose = useCallback(
+		(moduleId: string, e: React.MouseEvent) => {
+			e.stopPropagation();
+
+			// Remove from open files
+			const remaining = openFiles.filter(f => f.moduleId !== moduleId);
+			setOpenFiles(remaining);
+
+			// Navigate to next file or empty state
+			const target = remaining.length > 0 ? remaining[remaining.length - 1].moduleId : '';
+			router.push(target ? `/portfolio/${target}` : '/portfolio');
+		},
+		[openFiles, setOpenFiles, router],
+	);
+
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 

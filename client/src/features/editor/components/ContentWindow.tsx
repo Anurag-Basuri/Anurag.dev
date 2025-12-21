@@ -41,11 +41,6 @@ export function ContentWindow({ title, moduleId, children }: ContentWindowProps)
 		router.push(target ? `/portfolio/${target}` : '/portfolio');
 	};
 
-	const handleMinimize = () => {
-		// keep file open, just “desktop”
-		router.push('/portfolio');
-	};
-
 	const handleMaximize = () => {
 		setIsMaximized(!isMaximized);
 	};
@@ -89,11 +84,9 @@ export function ContentWindow({ title, moduleId, children }: ContentWindowProps)
 					<div className="flex items-center gap-3">
 						<WindowControls
 							onClose={handleClose}
-							onMinimize={handleMinimize}
 							onMaximize={handleMaximize}
 							isMaximized={isMaximized}
 							maximizeLabel="Full Screen"
-							minimizeLabel="Minimize"
 							closeLabel="Close File"
 						/>
 						<div className="h-3 w-px bg-white/10" aria-hidden="true" />
