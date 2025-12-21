@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { fadeInUp } from '@/lib/animations';
@@ -7,7 +8,7 @@ interface ModuleHeaderProps {
 	label: string;
 	title: string;
 	description?: string;
-	actions?: React.ReactNode;
+	actions?: ReactNode;
 }
 
 export function ModuleHeader({
@@ -36,9 +37,11 @@ export function ModuleHeader({
 					</span>
 					<span>{label}</span>
 				</motion.div>
+
 				<h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-2 tracking-tight">
 					{title}
 				</h1>
+
 				{description && (
 					<p className="text-sm text-muted-foreground/80 mt-2 max-w-lg leading-relaxed font-medium">
 						{description}

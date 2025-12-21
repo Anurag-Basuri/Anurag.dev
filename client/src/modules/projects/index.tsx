@@ -11,20 +11,15 @@ import {
 	Star,
 	Box,
 	Layout,
-	Server,
-	Database,
 	X,
-	Info,
 	Layers,
 	Globe,
-	Code2,
 	Eye,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/lib/animations';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 import { cn } from '@/lib/utils';
-import { ModuleError } from '@/components/ui/module-error';
 
 function ProjectsSkeleton() {
 	return (
@@ -81,7 +76,7 @@ export function ProjectsModule() {
 	if (loading) return <ProjectsSkeleton />;
 
 	if (error) {
-		return <ModuleError message={error} onRetry={fetchData} />;
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
 
 	return (
