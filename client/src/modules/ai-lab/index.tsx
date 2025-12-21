@@ -113,8 +113,8 @@ export function AILabModule() {
 								AI Assistant Online
 							</h3>
 							<p className="max-w-md mx-auto text-sm leading-relaxed text-muted-foreground/80">
-								Ask me anything about my projects, skills, or experience. I'm here
-								to help you navigate my portfolio.
+								Ask me anything about my projects, skills, or experience. I&apos;m
+								here to help you navigate my portfolio.
 							</p>
 						</div>
 					) : (

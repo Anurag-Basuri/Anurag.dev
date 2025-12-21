@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { CommandSuggestionsProps } from './types';
+import type { CommandSuggestionsProps } from '../types';
 import { useCallback, useMemo } from 'react';
 
 export function CommandSuggestions({
