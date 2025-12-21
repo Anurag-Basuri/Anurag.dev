@@ -1,10 +1,10 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
-import { cn } from '@/lib/utils';
 import { Rocket, Brain, Terminal } from 'lucide-react';
 
 // Constants
@@ -108,7 +108,7 @@ const HexGrid = memo(function HexGrid({ opacity }: { opacity: number }) {
 });
 
 // Simplified Tilt Card (CSS only)
-const TiltCard = ({ children }: { children: React.ReactNode }) => {
+const TiltCard = ({ children }: { children: ReactNode }) => {
 	return (
 		<div className="relative z-20 cursor-default px-4 w-full flex justify-center perspective-[1000px]">
 			<div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 p-8 sm:p-14 rounded-2xl shadow-[0_0_50px_-10px_rgba(16,185,129,0.15)] relative overflow-hidden group w-full max-w-xl transition-transform duration-300 hover:scale-[1.01] hover:shadow-[0_0_60px_-5px_rgba(16,185,129,0.25)]">

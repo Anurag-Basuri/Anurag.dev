@@ -1,9 +1,10 @@
 import { createContext, useContext } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import type { FileSystemItem } from '@/types/file-system';
 
 interface FolderTreeContextValue {
 	expandedFolders: Set<string>;
-	setExpandedFolders: React.Dispatch<React.SetStateAction<Set<string>>>;
+	setExpandedFolders: Dispatch<SetStateAction<Set<string>>>;
 	focusedId: string | null;
 	setFocusedId: (id: string | null) => void;
 	activeModuleId: string | null;
