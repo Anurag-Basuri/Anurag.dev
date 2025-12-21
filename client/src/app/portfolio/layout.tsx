@@ -21,13 +21,6 @@ const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI)
 	ssr: false,
 	loading: () => <ComponentLoader height="h-32" />,
 });
-const CollapsedTerminal = dynamic(
-	() =>
-		import('@/features/terminal/components/CollapsedTerminal').then(
-			mod => mod.CollapsedTerminal,
-		),
-	{ ssr: false },
-);
 const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => mod.Sidebar), {
 	ssr: false,
 });
@@ -163,7 +156,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 		return (
 			<div className="h-full w-full flex">
-				{/* Sidebar Container - shows line when collapsed */}
+				{/* Sidebar */}
 				<motion.div
 					initial={false}
 					animate={{
@@ -184,49 +177,21 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 					{/* Main Content */}
 					<div className="flex-1 min-h-0 bg-card/80 relative z-0">{children}</div>
 
-					{/* Terminal Container - shows line when collapsed */}
-					<motion.div
-						initial={false}
-						animate={{
-							height: terminal.isCollapsed ? 12 : 208,
-						}}
-						transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-						className="shrink-0 border-t border-border bg-card/80 overflow-hidden"
-					>
-						<Suspense fallback={<ComponentLoader height="h-32" />}>
-							<AnimatePresence mode="wait">
-								{terminal.isCollapsed ? (
-									<motion.div
-										key="collapsed-terminal"
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										transition={{ duration: 0.2 }}
-										className="h-full w-full"
-									>
-										<CollapsedTerminal onExpand={terminal.expand} />
-									</motion.div>
-								) : (
-									<motion.div
-										key="expanded-terminal"
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										transition={{ duration: 0.2 }}
-										className="h-full"
-									>
-										<CLI
-											onToggleCollapse={terminal.collapse}
-											isCollapsed={terminal.isCollapsed}
-											onMaximize={terminal.maximize}
-											onMinimize={terminal.collapse}
-											onClose={terminal.collapse}
-										/>
-									</motion.div>
-								)}
-							</AnimatePresence>
-						</Suspense>
-					</motion.div>
+					{/* Terminal Area - Completely hidden on mobile */}
+					{!isMobile && (
+						<motion.div
+							initial={false}
+							animate={{
+								height: terminal.isCollapsed ? 12 : 208,
+							}}
+							transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+							className="shrink-0 border-t border-border bg-card/80 overflow-hidden"
+						>
+							<Suspense fallback={<ComponentLoader height="h-32" />}>
+								<CLI />
+							</Suspense>
+						</motion.div>
+					)}
 				</div>
 			</div>
 		);
@@ -239,14 +204,6 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 			<div className="h-full w-full flex flex-col">
 				<div className="flex-1 overflow-hidden border border-border bg-card/80">
 					{children}
-				</div>
-				<div className="h-[40vh] border-t border-border bg-card/80">
-					<Suspense fallback={<ComponentLoader height="h-32" />}>
-						<CLI
-							onToggleCollapse={terminal.collapse}
-							isCollapsed={terminal.isCollapsed}
-						/>
-					</Suspense>
 				</div>
 			</div>
 		);

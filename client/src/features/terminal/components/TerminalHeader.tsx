@@ -1,4 +1,4 @@
-import { Terminal } from 'lucide-react';
+import { Terminal, ChevronsUpDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { TerminalControls } from '@/components/common/WindowControls';
 
@@ -98,6 +98,14 @@ export function TerminalHeader({
 						{historyLength}
 					</span>
 				)}
+
+				<button
+					onClick={onToggleCollapse}
+					className="p-1 rounded hover:bg-white/10 text-muted-foreground hover:text-emerald-400 transition-colors"
+					title="Collapse Terminal"
+				>
+					<ChevronsUpDown className="w-3.5 h-3.5" />
+				</button>
 			</div>
 		</header>
 	);
