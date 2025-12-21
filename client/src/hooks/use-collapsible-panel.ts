@@ -44,11 +44,14 @@ export function useCollapsiblePanel({
 			? terminalCollapsed
 			: moduleMinimized;
 
-	const setIsCollapsed = (val: boolean) => {
-		if (type === 'sidebar') setSidebarCollapsed(val);
-		else if (type === 'terminal') setTerminalCollapsed(val);
-		else setModuleMinimized(val);
-	};
+	const setIsCollapsed = useCallback(
+		(val: boolean) => {
+			if (type === 'sidebar') setSidebarCollapsed(val);
+			else if (type === 'terminal') setTerminalCollapsed(val);
+			else setModuleMinimized(val);
+		},
+		[type, setSidebarCollapsed, setTerminalCollapsed, setModuleMinimized],
+	);
 
 	const toggle = useCallback(() => {
 		const next = !isCollapsed;
@@ -58,17 +61,17 @@ export function useCollapsiblePanel({
 		} else {
 			onExpand?.();
 		}
-	}, [isCollapsed, onCollapse, onExpand, type]);
+	}, [isCollapsed, onCollapse, onExpand, setIsCollapsed]);
 
 	const expand = useCallback(() => {
 		setIsCollapsed(false);
 		onExpand?.();
-	}, [onExpand, type]);
+	}, [onExpand, setIsCollapsed]);
 
 	const collapse = useCallback(() => {
 		setIsCollapsed(true);
 		onCollapse?.();
-	}, [onCollapse, type]);
+	}, [onCollapse, setIsCollapsed]);
 
 	const maximize = useCallback(() => {
 		if (type === 'module') {
@@ -78,7 +81,7 @@ export function useCollapsiblePanel({
 			setIsCollapsed(false);
 		}
 		onExpand?.();
-	}, [onExpand, type, setModuleMaximized, setModuleMinimized]);
+	}, [onExpand, setIsCollapsed, setModuleMaximized, setModuleMinimized, type]);
 
 	const restore = useCallback(() => {
 		if (type === 'module') {
