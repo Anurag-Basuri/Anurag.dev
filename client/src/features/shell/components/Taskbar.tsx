@@ -487,7 +487,7 @@ export const Taskbar = memo(function Taskbar({
 
 				{/* Right Side Actions */}
 				{!isMobile && (
-					<div className="flex items-center gap-3 pl-4 border-l border-white/5">
+					<div className="flex items-center pl-4 border-l border-white/5">
 						{/* Clock or localized status could go here */}
 
 						<HelpButton placement="taskbar" />
