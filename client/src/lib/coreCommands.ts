@@ -255,12 +255,6 @@ const openCommand = createCommand({
 			};
 		}
 
-		// 2. Resume PDF Special Case
-		if (item.name === 'resume.pdf') {
-			if (typeof window !== 'undefined') window.open('/resume.pdf', '_blank');
-			return { ok: true, data: 'Opening resume...' };
-		}
-
 		// 3. Fallback for executables or special files not caught above
 		if (item.name.endsWith('.app') || item.name.endsWith('.exe')) {
 			return { ok: false, error: `open: ${item.name}: No executable handler found.` };
@@ -382,20 +376,6 @@ const socialsCommand = createCommand({
 	}),
 });
 
-const resumeCommand = createCommand({
-	name: 'resume',
-	aliases: ['cv'],
-	description: 'Opens my resume.',
-	usage: 'resume',
-	category: 'Navigation',
-	execute: () => {
-		if (typeof window !== 'undefined') {
-			window.open('/resume.pdf', '_blank');
-		}
-		return { ok: true, data: 'Opening resume in a new tab...' };
-	},
-});
-
 const secretCommand = createCommand({
 	name: 'secret',
 	description: '???',
@@ -494,7 +474,6 @@ export function registerCoreCommands() {
 		blogCommand,
 		ailabCommand,
 		socialsCommand,
-		resumeCommand,
 		secretCommand,
 		coffeeCommand,
 		sudoCommand,

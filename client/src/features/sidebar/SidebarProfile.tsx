@@ -75,15 +75,6 @@ export const SidebarProfile = memo(function SidebarProfile({
 
 				{/* Action Buttons - grouped closer */}
 				<div className="grid gap-1.5 relative z-10" onClick={e => e.stopPropagation()}>
-					<a
-						href="/resume.pdf"
-						target="_blank"
-						className="flex items-center justify-center gap-1.5 h-7 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/30 rounded text-[10px] font-medium text-emerald-400 transition-all hover:shadow-[0_0_10px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 cursor-pointer"
-					>
-						<Download className="w-3 h-3" />
-						<span className="uppercase tracking-wider">Resume</span>
-					</a>
-
 					<div className="flex gap-1.5">
 						<SocialButton
 							href="https://linkedin.com/in/anurag-basuri"
