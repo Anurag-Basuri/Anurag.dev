@@ -73,8 +73,9 @@ export function JourneyModule() {
 			setError(null);
 			const data = await api.getJourney();
 			setJourney(data.sort((a, b) => a.order - b.order));
-		} catch (err: any) {
-			setError(err.message);
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Failed to load journey timeline';
+			setError(message);
 		} finally {
 			setLoading(false);
 		}

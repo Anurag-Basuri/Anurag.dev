@@ -48,8 +48,9 @@ export function CertificationModule() {
 			setError(null);
 			const data = await api.getCertifications();
 			setCerts(data);
-		} catch (err: any) {
-			setError(err.message);
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Failed to load certifications';
+			setError(message);
 		} finally {
 			setLoading(false);
 		}

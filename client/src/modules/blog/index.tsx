@@ -38,8 +38,9 @@ export function BlogModule() {
 			setError(null);
 			const data = await api.getBlogPosts();
 			setPosts(data);
-		} catch (err: any) {
-			setError(err.message);
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : 'Failed to load blog posts';
+			setError(message);
 		} finally {
 			setLoading(false);
 		}
@@ -166,7 +167,7 @@ export function BlogModule() {
 						<div className="w-16 h-16 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-4">
 							<Search className="w-8 h-8 opacity-50" />
 						</div>
-						<p>No articles found matching "{searchQuery}"</p>
+						<p>No articles found matching &quot;{searchQuery}&quot;</p>
 					</div>
 				)}
 			</div>
