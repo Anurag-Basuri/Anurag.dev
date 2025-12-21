@@ -20,7 +20,7 @@ export const Sidebar: React.FC = () => {
 			.split('/')
 			.filter(Boolean)
 			.filter(s => s !== 'portfolio');
-		return resolveModuleFromSlug(segments) || 'about';
+		return resolveModuleFromSlug(segments);
 	}, [pathname]);
 
 	const handleFileSelect = useCallback(

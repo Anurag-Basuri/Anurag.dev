@@ -94,9 +94,7 @@ const routeToModuleMap: Record<string, ModuleId> = {
  * @returns The resolved module ID or null if invalid
  */
 export function resolveModuleFromSlug(slug: string[]): ModuleId | null {
-	if (!slug || slug.length === 0) {
-		return 'about'; // default module *when you are resolving*
-	}
+	if (!slug || slug.length === 0) return null;
 
 	const lastSegment = slug[slug.length - 1];
 	if (lastSegment in routeToModuleMap) return routeToModuleMap[lastSegment];

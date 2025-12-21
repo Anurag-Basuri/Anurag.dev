@@ -21,6 +21,7 @@ import { FolderTree, SidebarProfile } from '@/features/sidebar';
 import { INITIAL_FILE_SYSTEM, type FileSystemItem } from '@/data/filesystem';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import Image from 'next/image';
 
 interface TopBarProps {
 	isMobile: boolean;
@@ -151,11 +152,18 @@ export const TopBar = memo(function TopBar({
 
 					{/* Branding */}
 					{!isMobile && (
-						<div className="flex items-center gap-1.5 md:gap-2 group cursor-default">
-							<div
-								className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-linear-to-tr from-emerald-400 to-emerald-600 shadow-[0_0_8px_rgba(52,211,153,0.55)] group-hover:shadow-[0_0_16px_rgba(52,211,153,0.8)] transition-all duration-300 group-hover:scale-110"
-								aria-hidden="true"
-							/>
+						<div className="flex items-center gap-2 group cursor-default min-w-0">
+							<div className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative shrink-0">
+								<Image
+									src="/logo.png"
+									alt="AnuragOS"
+									fill
+									sizes="18px"
+									className="object-contain"
+									priority
+								/>
+							</div>
+
 							<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-white/90 group-hover:text-white transition-colors truncate">
 								ANURAG&apos;S <span className="text-emerald-400">PORTFOLIO</span>
 							</span>
