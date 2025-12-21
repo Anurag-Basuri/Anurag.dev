@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { api } from '@/lib/api';
+import { api, AboutData } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Send,
@@ -53,10 +53,21 @@ export function ContactModule() {
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
+	const [about, setAbout] = useState<AboutData | null>(null);
 
-	// Simulate initial load
+	// Fetch data
 	useEffect(() => {
-		setTimeout(() => setInitialLoading(false), 300);
+		const fetchData = async () => {
+			try {
+				const aboutData = await api.getAbout();
+				setAbout(aboutData);
+			} catch (err) {
+				console.error('Failed to fetch about data in contact module', err);
+			} finally {
+				setInitialLoading(false);
+			}
+		};
+		fetchData();
 	}, []);
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -120,6 +131,12 @@ export function ContactModule() {
 	if (error) {
 		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
+
+	const socialIcons: Record<string, any> = {
+		GitHub: Github,
+		Twitter: Twitter,
+		LinkedIn: Linkedin,
+	};
 
 	return (
 		<ScrollArea className="h-full">
@@ -199,27 +216,21 @@ export function ContactModule() {
 								Social Protocols
 							</h3>
 							<div className="flex gap-2 sm:gap-3">
-								<a
-									href="#"
-									target="_blank"
-									className="p-3 sm:p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group hover:scale-105 active:scale-95"
-								>
-									<Github className="w-5 h-5 group-hover:scale-110 transition-transform" />
-								</a>
-								<a
-									href="#"
-									target="_blank"
-									className="p-3 rounded-xl bg-linear-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 hover:border-blue-500/40 transition-all text-blue-400 hover:text-blue-300 group hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-blue-500/10"
-								>
-									<Twitter className="w-5 h-5 group-hover:scale-110 transition-transform" />
-								</a>
-								<a
-									href="#"
-									target="_blank"
-									className="p-3 rounded-xl bg-linear-to-br from-blue-600/10 to-blue-700/5 border border-blue-600/20 hover:border-blue-600/40 transition-all text-blue-500 hover:text-blue-400 group hover:scale-105 active:scale-95 hover:shadow-lg hover:shadow-blue-600/10"
-								>
-									<Linkedin className="w-5 h-5 group-hover:scale-110 transition-transform" />
-								</a>
+								{about?.socials.map(social => {
+									const Icon = socialIcons[social.platform] || Mail;
+									return (
+										<a
+											key={social.platform}
+											href={social.url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all text-muted-foreground hover:text-white group hover:scale-105 active:scale-95"
+											title={social.platform}
+										>
+											<Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+										</a>
+									);
+								})}
 							</div>
 						</div>
 					</motion.div>
