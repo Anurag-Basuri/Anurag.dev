@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 	],
 	authors: [{ name: 'Anurag Basuri', url: 'https://github.com/Anurag-Basuri' }],
 	creator: 'Anurag Basuri',
-	metadataBase: new URL('https://anuragbasuri.com'), // Update with your actual domain
+	metadataBase: new URL('https://anuragbasuri.com'),
 	openGraph: {
 		type: 'website',
 		locale: 'en_US',

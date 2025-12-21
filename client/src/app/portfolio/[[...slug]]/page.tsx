@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
 import { ModuleLoader } from '@/components/common/ModuleLoader';
-import { ContentWindow } from '@/features/editor/components/ContentWindow';
 import { EmptyState } from '@/components/editor/EmptyState';
 
 interface PageProps {
@@ -56,12 +55,13 @@ export default async function PortfolioModulePage({ params }: PageProps) {
 
 	const displayTitle = getModuleMetadata(moduleId).title;
 
+	// Render module content directly without wrapper
 	return (
-		<ContentWindow title={displayTitle} moduleId={moduleId}>
+		<div className="h-full w-full overflow-auto custom-scrollbar bg-transparent">
 			<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
 				{getModuleComponent(moduleId)}
 			</Suspense>
-		</ContentWindow>
+		</div>
 	);
 }
 
