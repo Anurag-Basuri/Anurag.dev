@@ -1,7 +1,13 @@
 'use client';
 
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { taskbarModules, navigationItems, getModulePath, type ModuleId } from '@/lib/routes';
+import {
+	navigationItems,
+	getAllModuleIds,
+	getModulePath,
+	isValidModule,
+	type ModuleId,
+} from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import React, { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -22,13 +28,12 @@ const Logo = () => (
 	</div>
 );
 
-const VALID_MODULE_IDS = new Set<ModuleId>([
-	...taskbarModules,
-	...navigationItems.map(item => item.id),
-]);
+const VALID_MODULE_IDS = new Set<ModuleId>(getAllModuleIds());
 
-const normalizeModuleId = (id: string): ModuleId => {
-	return VALID_MODULE_IDS.has(id as ModuleId) ? (id as ModuleId) : 'about';
+const normalizeModuleId = (id: string): ModuleId | null => {
+	if (!id) return null;
+	if (!isValidModule(id)) return null;
+	return id as ModuleId;
 };
 
 type ModuleIconComponent = LucideIcon;
@@ -55,14 +60,13 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 	onClick,
 	onClose,
 }: {
-	moduleId: string;
+	moduleId: ModuleId;
 	isActive: boolean;
 	onClick: () => void;
 	onClose?: (moduleId: string) => void;
 }) {
-	const safeModuleId = normalizeModuleId(moduleId);
-	const IconComponent = MODULE_ICON_BY_ID[safeModuleId];
-	const title = getModuleTitle(safeModuleId);
+	const IconComponent = MODULE_ICON_BY_ID[moduleId];
+	const title = getModuleTitle(moduleId);
 
 	return (
 		<Tooltip>
@@ -118,7 +122,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 						<div
 							onClick={e => {
 								e.stopPropagation();
-								onClose(safeModuleId);
+								onClose(moduleId);
 							}}
 							className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 cursor-pointer"
 							role="button"
@@ -128,7 +132,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
 									e.stopPropagation();
-									onClose(safeModuleId);
+									onClose(moduleId);
 								}
 							}}
 						>
@@ -162,11 +166,18 @@ export const Taskbar = memo(function Taskbar({
 	const startButtonRef = useRef<HTMLButtonElement>(null);
 	const firstMenuItemRef = useRef<HTMLButtonElement>(null);
 
-	// Get current module from pathname
-	const currentModule = useMemo(() => {
-		const path = pathname.replace('/portfolio/', '').replace(/^\/+/, '');
-		return path || 'about';
+	// Get current module from pathname (root => no active tab)
+	const currentModule = useMemo((): ModuleId | null => {
+		if (pathname === '/portfolio' || pathname === '/portfolio/') return null;
+		const maybe = pathname.replace('/portfolio/', '').replace(/^\/+/, '');
+		return normalizeModuleId(maybe);
 	}, [pathname]);
+
+	const visibleOpenFiles = useMemo(() => {
+		return openFiles
+			.map(f => ({ moduleId: normalizeModuleId(f.moduleId), openedAt: f.openedAt }))
+			.filter((f): f is { moduleId: ModuleId; openedAt: number } => Boolean(f.moduleId));
+	}, [openFiles]);
 
 	// Close with Escape and restore focus to trigger
 	useEffect(() => {
@@ -243,6 +254,7 @@ export const Taskbar = memo(function Taskbar({
 	const handleNavigate = useCallback(
 		(moduleId: string) => {
 			const safeModuleId = normalizeModuleId(moduleId);
+			if (!safeModuleId) return;
 			setIsStartOpen(false);
 			router.push(getModulePath(safeModuleId));
 		},
@@ -255,7 +267,7 @@ export const Taskbar = memo(function Taskbar({
 	 */
 	const getNavigationTarget = useCallback(
 		(closingModuleId: string): string => {
-			const remainingFiles = openFiles.filter(f => f.moduleId !== closingModuleId);
+			const remainingFiles = visibleOpenFiles.filter(f => f.moduleId !== closingModuleId);
 
 			// If files remain, go to most recent (last in array)
 			if (remainingFiles.length > 0) {
@@ -265,7 +277,7 @@ export const Taskbar = memo(function Taskbar({
 			// No files left - return empty string to go to root
 			return '';
 		},
-		[openFiles],
+		[visibleOpenFiles],
 	);
 
 	const handleCloseItem = useCallback(
@@ -433,7 +445,7 @@ export const Taskbar = memo(function Taskbar({
 			</AnimatePresence>
 
 			{/* Main Bar */}
-			<div className="w-full shrink-0 h-14 sm:h-12 bg-[#050505]/85 backdrop-blur-2xl backdrop-saturate-200 border-t border-white/10 flex items-center justify-between z-40 px-3 sm:px-6 lg:px-8 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.5)] relative">
+			<div className="w-full shrink-0 h-10 sm:h-12 bg-[#050505]/85 backdrop-blur-2xl backdrop-saturate-200 border-t border-white/10 flex items-center justify-between z-40 px-3 sm:px-6 lg:px-8 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.5)] relative">
 				{/* Top Glow Line */}
 				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent opacity-50" />
 
@@ -479,7 +491,7 @@ export const Taskbar = memo(function Taskbar({
 					<div className="flex items-center gap-1.5 sm:gap-2 h-full">
 						<LayoutGroup>
 							<AnimatePresence mode="popLayout" initial={false}>
-								{openFiles.map(({ moduleId }) => (
+								{visibleOpenFiles.map(({ moduleId }) => (
 									<TaskbarNavItem
 										key={moduleId}
 										moduleId={moduleId}

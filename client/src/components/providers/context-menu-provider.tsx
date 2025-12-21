@@ -1,14 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 interface ContextMenuContextType {
-	showMenu: (x: number, y: number, type?: string, data?: any) => void;
+	showMenu: (x: number, y: number, type?: string, data?: unknown) => void;
 	hideMenu: () => void;
 	isOpen: boolean;
 	position: { x: number; y: number };
 	type: string;
-	data: any;
+	data: unknown;
 }
 
 const ContextMenuContext = createContext<ContextMenuContextType | undefined>(undefined);
@@ -29,17 +29,20 @@ export function ContextMenuProvider({ children }: ContextMenuProviderProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const [type, setType] = useState('desktop');
-	const [data, setData] = useState<any>(null);
+	const [data, setData] = useState<unknown>(null);
 
-	const showMenu = useCallback((x: number, y: number, menuType = 'desktop', menuData = null) => {
-		// Adjust position if close to edge (basic implementation)
-		// We'll let the component handle detailed edge detection if needed,
-		// but basic clamping here is good practice.
-		setPosition({ x, y });
-		setType(menuType);
-		setData(menuData);
-		setIsOpen(true);
-	}, []);
+	const showMenu = useCallback(
+		(x: number, y: number, menuType = 'desktop', menuData: unknown = null) => {
+			// Adjust position if close to edge (basic implementation)
+			// We'll let the component handle detailed edge detection if needed,
+			// but basic clamping here is good practice.
+			setPosition({ x, y });
+			setType(menuType);
+			setData(menuData);
+			setIsOpen(true);
+		},
+		[],
+	);
 
 	const hideMenu = useCallback(() => {
 		setIsOpen(false);
