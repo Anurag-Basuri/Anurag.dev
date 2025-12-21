@@ -49,8 +49,8 @@ const MatrixRain = memo(function MatrixRain() {
 		resize();
 		window.addEventListener('resize', resize);
 
-		let columns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
-		let drops: number[] = Array.from({ length: columns }, () => Math.random() * -100);
+		const columns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
+		const drops: number[] = Array.from({ length: columns }, () => Math.random() * -100);
 		let lastTime = 0;
 
 		const draw = (timestamp: number) => {

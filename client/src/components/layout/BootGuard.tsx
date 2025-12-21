@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import dynamic from 'next/dynamic';
@@ -15,15 +15,7 @@ const Introduction = dynamic(
 );
 
 export function BootGuard({ children }: { children: React.ReactNode }) {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-
-	// Prevent hydration mismatch by not rendering until mounted
-	if (!mounted) return null;
+	const [bootComplete] = useAtom(bootCompleteAtom);
 
 	if (!bootComplete) {
 		return <Introduction />;

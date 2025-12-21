@@ -18,11 +18,6 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 	const panelRef = useRef<HTMLDivElement>(null);
 	const triggerRef = useRef<HTMLButtonElement>(null);
 	const closeBtnRef = useRef<HTMLButtonElement>(null);
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
 
 	const commands = [
 		{ cmd: 'help', desc: 'List commands' },
@@ -143,7 +138,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 			)}
 
 			{/* Help Popover */}
-			{mounted &&
+			{typeof document !== 'undefined' &&
 				createPortal(
 					<AnimatePresence>
 						{isOpen && (
