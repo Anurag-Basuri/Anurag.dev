@@ -9,6 +9,7 @@ import { FolderTree } from './FolderTree';
 import { CollapsedSidebar } from './CollapsedSidebar';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { resolveModuleFromSlug } from '@/lib/routes';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export const Sidebar: React.FC = () => {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
@@ -47,21 +48,19 @@ export const Sidebar: React.FC = () => {
 						<CollapsedSidebar onExpand={sidebar.expand} />
 					</motion.div>
 				) : (
-					<motion.div
-						key="expanded-sidebar"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.2 }}
-						className="h-full w-full flex flex-col"
-					>
+					<motion.div key="expanded-sidebar" className="h-full w-full flex flex-col">
 						<SidebarProfile onCollapse={sidebar.collapse} onExpand={sidebar.maximize} />
-						<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
-							<FolderTree
-								items={fileSystem}
-								onSelect={handleFileSelect}
-								activeModuleId={currentModule ?? null}
-							/>
+
+						<div className="flex-1 min-h-0">
+							<ScrollArea className="h-full">
+								<div className="p-2">
+									<FolderTree
+										items={fileSystem}
+										onSelect={handleFileSelect}
+										activeModuleId={currentModule ?? null}
+									/>
+								</div>
+							</ScrollArea>
 						</div>
 					</motion.div>
 				)}

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
 import { FileIcon } from '@/components/common/FileIcon';
+import { getModuleTitle } from '@/lib/moduleRegistry';
 
 interface FolderTreeProps {
 	items: FileSystemItem[];
@@ -293,6 +294,11 @@ function FolderTreeItem({
 		[isFolder, item, onSelect, onToggle, onFocus],
 	);
 
+	const getDisplayName = (item: FileSystemItem) => {
+		if (item.type === 'file' && item.moduleId) return getModuleTitle(item.moduleId);
+		return item.name;
+	};
+
 	return (
 		<div className="relative">
 			<div
@@ -355,7 +361,7 @@ function FolderTreeItem({
 						isActive && 'font-semibold',
 					)}
 				>
-					{item.name}
+					{getDisplayName(item)}
 				</span>
 			</div>
 
