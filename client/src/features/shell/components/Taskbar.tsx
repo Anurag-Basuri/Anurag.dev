@@ -120,9 +120,17 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								e.stopPropagation();
 								onClose(safeModuleId);
 							}}
-							className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+							className="absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded-full bg-white/10 hover:bg-red-500/20 text-white/40 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 cursor-pointer"
 							role="button"
 							aria-label={`Close ${title}`}
+							tabIndex={0}
+							onKeyDown={e => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									e.stopPropagation();
+									onClose(safeModuleId);
+								}
+							}}
 						>
 							<X className="w-2.5 h-2.5" />
 						</div>
