@@ -262,21 +262,21 @@ export const Taskbar = memo(function Taskbar({
 
 	const handleCloseItem = useCallback(
 		(moduleId: string) => {
+			// Get navigation target BEFORE removing file
+			const targetModule = getNavigationTarget(moduleId);
+
 			// Remove from open files
 			setOpenFilesState(prev => prev.filter(f => f.moduleId !== moduleId));
 
-			// If closing the active module, navigate to another open file or default
-			if (currentModule === moduleId) {
-				const targetModule = getNavigationTarget(moduleId);
-				// If target is empty, navigate to root, otherwise to module
-				if (targetModule) {
-					router.push(`/portfolio/${targetModule}`);
-				} else {
-					router.push('/portfolio');
-				}
+			// Always navigate when closing a tab
+			// If target exists, go to that module, otherwise go to empty state
+			if (targetModule) {
+				router.push(`/portfolio/${targetModule}`);
+			} else {
+				router.push('/portfolio');
 			}
 		},
-		[currentModule, getNavigationTarget, router, setOpenFilesState],
+		[getNavigationTarget, router, setOpenFilesState],
 	);
 
 	// Menu items from centralized config with icons

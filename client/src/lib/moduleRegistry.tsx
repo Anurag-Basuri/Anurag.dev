@@ -12,9 +12,7 @@ import {
 } from 'lucide-react';
 
 // Lazy load all app modules for better performance
-const AboutModule = lazy(() =>
-	import('@/modules/about').then(m => ({ default: m.AboutModule })),
-);
+const AboutModule = lazy(() => import('@/modules/about').then(m => ({ default: m.AboutModule })));
 const ProjectsModule = lazy(() =>
 	import('@/modules/projects').then(m => ({ default: m.ProjectsModule })),
 );
@@ -24,12 +22,8 @@ const JourneyModule = lazy(() =>
 const CertificationModule = lazy(() =>
 	import('@/modules/certifications').then(m => ({ default: m.CertificationModule })),
 );
-const AILabModule = lazy(() =>
-	import('@/modules/ai-lab').then(m => ({ default: m.AILabModule })),
-);
-const BlogModule = lazy(() =>
-	import('@/modules/blog').then(m => ({ default: m.BlogModule })),
-);
+const AILabModule = lazy(() => import('@/modules/ai-lab').then(m => ({ default: m.AILabModule })));
+const BlogModule = lazy(() => import('@/modules/blog').then(m => ({ default: m.BlogModule })));
 const ContactModule = lazy(() =>
 	import('@/modules/contact').then(m => ({ default: m.ContactModule })),
 );
@@ -86,11 +80,11 @@ export const getModuleComponent = (id: string): React.ReactNode => {
 };
 
 export function getModuleIcon(id: string): LucideIcon {
-	return moduleMeta[id]?.icon || moduleMeta.default.icon;
+	return moduleMeta[id]?.icon || Info;
 }
 
 export function getModuleTitle(id: string): string {
-	return moduleMeta[id]?.title || moduleMeta.default.title;
+	return moduleMeta[id]?.title || 'Unknown';
 }
 
 export function isValidModuleId(id: string): boolean {
