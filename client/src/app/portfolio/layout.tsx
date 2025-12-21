@@ -16,6 +16,7 @@ import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
 
 import dynamic from 'next/dynamic';
+import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -36,6 +37,11 @@ const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m
 	loading: () => <ComponentLoader height="h-8" />,
 });
 
+const ModuleHeader = dynamic(
+	() => import('@/features/shell/components/ModuleHeader').then(mod => mod.ModuleHeader),
+	{ ssr: false },
+);
+
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
 		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -45,9 +51,11 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 export default function PortfolioLayout({ children }: { children: React.ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
+	const module = useCollapsiblePanel({ type: 'module' });
 
 	useKeyboardShortcuts([
 		{
@@ -75,12 +83,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		},
 	]);
 
-	const pathname = usePathname();
 	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
 	const getModuleIdFromPathname = useCallback((path: string): string | null => {
-		// Extract module ID from the current pathname.
-		// Returns the last segment of the path, or null if at root.
 		const segments = path.split('/').filter(Boolean);
 		const lastSegment = segments[segments.length - 1];
 
@@ -96,29 +101,22 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		return aliases[lastSegment] || lastSegment;
 	}, []);
 
+	const currentModuleId = getModuleIdFromPathname(pathname);
+
 	// Synchronize open files with navigation.
-	// Adds newly visited files and maintains MRU (Most Recently Used) ordering.
 	useEffect(() => {
-		const moduleId = getModuleIdFromPathname(pathname);
+		if (!currentModuleId) return;
 
 		setOpenFiles(prev => {
-			// If no module ID (root path), don't add anything
-			if (!moduleId) return prev;
-
-			// Check if file is already open
-			const existingIndex = prev.findIndex(f => f.moduleId === moduleId);
-
+			const existingIndex = prev.findIndex(f => f.moduleId === currentModuleId);
 			if (existingIndex !== -1) {
-				// File exists - move to end (MRU) with updated timestamp
 				const updated = [...prev];
 				const [existing] = updated.splice(existingIndex, 1);
 				return [...updated, { ...existing, openedAt: Date.now() }];
 			}
-
-			// New file - add to end
-			return [...prev, { moduleId, openedAt: Date.now() }];
+			return [...prev, { moduleId: currentModuleId, openedAt: Date.now() }];
 		});
-	}, [pathname, getModuleIdFromPathname, setOpenFiles]);
+	}, [pathname, currentModuleId, setOpenFiles]);
 
 	const handleFileSelect = useCallback(
 		(item: FileSystemItem) => {
@@ -128,7 +126,40 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		},
 		[router],
 	);
-	
+
+	const renderModuleContent = (className?: string) => {
+		if (!currentModuleId) return children;
+
+		const Icon = getModuleIcon(currentModuleId);
+		const title = getModuleTitle(currentModuleId);
+
+		return (
+			<div className={cn('h-full flex flex-col min-w-0', className)}>
+				<ModuleHeader
+					icon={Icon}
+					title={title}
+					isMaximized={module.isMaximized}
+					onMaximize={module.isMaximized ? module.restore : module.maximize}
+					onMinimize={module.toggle}
+					onClose={() => router.push('/portfolio')}
+				/>
+				<div className={cn('flex-1 min-h-0 relative', module.isCollapsed && 'hidden')}>
+					{children}
+				</div>
+				{module.isCollapsed && (
+					<div
+						className="flex-1 flex items-center justify-center cursor-pointer hover:bg-white/5 transition-colors group"
+						onClick={module.expand}
+					>
+						<p className="text-xs font-mono text-muted-foreground group-hover:text-emerald-400 transition-colors">
+							Module minimized. Click to restore.
+						</p>
+					</div>
+				)}
+			</div>
+		);
+	};
+
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
@@ -153,7 +184,9 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 				{/* Main Content + Terminal Area */}
 				<div className="flex-1 min-w-0 flex flex-col relative">
 					{/* Main Content */}
-					<div className="flex-1 min-h-0 bg-card/80 relative z-0">{children}</div>
+					<div className="flex-1 min-h-0 bg-card/80 relative z-0">
+						{renderModuleContent()}
+					</div>
 
 					{/* Terminal Area - Completely hidden on mobile */}
 					{!isMobile && (
@@ -181,7 +214,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		return (
 			<div className="h-full w-full flex flex-col">
 				<div className="flex-1 overflow-hidden border border-border bg-card/80">
-					{children}
+					{renderModuleContent()}
 				</div>
 			</div>
 		);
@@ -191,7 +224,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		<ErrorBoundary>
 			<BootGuard>
 				<ContextMenuProvider>
-					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black">
+					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
 						<Suspense fallback={<ComponentLoader height="h-8" />}>
 							<TopBar
 								isMobile={isMobile}
@@ -211,6 +244,20 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 							{renderDesktopLayout()}
 							{renderMobileLayout()}
 						</div>
+
+						{/* Shared Maximized Overlay */}
+						<AnimatePresence>
+							{module.isMaximized && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.95 }}
+									className="fixed inset-0 z-100 bg-black"
+								>
+									{renderModuleContent('maximized-content')}
+								</motion.div>
+							)}
+						</AnimatePresence>
 
 						<Suspense fallback={<ComponentLoader height="h-9" />}>
 							<Taskbar isMobile={isMobile} />
