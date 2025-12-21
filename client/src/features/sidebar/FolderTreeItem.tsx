@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useCallback, memo } from 'react';
 import type { FileSystemItem } from '@/types/file-system';
 import { Folder, FolderOpen, ChevronRight } from 'lucide-react';

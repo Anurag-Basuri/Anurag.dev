@@ -13,7 +13,7 @@ import { ContextMenuProvider } from '@/components/providers/context-menu-provide
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
-import { openFilesAtom, type OpenFile } from '@/store';
+import { openFilesAtom } from '@/store';
 
 import dynamic from 'next/dynamic';
 
@@ -128,29 +128,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		},
 		[router],
 	);
-
-	const handleTabClick = useCallback(
-		(moduleId: string) => {
-			router.push(`/portfolio/${moduleId}`);
-		},
-		[router],
-	);
-
-	const handleTabClose = useCallback(
-		(moduleId: string, e: React.MouseEvent) => {
-			e.stopPropagation();
-
-			// Remove from open files
-			const remaining = openFiles.filter(f => f.moduleId !== moduleId);
-			setOpenFiles(remaining);
-
-			// Navigate to next file or empty state
-			const target = remaining.length > 0 ? remaining[remaining.length - 1].moduleId : '';
-			router.push(target ? `/portfolio/${target}` : '/portfolio');
-		},
-		[openFiles, setOpenFiles, router],
-	);
-
+	
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
@@ -235,7 +213,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 						</div>
 
 						<Suspense fallback={<ComponentLoader height="h-9" />}>
-							<Taskbar openFiles={openFiles} isMobile={isMobile} />
+							<Taskbar isMobile={isMobile} />
 						</Suspense>
 
 						<Toaster

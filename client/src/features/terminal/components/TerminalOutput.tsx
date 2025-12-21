@@ -1,3 +1,4 @@
+'use client';
 import { useMemo } from 'react';
 import { OptimizedTerminalOutput } from './VirtualizedTerminalOutput';
 import { HistoryItem } from '../types';

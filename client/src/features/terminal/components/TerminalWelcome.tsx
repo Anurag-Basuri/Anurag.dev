@@ -1,3 +1,4 @@
+'use client';
 import { motion } from 'framer-motion';
 import { Terminal } from 'lucide-react';
 
@@ -10,9 +11,7 @@ export function TerminalWelcome() {
 		>
 			<div className="flex items-center gap-2">
 				<Terminal className="w-5 h-5 text-primary" />
-				<span className="text-primary font-bold text-sm">
-					AnuragOS Terminal v1.0
-				</span>
+				<span className="text-primary font-bold text-sm">AnuragOS Terminal v1.0</span>
 			</div>
 			<div className="text-muted-foreground space-y-1 pl-7">
 				<div>
@@ -23,9 +22,8 @@ export function TerminalWelcome() {
 					to see available commands
 				</div>
 				<div className="text-[10px] opacity-70">
-					Pro tip: Use <kbd className="kbd">↑</kbd> /{' '}
-					<kbd className="kbd">↓</kbd> for history,{' '}
-					<kbd className="kbd">Tab</kbd> to autocomplete
+					Pro tip: Use <kbd className="kbd">↑</kbd> / <kbd className="kbd">↓</kbd> for
+					history, <kbd className="kbd">Tab</kbd> to autocomplete
 				</div>
 			</div>
 		</motion.div>

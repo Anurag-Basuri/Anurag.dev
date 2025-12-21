@@ -1,3 +1,4 @@
+'use client';
 import { useCallback, useEffect, useMemo, useRef, useReducer } from 'react';
 import { useSetAtom } from 'jotai';
 import { openFilesAtom, createFileEntry } from '@/store';

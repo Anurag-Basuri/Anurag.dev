@@ -1,3 +1,4 @@
+'use client';
 import { Terminal, ChevronsUpDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { TerminalControls } from '@/components/common/WindowControls';
