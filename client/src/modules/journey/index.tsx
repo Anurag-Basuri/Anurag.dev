@@ -1,18 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ComponentType } from 'react';
 import { api, JourneyEntry } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ModuleError } from '@/components/ui/module-error';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 import { fadeInUp, viewportSettings } from '@/lib/animations';
 
 const categoryConfig: Record<
 	string,
-	{ color: string; icon: React.ComponentType<{ className?: string }>; bg: string; border: string }
+	{ color: string; icon: ComponentType<{ className?: string }>; bg: string; border: string }
 > = {
 	education: {
 		color: 'text-blue-400',
@@ -88,7 +88,7 @@ export function JourneyModule() {
 	if (loading) return <JourneySkeleton />;
 
 	if (error) {
-		return <ModuleError message={error} onRetry={fetchData} />;
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
 
 	return (

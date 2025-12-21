@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, memo, useMemo } from 'react';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { api, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -16,7 +17,6 @@ import {
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
-import { ModuleError } from '@/components/ui/module-error';
 import { staggerContainer, staggerItem, fadeInUp } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +31,7 @@ const PROGRESS_BAR_DURATION = 1;
 const STAT_CARD_CONFIG: Array<{
 	key: string;
 	label: string;
-	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: ComponentType<SVGProps<SVGSVGElement>>;
 	bgClass: string;
 	iconBgClass: string;
 	iconTextClass: string;
@@ -198,7 +198,7 @@ const QuickStatCard = memo(function QuickStatCard({
 }: {
 	label: string;
 	value: string | number;
-	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: ComponentType<SVGProps<SVGSVGElement>>;
 	bgClass: string;
 	iconBgClass: string;
 	iconTextClass: string;
@@ -288,12 +288,12 @@ const PlatformCard = memo(function PlatformCard({
 	title: string;
 	username: string;
 	url: string;
-	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: ComponentType<SVGProps<SVGSVGElement>>;
 	iconBg: string;
 	iconColor: string;
 	usernameBg: string;
-	stats?: React.ReactNode;
-	children?: React.ReactNode;
+	stats?: ReactNode;
+	children?: ReactNode;
 }) {
 	const handleProfileClick = useCallback(() => {
 		window.open(url, '_blank', 'noopener,noreferrer');
@@ -344,7 +344,7 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 }: {
 	title: string;
 	username: string;
-	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: ComponentType<SVGProps<SVGSVGElement>>;
 	iconBg: string;
 	iconColor: string;
 	usernameBg: string;
@@ -448,13 +448,13 @@ export function CodingStatsModule() {
 	// Loading state
 	if (loading) return <CodingStatsSkeleton />;
 
-	// Error state
-	if (error) {
-		return <ModuleError message={error} onRetry={fetchData} />;
-	}
-
 	// No data state
 	if (!stats || !leetcodeStats) return null;
+
+	// Error state
+	if (error) {
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
+	}
 
 	return (
 		<ScrollArea className="h-full">

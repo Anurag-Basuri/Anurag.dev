@@ -5,8 +5,6 @@ import { api, BlogPost } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { ModuleError } from '@/components/ui/module-error';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 
@@ -60,7 +58,7 @@ export function BlogModule() {
 	if (loading) return <BlogSkeleton />;
 
 	if (error) {
-		return <ModuleError message={error} onRetry={fetchData} />;
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
 
 	return (
