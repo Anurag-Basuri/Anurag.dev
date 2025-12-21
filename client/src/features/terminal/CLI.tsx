@@ -1,46 +1,60 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useTerminalState } from './hooks/useTerminalState';
 import { TerminalLayout } from './components/TerminalLayout';
 import { TerminalHistory } from './components/TerminalHistory';
 import { TerminalPrompt } from './components/TerminalPrompt';
 import { CollapsedTerminal } from './components/CollapsedTerminal';
 import { useCLI } from './hooks/useCLI';
-import { collapsedVariants, expandedVariants } from './utils/variants';
-
-interface CLIProps {
-	onToggleCollapse?: () => void;
-	isCollapsed?: boolean;
-	onMaximize?: () => void;
-	onMinimize?: () => void;
-	onClose?: () => void;
-}
-
-export function CLI({
-	onToggleCollapse,
-	isCollapsed: externalIsCollapsed,
-	onMaximize,
-	onMinimize,
-	onClose,
-}: CLIProps) {
+export function CLI() {
+	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const terminalState = useTerminalState();
 	const { handleKeyDown } = useCLI(terminalState);
 
-	/* The container height is managed by the layout (NavRail + Motion.div) */
 	return (
-		<TerminalLayout
-			currentPath={terminalState.currentPath}
-			historyLength={terminalState.history.length}
-			onClearHistory={terminalState.clearHistory}
-			onToggleCollapse={onToggleCollapse}
-			onMaximize={onMaximize}
-			onMinimize={onMinimize}
-			onClose={onClose}
-			isFocused={terminalState.isFocused}
-		>
-			<TerminalHistory history={terminalState.history} />
-			<TerminalPrompt terminalState={terminalState} onKeyDown={handleKeyDown} />
-		</TerminalLayout>
+		<div className="h-full w-full">
+			<AnimatePresence mode="wait">
+				{terminal.isCollapsed ? (
+					<motion.div
+						key="collapsed-terminal"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="h-full w-full"
+					>
+						<CollapsedTerminal onExpand={terminal.expand} />
+					</motion.div>
+				) : (
+					<motion.div
+						key="expanded-terminal"
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						transition={{ duration: 0.2 }}
+						className="h-full"
+					>
+						<TerminalLayout
+							currentPath={terminalState.currentPath}
+							historyLength={terminalState.history.length}
+							onClearHistory={terminalState.clearHistory}
+							onToggleCollapse={terminal.collapse}
+							onMaximize={terminal.maximize}
+							onMinimize={terminal.collapse}
+							onClose={terminal.collapse}
+							isFocused={terminalState.isFocused}
+						>
+							<TerminalHistory history={terminalState.history} />
+							<TerminalPrompt
+								terminalState={terminalState}
+								onKeyDown={handleKeyDown}
+							/>
+						</TerminalLayout>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</div>
 	);
 }
