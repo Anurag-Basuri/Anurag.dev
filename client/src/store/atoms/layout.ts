@@ -14,4 +14,6 @@ export const mainVerticalSizesAtom = atomWithStorage<number[]>('layout:main-v', 
 export const mainHorizontalSizesAtom = atomWithStorage<number[]>('layout:main-h', [20, 80]);
 export const sidebarCollapsedAtom = atomWithStorage('layout:sidebar-collapsed', false);
 export const terminalCollapsedAtom = atomWithStorage('layout:terminal-collapsed', false);
+export const moduleMaximizedAtom = atom(false);
+export const moduleMinimizedAtom = atom(false);
 export const mobileSidebarOpenAtom = atom(false);

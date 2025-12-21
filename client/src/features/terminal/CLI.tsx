@@ -8,6 +8,7 @@ import { TerminalHistory } from './components/TerminalHistory';
 import { TerminalPrompt } from './components/TerminalPrompt';
 import { CollapsedTerminal } from './components/CollapsedTerminal';
 import { useCLI } from './hooks/useCLI';
+
 export function CLI() {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const terminalState = useTerminalState();

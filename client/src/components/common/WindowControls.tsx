@@ -181,3 +181,22 @@ export const TerminalControls = ({
 		minimizeLabel="Clear History"
 	/>
 );
+
+export const ModuleControls = ({
+	onClose,
+	onMinimize,
+	onMaximize,
+	isMaximized = false,
+}: {
+	onClose?: () => void;
+	onMinimize?: () => void;
+	onMaximize?: () => void;
+	isMaximized?: boolean;
+}) => (
+	<WindowControls
+		onClose={onClose}
+		onMinimize={onMinimize}
+		onMaximize={onMaximize}
+		isMaximized={isMaximized}
+	/>
+);
