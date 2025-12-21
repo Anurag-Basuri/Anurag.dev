@@ -5,7 +5,6 @@ import { api, Certification } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ModuleError } from '@/components/ui/module-error';
 import { staggerContainer, staggerItem } from '@/lib/animations';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 
@@ -62,7 +61,9 @@ export function CertificationModule() {
 
 	if (loading) return <CertificationsSkeleton />;
 
-	if (error) return <ModuleError message={error} onRetry={fetchData} />;
+	if (error) {
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
+	}
 
 	return (
 		<ScrollArea className="h-full">

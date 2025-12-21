@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import type { KeyboardEvent } from 'react';
 import { Send, Bot, User, Sparkles, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { fadeInUp, scaleIn } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 
@@ -73,7 +73,7 @@ export function AILabModule() {
 		}, 1500);
 	};
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
 			handleSend();

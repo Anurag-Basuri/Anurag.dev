@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import { api } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -58,7 +59,7 @@ export function ContactModule() {
 		setTimeout(() => setInitialLoading(false), 300);
 	}, []);
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
 		setError(null);
@@ -100,7 +101,7 @@ export function ContactModule() {
 		}
 	};
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setFormData(prev => ({
 			...prev,
 			[e.target.name]: e.target.value,
@@ -115,6 +116,10 @@ export function ContactModule() {
 	};
 
 	if (initialLoading) return <ContactSkeleton />;
+
+	if (error) {
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
+	}
 
 	return (
 		<ScrollArea className="h-full">
