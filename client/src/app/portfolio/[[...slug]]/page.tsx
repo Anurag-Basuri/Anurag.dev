@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
@@ -72,10 +72,10 @@ export default async function PortfolioModulePage({ params }: PageProps) {
 		notFound();
 	}
 
-	const displayTitle = getModuleMetadata(moduleId).title;
+	const title = getModuleMetadata(moduleId).title;
 
 	return (
-		<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
+		<Suspense fallback={<ModuleLoader message={`Loading ${title}...`} />}>
 			{getModuleComponent(moduleId)}
 		</Suspense>
 	);

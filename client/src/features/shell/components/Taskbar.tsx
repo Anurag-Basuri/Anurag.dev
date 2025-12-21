@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import React, { memo, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Power, Github, Linkedin, Twitter, X, type LucideIcon, ChevronRight } from 'lucide-react';
+import { Power, Github, Linkedin, Twitter, X, type LucideIcon, ChevronRight, Instagram } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/common/HelpButton';
 import { useAtom } from 'jotai';
@@ -152,15 +152,13 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 });
 
 export const Taskbar = memo(function Taskbar({
-	openFiles = [],
 	isMobile = false,
 }: {
-	openFiles?: OpenFile[];
 	isMobile?: boolean;
 }) {
 	const router = useRouter();
 	const pathname = usePathname();
-	const [, setOpenFilesState] = useAtom(openFilesAtom);
+	const [openFilesState, setOpenFilesState] = useAtom(openFilesAtom);
 	const [isStartOpen, setIsStartOpen] = useState(false);
 	const stateMenuRef = useRef<HTMLDivElement>(null);
 	const startButtonRef = useRef<HTMLButtonElement>(null);
@@ -173,11 +171,12 @@ export const Taskbar = memo(function Taskbar({
 		return normalizeModuleId(maybe);
 	}, [pathname]);
 
+	// Determine visible open files with valid module IDs
 	const visibleOpenFiles = useMemo(() => {
-		return openFiles
+		return openFilesState
 			.map(f => ({ moduleId: normalizeModuleId(f.moduleId), openedAt: f.openedAt }))
 			.filter((f): f is { moduleId: ModuleId; openedAt: number } => Boolean(f.moduleId));
-	}, [openFiles]);
+	}, [openFilesState]);
 
 	// Close with Escape and restore focus to trigger
 	useEffect(() => {
@@ -219,6 +218,7 @@ export const Taskbar = memo(function Taskbar({
 		};
 	}, [isStartOpen]);
 
+	// Trap Tab inside the menu when open
 	const handleMenuKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (!stateMenuRef.current) return;
 		if (e.key !== 'Tab') return;
@@ -251,6 +251,7 @@ export const Taskbar = memo(function Taskbar({
 		}
 	}, []);
 
+	// Navigate to module
 	const handleNavigate = useCallback(
 		(moduleId: string) => {
 			const safeModuleId = normalizeModuleId(moduleId);
@@ -261,10 +262,7 @@ export const Taskbar = memo(function Taskbar({
 		[router],
 	);
 
-	/**
-	 * Determine which file to navigate to after closing the current one.
-	 * Prefers the most recently used file, falls back to empty string (root).
-	 */
+	// Determine navigation target when closing a tab
 	const getNavigationTarget = useCallback(
 		(closingModuleId: string): string => {
 			const remainingFiles = visibleOpenFiles.filter(f => f.moduleId !== closingModuleId);
@@ -280,6 +278,7 @@ export const Taskbar = memo(function Taskbar({
 		[visibleOpenFiles],
 	);
 
+	// Handle closing a tab
 	const handleCloseItem = useCallback(
 		(moduleId: string) => {
 			// Get navigation target BEFORE removing file
@@ -302,6 +301,7 @@ export const Taskbar = memo(function Taskbar({
 	// Menu items from centralized config with icons
 	const menuItemsWithIcons = MENU_ITEMS_WITH_ICONS;
 
+	// Detect if on mobile for conditional rendering
 	const socialLinks = [
 		{
 			href: 'https://github.com/Anurag-Basuri',
@@ -318,6 +318,11 @@ export const Taskbar = memo(function Taskbar({
 			icon: Twitter,
 			label: 'Twitter',
 		},
+		{
+			href:'https://instagram.com/anurag.basuri',
+			icon: Instagram,
+			label: 'Instagram',
+		}
 	];
 
 	return (
@@ -491,15 +496,18 @@ export const Taskbar = memo(function Taskbar({
 					<div className="flex items-center gap-1.5 sm:gap-2 h-full">
 						<LayoutGroup>
 							<AnimatePresence mode="popLayout" initial={false}>
-								{visibleOpenFiles.map(({ moduleId }) => (
-									<TaskbarNavItem
-										key={moduleId}
-										moduleId={moduleId}
-										isActive={currentModule === moduleId}
-										onClick={() => handleNavigate(moduleId)}
-										onClose={handleCloseItem}
-									/>
-								))}
+								{openFilesState
+									.map(f => normalizeModuleId(f.moduleId))
+									.filter((m): m is ModuleId => Boolean(m))
+									.map(moduleId => (
+										<TaskbarNavItem
+											key={moduleId}
+											moduleId={moduleId}
+											isActive={currentModule === moduleId}
+											onClick={() => handleNavigate(moduleId)}
+											onClose={handleCloseItem}
+										/>
+									))}
 							</AnimatePresence>
 						</LayoutGroup>
 					</div>
