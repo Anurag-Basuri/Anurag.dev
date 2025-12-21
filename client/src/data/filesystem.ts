@@ -3,34 +3,49 @@ export type { FileSystemItem } from '@/types/file-system';
 import { FileSystemBuilder as fs } from '@/lib/filesystem-builder';
 
 export const INITIAL_FILE_SYSTEM: FileSystemItem[] = [
-	// Let's manually create the root readme to match exact ID 'root/readme'.
+	// Root README - Project overview
 	{
 		name: 'README.md',
 		type: 'file',
 		id: 'root/readme',
-		content:
-			'# Welcome to AnuragOS\n\nI am a Full Stack Engineer passionate about building elegant solutions.\n\nType `help` to see available commands, or explore the directories below:\n\n- `bio/`: About me, my journey, and resume\n- `work/`: My projects, AI experiments, and coding stats\n- `connect/`: Contact info, social links, and blog',
+		content: `# Welcome to Anurag's Portfolio
+
+I am a Full Stack Engineer passionate about building elegant solutions.
+
+## Quick Start
+- Click files in the sidebar to explore
+- Use terminal for commands (type \`help\`)
+- Navigate with keyboard shortcuts
+
+## Structure
+- **bio/** - About me, my journey, and certifications
+- **work/** - Projects, AI experiments, and coding stats
+- **connect/** - Contact info and blog
+
+## Tech Stack
+Next.js 15 • React 18 • TypeScript • Tailwind CSS • Framer Motion • Three.js
+
+---
+*Built with ❤️ by Anurag Basuri*`,
 	},
 
+	// Bio folder - Personal information (.md files)
 	fs.folder('bio', 'bio', [
-		fs.app('about', { name: 'about.md' }), // Using app shortcut for About
+		fs.app('about', { name: 'about.md' }),
 		fs.app('journey', { name: 'journey.md' }),
-		fs.app('certifications', { name: 'certifications.md', id: 'bio/certs' }), // Custom ID override if needed to match legacy
-		fs.file('resume.pdf', '[Binary PDF Data]'), // Standard file
+		fs.app('certifications', { name: 'certifications.md' }),
 	]),
 
+	// Work folder - Projects and experiments (.app files)
 	fs.folder('work', 'work', [
-		fs.app('projects'), // Default: projects.app, id: work/projects
-		fs.app('ailab'), // Default: ailab.app, id: work/ailab
-		fs.app('profiles'), // Default: profiles.app, id: work/profiles
+		fs.app('projects', { name: 'projects.app' }),
+		fs.app('ailab', { name: 'ailab.app' }),
+		fs.app('profiles', { name: 'profiles.app' }),
 	]),
 
+	// Connect folder - Communication (.md files)
 	fs.folder('connect', 'connect', [
 		fs.app('contact', { name: 'contact.md' }),
-		fs.file(
-			'socials.md',
-			'Find me on:\n\n- GitHub: https://github.com/Anurag-Basuri\n- LinkedIn: https://www.linkedin.com/in/anuragbasuri/\n- Twitter: https://twitter.com/AnuragBasuri',
-		),
-		fs.app('blog'),
+		fs.app('blog', { name: 'blog.md' }),
 	]),
 ];

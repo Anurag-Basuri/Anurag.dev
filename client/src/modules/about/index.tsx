@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import type { ComponentType, ElementType, SVGProps } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -299,10 +300,8 @@ const TechStackCard = memo(function TechStackCard({
 
 const CodingStatsCard = memo(function CodingStatsCard({
 	codingStats,
-	openWindow,
 }: {
 	codingStats: CodingStats | null;
-	openWindow: (id: string) => void;
 }) {
 	if (!codingStats) return null;
 
@@ -319,13 +318,13 @@ const CodingStatsCard = memo(function CodingStatsCard({
 					<Terminal className="w-5 h-5 text-emerald-500" />
 					Coding Stats
 				</h3>
-				<button
-					onClick={() => openWindow('coding-stats')}
+				<Link
+					href="/portfolio/profiles"
 					className="text-xs font-bold text-muted-foreground hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 group"
 				>
 					View All
 					<ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-				</button>
+				</Link>
 			</div>
 
 			<div className="space-y-4">
