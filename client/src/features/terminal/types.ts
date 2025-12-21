@@ -1,3 +1,4 @@
+import type { ChangeEvent, KeyboardEvent, SyntheticEvent } from 'react';
 import type { CommandResponse } from '@/lib/commands';
 
 export type { CommandResponse };
@@ -14,9 +15,9 @@ export interface TerminalInputProps {
 	input: string;
 	cursorPos: number;
 	isFocused: boolean;
-	onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-	onKeyDown: (e: React.KeyboardEvent) => void;
-	onInputSelect: (e: React.SyntheticEvent<HTMLInputElement>) => void;
+	onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
+	onKeyDown: (e: KeyboardEvent) => void;
+	onInputSelect: (e: SyntheticEvent<HTMLInputElement>) => void;
 	onFocus: () => void;
 	onBlur: () => void;
 	currentPath: string;

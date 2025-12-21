@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback, memo } from 'react';
+import type { ComponentType, ElementType, SVGProps } from 'react';
 import Image from 'next/image';
 import { api, AboutData, CodingStats } from '@/lib/api';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -27,16 +28,13 @@ import {
 	Server,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
-import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
-import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '@/lib/animations';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const SOCIAL_ICON_MAP: Record<string, React.ElementType> = {
+const SOCIAL_ICON_MAP: Record<string, ElementType> = {
 	GitHub: Github,
 	LinkedIn: Linkedin,
 	Twitter: Twitter,
@@ -205,7 +203,7 @@ const QuickStat = memo(function QuickStat({
 }: {
 	value: string | number;
 	label: string;
-	icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+	icon: ComponentType<SVGProps<SVGSVGElement>>;
 	delay?: number;
 	gradientFrom: string;
 	textColor: string;
@@ -382,7 +380,6 @@ export function AboutModule() {
 	const [codingStats, setCodingStats] = useState<CodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const { openWindow } = useWindowManager();
 
 	// Fetch data with error handling
 	const fetchData = useCallback(async () => {
@@ -426,7 +423,7 @@ export function AboutModule() {
 
 	// Error state
 	if (error) {
-		return <ModuleError message={error} onRetry={fetchData} />;
+		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
 
 	// No data state
@@ -536,9 +533,8 @@ export function AboutModule() {
 												const Icon =
 													(SOCIAL_ICON_MAP[
 														social.platform as keyof typeof SOCIAL_ICON_MAP
-													] as React.ComponentType<
-														React.SVGProps<SVGSVGElement>
-													>) || Globe;
+													] as ComponentType<SVGProps<SVGSVGElement>>) ||
+													Globe;
 												return (
 													<motion.button
 														key={social.platform}
@@ -651,7 +647,7 @@ export function AboutModule() {
 
 						{/* Sidebar Stats */}
 						<div className="lg:col-span-4 space-y-6">
-							<CodingStatsCard codingStats={codingStats} openWindow={openWindow} />
+							<CodingStatsCard codingStats={codingStats} />
 						</div>
 					</div>
 

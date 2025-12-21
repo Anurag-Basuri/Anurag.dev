@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import type { FileSystemItem } from '@/types/file-system';
+import type { Dispatch, SetStateAction, KeyboardEvent } from 'react';
 
 interface FlatItem {
 	item: FileSystemItem;
@@ -11,11 +12,11 @@ export function useKeyboardNavigation(
 	focusedId: string | null,
 	setFocusedId: (id: string | null) => void,
 	expandedFolders: Set<string>,
-	setExpandedFolders: React.Dispatch<React.SetStateAction<Set<string>>>,
+	setExpandedFolders: Dispatch<SetStateAction<Set<string>>>,
 	onSelect?: (item: FileSystemItem) => void,
 ) {
 	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
+		(e: KeyboardEvent) => {
 			if (!focusedId && flatItems.length > 0) {
 				setFocusedId(flatItems[0].item.id);
 				return;
@@ -92,7 +93,7 @@ export function useKeyboardNavigation(
 					break;
 			}
 		},
-		[focusedId, flatItems, expandedFolders, setExpandedFolders, setFocusedId, onSelect],
+		[focusedId, flatItems, expandedFolders, onSelect, setExpandedFolders, setFocusedId],
 	);
 
 	// Ensure focused item is visible
