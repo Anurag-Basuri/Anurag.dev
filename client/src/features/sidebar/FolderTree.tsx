@@ -217,7 +217,7 @@ function RecursiveFolderTree({
 	setFocusedId,
 }: RecursiveProps) {
 	return (
-		<>
+		<div className="relative">
 			{level > 0 && (
 				<div
 					className="absolute left-[11px] top-0 bottom-0 w-px bg-border/40"
@@ -249,7 +249,7 @@ function RecursiveFolderTree({
 					setFocusedId={setFocusedId}
 				/>
 			))}
-		</>
+		</div>
 	);
 }
 

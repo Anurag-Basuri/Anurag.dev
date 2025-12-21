@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
@@ -53,14 +53,16 @@ export const Sidebar: React.FC = () => {
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.2 }}
-						className="h-full w-full"
+						className="h-full w-full flex flex-col"
 					>
 						<SidebarProfile onCollapse={sidebar.collapse} onExpand={sidebar.maximize} />
+						<div className="flex-1 overflow-auto px-2 pb-3 custom-scrollbar">
 							<FolderTree
 								items={fileSystem}
 								onSelect={handleFileSelect}
-								activeModuleId={currentModule}
+								activeModuleId={currentModule ?? null}
 							/>
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
