@@ -85,26 +85,26 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 	const pathname = usePathname();
 	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
-	/**
-	 * Extract module ID from the current pathname.
-	 * Returns the last segment of the path, or null if at root.
-	 */
 	const getModuleIdFromPathname = useCallback((path: string): string | null => {
+		// Extract module ID from the current pathname.
+		// Returns the last segment of the path, or null if at root.
 		const segments = path.split('/').filter(Boolean);
-		const moduleId = segments[segments.length - 1];
+		const lastSegment = segments[segments.length - 1];
 
-		// Return null if no module or if at portfolio root
-		if (!moduleId || moduleId === 'portfolio') {
-			return null;
-		}
+		if (!lastSegment || lastSegment === 'portfolio') return null;
 
-		return moduleId;
+		const aliases: Record<string, string> = {
+			bio: 'about',
+			work: 'projects',
+			connect: 'contact',
+			certs: 'certifications',
+		};
+
+		return aliases[lastSegment] || lastSegment;
 	}, []);
 
-	/**
-	 * Synchronize open files with navigation.
-	 * Adds newly visited files and maintains MRU (Most Recently Used) ordering.
-	 */
+	// Synchronize open files with navigation.
+	// Adds newly visited files and maintains MRU (Most Recently Used) ordering.
 	useEffect(() => {
 		const moduleId = getModuleIdFromPathname(pathname);
 
