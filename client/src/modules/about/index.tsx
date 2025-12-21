@@ -30,7 +30,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ModuleHeader } from '@/modules/shared/ModuleHeader';
 import { ModuleError } from '@/components/ui/module-error';
 import { cn } from '@/lib/utils';
-import { useWindowManager } from '@/hooks/use-window-manager';
 import { fadeInUp, staggerContainer, staggerItem, scaleIn } from '@/lib/animations';
 
 // ============================================================================
