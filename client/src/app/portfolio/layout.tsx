@@ -17,6 +17,9 @@ import { openFilesAtom } from '@/store';
 
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
+import { ResizablePanel, ResizeHandle, PanelGroup } from '@/components/common/ResizeHandle';
+import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
+import { EmptyState } from '@/components/editor/EmptyState';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -55,7 +58,10 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
-	const module = useCollapsiblePanel({ type: 'module' });
+	const modulePanel = useCollapsiblePanel({ type: 'module' });
+
+	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
+	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
 	useKeyboardShortcuts([
 		{
@@ -138,24 +144,14 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 				<ModuleHeader
 					icon={Icon}
 					title={title}
-					isMaximized={module.isMaximized}
-					onMaximize={module.isMaximized ? module.restore : module.maximize}
-					onMinimize={module.toggle}
+					isMaximized={modulePanel.isMaximized}
+					onMaximize={modulePanel.isMaximized ? modulePanel.restore : modulePanel.maximize}
+					onMinimize={modulePanel.toggle}
 					onClose={() => router.push('/portfolio')}
 				/>
-				<div className={cn('flex-1 min-h-0 relative', module.isCollapsed && 'hidden')}>
-					{children}
+				<div className="flex-1 min-h-0 relative">
+					{modulePanel.isCollapsed ? <EmptyState /> : children}
 				</div>
-				{module.isCollapsed && (
-					<div
-						className="flex-1 flex items-center justify-center cursor-pointer hover:bg-white/5 transition-colors group"
-						onClick={module.expand}
-					>
-						<p className="text-xs font-mono text-muted-foreground group-hover:text-emerald-400 transition-colors">
-							Module minimized. Click to restore.
-						</p>
-					</div>
-				)}
 			</div>
 		);
 	};
@@ -164,47 +160,51 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 		if (isMobile) return null;
 
 		return (
-			<div className="h-full w-full flex">
-				{/* Sidebar */}
-				<motion.div
-					initial={false}
-					animate={{
-						width: sidebar.isCollapsed ? 12 : 208,
-					}}
-					transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-					className="shrink-0 overflow-hidden bg-sidebar/50 border-r border-border relative z-20"
+			<PanelGroup direction="horizontal" onLayout={setHSizes} className="h-full w-full">
+				{/* Sidebar Panel */}
+				<ResizablePanel
+					defaultSize={hSizes[0]}
+					collapsible
+					minSize={10}
+					maxSize={25}
+					className="bg-sidebar/50 border-r border-border relative z-20"
 				>
 					<Suspense fallback={<ComponentLoader />}>
 						<AnimatePresence mode="wait">
 							<Sidebar />
 						</AnimatePresence>
 					</Suspense>
-				</motion.div>
+				</ResizablePanel>
 
-				{/* Main Content + Terminal Area */}
-				<div className="flex-1 min-w-0 flex flex-col relative">
-					{/* Main Content */}
-					<div className="flex-1 min-h-0 bg-card/80 relative z-0">
-						{renderModuleContent()}
-					</div>
+				<ResizeHandle direction="horizontal" />
 
-					{/* Terminal Area - Completely hidden on mobile */}
-					{!isMobile && (
-						<motion.div
-							initial={false}
-							animate={{
-								height: terminal.isCollapsed ? 12 : 208,
-							}}
-							transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-							className="shrink-0 border-t border-border bg-card/80 overflow-hidden"
+				{/* Content + Terminal PanelGroup */}
+				<ResizablePanel defaultSize={hSizes[1]}>
+					<PanelGroup direction="vertical" onLayout={setVSizes}>
+						{/* Main Content Panel */}
+						<ResizablePanel defaultSize={vSizes[0]} minSize={30}>
+							<div className="h-full w-full bg-card/80 relative z-0">
+								{renderModuleContent()}
+							</div>
+						</ResizablePanel>
+
+						<ResizeHandle direction="vertical" />
+
+						{/* Terminal Panel */}
+						<ResizablePanel
+							defaultSize={vSizes[1]}
+							collapsible
+							minSize={5}
+							maxSize={50}
+							className="border-t border-border bg-card/80 overflow-hidden"
 						>
 							<Suspense fallback={<ComponentLoader height="h-32" />}>
 								<CLI />
 							</Suspense>
-						</motion.div>
-					)}
-				</div>
-			</div>
+						</ResizablePanel>
+					</PanelGroup>
+				</ResizablePanel>
+			</PanelGroup>
 		);
 	};
 
@@ -247,7 +247,7 @@ export default function PortfolioLayout({ children }: { children: React.ReactNod
 
 						{/* Shared Maximized Overlay */}
 						<AnimatePresence>
-							{module.isMaximized && (
+							{modulePanel.isMaximized && (
 								<motion.div
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
