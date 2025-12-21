@@ -20,7 +20,7 @@ const getDefaultOpenFiles = (): OpenFile[] => [];
 
 /**
  * Atom to track currently open files in the application.
- * Persists to localStorage and initializes with the 'about' file as default.
+ * Persists to localStorage and initializes empty.
  */
 export const openFilesAtom = atomWithStorage<OpenFile[]>(STORAGE_KEY, getDefaultOpenFiles());
 

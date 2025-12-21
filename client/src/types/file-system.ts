@@ -1,4 +1,4 @@
-import { AppModuleId } from '@/lib/moduleRegistry';
+import type { AppModuleId } from '@/lib/moduleRegistry';
 
 export type FileSystemItem = {
 	name: string;
