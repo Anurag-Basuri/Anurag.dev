@@ -29,13 +29,13 @@ export default function AppNotFound() {
 				{/* Title */}
 				<h1 className="text-3xl font-bold text-white mb-2">Module Not Found</h1>
 				<p className="text-muted-foreground mb-8">
-					The requested module doesn't exist or has been moved.
+					The requested module doesn&apos;t exist or has been moved.
 				</p>
 
 				{/* Actions */}
 				<div className="flex items-center justify-center gap-4">
 					<Link
-						href="/app"
+						href="/portfolio"
 						className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors border border-primary/30"
 					>
 						<Home className="w-4 h-4" />

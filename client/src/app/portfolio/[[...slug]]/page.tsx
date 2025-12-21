@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
 import { ModuleLoader } from '@/components/common/ModuleLoader';
@@ -14,62 +16,73 @@ interface PageProps {
 // Dynamic metadata generation
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { slug } = await params;
-	const moduleId = resolveModuleFromSlug(slug || []);
 
+	// Root portfolio page: show desktop/empty state metadata
+	if (!slug || slug.length === 0) {
+		return {
+			title: 'Portfolio',
+			description:
+				'Explore projects, journey, certifications, blog posts, and ways to connect.',
+		};
+	}
+
+	const moduleId = resolveModuleFromSlug(slug);
+
+	// Invalid slug: let Next render 404, but keep metadata sane
 	if (!moduleId) {
 		return {
-			title: 'Page Not Found',
+			title: 'Not Found',
+			description: 'The requested page does not exist.',
 		};
 	}
 
 	const metadata = getModuleMetadata(moduleId);
 
+	// IMPORTANT: return a short title so root layout template applies
+	// Root layout already does: "%s | Anurag Basuri"
 	return {
-		title: `${metadata.title} | Anurag Basuri - Software Developer`,
+		title: metadata.title,
 		description: metadata.description,
 		keywords: metadata.keywords,
-		authors: [{ name: 'Anurag Basuri' }],
 		openGraph: {
-			title: `${metadata.title} | Anurag Basuri`,
+			title: metadata.title,
 			description: metadata.description,
 			type: 'website',
-			locale: 'en_US',
-			siteName: 'Anurag Basuri Portfolio',
 		},
 		twitter: {
 			card: 'summary_large_image',
-			title: `${metadata.title} | Anurag Basuri`,
+			title: metadata.title,
 			description: metadata.description,
-			creator: '@AnuragBasuri',
 		},
 	};
 }
 
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
-	const moduleId = resolveModuleFromSlug(slug || []);
 
-	if (!moduleId) {
+	// Root: EmptyState (transparent)
+	if (!slug || slug.length === 0) {
 		return <EmptyState />;
+	}
+
+	const moduleId = resolveModuleFromSlug(slug);
+
+	// Invalid route: 404 (not EmptyState)
+	if (!moduleId) {
+		notFound();
 	}
 
 	const displayTitle = getModuleMetadata(moduleId).title;
 
-	// Render module content directly without wrapper
 	return (
-		<div className="h-full w-full overflow-auto custom-scrollbar bg-transparent">
-			<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
-				{getModuleComponent(moduleId)}
-			</Suspense>
-		</div>
+		<Suspense fallback={<ModuleLoader message={`Loading ${displayTitle}...`} />}>
+			{getModuleComponent(moduleId)}
+		</Suspense>
 	);
 }
 
 // Pre-generate common routes for better performance
 export async function generateStaticParams() {
 	const modules = getAllModuleIds();
-	return [
-		{ slug: [] }, // Default route
-		...modules.map(id => ({ slug: [id] })),
-	];
+	return [{ slug: [] }, ...modules.map(id => ({ slug: [id] }))];
 }
