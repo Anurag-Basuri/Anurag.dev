@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useReducer } from 'react';
-import { useAtom } from 'jotai';
-import { windowsAtom } from '@/store';
+import { useSetAtom } from 'jotai';
+import { openFilesAtom, createFileEntry } from '@/store';
+import { useRouter } from 'next/navigation';
 import { processCommand, getCommandSuggestions } from '@/lib/commands';
 import type { CommandResponse } from '@/lib/commands';
 import { getModuleComponent } from '@/lib/moduleRegistry';
@@ -65,9 +66,10 @@ export function useTerminalState() {
 		currentPath: loadCurrentPath(),
 	}));
 
-	// Atoms
-	const [, setWindows] = useAtom(windowsAtom);
+	// Atoms and Hooks
+	const setOpenFiles = useSetAtom(openFilesAtom);
 	const { setTheme, resolvedTheme } = useTheme();
+	const router = useRouter();
 
 	// Refs for debouncing
 	const suggestionsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -138,14 +140,6 @@ export function useTerminalState() {
 	}, []);
 
 	const pushCommandToHistory = useCallback((command: string) => {
-		// We modify the command history before saving
-		// This logic needs to be careful not to create duplicates if we want unique history
-		// but standard terminals often allow dupes or have config. simpler to just dispatch.
-		// For now let's keep the hook strict about it.
-		// However, since reducer is pure, we might want to do logic here or inside reducer.
-		// Let's implement robust logic inside reducer or here.
-		// Simplest is direct dispatch since we migrated logic to reducer? Use the helper:
-		// Actually, I'll keep the logic here for now to match previous behavior exactly.
 		dispatch({ type: 'ADD_CMD_TO_HISTORY', payload: command });
 	}, []);
 
@@ -187,31 +181,13 @@ export function useTerminalState() {
 					addToHistory(trimmedCommand, response);
 					if (response.moduleId) {
 						const moduleId = response.moduleId;
-						setWindows(prev => {
-							// Don't duplicate windows
-							if (prev.find(w => w.id === moduleId)) {
-								// Just bring existing window to front
-								return prev.map(w =>
-									w.id === moduleId ? { ...w, isMinimized: false } : w,
-								);
-							}
-							// Create new window
-							return [
-								...prev,
-								{
-									id: moduleId,
-									title: moduleId.toUpperCase(),
-									component: getModuleComponent(moduleId),
-									isOpen: true,
-									isMinimized: false,
-									position: {
-										x: 100 + (prev.length % 10) * 30,
-										y: 100 + (prev.length % 10) * 30,
-									},
-									size: { width: 720, height: 480 },
-								},
-							];
+						// Update open files atom
+						setOpenFiles(prev => {
+							if (prev.some(f => f.moduleId === moduleId)) return prev;
+							return [...prev, createFileEntry(moduleId)];
 						});
+						// Navigate to the module
+						router.push(`/portfolio/${moduleId}`);
 					}
 					break;
 
@@ -232,13 +208,17 @@ export function useTerminalState() {
 			}
 
 			// Add to command history
-			// Note: The previous logic filtered out duplicates. The reducer implementation
-			// should ideally handle that or we handle it before dispatch.
-			// Let's do it before dispatch to be safe.
-			// Ideally we would do:
 			dispatch({ type: 'ADD_CMD_TO_HISTORY', payload: trimmedCommand });
 		},
-		[state.currentPath, addToHistory, setWindows, setTheme, resolvedTheme, setCurrentPath],
+		[
+			state.currentPath,
+			addToHistory,
+			setOpenFiles,
+			setTheme,
+			resolvedTheme,
+			setCurrentPath,
+			router,
+		],
 	);
 
 	const clearHistory = useCallback(() => {
