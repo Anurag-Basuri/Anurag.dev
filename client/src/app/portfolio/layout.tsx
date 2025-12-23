@@ -17,6 +17,7 @@ import { openFilesAtom } from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { PanelGroup, ResizablePanel, ResizeHandle } from '@/components/common/ResizeHandle';
+import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
 import { EmptyState } from '@/components/editor/EmptyState';
 
