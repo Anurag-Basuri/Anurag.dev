@@ -59,13 +59,6 @@ export const ModuleHeader = memo(function ModuleHeader({
 					</span>
 				</div>
 			</div>
-
-			{/* Right: Module Identifier or status (optional) */}
-			<div className="flex items-center gap-2">
-				<div className="text-[10px] font-mono text-white/20 px-1.5 py-0.5 rounded bg-white/5 border border-white/5">
-					MODULE
-				</div>
-			</div>
 		</header>
 	);
 });
