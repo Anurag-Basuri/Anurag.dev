@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -14,12 +14,12 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
-
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
+import { Group, Panel, type GroupImperativeHandle, type Layout } from 'react-resizable-panels';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
 import { EmptyState } from '@/components/editor/EmptyState';
+import { ResizeHandle } from '@/components/common/ResizeHandle';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -51,6 +51,19 @@ const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	</div>
 );
 
+function clampPercentPair(a: unknown, b: unknown, fallback: [number, number]) {
+	const aNum = typeof a === 'number' && Number.isFinite(a) ? a : fallback[0];
+	const bNum = typeof b === 'number' && Number.isFinite(b) ? b : fallback[1];
+	const sum = aNum + bNum;
+
+	if (sum <= 0) return fallback;
+
+	const aPct = (aNum / sum) * 100;
+	const bPct = (bNum / sum) * 100;
+
+	return [aPct, bPct] as const;
+}
+
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
@@ -63,41 +76,55 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	const parsePanelLayout = (layout: unknown): number[] | null => {
-		if (Array.isArray(layout)) {
-			const values = layout
-				.map(v => (typeof v === 'number' ? v : Number(v)))
-				.filter(v => Number.isFinite(v));
-			return values.length ? values : null;
-		}
-
-		if (layout && typeof layout === 'object') {
-			const values = Object.values(layout as Record<string, unknown>)
-				.map(v => (typeof v === 'number' ? v : Number(v)))
-				.filter(v => Number.isFinite(v));
-			return values.length ? values : null;
-		}
-
-		return null;
-	};
+	const horizontalGroupRef = useRef<GroupImperativeHandle>(null);
+	const verticalGroupRef = useRef<GroupImperativeHandle>(null);
 
 	const handleHorizontalLayoutChange = useCallback(
-		(layout: unknown) => {
-			const next = parsePanelLayout(layout);
-			if (!next) return;
-			setHSizes(next);
+		(layout: Layout) => {
+			const nextSidebar = layout.sidebar;
+			const nextMain = layout.main;
+			if (typeof nextSidebar !== 'number' || typeof nextMain !== 'number') return;
+			setHSizes([nextSidebar, nextMain]);
 		},
 		[setHSizes],
 	);
 
 	const handleVerticalLayoutChange = useCallback(
-		(layout: unknown) => {
-			const next = parsePanelLayout(layout);
-			if (!next) return;
-			setVSizes(next);
+		(layout: Layout) => {
+			const nextContent = layout.content;
+			const nextTerminal = layout.terminal;
+			if (typeof nextContent !== 'number' || typeof nextTerminal !== 'number') return;
+			setVSizes([nextContent, nextTerminal]);
 		},
 		[setVSizes],
 	);
+
+	// Keep panel geometry roughly in sync with collapse toggles.
+	useEffect(() => {
+		const api = horizontalGroupRef.current;
+		if (!api) return;
+
+		if (sidebar.isCollapsed) {
+			api.setLayout({ sidebar: 6, main: 94 });
+		} else {
+			const [s, m] = clampPercentPair(hSizes?.[0], hSizes?.[1], [20, 80]);
+			api.setLayout({ sidebar: s, main: m });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sidebar.isCollapsed]);
+
+	useEffect(() => {
+		const api = verticalGroupRef.current;
+		if (!api) return;
+
+		if (terminal.isCollapsed) {
+			api.setLayout({ content: 100, terminal: 0 });
+		} else {
+			const [c, t] = clampPercentPair(vSizes?.[0], vSizes?.[1], [60, 40]);
+			api.setLayout({ content: c, terminal: t });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [terminal.isCollapsed]);
 
 	useKeyboardShortcuts([
 		{
@@ -197,48 +224,51 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
+		const [sidebarSize, mainSize] = clampPercentPair(hSizes?.[0], hSizes?.[1], [20, 80]);
+		const [contentSize, terminalSize] = clampPercentPair(vSizes?.[0], vSizes?.[1], [60, 40]);
+
 		return (
 			<Group
+				id="portfolio-main-h"
 				orientation="horizontal"
+				groupRef={horizontalGroupRef}
+				defaultLayout={{ sidebar: sidebarSize, main: mainSize }}
 				onLayoutChange={handleHorizontalLayoutChange}
 				className="h-full w-full"
 			>
-				{/* Sidebar Panel */}
 				<Panel
-					defaultSize={hSizes[0]}
-					collapsible
-					minSize={10}
-					maxSize={25}
-					className="bg-sidebar/50 border-r border-border relative z-20"
+					id="sidebar"
+					minSize="10"
+					className="bg-sidebar/50 border-r border-border relative z-20 min-w-0"
 				>
 					<Suspense fallback={<ComponentLoader />}>
-						<AnimatePresence mode="wait">
-							<Sidebar />
-						</AnimatePresence>
+						<Sidebar />
 					</Suspense>
 				</Panel>
 
-				<ResizeHandle />
+				<ResizeHandle id="sidebar-resize-handle" />
 
-				{/* Content + Terminal PanelGroup */}
-				<Panel defaultSize={hSizes[1]}>
-					<Group orientation="vertical" onLayoutChange={handleVerticalLayoutChange}>
-						{/* Main Content Panel */}
-						<Panel defaultSize={vSizes[0]} minSize={30}>
-							<div className="h-full w-full bg-card/80 relative z-0">
+				<Panel id="main" minSize="30" className="min-w-0">
+					<Group
+						id="portfolio-main-v"
+						orientation="vertical"
+						groupRef={verticalGroupRef}
+						defaultLayout={{ content: contentSize, terminal: terminalSize }}
+						onLayoutChange={handleVerticalLayoutChange}
+						className="h-full w-full"
+					>
+						<Panel id="content" minSize="20" className="min-h-0">
+							<div className="h-full w-full overflow-hidden border border-border bg-card/80">
 								{renderModuleContent()}
 							</div>
 						</Panel>
 
-						<ResizeHandle />
+						<ResizeHandle id="terminal-resize-handle" />
 
-						{/* Terminal Panel */}
 						<Panel
-							defaultSize={vSizes[1]}
-							collapsible
-							minSize={5}
-							maxSize={50}
-							className="border-t border-border bg-card/80 overflow-hidden"
+							id="terminal"
+							minSize="0"
+							className="min-h-0 border-t border-border bg-card/70"
 						>
 							<Suspense fallback={<ComponentLoader height="h-32" />}>
 								<CLI />
@@ -287,7 +317,6 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							{renderMobileLayout()}
 						</div>
 
-						{/* Shared Maximized Overlay */}
 						<AnimatePresence>
 							{modulePanel.isMaximized && (
 								<motion.div
