@@ -1,10 +1,6 @@
 'use client';
 
-import {
-	Group as PanelGroup,
-	Panel as ResizablePanel,
-	Separator as PanelResizeHandle,
-} from 'react-resizable-panels';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import { cn } from '@/lib/utils';
 
 interface ResizeHandleProps {
@@ -12,9 +8,9 @@ interface ResizeHandleProps {
 	id?: string;
 }
 
-export function ResizeHandle({ className, id }: ResizeHandleProps) {
+function ResizeHandle({ className, id }: ResizeHandleProps) {
 	return (
-		<PanelResizeHandle
+		<Separator
 			id={id}
 			className={cn(
 				'group relative flex items-center justify-center',
@@ -34,4 +30,4 @@ export function ResizeHandle({ className, id }: ResizeHandleProps) {
 	);
 }
 
-export { ResizablePanel, PanelGroup };
+export { Panel, Group, ResizeHandle };

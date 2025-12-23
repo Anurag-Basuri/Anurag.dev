@@ -17,7 +17,7 @@ import { openFilesAtom } from '@/store';
 
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { ResizablePanel, ResizeHandle, PanelGroup } from '@/components/common/ResizeHandle';
+import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
 import { EmptyState } from '@/components/editor/EmptyState';
 
@@ -198,13 +198,13 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		if (isMobile) return null;
 
 		return (
-			<PanelGroup
+			<Group
 				orientation="horizontal"
 				onLayoutChange={handleHorizontalLayoutChange}
 				className="h-full w-full"
 			>
 				{/* Sidebar Panel */}
-				<ResizablePanel
+				<Panel
 					defaultSize={hSizes[0]}
 					collapsible
 					minSize={10}
@@ -216,24 +216,24 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							<Sidebar />
 						</AnimatePresence>
 					</Suspense>
-				</ResizablePanel>
+				</Panel>
 
-				<ResizeHandle direction="horizontal" />
+				<ResizeHandle />
 
 				{/* Content + Terminal PanelGroup */}
-				<ResizablePanel defaultSize={hSizes[1]}>
-					<PanelGroup orientation="vertical" onLayoutChange={handleVerticalLayoutChange}>
+				<Panel defaultSize={hSizes[1]}>
+					<Group orientation="vertical" onLayoutChange={handleVerticalLayoutChange}>
 						{/* Main Content Panel */}
-						<ResizablePanel defaultSize={vSizes[0]} minSize={30}>
+						<Panel defaultSize={vSizes[0]} minSize={30}>
 							<div className="h-full w-full bg-card/80 relative z-0">
 								{renderModuleContent()}
 							</div>
-						</ResizablePanel>
+						</Panel>
 
-						<ResizeHandle direction="vertical" />
+						<ResizeHandle />
 
 						{/* Terminal Panel */}
-						<ResizablePanel
+						<Panel
 							defaultSize={vSizes[1]}
 							collapsible
 							minSize={5}
@@ -243,10 +243,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							<Suspense fallback={<ComponentLoader height="h-32" />}>
 								<CLI />
 							</Suspense>
-						</ResizablePanel>
-					</PanelGroup>
-				</ResizablePanel>
-			</PanelGroup>
+						</Panel>
+					</Group>
+				</Panel>
+			</Group>
 		);
 	};
 
