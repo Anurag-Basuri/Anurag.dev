@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, type ReactNode, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -61,6 +61,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+
+	const horizontalGroupRef = useRef<GroupImperativeHandle>(null);
+	const verticalGroupRef = useRef<GroupImperativeHandle>(null);
 
 	useKeyboardShortcuts([
 		{
@@ -157,45 +160,84 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		);
 	};
 
+	useEffect(() => {
+		const api = horizontalGroupRef.current;
+		if (!api) return;
+
+		if (sidebar.isCollapsed) api.setLayout({ sidebar: 6, main: 94 });
+		else api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sidebar.isCollapsed]);
+
+	useEffect(() => {
+		const api = verticalGroupRef.current;
+		if (!api) return;
+
+		if (terminal.isCollapsed) api.setLayout({ content: 100, terminal: 0 });
+		else api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [terminal.isCollapsed]);
+
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
 		return (
-			<PanelGroup orientation="horizontal" className="h-full w-full">
-				{/* Sidebar Panel */}
+			<PanelGroup
+				id="portfolio-main-h"
+				orientation="horizontal"
+				groupRef={horizontalGroupRef}
+				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
+				onLayoutChange={(layout: Layout) => {
+					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
+						setHSizes([layout.sidebar, layout.main]);
+					}
+				}}
+				className="h-full w-full"
+			>
 				<ResizablePanel
-					defaultSize={hSizes[0]}
-					minSize={10}
-					maxSize={500}
+					id="sidebar"
 					collapsible
-					className="bg-sidebar/50 border-r border-border relative z-20"
+					collapsedSize="0%"
+					minSize="10%"
+					className="bg-sidebar/50 border-r border-border relative z-20 min-w-0"
 				>
 					<Suspense fallback={<ComponentLoader />}>
 						<Sidebar />
 					</Suspense>
 				</ResizablePanel>
 
-				<ResizeHandle />
+				<ResizeHandle id="sidebar-resize-handle" />
 
-				{/* Main Content + Terminal Area */}
-				<ResizablePanel defaultSize={hSizes[1]}>
-					<PanelGroup orientation="vertical" className="h-full w-full">
-						{/* Content Panel */}
-						<ResizablePanel defaultSize={vSizes[0]} minSize={30}>
-							<div className="h-full w-full bg-card/80 relative z-0">
+				<ResizablePanel id="main" minSize="30%" className="min-w-0">
+					<PanelGroup
+						id="portfolio-main-v"
+						orientation="vertical"
+						groupRef={verticalGroupRef}
+						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
+						onLayoutChange={(layout: Layout) => {
+							if (
+								typeof layout.content === 'number' &&
+								typeof layout.terminal === 'number'
+							) {
+								setVSizes([layout.content, layout.terminal]);
+							}
+						}}
+						className="h-full w-full"
+					>
+						<ResizablePanel id="content" minSize="20%" className="min-h-0">
+							<div className="h-full w-full bg-card/80 overflow-hidden">
 								{renderModuleContent()}
 							</div>
 						</ResizablePanel>
 
-						<ResizeHandle />
+						<ResizeHandle id="terminal-resize-handle" />
 
-						{/* Terminal Panel */}
 						<ResizablePanel
-							defaultSize={vSizes[1]}
-							minSize={5}
-							maxSize={500}
+							id="terminal"
 							collapsible
-							className="border-t border-border bg-card/80 overflow-hidden"
+							collapsedSize="0%"
+							minSize="0%"
+							className="border-t border-border bg-card/80 overflow-hidden min-h-0"
 						>
 							<Suspense fallback={<ComponentLoader height="h-32" />}>
 								<CLI />
