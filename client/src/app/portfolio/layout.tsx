@@ -13,12 +13,12 @@ import { ContextMenuProvider } from '@/components/providers/context-menu-provide
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
-import { openFilesAtom } from '@/store';
+import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
-import type { ImperativePanelGroupHandle } from 'react-resizable-panels';
+import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -59,8 +59,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
-	const horizontalGroupRef = useRef<ImperativePanelGroupHandle | null>(null);
-	const verticalGroupRef = useRef<ImperativePanelGroupHandle | null>(null);
+	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
+	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+
+	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
+	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
 
 	useKeyboardShortcuts([
 		{
@@ -161,36 +164,42 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		const api = horizontalGroupRef.current;
 		if (!api) return;
 
-		// Panel order: [Sidebar, Main]
-		if (sidebar.isCollapsed) api.setLayout([0, 100]);
-		else api.setLayout([20, 80]);
-	}, [sidebar.isCollapsed]);
+		if (sidebar.isCollapsed) api.setLayout({ sidebar: 0, main: 100 });
+		else api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
+	}, [sidebar.isCollapsed, hSizes]);
 
 	useEffect(() => {
 		const api = verticalGroupRef.current;
 		if (!api) return;
 
-		// Panel order: [Content, Terminal]
-		if (terminal.isCollapsed) api.setLayout([100, 0]);
-		else api.setLayout([60, 40]);
-	}, [terminal.isCollapsed]);
+		if (terminal.isCollapsed) api.setLayout({ content: 100, terminal: 0 });
+		else api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
+	}, [terminal.isCollapsed, vSizes]);
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
 		return (
 			<Group
+				id="portfolio-main-h"
 				orientation="horizontal"
 				className="h-full w-full gap-1"
 				groupRef={horizontalGroupRef}
+				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
+				onLayoutChange={(layout: Layout) => {
+					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
+						setHSizes([layout.sidebar, layout.main]);
+					}
+				}}
 			>
 				{/* Sidebar */}
 				<Panel
-					defaultSize={20}
-					minSize={10}
-					maxSize={30}
+					id="sidebar"
+					defaultSize="20%"
+					minSize="10%"
+					maxSize="30%"
 					collapsible
-					collapsedSize={0}
+					collapsedSize="0%"
 					className="overflow-hidden"
 				>
 					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20 transition-all duration-300">
@@ -203,14 +212,29 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				<ResizeHandle />
 
 				{/* Main Content + Terminal */}
-				<Panel defaultSize={80} minSize={50}>
+				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
 					<Group
+						id="portfolio-main-v"
 						orientation="vertical"
 						className="h-full gap-1"
 						groupRef={verticalGroupRef}
+						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
+						onLayoutChange={(layout: Layout) => {
+							if (
+								typeof layout.content === 'number' &&
+								typeof layout.terminal === 'number'
+							) {
+								setVSizes([layout.content, layout.terminal]);
+							}
+						}}
 					>
 						{/* Content Area */}
-						<Panel defaultSize={65} minSize={30} className="overflow-hidden">
+						<Panel
+							id="content"
+							defaultSize="65%"
+							minSize="30%"
+							className="overflow-hidden min-h-0"
+						>
 							<div className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 transition-all duration-300 hover:shadow-emerald-500/10">
 								{renderModuleContent()}
 							</div>
@@ -220,12 +244,13 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 						{/* Terminal */}
 						<Panel
-							defaultSize={35}
-							minSize={10}
-							maxSize={60}
+							id="terminal"
+							defaultSize="35%"
+							minSize="10%"
+							maxSize="60%"
 							collapsible
-							collapsedSize={0}
-							className="overflow-hidden"
+							collapsedSize="0%"
+							className="overflow-hidden min-h-0"
 						>
 							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20 transition-all duration-300">
 								<Suspense fallback={<ComponentLoader height="h-32" />}>
