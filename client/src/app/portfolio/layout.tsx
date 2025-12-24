@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, type ReactNode, useRef } from 'react';
+import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -16,9 +16,7 @@ import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { PanelGroup, ResizablePanel, ResizeHandle } from '@/components/common/ResizeHandle';
-import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
-import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
+import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -60,11 +58,12 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
-	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
-	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+	type PanelGroupApi = {
+		setLayout: (layout: Record<string, number>) => void;
+	};
 
-	const horizontalGroupRef = useRef<GroupImperativeHandle>(null);
-	const verticalGroupRef = useRef<GroupImperativeHandle>(null);
+	const horizontalGroupRef = useRef<PanelGroupApi | null>(null);
+	const verticalGroupRef = useRef<PanelGroupApi | null>(null);
 
 	useKeyboardShortcuts([
 		{
@@ -166,8 +165,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		if (!api) return;
 
 		if (sidebar.isCollapsed) api.setLayout({ sidebar: 6, main: 94 });
-		else api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		else api.setLayout({ sidebar: 20, main: 80 });
 	}, [sidebar.isCollapsed]);
 
 	useEffect(() => {
@@ -175,78 +173,54 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		if (!api) return;
 
 		if (terminal.isCollapsed) api.setLayout({ content: 100, terminal: 0 });
-		else api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		else api.setLayout({ content: 60, terminal: 40 });
 	}, [terminal.isCollapsed]);
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
 		return (
-			<PanelGroup
-				id="portfolio-main-h"
-				orientation="horizontal"
-				groupRef={horizontalGroupRef}
-				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
-				onLayoutChange={(layout: Layout) => {
-					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
-						setHSizes([layout.sidebar, layout.main]);
-					}
-				}}
-				className="h-full w-full"
-			>
-				<ResizablePanel
-					id="sidebar"
+			<Group orientation="horizontal" className="h-full w-full">
+				{/* Sidebar */}
+				<Panel
+					defaultSize={20}
+					minSize={10}
+					maxSize={30}
 					collapsible
-					collapsedSize="0%"
-					minSize="10%"
-					className="bg-sidebar/50 border-r border-border relative z-20 min-w-0"
+					className="bg-sidebar/50 border-r border-border"
 				>
 					<Suspense fallback={<ComponentLoader />}>
 						<Sidebar />
 					</Suspense>
-				</ResizablePanel>
+				</Panel>
 
-				<ResizeHandle id="sidebar-resize-handle" />
+				<ResizeHandle />
 
-				<ResizablePanel id="main" minSize="30%" className="min-w-0">
-					<PanelGroup
-						id="portfolio-main-v"
-						orientation="vertical"
-						groupRef={verticalGroupRef}
-						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
-						onLayoutChange={(layout: Layout) => {
-							if (
-								typeof layout.content === 'number' &&
-								typeof layout.terminal === 'number'
-							) {
-								setVSizes([layout.content, layout.terminal]);
-							}
-						}}
-						className="h-full w-full"
-					>
-						<ResizablePanel id="content" minSize="20%" className="min-h-0">
-							<div className="h-full w-full bg-card/80 overflow-hidden">
-								{renderModuleContent()}
-							</div>
-						</ResizablePanel>
+				{/* Main Content + Terminal */}
+				<Panel defaultSize={80} minSize={50}>
+					<Group orientation="vertical" className="h-full">
+						{/* Content Area */}
+						<Panel defaultSize={65} minSize={30}>
+							<div className="h-full w-full bg-card/80">{renderModuleContent()}</div>
+						</Panel>
 
-						<ResizeHandle id="terminal-resize-handle" />
+						<ResizeHandle />
 
-						<ResizablePanel
-							id="terminal"
+						{/* Terminal */}
+						<Panel
+							defaultSize={35}
+							minSize={10}
+							maxSize={60}
 							collapsible
-							collapsedSize="0%"
-							minSize="0%"
-							className="border-t border-border bg-card/80 overflow-hidden min-h-0"
+							className="bg-card/80 border-t border-border"
 						>
 							<Suspense fallback={<ComponentLoader height="h-32" />}>
 								<CLI />
 							</Suspense>
-						</ResizablePanel>
-					</PanelGroup>
-				</ResizablePanel>
-			</PanelGroup>
+						</Panel>
+					</Group>
+				</Panel>
+			</Group>
 		);
 	};
 
