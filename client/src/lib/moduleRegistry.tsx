@@ -51,30 +51,72 @@ const withSuspense = (Component: ModuleComponent | LazyModuleComponent) => (
 	</Suspense>
 );
 
-export const moduleRegistry: Record<string, React.ReactNode> = {
-	about: withSuspense(AboutModule),
-	projects: withSuspense(ProjectsModule),
-	journey: withSuspense(JourneyModule),
-	certifications: withSuspense(CertificationModule),
-	blog: withSuspense(BlogModule),
-	contact: withSuspense(ContactModule),
-	ailab: withSuspense(AILabModule),
-	profiles: withSuspense(CodingStatsModule),
+// Module configuration type
+type ModuleConfig = {
+	component: React.ReactNode;
+	icon: LucideIcon;
+	title: string;
 };
 
-export type AppModuleId = keyof typeof moduleRegistry;
+type ModuleId =
+	| 'about'
+	| 'projects'
+	| 'journey'
+	| 'certifications'
+	| 'blog'
+	| 'contact'
+	| 'ailab'
+	| 'profiles';
 
-const moduleMeta: Record<string, { title: string; icon: LucideIcon }> = {
-	about: { title: 'About Me', icon: Info },
-	projects: { title: 'Projects', icon: LayoutDashboard },
-	journey: { title: 'My Journey', icon: GitBranch },
-	certifications: { title: 'Certifications', icon: ShieldQuestion },
-	blog: { title: 'Blog', icon: Book },
-	contact: { title: 'Contact', icon: Contact },
-	ailab: { title: 'AI Lab', icon: Code },
-	profiles: { title: 'Coding Profiles', icon: Code },
-	terminal: { title: 'Terminal', icon: Terminal },
+const moduleConfigs: Record<ModuleId, ModuleConfig> = {
+	about: {
+		component: withSuspense(AboutModule),
+		icon: Info,
+		title: 'About Me',
+	},
+	projects: {
+		component: withSuspense(ProjectsModule),
+		icon: LayoutDashboard,
+		title: 'Projects',
+	},
+	journey: {
+		component: withSuspense(JourneyModule),
+		icon: GitBranch,
+		title: 'My Journey',
+	},
+	certifications: {
+		component: withSuspense(CertificationModule),
+		icon: ShieldQuestion,
+		title: 'Certifications',
+	},
+	blog: {
+		component: withSuspense(BlogModule),
+		icon: Book,
+		title: 'Blog',
+	},
+	contact: {
+		component: withSuspense(ContactModule),
+		icon: Contact,
+		title: 'Contact',
+	},
+	ailab: {
+		component: withSuspense(AILabModule),
+		icon: Code,
+		title: 'AI Lab',
+	},
+	profiles: {
+		component: withSuspense(CodingStatsModule),
+		icon: Code,
+		title: 'Coding Profiles',
+	},
 };
+
+// Legacy export for backward compatibility
+export const moduleRegistry = Object.fromEntries(
+	Object.entries(moduleConfigs).map(([id, config]) => [id, config.component]),
+) as Record<string, React.ReactNode>;
+
+export type AppModuleId = ModuleId;
 
 export const getModuleComponent = (id: string): React.ReactNode => {
 	// Handle complex paths: "about/whoami.md" -> "about"
@@ -83,13 +125,13 @@ export const getModuleComponent = (id: string): React.ReactNode => {
 };
 
 export function getModuleIcon(id: string): LucideIcon {
-	return moduleMeta[id]?.icon || Info;
+	return moduleConfigs[id as ModuleId]?.icon ?? Info;
 }
 
 export function getModuleTitle(id: string): string {
-	return moduleMeta[id]?.title || 'Unknown';
+	return moduleConfigs[id as ModuleId]?.title ?? 'Unknown';
 }
 
-export function isValidModuleId(id: string): boolean {
-	return id in moduleRegistry;
+export function isValidModuleId(id: string): id is ModuleId {
+	return id in moduleConfigs;
 }
