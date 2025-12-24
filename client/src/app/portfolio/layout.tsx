@@ -164,17 +164,25 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		const api = horizontalGroupRef.current;
 		if (!api) return;
 
-		if (sidebar.isCollapsed) api.setLayout({ sidebar: 0, main: 100 });
-		else api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
-	}, [sidebar.isCollapsed, hSizes]);
+		if (sidebar.isCollapsed) {
+			api.setLayout({ sidebar: 0, main: 100 });
+		} else {
+			api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sidebar.isCollapsed]);
 
 	useEffect(() => {
 		const api = verticalGroupRef.current;
 		if (!api) return;
 
-		if (terminal.isCollapsed) api.setLayout({ content: 100, terminal: 0 });
-		else api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
-	}, [terminal.isCollapsed, vSizes]);
+		if (terminal.isCollapsed) {
+			api.setLayout({ content: 100, terminal: 0 });
+		} else {
+			api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [terminal.isCollapsed]);
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
