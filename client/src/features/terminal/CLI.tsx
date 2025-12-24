@@ -15,7 +15,13 @@ export function CLI() {
 	const { handleKeyDown } = useCLI(terminalState);
 
 	return (
-		<div className="h-full w-full">
+		<div
+			className="h-full w-full transition-all duration-200"
+			style={{
+				opacity: terminal.isCollapsed ? 0 : 1,
+				filter: terminal.isCollapsed ? 'blur(2px)' : 'blur(0px)',
+			}}
+		>
 			<AnimatePresence mode="wait">
 				{terminal.isCollapsed ? (
 					<motion.div

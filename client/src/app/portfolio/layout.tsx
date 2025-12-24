@@ -56,7 +56,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
-	const COLLAPSE_EPS = 0.5;
+	const COLLAPSE_EPS = 2; // 2% threshold for collapse
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -276,7 +276,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
 					collapsible
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
-					className="overflow-hidden"
+					className="overflow-hidden bg-sidebar/40 border-r border-border/30 backdrop-blur-lg rounded-r-xl shadow-xl"
 				>
 					<Suspense fallback={<ComponentLoader />}>
 						<Sidebar />
@@ -393,7 +393,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
 									exit={{ opacity: 0, scale: 0.95 }}
-									className="fixed inset-0 z-[100] bg-black"
+									className="fixed inset-0 z-100 bg-black"
 								>
 									{renderModuleContent('maximized-content')}
 								</motion.div>

@@ -34,7 +34,13 @@ export const Sidebar: React.FC = () => {
 	);
 
 	return (
-		<div className="h-full w-full">
+		<div
+			className="h-full w-full transition-all duration-200"
+			style={{
+				opacity: sidebar.isCollapsed ? 0 : 1,
+				filter: sidebar.isCollapsed ? 'blur(2px)' : 'blur(0px)',
+			}}
+		>
 			<AnimatePresence mode="wait">
 				{sidebar.isCollapsed ? (
 					<motion.div
