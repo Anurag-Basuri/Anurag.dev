@@ -16,7 +16,7 @@ import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
+import { Panel, Group, Separator } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -187,24 +187,28 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					minSize={10}
 					maxSize={30}
 					collapsible
-					className="bg-sidebar/50 border-r border-border"
+					className="overflow-hidden"
 				>
-					<Suspense fallback={<ComponentLoader />}>
-						<Sidebar />
-					</Suspense>
+					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-sm rounded-r-lg shadow-lg">
+						<Suspense fallback={<ComponentLoader />}>
+							<Sidebar />
+						</Suspense>
+					</div>
 				</Panel>
 
-				<ResizeHandle />
+				<Separator />
 
 				{/* Main Content + Terminal */}
 				<Panel defaultSize={80} minSize={50}>
 					<Group orientation="vertical" className="h-full">
 						{/* Content Area */}
-						<Panel defaultSize={65} minSize={30}>
-							<div className="h-full w-full bg-card/80">{renderModuleContent()}</div>
+						<Panel defaultSize={65} minSize={30} className="overflow-hidden">
+							<div className="h-full w-full bg-card/80 backdrop-blur-sm rounded-lg shadow-xl border border-border/30">
+								{renderModuleContent()}
+							</div>
 						</Panel>
 
-						<ResizeHandle />
+						<Separator />
 
 						{/* Terminal */}
 						<Panel
@@ -212,11 +216,13 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							minSize={10}
 							maxSize={60}
 							collapsible
-							className="bg-card/80 border-t border-border"
+							className="overflow-hidden"
 						>
-							<Suspense fallback={<ComponentLoader height="h-32" />}>
-								<CLI />
-							</Suspense>
+							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-sm rounded-t-lg shadow-lg">
+								<Suspense fallback={<ComponentLoader height="h-32" />}>
+									<CLI />
+								</Suspense>
+							</div>
 						</Panel>
 					</Group>
 				</Panel>
