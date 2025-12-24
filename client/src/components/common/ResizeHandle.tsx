@@ -60,8 +60,8 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 				'transition-all duration-300 ease-out',
 
 				// v4 API: aria-orientation for direction (larger for easier grabbing)
-				'aria-[orientation=vertical]:w-5 aria-[orientation=vertical]:h-full aria-[orientation=vertical]:cursor-col-resize',
-				'aria-[orientation=horizontal]:h-5 aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:cursor-row-resize',
+				'aria-[orientation=vertical]:w-3 aria-[orientation=vertical]:h-full aria-[orientation=vertical]:cursor-col-resize',
+				'aria-[orientation=horizontal]:h-3 aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:cursor-row-resize',
 
 				// v4 API: data-separator state styling
 				'data-[separator=inactive]:bg-transparent',

@@ -235,15 +235,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					<motion.div
 						layout
 						initial={false}
-						animate={{
-							opacity: sidebar.isCollapsed ? 0 : 1,
-							scale: sidebar.isCollapsed ? 0.95 : 1,
-						}}
-						transition={{
-							layout: { type: 'spring', stiffness: 300, damping: 30, mass: 0.8 },
-							opacity: { duration: 0.2 },
-							scale: { duration: 0.2 },
-						}}
+						animate={{ opacity: sidebar.isCollapsed ? 0 : 1 }}
+						transition={PANEL_ANIMATION}
 						className={`h-full bg-sidebar/50 border-r ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-r-xl ${PANEL_DESIGN.shadow.default}`}
 					>
 						<Suspense fallback={<ComponentLoader />}>
@@ -299,7 +292,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 								layout
 								initial={false}
 								transition={PANEL_ANIMATION}
-								className={`h-full w-full bg-card/80 ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-xl ${PANEL_DESIGN.shadow.default} ${PANEL_DESIGN.shadow.hover}`}
+								className={`h-full w-full bg-card/80 ${PANEL_DESIGN.backdrop} rounded-xl ${PANEL_DESIGN.shadow.default} ${PANEL_DESIGN.shadow.hover}`}
 							>
 								{renderModuleContent()}
 							</motion.div>
@@ -309,8 +302,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							onDoubleClick={() => {
 								const api = verticalGroupRef.current;
 								if (api) {
-									api.setLayout({ content: 60, terminal: 40 });
-									setVSizes([60, 40]);
+									const [defaultC, defaultT] = PANEL_CONFIG.DEFAULTS.vertical;
+									api.setLayout({ content: defaultC, terminal: defaultT });
+									setVSizes(PANEL_CONFIG.DEFAULTS.vertical);
 								}
 							}}
 						/>
@@ -328,20 +322,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							<motion.div
 								layout
 								initial={false}
-								animate={{
-									opacity: terminal.isCollapsed ? 0 : 1,
-									scale: terminal.isCollapsed ? 0.95 : 1,
-								}}
-								transition={{
-									layout: {
-										type: 'spring',
-										stiffness: 300,
-										damping: 30,
-										mass: 0.8,
-									},
-									opacity: { duration: 0.2 },
-									scale: { duration: 0.2 },
-								}}
+								animate={{ opacity: terminal.isCollapsed ? 0 : 1 }}
+								transition={PANEL_ANIMATION}
 								className={`h-full bg-card/80 border-t ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-t-xl ${PANEL_DESIGN.shadow.default}`}
 							>
 								<ErrorBoundary>
