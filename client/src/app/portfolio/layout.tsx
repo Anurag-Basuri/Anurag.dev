@@ -284,7 +284,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				</Panel>
 
 				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
-				<ResizeHandle isCollapsed={sidebar.isCollapsed} />
+				<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
 				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
@@ -326,7 +326,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						</Panel>
 
 						{/* Vertical ResizeHandle - hides when terminal collapsed */}
-						<ResizeHandle isCollapsed={terminal.isCollapsed} />
+						<ResizeHandle isCollapsed={terminal.isCollapsed} orientation="horizontal" />
 
 						{/* Terminal */}
 						<Panel
@@ -347,7 +347,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					</Group>
 				</Panel>
 			</Group>
-		);
+		);	
 	};
 
 	const renderMobileLayout = () => {

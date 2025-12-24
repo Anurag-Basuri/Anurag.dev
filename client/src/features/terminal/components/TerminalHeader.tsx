@@ -32,7 +32,7 @@ export function TerminalHeader({
 			{/* Left: Traffic Lights + Title + Path */}
 			<div className="flex items-center gap-2">
 				<TerminalControls
-					onClose={onClose}
+					onClose={onToggleCollapse}
 					onMaximize={onMaximize}
 					onClearHistory={onClearHistory}
 				/>
