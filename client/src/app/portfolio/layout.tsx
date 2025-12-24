@@ -14,7 +14,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
-import { PANEL_CONFIG, PANEL_ANIMATION, PANEL_DESIGN } from '@/lib/constants';
+import { PANEL_CONFIG } from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
@@ -103,7 +103,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		},
 	]);
 
-	const [, setOpenFiles] = useAtom(openFilesAtom);
+	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
 	const getModuleIdFromPathname = useCallback((path: string): string | null => {
 		const segments = path.split('/').filter(Boolean);
@@ -138,6 +138,38 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		});
 	}, [pathname, currentModuleId, setOpenFiles]);
 
+	useEffect(() => {
+		// If user navigates to a module, ensure it isn't stuck minimized
+		if (currentModuleId) modulePanel.expand();
+	}, [currentModuleId, modulePanel]);
+
+	const getNextModuleAfterClose = useCallback(
+		(closingModuleId: string) => {
+			const remaining = openFiles.filter(f => f.moduleId !== closingModuleId);
+			return remaining.length > 0 ? remaining[remaining.length - 1].moduleId : null;
+		},
+		[openFiles],
+	);
+
+	const dismissCurrentModule = useCallback(() => {
+		if (!currentModuleId) return;
+
+		const nextModule = getNextModuleAfterClose(currentModuleId);
+
+		// Close behaves like taskbar close: remove from open files
+		setOpenFiles(prev => prev.filter(f => f.moduleId !== currentModuleId));
+
+		// If maximized, restore first so overlay doesn't stick
+		if (modulePanel.isMaximized) modulePanel.restore();
+
+		// Collapse state (even though we navigate away) keeps internal state consistent
+		modulePanel.collapse();
+
+		// Navigate like taskbar close
+		if (nextModule) router.push(`/portfolio/${nextModule}`);
+		else router.push('/portfolio');
+	}, [currentModuleId, getNextModuleAfterClose, modulePanel, router, setOpenFiles]);
+
 	const handleFileSelect = useCallback(
 		(item: FileSystemItem) => {
 			if (item.type === 'file' && item.moduleId) {
@@ -162,8 +194,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					onMaximize={
 						modulePanel.isMaximized ? modulePanel.restore : modulePanel.maximize
 					}
-					onMinimize={modulePanel.toggle}
-					onClose={() => router.push('/portfolio')}
+					onMinimize={dismissCurrentModule}
+					onClose={dismissCurrentModule}
 				/>
 				<div className="flex-1 min-h-0 relative">
 					{modulePanel.isCollapsed ? <EmptyState /> : children}
@@ -345,7 +377,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 									initial={{ opacity: 0, scale: 0.95 }}
 									animate={{ opacity: 1, scale: 1 }}
 									exit={{ opacity: 0, scale: 0.95 }}
-									className="fixed inset-0 z-100 bg-black"
+									className="fixed inset-0 z-[100] bg-black"
 								>
 									{renderModuleContent('maximized-content')}
 								</motion.div>
