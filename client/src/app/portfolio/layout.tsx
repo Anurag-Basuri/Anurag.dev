@@ -210,11 +210,24 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					collapsedSize="0%"
 					className="overflow-hidden"
 				>
-					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20 transition-all duration-300">
+					<motion.div
+						layout
+						initial={false}
+						animate={{
+							opacity: sidebar.isCollapsed ? 0 : 1,
+							scale: sidebar.isCollapsed ? 0.95 : 1,
+						}}
+						transition={{
+							layout: { type: 'spring', stiffness: 300, damping: 30 },
+							opacity: { duration: 0.2 },
+							scale: { duration: 0.2 },
+						}}
+						className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20"
+					>
 						<Suspense fallback={<ComponentLoader />}>
 							<Sidebar />
 						</Suspense>
-					</div>
+					</motion.div>
 				</Panel>
 
 				<ResizeHandle
@@ -251,9 +264,14 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							minSize="30%"
 							className="overflow-hidden min-h-0"
 						>
-							<div className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 transition-all duration-300 hover:shadow-emerald-500/10">
+							<motion.div
+								layout
+								initial={false}
+								transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+								className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 hover:shadow-emerald-500/10"
+							>
 								{renderModuleContent()}
-							</div>
+							</motion.div>
 						</Panel>
 
 						<ResizeHandle
@@ -276,11 +294,24 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							collapsedSize="0%"
 							className="overflow-hidden min-h-0"
 						>
-							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20 transition-all duration-300">
+							<motion.div
+								layout
+								initial={false}
+								animate={{
+									opacity: terminal.isCollapsed ? 0 : 1,
+									scale: terminal.isCollapsed ? 0.95 : 1,
+								}}
+								transition={{
+									layout: { type: 'spring', stiffness: 300, damping: 30 },
+									opacity: { duration: 0.2 },
+									scale: { duration: 0.2 },
+								}}
+								className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20"
+							>
 								<Suspense fallback={<ComponentLoader height="h-32" />}>
 									<CLI />
 								</Suspense>
-							</div>
+							</motion.div>
 						</Panel>
 					</Group>
 				</Panel>
