@@ -14,7 +14,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
-import { PANEL_CONFIG } from '@/lib/constants';
+import { PANEL_CONFIG, PANEL_ANIMATION, PANEL_DESIGN } from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
@@ -210,7 +210,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			<Group
 				id="portfolio-main-h"
 				orientation="horizontal"
-				className="h-full w-full gap-1"
+				className={`h-full w-full ${PANEL_DESIGN.gap}`}
 				groupRef={horizontalGroupRef}
 				defaultLayout={{
 					sidebar: hSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.horizontal[0],
@@ -244,7 +244,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							opacity: { duration: 0.2 },
 							scale: { duration: 0.2 },
 						}}
-						className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20"
+						className={`h-full bg-sidebar/50 border-r ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-r-xl ${PANEL_DESIGN.shadow.default}`}
 					>
 						<Suspense fallback={<ComponentLoader />}>
 							<Sidebar />
@@ -273,7 +273,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					<Group
 						id="portfolio-main-v"
 						orientation="vertical"
-						className="h-full gap-1"
+						className={`h-full ${PANEL_DESIGN.gap}`}
 						groupRef={verticalGroupRef}
 						defaultLayout={{
 							content: vSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.vertical[0],
@@ -298,8 +298,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							<motion.div
 								layout
 								initial={false}
-								transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-								className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 hover:shadow-emerald-500/10"
+								transition={PANEL_ANIMATION}
+								className={`h-full w-full bg-card/80 ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-xl ${PANEL_DESIGN.shadow.default} ${PANEL_DESIGN.shadow.hover}`}
 							>
 								{renderModuleContent()}
 							</motion.div>
@@ -342,7 +342,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 									opacity: { duration: 0.2 },
 									scale: { duration: 0.2 },
 								}}
-								className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20"
+								className={`h-full bg-card/80 border-t ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-t-xl ${PANEL_DESIGN.shadow.default}`}
 							>
 								<ErrorBoundary>
 									<Suspense fallback={<ComponentLoader height="h-32" />}>

@@ -38,3 +38,36 @@ export const PANEL_CONFIG = {
 		vertical: [60, 40] as [number, number],
 	},
 } as const;
+
+/**
+ * Unified animation configuration for panels
+ * Ensures consistent, smooth transitions across all panels
+ */
+export const PANEL_ANIMATION = {
+	layout: {
+		type: 'spring' as const,
+		stiffness: 280,
+		damping: 28,
+		mass: 1.2,
+	},
+	opacity: {
+		duration: 0.12,
+		ease: [0.4, 0, 0.2, 1] as [number, number, number, number], // Cubic ease-out
+	},
+} as const;
+
+/**
+ * Design tokens for panel styling consistency
+ */
+export const PANEL_DESIGN = {
+	border: {
+		opacity: 'border-border/50',
+		width: 'border',
+	},
+	shadow: {
+		default: 'shadow-2xl shadow-black/20',
+		hover: 'hover:shadow-emerald-500/10',
+	},
+	backdrop: 'backdrop-blur-sm', // Reduced from md for performance
+	gap: 'gap-2', // 8px instead of 4px
+} as const;
