@@ -19,7 +19,6 @@ import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
-import { PanelContainer } from '@/components/layout/PanelContainer';
 import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -279,14 +278,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
 					className="overflow-hidden"
 				>
-					<PanelContainer
-						isCollapsed={sidebar.isCollapsed}
-						className="bg-sidebar/40 border-r border-border/30 backdrop-blur-lg rounded-r-xl shadow-xl"
-					>
-						<Suspense fallback={<ComponentLoader />}>
-							<Sidebar />
-						</Suspense>
-					</PanelContainer>
+					<Suspense fallback={<ComponentLoader />}>
+						<Sidebar />
+					</Suspense>
 				</Panel>
 
 				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
@@ -328,9 +322,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
 							className="overflow-hidden min-h-0"
 						>
-							<PanelContainer className="bg-card/80 backdrop-blur-xl rounded-xl shadow-xl border border-border/20">
-								{renderModuleContent()}
-							</PanelContainer>
+							{renderModuleContent()}
 						</Panel>
 
 						{/* Vertical ResizeHandle - hides when terminal collapsed */}
@@ -346,16 +338,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
 							className="overflow-hidden min-h-0"
 						>
-							<PanelContainer
-								isCollapsed={terminal.isCollapsed}
-								className="bg-card/70 border-t border-border/30 backdrop-blur-xl rounded-t-xl shadow-xl"
-							>
-								<ErrorBoundary>
-									<Suspense fallback={<ComponentLoader height="h-32" />}>
-										<CLI />
-									</Suspense>
-								</ErrorBoundary>
-							</PanelContainer>
+							<ErrorBoundary>
+								<Suspense fallback={<ComponentLoader height="h-32" />}>
+									<CLI />
+								</Suspense>
+							</ErrorBoundary>
 						</Panel>
 					</Group>
 				</Panel>
