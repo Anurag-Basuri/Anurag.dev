@@ -20,3 +20,21 @@ export const ANIMATION_DURATIONS = {
 	normal: 0.2,
 	slow: 0.3,
 } as const;
+
+/**
+ * Panel size constraints and defaults for resizable layout
+ */
+export const PANEL_CONFIG = {
+	HORIZONTAL: {
+		SIDEBAR: { defaultSize: '20%', minSize: '10%', maxSize: '30%', collapsedSize: '0%' },
+		MAIN: { defaultSize: '80%', minSize: '50%' },
+	},
+	VERTICAL: {
+		CONTENT: { defaultSize: '65%', minSize: '30%' },
+		TERMINAL: { defaultSize: '35%', minSize: '10%', maxSize: '60%', collapsedSize: '0%' },
+	},
+	DEFAULTS: {
+		horizontal: [20, 80] as [number, number],
+		vertical: [60, 40] as [number, number],
+	},
+} as const;
