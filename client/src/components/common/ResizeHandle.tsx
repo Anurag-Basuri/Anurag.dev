@@ -42,57 +42,51 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 				className,
 			)}
 		>
-			{/* Rectangular grip with 6 dots (2x3 grid) */}
+			{/* 6-dot grip pattern: 2 columns × 3 rows (matches user's reference) */}
 			<motion.div
 				animate={{
-					opacity: isHovered ? 1 : 0.4,
-					scale: isHovered ? 1.1 : 1,
+					opacity: isHovered ? 1 : 0.5,
+					scale: isHovered ? 1.05 : 1,
 				}}
-				transition={{ duration: 0.15 }}
+				transition={{ duration: 0.2 }}
 				className={cn(
-					'absolute rounded-md',
-					'bg-linear-to-br from-border/60 to-border/40',
-					'backdrop-blur-sm',
-					'flex items-center justify-center',
-					'shadow-sm',
+					'absolute flex gap-1',
 
-					// Horizontal orientation: wide rectangle
-					'aria-[orientation=horizontal]:w-12 aria-[orientation=horizontal]:h-1',
-					'aria-[orientation=horizontal]:flex-row aria-[orientation=horizontal]:gap-1.5',
+					// Horizontal handle: 2 columns × 3 rows (vertical dots)
+					'aria-[orientation=horizontal]:flex-row',
 
-					// Vertical orientation: tall rectangle
-					'aria-[orientation=vertical]:w-1 aria-[orientation=vertical]:h-12',
-					'aria-[orientation=vertical]:flex-col aria-[orientation=vertical]:gap-1.5',
+					// Vertical handle: 3 rows × 2 columns (horizontal dots, rotated 90°)
+					'aria-[orientation=vertical]:flex-col',
 				)}
 			>
-				{/* 6 dots in 2x3 grid pattern */}
-				<div
-					className={cn(
-						'flex gap-0.5',
-						'aria-[orientation=horizontal]:flex-col',
-						'aria-[orientation=vertical]:flex-row',
-					)}
-				>
-					{/* Column/Row 1 */}
+				{/* Column/Row 1 */}
+				<div className="flex flex-col gap-1">
 					{[0, 1, 2].map(i => (
 						<div
-							key={`a-${i}`}
-							className="w-0.5 h-0.5 rounded-full bg-foreground/30 group-hover:bg-emerald-400/60"
+							key={`col1-${i}`}
+							className={cn(
+								'rounded-full transition-colors duration-200',
+								'w-1 h-1',
+								'bg-foreground/40',
+								'group-hover:bg-emerald-400/70',
+								'group-active:bg-emerald-300',
+							)}
 						/>
 					))}
 				</div>
-				<div
-					className={cn(
-						'flex gap-0.5',
-						'aria-[orientation=horizontal]:flex-col',
-						'aria-[orientation=vertical]:flex-row',
-					)}
-				>
-					{/* Column/Row 2 */}
+
+				{/* Column/Row 2 */}
+				<div className="flex flex-col gap-1">
 					{[0, 1, 2].map(i => (
 						<div
-							key={`b-${i}`}
-							className="w-0.5 h-0.5 rounded-full bg-foreground/30 group-hover:bg-emerald-400/60"
+							key={`col2-${i}`}
+							className={cn(
+								'rounded-full transition-colors duration-200',
+								'w-1 h-1',
+								'bg-foreground/40',
+								'group-hover:bg-emerald-400/70',
+								'group-active:bg-emerald-300',
+							)}
 						/>
 					))}
 				</div>

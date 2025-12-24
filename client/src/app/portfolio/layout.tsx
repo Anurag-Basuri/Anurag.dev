@@ -210,7 +210,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			<Group
 				id="portfolio-main-h"
 				orientation="horizontal"
-				className="h-full w-full gap-2"
+				className="h-full w-full gap-1"
 				groupRef={horizontalGroupRef}
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
 				onLayoutChange={(layout: Layout) => {
@@ -258,7 +258,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					<Group
 						id="portfolio-main-v"
 						orientation="vertical"
-						className="h-full gap-2"
+						className="h-full gap-1"
 						groupRef={verticalGroupRef}
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
 						onLayoutChange={(layout: Layout) => {
