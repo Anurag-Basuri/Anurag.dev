@@ -207,135 +207,137 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		if (isMobile) return null;
 
 		return (
-			<Group
-				id="portfolio-main-h"
-				orientation="horizontal"
-				className={`h-full w-full ${PANEL_DESIGN.gap}`}
-				groupRef={horizontalGroupRef}
-				defaultLayout={{
-					sidebar: hSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.horizontal[0],
-					main: hSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.horizontal[1],
-				}}
-				onLayoutChange={(layout: Layout) => {
-					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
-						setHSizes([layout.sidebar, layout.main]);
-					}
-				}}
-			>
-				{/* Sidebar */}
-				<Panel
-					id="sidebar"
-					defaultSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize}
-					minSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize}
-					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
-					collapsible
-					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
-					className="overflow-hidden"
-				>
-					<motion.div
-						layout
-						initial={false}
-						animate={{ opacity: sidebar.isCollapsed ? 0 : 1 }}
-						transition={PANEL_ANIMATION}
-						className={`h-full bg-sidebar/50 border-r ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-r-xl ${PANEL_DESIGN.shadow.default}`}
-					>
-						<Suspense fallback={<ComponentLoader />}>
-							<Sidebar />
-						</Suspense>
-					</motion.div>
-				</Panel>
-
-				<ResizeHandle
-					onDoubleClick={() => {
-						const api = horizontalGroupRef.current;
-						if (api) {
-							const [defaultH, defaultM] = PANEL_CONFIG.DEFAULTS.horizontal;
-							api.setLayout({ sidebar: defaultH, main: defaultM });
-							setHSizes(PANEL_CONFIG.DEFAULTS.horizontal);
+			<div className="h-full w-full p-2 bg-background/50">
+				<Group
+					id="portfolio-main-h"
+					orientation="horizontal"
+					className={`h-full w-full ${PANEL_DESIGN.gap}`}
+					groupRef={horizontalGroupRef}
+					defaultLayout={{
+						sidebar: hSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.horizontal[0],
+						main: hSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.horizontal[1],
+					}}
+					onLayoutChange={(layout: Layout) => {
+						if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
+							setHSizes([layout.sidebar, layout.main]);
 						}
 					}}
-				/>
-
-				{/* Main Content + Terminal */}
-				<Panel
-					id="main"
-					defaultSize={PANEL_CONFIG.HORIZONTAL.MAIN.defaultSize}
-					minSize={PANEL_CONFIG.HORIZONTAL.MAIN.minSize}
-					className="min-w-0"
 				>
-					<Group
-						id="portfolio-main-v"
-						orientation="vertical"
-						className={`h-full ${PANEL_DESIGN.gap}`}
-						groupRef={verticalGroupRef}
-						defaultLayout={{
-							content: vSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.vertical[0],
-							terminal: vSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.vertical[1],
-						}}
-						onLayoutChange={(layout: Layout) => {
-							if (
-								typeof layout.content === 'number' &&
-								typeof layout.terminal === 'number'
-							) {
-								setVSizes([layout.content, layout.terminal]);
+					{/* Sidebar */}
+					<Panel
+						id="sidebar"
+						defaultSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize}
+						minSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize}
+						maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
+						collapsible
+						collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
+						className="overflow-hidden"
+					>
+						<motion.div
+							layout
+							initial={false}
+							animate={{ opacity: sidebar.isCollapsed ? 0 : 1 }}
+							transition={PANEL_ANIMATION}
+							className={`h-full bg-sidebar/50 border-r ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-r-xl ${PANEL_DESIGN.shadow.default}`}
+						>
+							<Suspense fallback={<ComponentLoader />}>
+								<Sidebar />
+							</Suspense>
+						</motion.div>
+					</Panel>
+
+					<ResizeHandle
+						onDoubleClick={() => {
+							const api = horizontalGroupRef.current;
+							if (api) {
+								const [defaultH, defaultM] = PANEL_CONFIG.DEFAULTS.horizontal;
+								api.setLayout({ sidebar: defaultH, main: defaultM });
+								setHSizes(PANEL_CONFIG.DEFAULTS.horizontal);
 							}
 						}}
-					>
-						{/* Content Area */}
-						<Panel
-							id="content"
-							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
-							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
-							className="overflow-hidden min-h-0"
-						>
-							<motion.div
-								layout
-								initial={false}
-								transition={PANEL_ANIMATION}
-								className={`h-full w-full bg-card/80 ${PANEL_DESIGN.backdrop} rounded-xl ${PANEL_DESIGN.shadow.default} ${PANEL_DESIGN.shadow.hover}`}
-							>
-								{renderModuleContent()}
-							</motion.div>
-						</Panel>
+					/>
 
-						<ResizeHandle
-							onDoubleClick={() => {
-								const api = verticalGroupRef.current;
-								if (api) {
-									const [defaultC, defaultT] = PANEL_CONFIG.DEFAULTS.vertical;
-									api.setLayout({ content: defaultC, terminal: defaultT });
-									setVSizes(PANEL_CONFIG.DEFAULTS.vertical);
+					{/* Main Content + Terminal */}
+					<Panel
+						id="main"
+						defaultSize={PANEL_CONFIG.HORIZONTAL.MAIN.defaultSize}
+						minSize={PANEL_CONFIG.HORIZONTAL.MAIN.minSize}
+						className="min-w-0"
+					>
+						<Group
+							id="portfolio-main-v"
+							orientation="vertical"
+							className={`h-full ${PANEL_DESIGN.gap}`}
+							groupRef={verticalGroupRef}
+							defaultLayout={{
+								content: vSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.vertical[0],
+								terminal: vSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.vertical[1],
+							}}
+							onLayoutChange={(layout: Layout) => {
+								if (
+									typeof layout.content === 'number' &&
+									typeof layout.terminal === 'number'
+								) {
+									setVSizes([layout.content, layout.terminal]);
 								}
 							}}
-						/>
-
-						{/* Terminal */}
-						<Panel
-							id="terminal"
-							defaultSize={PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize}
-							minSize={PANEL_CONFIG.VERTICAL.TERMINAL.minSize}
-							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
-							collapsible
-							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
-							className="overflow-hidden min-h-0"
 						>
-							<motion.div
-								layout
-								initial={false}
-								animate={{ opacity: terminal.isCollapsed ? 0 : 1 }}
-								transition={PANEL_ANIMATION}
-								className={`h-full bg-card/80 border-t ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-t-xl ${PANEL_DESIGN.shadow.default}`}
+							{/* Content Area */}
+							<Panel
+								id="content"
+								defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
+								minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
+								className="overflow-hidden min-h-0"
 							>
-								<ErrorBoundary>
-									<Suspense fallback={<ComponentLoader height="h-32" />}>
-										<CLI />
-									</Suspense>
-								</ErrorBoundary>
-							</motion.div>
-						</Panel>
-					</Group>
-				</Panel>
-			</Group>
+								<motion.div
+									layout
+									initial={false}
+									transition={PANEL_ANIMATION}
+									className={`h-full w-full bg-card/80 ${PANEL_DESIGN.backdrop} rounded-xl ${PANEL_DESIGN.shadow.default} ${PANEL_DESIGN.shadow.hover}`}
+								>
+									{renderModuleContent()}
+								</motion.div>
+							</Panel>
+
+							<ResizeHandle
+								onDoubleClick={() => {
+									const api = verticalGroupRef.current;
+									if (api) {
+										const [defaultC, defaultT] = PANEL_CONFIG.DEFAULTS.vertical;
+										api.setLayout({ content: defaultC, terminal: defaultT });
+										setVSizes(PANEL_CONFIG.DEFAULTS.vertical);
+									}
+								}}
+							/>
+
+							{/* Terminal */}
+							<Panel
+								id="terminal"
+								defaultSize={PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize}
+								minSize={PANEL_CONFIG.VERTICAL.TERMINAL.minSize}
+								maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
+								collapsible
+								collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
+								className="overflow-hidden min-h-0"
+							>
+								<motion.div
+									layout
+									initial={false}
+									animate={{ opacity: terminal.isCollapsed ? 0 : 1 }}
+									transition={PANEL_ANIMATION}
+									className={`h-full bg-card/80 border-t ${PANEL_DESIGN.border.opacity} ${PANEL_DESIGN.backdrop} rounded-t-xl ${PANEL_DESIGN.shadow.default}`}
+								>
+									<ErrorBoundary>
+										<Suspense fallback={<ComponentLoader height="h-32" />}>
+											<CLI />
+										</Suspense>
+									</ErrorBoundary>
+								</motion.div>
+							</Panel>
+						</Group>
+					</Panel>
+				</Group>
+			</div>
 		);
 	};
 
