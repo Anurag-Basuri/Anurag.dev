@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils';
 interface ResizeHandleProps {
 	className?: string;
 	id?: string;
-	isCollapsed?: boolean; // NEW: Track if adjacent panel is collapsed
+	isCollapsed?: boolean;
+	orientation?: 'horizontal' | 'vertical';
 }
 
 /**
@@ -15,8 +16,16 @@ interface ResizeHandleProps {
  * - Hides when adjacent panel is collapsed
  * - Shows white line indicator when collapsed
  * - Centered in gap between panels
+ * - Adapts to horizontal/vertical orientation
  */
-function ResizeHandle({ className, id, isCollapsed = false }: ResizeHandleProps) {
+function ResizeHandle({
+	className,
+	id,
+	isCollapsed = false,
+	orientation = 'vertical', // Default to vertical (for horizontal split)
+}: ResizeHandleProps) {
+	const isHorizontal = orientation === 'horizontal';
+
 	return (
 		<>
 			{/* Collapsed indicator: subtle white line */}
@@ -27,10 +36,10 @@ function ResizeHandle({ className, id, isCollapsed = false }: ResizeHandleProps)
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						className={cn(
-							'absolute z-10',
-							'bg-white/20',
-							'aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:top-1/2',
-							'aria-[orientation=vertical]:w-px aria-[orientation=vertical]:h-full aria-[orientation=vertical]:left-1/2',
+							'absolute z-10 bg-white/20',
+							isHorizontal
+								? 'h-px w-full top-1/2 -translate-y-1/2'
+								: 'w-px h-full left-1/2 -translate-x-1/2',
 						)}
 					/>
 				)}
@@ -45,11 +54,11 @@ function ResizeHandle({ className, id, isCollapsed = false }: ResizeHandleProps)
 							'group relative flex items-center justify-center',
 							'transition-colors duration-200',
 
-							// Horizontal handle (for vertical split)
-							'aria-[orientation=horizontal]:h-2 aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:cursor-row-resize',
+							// Horizontal handle (for vertical split - top/bottom panels)
+							isHorizontal && 'h-2 w-full cursor-row-resize',
 
-							// Vertical handle (for horizontal split)
-							'aria-[orientation=vertical]:w-2 aria-[orientation=vertical]:h-full aria-[orientation=vertical]:cursor-col-resize',
+							// Vertical handle (for horizontal split - left/right panels)
+							!isHorizontal && 'w-2 h-full cursor-col-resize',
 
 							// Hover state
 							'hover:bg-emerald-500/5',
@@ -65,14 +74,14 @@ function ResizeHandle({ className, id, isCollapsed = false }: ResizeHandleProps)
 							className={cn(
 								'absolute flex gap-1',
 
-								// Horizontal handle: 2 columns × 3 rows (vertical dots)
-								'aria-[orientation=horizontal]:flex-row',
+								// Horizontal handle: dots arranged horizontally (2 rows × 3 cols)
+								isHorizontal && 'flex-row',
 
-								// Vertical handle: 2 columns × 3 rows (rotated)
-								'aria-[orientation=vertical]:flex-col',
+								// Vertical handle: dots arranged vertically (2 cols × 3 rows)
+								!isHorizontal && 'flex-col',
 							)}
 						>
-							{/* Column 1 */}
+							{/* Column/Row 1 */}
 							<div className="flex flex-col gap-1">
 								{[0, 1, 2].map(i => (
 									<div
@@ -88,7 +97,7 @@ function ResizeHandle({ className, id, isCollapsed = false }: ResizeHandleProps)
 								))}
 							</div>
 
-							{/* Column 2 */}
+							{/* Column/Row 2 */}
 							<div className="flex flex-col gap-1">
 								{[0, 1, 2].map(i => (
 									<div
