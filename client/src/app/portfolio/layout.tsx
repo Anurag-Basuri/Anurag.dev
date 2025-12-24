@@ -71,14 +71,23 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		{
 			key: 'b',
 			ctrl: true,
-			handler: () => (sidebar.isCollapsed ? sidebar.expand() : sidebar.collapse()),
+			handler: () => sidebar.toggle(),
 			description: 'Toggle sidebar',
 		},
 		{
-			key: '`',
+			key: 'j',
 			ctrl: true,
-			handler: () => (terminal.isCollapsed ? terminal.expand() : terminal.collapse()),
+			handler: () => terminal.toggle(),
 			description: 'Toggle terminal',
+		},
+		{
+			key: 'Escape',
+			handler: () => {
+				if (modulePanel.isMaximized) {
+					modulePanel.restore();
+				}
+			},
+			description: 'Close maximized panel',
 		},
 		{
 			key: 'k',
@@ -231,7 +240,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							scale: sidebar.isCollapsed ? 0.95 : 1,
 						}}
 						transition={{
-							layout: { type: 'spring', stiffness: 300, damping: 30 },
+							layout: { type: 'spring', stiffness: 300, damping: 30, mass: 0.8 },
 							opacity: { duration: 0.2 },
 							scale: { duration: 0.2 },
 						}}
@@ -324,7 +333,12 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 									scale: terminal.isCollapsed ? 0.95 : 1,
 								}}
 								transition={{
-									layout: { type: 'spring', stiffness: 300, damping: 30 },
+									layout: {
+										type: 'spring',
+										stiffness: 300,
+										damping: 30,
+										mass: 0.8,
+									},
 									opacity: { duration: 0.2 },
 									scale: { duration: 0.2 },
 								}}

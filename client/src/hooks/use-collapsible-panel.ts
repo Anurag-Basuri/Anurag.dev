@@ -77,11 +77,25 @@ export function useCollapsiblePanel({
 		if (type === 'module') {
 			setModuleMaximized(true);
 			setModuleMinimized(false);
-		} else {
+		} else if (type === 'sidebar') {
+			// When sidebar maximizes, collapse terminal
+			setTerminalCollapsed(true);
+			setIsCollapsed(false);
+		} else if (type === 'terminal') {
+			// When terminal maximizes, collapse sidebar
+			setSidebarCollapsed(true);
 			setIsCollapsed(false);
 		}
 		onExpand?.();
-	}, [onExpand, setIsCollapsed, setModuleMaximized, setModuleMinimized, type]);
+	}, [
+		onExpand,
+		setIsCollapsed,
+		setModuleMaximized,
+		setModuleMinimized,
+		setSidebarCollapsed,
+		setTerminalCollapsed,
+		type,
+	]);
 
 	const restore = useCallback(() => {
 		if (type === 'module') {
