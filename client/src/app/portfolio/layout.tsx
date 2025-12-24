@@ -242,16 +242,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					</motion.div>
 				</Panel>
 
-				<ResizeHandle
-					onDoubleClick={() => {
-						const api = horizontalGroupRef.current;
-						if (api) {
-							const [defaultH, defaultM] = PANEL_CONFIG.DEFAULTS.horizontal;
-							api.setLayout({ sidebar: defaultH, main: defaultM });
-							setHSizes(PANEL_CONFIG.DEFAULTS.horizontal);
-						}
-					}}
-				/>
+				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
+				<ResizeHandle isCollapsed={sidebar.isCollapsed} />
 
 				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
@@ -287,16 +279,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							</motion.div>
 						</Panel>
 
-						<ResizeHandle
-							onDoubleClick={() => {
-								const api = verticalGroupRef.current;
-								if (api) {
-									const [defaultC, defaultT] = PANEL_CONFIG.DEFAULTS.vertical;
-									api.setLayout({ content: defaultC, terminal: defaultT });
-									setVSizes(PANEL_CONFIG.DEFAULTS.vertical);
-								}
-							}}
-						/>
+						{/* Vertical ResizeHandle - hides when terminal collapsed */}
+						<ResizeHandle isCollapsed={terminal.isCollapsed} />
 
 						{/* Terminal */}
 						<Panel
