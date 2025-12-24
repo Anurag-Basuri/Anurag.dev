@@ -16,7 +16,7 @@ import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { Panel, Group, Separator } from '@/components/common/ResizeHandle';
+import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -180,45 +180,45 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		if (isMobile) return null;
 
 		return (
-			<Group orientation="horizontal" className="h-full w-full">
+			<Group orientation="horizontal" className="h-full w-full gap-1">
 				{/* Sidebar */}
 				<Panel
 					defaultSize={20}
 					minSize={10}
-					maxSize={30}
+					maxSize={500}
 					collapsible
 					className="overflow-hidden"
 				>
-					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-sm rounded-r-lg shadow-lg">
+					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20 transition-all duration-300">
 						<Suspense fallback={<ComponentLoader />}>
 							<Sidebar />
 						</Suspense>
 					</div>
 				</Panel>
 
-				<Separator />
+				<ResizeHandle />
 
 				{/* Main Content + Terminal */}
 				<Panel defaultSize={80} minSize={50}>
-					<Group orientation="vertical" className="h-full">
+					<Group orientation="vertical" className="h-full gap-1">
 						{/* Content Area */}
 						<Panel defaultSize={65} minSize={30} className="overflow-hidden">
-							<div className="h-full w-full bg-card/80 backdrop-blur-sm rounded-lg shadow-xl border border-border/30">
+							<div className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 transition-all duration-300 hover:shadow-emerald-500/10">
 								{renderModuleContent()}
 							</div>
 						</Panel>
 
-						<Separator />
+						<ResizeHandle />
 
 						{/* Terminal */}
 						<Panel
 							defaultSize={35}
 							minSize={10}
-							maxSize={60}
+							maxSize={500}
 							collapsible
 							className="overflow-hidden"
 						>
-							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-sm rounded-t-lg shadow-lg">
+							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20 transition-all duration-300">
 								<Suspense fallback={<ComponentLoader height="h-32" />}>
 									<CLI />
 								</Suspense>
