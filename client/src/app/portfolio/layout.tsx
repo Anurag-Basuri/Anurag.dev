@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
+import type { ImperativePanelGroupHandle } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -58,12 +59,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
-	type PanelGroupApi = {
-		setLayout: (layout: Record<string, number>) => void;
-	};
-
-	const horizontalGroupRef = useRef<PanelGroupApi | null>(null);
-	const verticalGroupRef = useRef<PanelGroupApi | null>(null);
+	const horizontalGroupRef = useRef<ImperativePanelGroupHandle | null>(null);
+	const verticalGroupRef = useRef<ImperativePanelGroupHandle | null>(null);
 
 	useKeyboardShortcuts([
 		{
@@ -164,29 +161,36 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		const api = horizontalGroupRef.current;
 		if (!api) return;
 
-		if (sidebar.isCollapsed) api.setLayout({ sidebar: 6, main: 94 });
-		else api.setLayout({ sidebar: 20, main: 80 });
+		// Panel order: [Sidebar, Main]
+		if (sidebar.isCollapsed) api.setLayout([0, 100]);
+		else api.setLayout([20, 80]);
 	}, [sidebar.isCollapsed]);
 
 	useEffect(() => {
 		const api = verticalGroupRef.current;
 		if (!api) return;
 
-		if (terminal.isCollapsed) api.setLayout({ content: 100, terminal: 0 });
-		else api.setLayout({ content: 60, terminal: 40 });
+		// Panel order: [Content, Terminal]
+		if (terminal.isCollapsed) api.setLayout([100, 0]);
+		else api.setLayout([60, 40]);
 	}, [terminal.isCollapsed]);
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
 		return (
-			<Group orientation="horizontal" className="h-full w-full gap-1">
+			<Group
+				orientation="horizontal"
+				className="h-full w-full gap-1"
+				groupRef={horizontalGroupRef}
+			>
 				{/* Sidebar */}
 				<Panel
 					defaultSize={20}
 					minSize={10}
-					maxSize={500}
+					maxSize={30}
 					collapsible
+					collapsedSize={0}
 					className="overflow-hidden"
 				>
 					<div className="h-full bg-sidebar/50 border-r border-border/50 backdrop-blur-md rounded-r-xl shadow-2xl shadow-black/20 transition-all duration-300">
@@ -200,7 +204,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 				{/* Main Content + Terminal */}
 				<Panel defaultSize={80} minSize={50}>
-					<Group orientation="vertical" className="h-full gap-1">
+					<Group
+						orientation="vertical"
+						className="h-full gap-1"
+						groupRef={verticalGroupRef}
+					>
 						{/* Content Area */}
 						<Panel defaultSize={65} minSize={30} className="overflow-hidden">
 							<div className="h-full w-full bg-linear-to-br from-card/90 to-card/70 backdrop-blur-lg rounded-xl shadow-2xl border border-border/40 transition-all duration-300 hover:shadow-emerald-500/10">
@@ -214,8 +222,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						<Panel
 							defaultSize={35}
 							minSize={10}
-							maxSize={500}
+							maxSize={60}
 							collapsible
+							collapsedSize={0}
 							className="overflow-hidden"
 						>
 							<div className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20 transition-all duration-300">
