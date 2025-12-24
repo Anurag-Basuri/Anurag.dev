@@ -14,6 +14,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
+import { PANEL_CONFIG } from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
@@ -44,6 +45,7 @@ const ModuleHeader = dynamic(
 	{ ssr: false },
 );
 
+// Component loaders at module scope
 const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
 	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
 		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -160,29 +162,37 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		);
 	};
 
+	// Synchronize horizontal panel layout with sidebar collapse state
 	useEffect(() => {
 		const api = horizontalGroupRef.current;
 		if (!api) return;
 
+		const [defaultH] = PANEL_CONFIG.DEFAULTS.horizontal;
 		if (sidebar.isCollapsed) {
 			api.setLayout({ sidebar: 0, main: 100 });
 		} else {
-			api.setLayout({ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 });
+			api.setLayout({
+				sidebar: hSizes?.[0] ?? defaultH,
+				main: hSizes?.[1] ?? 100 - defaultH,
+			});
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [sidebar.isCollapsed]);
+	}, [sidebar.isCollapsed, hSizes]);
 
+	// Synchronize vertical panel layout with terminal collapse state
 	useEffect(() => {
 		const api = verticalGroupRef.current;
 		if (!api) return;
 
+		const [defaultV] = PANEL_CONFIG.DEFAULTS.vertical;
 		if (terminal.isCollapsed) {
 			api.setLayout({ content: 100, terminal: 0 });
 		} else {
-			api.setLayout({ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 });
+			api.setLayout({
+				content: vSizes?.[0] ?? defaultV,
+				terminal: vSizes?.[1] ?? 100 - defaultV,
+			});
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [terminal.isCollapsed]);
+	}, [terminal.isCollapsed, vSizes]);
 
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
@@ -193,7 +203,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				orientation="horizontal"
 				className="h-full w-full gap-1"
 				groupRef={horizontalGroupRef}
-				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
+				defaultLayout={{
+					sidebar: hSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.horizontal[0],
+					main: hSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.horizontal[1],
+				}}
 				onLayoutChange={(layout: Layout) => {
 					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
 						setHSizes([layout.sidebar, layout.main]);
@@ -203,11 +216,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				{/* Sidebar */}
 				<Panel
 					id="sidebar"
-					defaultSize="20%"
-					minSize="10%"
-					maxSize="30%"
+					defaultSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize}
+					minSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize}
+					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
 					collapsible
-					collapsedSize="0%"
+					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
 					className="overflow-hidden"
 				>
 					<motion.div
@@ -234,20 +247,29 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					onDoubleClick={() => {
 						const api = horizontalGroupRef.current;
 						if (api) {
-							api.setLayout({ sidebar: 20, main: 80 });
-							setHSizes([20, 80]);
+							const [defaultH, defaultM] = PANEL_CONFIG.DEFAULTS.horizontal;
+							api.setLayout({ sidebar: defaultH, main: defaultM });
+							setHSizes(PANEL_CONFIG.DEFAULTS.horizontal);
 						}
 					}}
 				/>
 
 				{/* Main Content + Terminal */}
-				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
+				<Panel
+					id="main"
+					defaultSize={PANEL_CONFIG.HORIZONTAL.MAIN.defaultSize}
+					minSize={PANEL_CONFIG.HORIZONTAL.MAIN.minSize}
+					className="min-w-0"
+				>
 					<Group
 						id="portfolio-main-v"
 						orientation="vertical"
 						className="h-full gap-1"
 						groupRef={verticalGroupRef}
-						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
+						defaultLayout={{
+							content: vSizes?.[0] ?? PANEL_CONFIG.DEFAULTS.vertical[0],
+							terminal: vSizes?.[1] ?? PANEL_CONFIG.DEFAULTS.vertical[1],
+						}}
 						onLayoutChange={(layout: Layout) => {
 							if (
 								typeof layout.content === 'number' &&
@@ -260,8 +282,8 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						{/* Content Area */}
 						<Panel
 							id="content"
-							defaultSize="65%"
-							minSize="30%"
+							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
+							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
 							className="overflow-hidden min-h-0"
 						>
 							<motion.div
@@ -287,11 +309,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						{/* Terminal */}
 						<Panel
 							id="terminal"
-							defaultSize="35%"
-							minSize="10%"
-							maxSize="60%"
+							defaultSize={PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize}
+							minSize={PANEL_CONFIG.VERTICAL.TERMINAL.minSize}
+							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
 							collapsible
-							collapsedSize="0%"
+							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
 							className="overflow-hidden min-h-0"
 						>
 							<motion.div

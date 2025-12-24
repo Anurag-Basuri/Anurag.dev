@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
 import { JotaiProvider } from '@/components/providers/jotai-provider';
-import { Toaster } from 'react-hot-toast';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({
