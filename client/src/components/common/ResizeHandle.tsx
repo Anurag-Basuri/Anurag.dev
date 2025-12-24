@@ -1,10 +1,9 @@
 'use client';
 
 import { Panel, Group, Separator } from 'react-resizable-panels';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { PANEL_DESIGN } from '@/lib/constants';
 
 interface ResizeHandleProps {
 	className?: string;
@@ -12,21 +11,12 @@ interface ResizeHandleProps {
 	onDoubleClick?: () => void;
 }
 
-// Industry-standard 6-dot grip ResizeHandle
+/**
+ * Industry-grade ResizeHandle with rectangular 6-dot grip pattern.
+ * Smaller, more subtle design that adapts to orientation.
+ */
 function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 	const [isHovered, setIsHovered] = useState(false);
-	const [isDragging, setIsDragging] = useState(false);
-	const [showTooltip, setShowTooltip] = useState(false);
-
-	// Show tooltip after brief hover, but only if not dragging
-	useEffect(() => {
-		if (isHovered && !isDragging) {
-			const timer = setTimeout(() => setShowTooltip(true), 800);
-			return () => clearTimeout(timer);
-		} else {
-			setShowTooltip(false);
-		}
-	}, [isHovered, isDragging]);
 
 	return (
 		<Separator
@@ -34,97 +24,91 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 			onDoubleClick={onDoubleClick}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
-			onMouseDown={() => setIsDragging(true)}
-			onMouseUp={() => setIsDragging(false)}
 			className={cn(
-				'group relative flex items-center justify-center z-20 outline-none',
-				'transition-all duration-200',
+				'group relative flex items-center justify-center z-20',
+				'transition-colors duration-200',
 
-				// Hit area sizing
-				// Horizontal group = Vertical Handle (Left/Right)
-				'data-[panel-group-direction=horizontal]:w-4 data-[panel-group-direction=horizontal]:h-full data-[panel-group-direction=horizontal]:cursor-col-resize',
-				// Vertical group = Horizontal Handle (Top/Bottom)
-				'data-[panel-group-direction=vertical]:h-4 data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:cursor-row-resize',
+				// Horizontal handle (for vertical split)
+				'aria-[orientation=horizontal]:h-2 aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:cursor-row-resize',
+				'aria-[orientation=horizontal]:hover:h-3',
 
-				// Visual feedback on the transparent separator track
-				'bg-transparent',
+				// Vertical handle (for horizontal split)
+				'aria-[orientation=vertical]:w-2 aria-[orientation=vertical]:h-full aria-[orientation=vertical]:cursor-col-resize',
+				'aria-[orientation=vertical]:hover:w-3',
+
+				// State-based background
+				'bg-transparent hover:bg-emerald-500/5 active:bg-emerald-500/10',
 
 				className,
 			)}
 		>
-			{/* The Visible Handle (The Pill) */}
+			{/* Rectangular grip with 6 dots (2x3 grid) */}
 			<motion.div
 				animate={{
-					backgroundColor: isDragging
-						? 'var(--primary)'
-						: isHovered
-						? 'var(--muted-foreground)'
-						: 'var(--border)',
-					scale: isDragging ? 1.05 : 1,
+					opacity: isHovered ? 1 : 0.4,
+					scale: isHovered ? 1.1 : 1,
 				}}
 				transition={{ duration: 0.15 }}
 				className={cn(
-					'relative flex items-center justify-center rounded-xs backdrop-blur-sm',
-					// Shape & Size
-					// Horizontal Direction -> Vertical Handle
-					'data-[panel-group-direction=horizontal]:w-1.5 data-[panel-group-direction=horizontal]:h-8',
-					// Vertical Direction -> Horizontal Handle
-					'data-[panel-group-direction=vertical]:h-1.5 data-[panel-group-direction=vertical]:w-8',
-					// Shadow for depth
+					'absolute rounded-md',
+					'bg-linear-to-br from-border/60 to-border/40',
+					'backdrop-blur-sm',
+					'flex items-center justify-center',
 					'shadow-sm',
+
+					// Horizontal orientation: wide rectangle
+					'aria-[orientation=horizontal]:w-12 aria-[orientation=horizontal]:h-1',
+					'aria-[orientation=horizontal]:flex-row aria-[orientation=horizontal]:gap-1.5',
+
+					// Vertical orientation: tall rectangle
+					'aria-[orientation=vertical]:w-1 aria-[orientation=vertical]:h-12',
+					'aria-[orientation=vertical]:flex-col aria-[orientation=vertical]:gap-1.5',
 				)}
 			>
+				{/* 6 dots in 2x3 grid pattern */}
 				<div
 					className={cn(
 						'flex gap-0.5',
-						// Rotate for orientation
-						// Horizontal group (Vertical handle) -> Flex col
-						'data-[panel-group-direction=horizontal]:flex-col',
-						'data-[panel-group-direction=vertical]:flex-row',
+						'aria-[orientation=horizontal]:flex-col',
+						'aria-[orientation=vertical]:flex-row',
 					)}
 				>
-					{/* 6 dots grid */}
-					<div
-						className={cn(
-							'grid gap-0.5 p-px',
-							// Horizontal group (Vertical handle) -> 2 cols x 3 rows
-							'data-[panel-group-direction=horizontal]:grid-cols-2 data-[panel-group-direction=horizontal]:grid-rows-3',
-							// Vertical group (Horizontal handle) -> 3 cols x 2 rows
-							'data-[panel-group-direction=vertical]:grid-rows-2 data-[panel-group-direction=vertical]:grid-cols-3',
-						)}
-					>
-						{[...Array(6)].map((_, i) => (
-							<div
-								key={i}
-								className={cn(
-									'w-0.5 h-0.5 rounded-full',
-									isDragging ? 'bg-primary-foreground' : 'bg-background',
-								)}
-							/>
-						))}
-					</div>
+					{/* Column/Row 1 */}
+					{[0, 1, 2].map(i => (
+						<div
+							key={`a-${i}`}
+							className="w-0.5 h-0.5 rounded-full bg-foreground/30 group-hover:bg-emerald-400/60"
+						/>
+					))}
+				</div>
+				<div
+					className={cn(
+						'flex gap-0.5',
+						'aria-[orientation=horizontal]:flex-col',
+						'aria-[orientation=vertical]:flex-row',
+					)}
+				>
+					{/* Column/Row 2 */}
+					{[0, 1, 2].map(i => (
+						<div
+							key={`b-${i}`}
+							className="w-0.5 h-0.5 rounded-full bg-foreground/30 group-hover:bg-emerald-400/60"
+						/>
+					))}
 				</div>
 			</motion.div>
 
-			{/* Tooltip */}
-			<AnimatePresence>
-				{showTooltip && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.9 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.9 }}
-						transition={{ duration: 0.1 }}
-						className={cn(
-							'absolute z-50 px-2 py-1 rounded bg-popover text-popover-foreground text-[10px] font-medium shadow-md border',
-							// Position
-							'data-[panel-group-direction=horizontal]:left-6',
-							'data-[panel-group-direction=vertical]:top-6',
-						)}
-					>
-						Double-click to reset
-					</motion.div>
+			{/* Subtle hit area indicator on hover */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: isHovered ? 0.3 : 0 }}
+				className={cn(
+					'absolute pointer-events-none',
+					'bg-linear-to-r from-transparent via-emerald-500/20 to-transparent',
+					'aria-[orientation=horizontal]:h-full aria-[orientation=horizontal]:w-24',
+					'aria-[orientation=vertical]:w-full aria-[orientation=vertical]:h-24',
 				)}
-			</AnimatePresence>
+			/>
 		</Separator>
 	);
 }
