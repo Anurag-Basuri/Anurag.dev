@@ -57,6 +57,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
+	const COLLAPSE_EPS = 0.5;
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -247,8 +248,24 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				groupRef={horizontalGroupRef}
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
 				onLayoutChange={(layout: Layout) => {
-					if (typeof layout.sidebar === 'number' && typeof layout.main === 'number') {
-						setHSizes([layout.sidebar, layout.main]);
+					const sidebarSize = layout.sidebar;
+					const mainSize = layout.main;
+					if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
+
+					const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
+
+					// Keep atom in sync with drag-collapse
+					if (nextCollapsed !== sidebar.isCollapsed) {
+						if (nextCollapsed) {
+							sidebar.collapse();
+						} else {
+							sidebar.expand();
+						}
+					}
+
+					// Don’t overwrite stored sizes with the collapsed layout
+					if (!nextCollapsed) {
+						setHSizes([sidebarSize, mainSize]);
 					}
 				}}
 			>
@@ -284,11 +301,23 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						groupRef={verticalGroupRef}
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
 						onLayoutChange={(layout: Layout) => {
-							if (
-								typeof layout.content === 'number' &&
-								typeof layout.terminal === 'number'
-							) {
-								setVSizes([layout.content, layout.terminal]);
+							const contentSize = layout.content;
+							const terminalSize = layout.terminal;
+							if (typeof contentSize !== 'number' || typeof terminalSize !== 'number')
+								return;
+
+							const nextCollapsed = terminalSize <= COLLAPSE_EPS;
+
+							if (nextCollapsed !== terminal.isCollapsed) {
+								if (nextCollapsed) {
+									terminal.collapse();
+								} else {
+									terminal.expand();
+								}
+							}
+
+							if (!nextCollapsed) {
+								setVSizes([contentSize, terminalSize]);
 							}
 						}}
 					>
