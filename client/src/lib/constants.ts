@@ -15,10 +15,65 @@ export const LAYOUT_STORAGE_KEYS = {
 	terminalCollapsed: 'layout:terminal-collapsed',
 } as const;
 
-export const ANIMATION_DURATIONS = {
-	fast: 0.15,
-	normal: 0.2,
-	slow: 0.3,
+/**
+ * Unified Animation System
+ * Provides consistent timing and easing across all components
+ */
+export const TIMINGS = {
+	instant: 0,
+	fast: 150,
+	normal: 200,
+	slow: 300,
+	slower: 500,
+} as const;
+
+export const EASINGS = {
+	smooth: [0.25, 0.46, 0.45, 0.94] as const,
+	snappy: [0.16, 1, 0.3, 1] as const,
+	bounce: [0.68, -0.55, 0.265, 1.55] as const,
+} as const;
+
+export const SPRINGS = {
+	gentle: { type: 'spring' as const, stiffness: 200, damping: 25 },
+	normal: { type: 'spring' as const, stiffness: 300, damping: 30 },
+	snappy: { type: 'spring' as const, stiffness: 400, damping: 20 },
+} as const;
+
+export const TRANSITIONS = {
+	fade: { duration: TIMINGS.normal / 1000, ease: EASINGS.smooth },
+	slide: { duration: TIMINGS.normal / 1000, ease: EASINGS.snappy },
+	scale: { duration: TIMINGS.fast / 1000, ease: EASINGS.smooth },
+	blur: { duration: TIMINGS.normal / 1000 },
+} as const;
+
+/**
+ * Design Tokens - Opacity System
+ */
+export const OPACITY = {
+	ghost: 10,
+	subtle: 20,
+	light: 30,
+	medium: 40,
+	strong: 50,
+	heavy: 60,
+	solid: 70,
+	opaque: 80,
+	full: 100,
+} as const;
+
+/**
+ * Z-Index System
+ * Ensures proper layering hierarchy
+ */
+export const Z_INDEX = {
+	base: 0,
+	panels: 1,
+	handles: 2,
+	headers: 4,
+	dropdowns: 10,
+	modals: 20,
+	toasts: 30,
+	maximized: 50,
 } as const;
 
 /**
@@ -44,30 +99,92 @@ export const PANEL_CONFIG = {
  * Ensures consistent, smooth transitions across all panels
  */
 export const PANEL_ANIMATION = {
-	layout: {
-		type: 'spring' as const,
-		stiffness: 280,
-		damping: 28,
-		mass: 1.2,
+	layout: SPRINGS.normal,
+	opacity: TRANSITIONS.fade,
+	scale: TRANSITIONS.scale,
+	filter: TRANSITIONS.blur,
+} as const;
+
+/**
+ * Panel collapse animation variants
+ */
+export const PANEL_COLLAPSE = {
+	expanded: {
+		opacity: 1,
+		scale: 1,
+		filter: 'blur(0px)',
 	},
-	opacity: {
-		duration: 0.12,
-		ease: [0.4, 0, 0.2, 1] as [number, number, number, number], // Cubic ease-out
+	collapsed: {
+		opacity: 0,
+		scale: 0.98,
+		filter: 'blur(2px)',
 	},
 } as const;
 
 /**
- * Design tokens for panel styling consistency
+ * Unified Panel Styles
  */
+export const PANEL_STYLES = {
+	sidebar: {
+		bg: `bg-sidebar/${OPACITY.medium}`,
+		border: `border-border/${OPACITY.light}`,
+		blur: 'backdrop-blur-lg',
+		shadow: 'shadow-xl',
+		rounded: 'rounded-r-xl',
+	},
+	content: {
+		bg: `bg-card/${OPACITY.opaque}`,
+		border: `border-border/${OPACITY.subtle}`,
+		blur: 'backdrop-blur-xl',
+		shadow: 'shadow-xl',
+		rounded: 'rounded-xl',
+	},
+	terminal: {
+		bg: `bg-card/${OPACITY.solid}`,
+		border: `border-border/${OPACITY.light}`,
+		blur: 'backdrop-blur-xl',
+		shadow: 'shadow-xl',
+		rounded: 'rounded-t-xl',
+	},
+} as const;
+
+/**
+ * Interaction States
+ */
+export const HOVER_STATES = {
+	button: 'hover:bg-white/10 transition-colors',
+	card: 'hover:shadow-lg hover:-translate-y-0.5 transition-all',
+	link: 'hover:text-emerald-400 transition-colors',
+	panel: 'hover:border-emerald-500/20 transition-colors',
+} as const;
+
+export const FOCUS_STATES = {
+	default: 'focus:outline-none focus:ring-2 focus:ring-emerald-500/50',
+	input: 'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500',
+	button: 'focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2',
+} as const;
+
+export const ACTIVE_STATES = {
+	button: 'active:scale-95',
+	card: 'active:scale-[0.98]',
+	tab: 'border-b-2 border-emerald-500',
+} as const;
+
+// Legacy export for backwards compatibility
+export const ANIMATION_DURATIONS = {
+	fast: TIMINGS.fast / 1000,
+	normal: TIMINGS.normal / 1000,
+	slow: TIMINGS.slow / 1000,
+} as const;
+
 export const PANEL_DESIGN = {
+	gap: 'gap-1',
+	backdrop: PANEL_STYLES.content.blur,
 	border: {
-		opacity: 'border-border/50',
-		width: 'border',
+		opacity: PANEL_STYLES.content.border,
 	},
 	shadow: {
-		default: 'shadow-2xl shadow-black/20',
-		hover: 'hover:shadow-emerald-500/10',
+		default: PANEL_STYLES.content.shadow,
+		hover: '',
 	},
-	backdrop: 'backdrop-blur-sm', // Reduced from md for performance
-	gap: 'gap-2', // 8px instead of 4px
 } as const;

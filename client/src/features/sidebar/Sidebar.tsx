@@ -10,6 +10,7 @@ import { CollapsedSidebar } from './CollapsedSidebar';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { resolveModuleFromSlug } from '@/lib/routes';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TIMINGS, TRANSITIONS } from '@/lib/constants';
 
 export const Sidebar: React.FC = () => {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
@@ -35,10 +36,11 @@ export const Sidebar: React.FC = () => {
 
 	return (
 		<div
-			className="h-full w-full transition-all duration-200"
+			className="h-full w-full transition-all"
 			style={{
 				opacity: sidebar.isCollapsed ? 0 : 1,
 				filter: sidebar.isCollapsed ? 'blur(2px)' : 'blur(0px)',
+				transitionDuration: `${TIMINGS.normal}ms`,
 			}}
 		>
 			<AnimatePresence mode="wait">
@@ -48,7 +50,7 @@ export const Sidebar: React.FC = () => {
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
-						transition={{ duration: 0.2 }}
+						transition={TRANSITIONS.fade}
 						className="h-full w-full"
 					>
 						<CollapsedSidebar onExpand={sidebar.expand} />

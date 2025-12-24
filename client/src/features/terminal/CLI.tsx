@@ -8,6 +8,7 @@ import { TerminalHistory } from './components/TerminalHistory';
 import { TerminalPrompt } from './components/TerminalPrompt';
 import { CollapsedTerminal } from './components/CollapsedTerminal';
 import { useCLI } from './hooks/useCLI';
+import { TIMINGS, TRANSITIONS } from '@/lib/constants';
 
 export function CLI() {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -16,10 +17,11 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full w-full transition-all duration-200"
+			className="h-full w-full transition-all"
 			style={{
 				opacity: terminal.isCollapsed ? 0 : 1,
 				filter: terminal.isCollapsed ? 'blur(2px)' : 'blur(0px)',
+				transitionDuration: `${TIMINGS.normal}ms`,
 			}}
 		>
 			<AnimatePresence mode="wait">
