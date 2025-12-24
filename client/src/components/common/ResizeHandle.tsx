@@ -41,8 +41,10 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 				'transition-all duration-200',
 
 				// Hit area sizing
-				'aria-[orientation=vertical]:w-4 aria-[orientation=vertical]:h-full aria-[orientation=vertical]:cursor-col-resize',
-				'aria-[orientation=horizontal]:h-4 aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:cursor-row-resize',
+				// Horizontal group = Vertical Handle (Left/Right)
+				'data-[panel-group-direction=horizontal]:w-4 data-[panel-group-direction=horizontal]:h-full data-[panel-group-direction=horizontal]:cursor-col-resize',
+				// Vertical group = Horizontal Handle (Top/Bottom)
+				'data-[panel-group-direction=vertical]:h-4 data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:cursor-row-resize',
 
 				// Visual feedback on the transparent separator track
 				'bg-transparent',
@@ -64,72 +66,31 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 				className={cn(
 					'relative flex items-center justify-center rounded-xs backdrop-blur-sm',
 					// Shape & Size
-					'aria-[orientation=vertical]:w-1.5 aria-[orientation=vertical]:h-8',
-					'aria-[orientation=horizontal]:h-1.5 aria-[orientation=horizontal]:w-8',
+					// Horizontal Direction -> Vertical Handle
+					'data-[panel-group-direction=horizontal]:w-1.5 data-[panel-group-direction=horizontal]:h-8',
+					// Vertical Direction -> Horizontal Handle
+					'data-[panel-group-direction=vertical]:h-1.5 data-[panel-group-direction=vertical]:w-8',
 					// Shadow for depth
 					'shadow-sm',
 				)}
 			>
-				{/* 6-Dots Grip Pattern */}
-				{/* We use a pseudo-element or just simple dots. Actual dots give more control. */}
-				<div
-					className={cn(
-						'grid gap-0.5 pointer-events-none opacity-80',
-						// Grid layout based on orientation
-						'aria-[orientation=vertical]:grid-cols-1 aria-[orientation=vertical]:grid-rows-3', // 3 stacked dots for vertical line look, or 2x3 for grip?
-						// User asked for "rectangle with six dot". Usually 2x3.
-						// Let's check orientation. If layout is vertical (separating left/right), handle is vertical.
-
-						// Vertical Handle (separates horizontal content): | |
-						'aria-[orientation=vertical]:grid-cols-1 gap-y-1', // Actually, simplest "grip" is often just a line or 3 dots.
-						// Requirements: "rectangle with six dot".
-						// Let's do 2 columns x 3 rows for vertical handle logic? No, vertical handle is thin.
-						// Usually vertical splitter has dots arranged vertically.
-						// 2 columns would be wide.
-
-						// Let's try flexible flex layout for "dots"
-					)}
-				>
-					{/* 
-                      Implementing strict "6 dots" design.
-                      Vertical Handle (Separates Left/Right): Needs to constitute a "vertical grip".
-                      Usually that's 2 columns of 3 dots if it's a "pad", or 1 column of 6 dots (too long).
-                      Let's stick to a clean standardized look:
-                      Vertical: 1 column of 3 elongated dashes OR 2 columns of 3 small dots.
-                      Given "w-4" (16px) hit area, and "w-1.5" (6px) visible handle... 2 columns is tight.
-                      Let's make the visible handle slightly wider to accommodate 2 cols if needed, 
-                      OR just standard 3-dot vertical ellipsis which is cleaner.
-                      
-                      Re-reading request: "rectangle with six dot in them and small".
-                      Okay, making the visible handle a "small rectangle".
-                      
-                      Vertical Handle:
-                      [ . . ]
-                      [ . . ]
-                      [ . . ]
-                    */}
-				</div>
-
-				{/* 
-                   Let's use absolute positioning for the dots based on parent orientation
-                   to avoid complex grid logical conditional classes.
-                */}
-
 				<div
 					className={cn(
 						'flex gap-0.5',
 						// Rotate for orientation
-						'aria-[orientation=vertical]:flex-col',
-						'aria-[orientation=horizontal]:flex-row',
+						// Horizontal group (Vertical handle) -> Flex col
+						'data-[panel-group-direction=horizontal]:flex-col',
+						'data-[panel-group-direction=vertical]:flex-row',
 					)}
 				>
-					{/* We will create 2 "lines" of 3 dots each? Or just one group of 6? */}
-					{/* Let's try 6 dots in a grid. */}
+					{/* 6 dots grid */}
 					<div
 						className={cn(
 							'grid gap-0.5 p-px',
-							'aria-[orientation=vertical]:grid-cols-2 aria-[orientation=vertical]:grid-rows-3',
-							'aria-[orientation=horizontal]:grid-rows-2 aria-[orientation=horizontal]:grid-cols-3',
+							// Horizontal group (Vertical handle) -> 2 cols x 3 rows
+							'data-[panel-group-direction=horizontal]:grid-cols-2 data-[panel-group-direction=horizontal]:grid-rows-3',
+							// Vertical group (Horizontal handle) -> 3 cols x 2 rows
+							'data-[panel-group-direction=vertical]:grid-rows-2 data-[panel-group-direction=vertical]:grid-cols-3',
 						)}
 					>
 						{[...Array(6)].map((_, i) => (
@@ -156,8 +117,8 @@ function ResizeHandle({ className, id, onDoubleClick }: ResizeHandleProps) {
 						className={cn(
 							'absolute z-50 px-2 py-1 rounded bg-popover text-popover-foreground text-[10px] font-medium shadow-md border',
 							// Position
-							'aria-[orientation=vertical]:left-6',
-							'aria-[orientation=horizontal]:top-6',
+							'data-[panel-group-direction=horizontal]:left-6',
+							'data-[panel-group-direction=vertical]:top-6',
 						)}
 					>
 						Double-click to reset
