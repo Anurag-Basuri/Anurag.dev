@@ -308,9 +308,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 								}}
 								className="h-full bg-card/80 border-t border-border/50 backdrop-blur-md rounded-t-xl shadow-2xl shadow-black/20"
 							>
-								<Suspense fallback={<ComponentLoader height="h-32" />}>
-									<CLI />
-								</Suspense>
+								<ErrorBoundary>
+									<Suspense fallback={<ComponentLoader height="h-32" />}>
+										<CLI />
+									</Suspense>
+								</ErrorBoundary>
 							</motion.div>
 						</Panel>
 					</Group>

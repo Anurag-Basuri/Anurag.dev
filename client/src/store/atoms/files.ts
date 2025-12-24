@@ -1,3 +1,4 @@
+import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 export interface OpenFile {
@@ -10,7 +11,7 @@ const DEFAULT_MODULE_ID = 'about' as const;
 const STORAGE_KEY = 'open-files' as const;
 
 // Helper function to create a file entry
-const createFileEntry = (moduleId: string): OpenFile => ({
+export const createFileEntry = (moduleId: string): OpenFile => ({
 	moduleId,
 	openedAt: Date.now(),
 });
@@ -21,8 +22,12 @@ const getDefaultOpenFiles = (): OpenFile[] => [];
 /**
  * Atom to track currently open files in the application.
  * Persists to localStorage and initializes empty.
+ * Initialized with proper SSR safety.
  */
-export const openFilesAtom = atomWithStorage<OpenFile[]>(STORAGE_KEY, getDefaultOpenFiles());
+export const openFilesAtom =
+	typeof window !== 'undefined'
+		? atomWithStorage<OpenFile[]>(STORAGE_KEY, getDefaultOpenFiles())
+		: atom<OpenFile[]>(getDefaultOpenFiles());
 
 // Export constants for use in other modules
-export { DEFAULT_MODULE_ID, createFileEntry };
+export { DEFAULT_MODULE_ID };
