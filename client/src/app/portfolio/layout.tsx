@@ -217,7 +217,15 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					</div>
 				</Panel>
 
-				<ResizeHandle />
+				<ResizeHandle
+					onDoubleClick={() => {
+						const api = horizontalGroupRef.current;
+						if (api) {
+							api.setLayout({ sidebar: 20, main: 80 });
+							setHSizes([20, 80]);
+						}
+					}}
+				/>
 
 				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
@@ -248,7 +256,15 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							</div>
 						</Panel>
 
-						<ResizeHandle />
+						<ResizeHandle
+							onDoubleClick={() => {
+								const api = verticalGroupRef.current;
+								if (api) {
+									api.setLayout({ content: 60, terminal: 40 });
+									setVSizes([60, 40]);
+								}
+							}}
+						/>
 
 						{/* Terminal */}
 						<Panel
