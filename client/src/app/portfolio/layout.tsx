@@ -83,6 +83,22 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const terminal = useCollapsiblePanel({ type: 'terminal', onExpand: handleTerminalExpand });
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
+	// Sync panel resize when collapsed state changes from ANY source (including child components)
+	useEffect(() => {
+		if (!sidebar.isCollapsed) {
+			// Small delay to ensure layout is ready
+			const timer = setTimeout(handleSidebarExpand, 50);
+			return () => clearTimeout(timer);
+		}
+	}, [sidebar.isCollapsed, handleSidebarExpand]);
+
+	useEffect(() => {
+		if (!terminal.isCollapsed) {
+			const timer = setTimeout(handleTerminalExpand, 50);
+			return () => clearTimeout(timer);
+		}
+	}, [terminal.isCollapsed, handleTerminalExpand]);
+
 	useKeyboardShortcuts([
 		{
 			key: 'b',
