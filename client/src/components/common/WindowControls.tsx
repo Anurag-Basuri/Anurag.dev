@@ -83,7 +83,8 @@ export function WindowControls({
 								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
 								style={{ backgroundColor: COLORS.close.hover }}
 							/>
-							<div className="absolute -inset-2" /> {/* Hit area */}
+							{/* Hit area - must be pointer-events-none to not block clicks */}
+							<div className="absolute -inset-2 pointer-events-none" />
 							<X
 								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
 								style={{ color: COLORS.close.icon }}
@@ -101,7 +102,11 @@ export function WindowControls({
 						<motion.button
 							whileHover={{ scale: 1.15 }}
 							whileTap={{ scale: 0.95 }}
-							onClick={onMinimize}
+							onClick={e => {
+								e.preventDefault();
+								e.stopPropagation();
+								onMinimize?.();
+							}}
 							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
 							style={{ backgroundColor: COLORS.minimize.bg }}
 							aria-label={minimizeLabel}
@@ -110,7 +115,8 @@ export function WindowControls({
 								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
 								style={{ backgroundColor: COLORS.minimize.hover }}
 							/>
-							<div className="absolute -inset-2" />
+							{/* Hit area - must be pointer-events-none to not block clicks */}
+							<div className="absolute -inset-2 pointer-events-none" />
 							<MinIcon
 								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
 								style={{ color: COLORS.minimize.icon }}
@@ -128,7 +134,11 @@ export function WindowControls({
 						<motion.button
 							whileHover={{ scale: 1.15 }}
 							whileTap={{ scale: 0.95 }}
-							onClick={onMaximize}
+							onClick={e => {
+								e.preventDefault();
+								e.stopPropagation();
+								onMaximize?.();
+							}}
 							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
 							style={{ backgroundColor: COLORS.maximize.bg }}
 							aria-label={maxLabel}
@@ -137,7 +147,8 @@ export function WindowControls({
 								className="absolute inset-0 rounded-full opacity-0 hover:opacity-100 transition-opacity"
 								style={{ backgroundColor: COLORS.maximize.hover }}
 							/>
-							<div className="absolute -inset-2" />
+							{/* Hit area - must be pointer-events-none to not block clicks */}
+							<div className="absolute -inset-2 pointer-events-none" />
 							<MaxIcon
 								className="w-2 h-2 relative z-10 opacity-0 group-hover/btn:opacity-100 transition-opacity"
 								style={{ color: COLORS.maximize.icon }}
