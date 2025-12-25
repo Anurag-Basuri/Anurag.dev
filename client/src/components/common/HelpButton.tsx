@@ -123,14 +123,19 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						<button
 							onClick={() => setIsOpen(true)}
 							className={cn(
-								'h-8 px-2 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 text-white/60 hover:text-emerald-400 transition-colors flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+								'h-6 px-2.5 rounded-md flex items-center gap-1.5 transition-all duration-200 group',
+								'bg-emerald-500/10 hover:bg-emerald-500/20',
+								'border border-emerald-500/20 hover:border-emerald-500/30',
+								'focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 								className,
 							)}
 							aria-label="Quick Help"
 							ref={triggerRef}
 						>
-							<HelpCircle className="w-4 h-4" />
-							<span className="text-xs">Help</span>
+							<HelpCircle className="w-3.5 h-3.5 text-emerald-400 group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all" />
+							<span className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider group-hover:text-white transition-colors">
+								Help
+							</span>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="top">Quick Help</TooltipContent>
@@ -166,7 +171,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 										'sm:w-80',
 										placement === 'floating'
 											? 'sm:bottom-24 sm:right-6'
-											: 'sm:bottom-12 sm:right-6',
+											: 'sm:bottom-10 sm:right-4',
 									)}
 									ref={panelRef}
 									onKeyDown={handlePanelKeyDown}
@@ -174,7 +179,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									<div
 										className={cn(
 											'bg-[#0d1117]/95 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden',
-											'rounded-t-2xl sm:rounded-2xl',
+											'rounded-t-2xl sm:rounded-xl',
 										)}
 									>
 										{/* Header */}
