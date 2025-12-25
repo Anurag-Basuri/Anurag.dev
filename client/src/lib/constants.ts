@@ -86,7 +86,7 @@ export const PANEL_CONFIG = {
 	},
 	VERTICAL: {
 		CONTENT: { defaultSize: '65%', minSize: '30%' },
-		TERMINAL: { defaultSize: '35%', minSize: '5%', maxSize: '60%', collapsedSize: '5%' },
+		TERMINAL: { defaultSize: '35%', minSize: '3%', maxSize: '60%', collapsedSize: '3%' },
 	},
 	DEFAULTS: {
 		horizontal: [20, 80] as [number, number],

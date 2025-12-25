@@ -72,40 +72,6 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
 	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
 
-	// Delayed handle hiding for smooth animations
-	const [hideSidebarHandle, setHideSidebarHandle] = useState(sidebar.isCollapsed);
-	const [hideTerminalHandle, setHideTerminalHandle] = useState(terminal.isCollapsed);
-
-	useEffect(() => {
-		let timer: ReturnType<typeof setTimeout> | null = null;
-
-		if (sidebar.isCollapsed) {
-			timer = setTimeout(() => setHideSidebarHandle(true), COLLAPSE_ANIMATION_DURATION);
-		} else {
-			// Avoid synchronous setState inside effect body
-			timer = setTimeout(() => setHideSidebarHandle(false), 0);
-		}
-
-		return () => {
-			if (timer) clearTimeout(timer);
-		};
-	}, [sidebar.isCollapsed]);
-
-	useEffect(() => {
-		let timer: ReturnType<typeof setTimeout> | null = null;
-
-		if (terminal.isCollapsed) {
-			timer = setTimeout(() => setHideTerminalHandle(true), COLLAPSE_ANIMATION_DURATION);
-		} else {
-			// Avoid synchronous setState inside effect body
-			timer = setTimeout(() => setHideTerminalHandle(false), 0);
-		}
-
-		return () => {
-			if (timer) clearTimeout(timer);
-		};
-	}, [terminal.isCollapsed]);
-
 	useKeyboardShortcuts([
 		{
 			key: 'b',
@@ -363,7 +329,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							{renderModuleContent()}
 						</Panel>
 
-						{/* Vertical ResizeHandle - hides when terminal collapsed */}
+						{/* Vertical ResizeHandle */}
 						<ResizeHandle isCollapsed={terminal.isCollapsed} orientation="horizontal" />
 
 						{/* Terminal */}
