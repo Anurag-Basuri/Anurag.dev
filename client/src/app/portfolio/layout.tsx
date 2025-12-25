@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -14,11 +14,7 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
-import {
-	PANEL_CONFIG,
-	PANEL_COLLAPSE_THRESHOLD,
-	COLLAPSE_ANIMATION_DURATION,
-} from '@/lib/constants';
+import { PANEL_CONFIG, PANEL_COLLAPSE_THRESHOLD } from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
@@ -62,15 +58,30 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
 	const COLLAPSE_EPS = PANEL_COLLAPSE_THRESHOLD;
 
-	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
-	const terminal = useCollapsiblePanel({ type: 'terminal' });
-	const modulePanel = useCollapsiblePanel({ type: 'module' });
-
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
 	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
 	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
+
+	// Callbacks to resize panels on expand
+	const handleSidebarExpand = useCallback(() => {
+		horizontalGroupRef.current?.setLayout({
+			sidebar: hSizes?.[0] ?? 20,
+			main: hSizes?.[1] ?? 80,
+		});
+	}, [hSizes]);
+
+	const handleTerminalExpand = useCallback(() => {
+		verticalGroupRef.current?.setLayout({
+			content: vSizes?.[0] ?? 60,
+			terminal: vSizes?.[1] ?? 40,
+		});
+	}, [vSizes]);
+
+	const sidebar = useCollapsiblePanel({ type: 'sidebar', onExpand: handleSidebarExpand });
+	const terminal = useCollapsiblePanel({ type: 'terminal', onExpand: handleTerminalExpand });
+	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
 	useKeyboardShortcuts([
 		{
