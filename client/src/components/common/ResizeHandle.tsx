@@ -29,6 +29,7 @@ export function ResizeHandle({
 
 	return (
 		<Separator
+			data-resize-handle
 			id={id}
 			className={cn(
 				'group relative flex items-center justify-center',

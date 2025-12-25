@@ -69,25 +69,37 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
 
 	// Delayed handle hiding for smooth animations
-	const [hideSidebarHandle, setHideSidebarHandle] = useState(false);
-	const [hideTerminalHandle, setHideTerminalHandle] = useState(false);
+	const [hideSidebarHandle, setHideSidebarHandle] = useState(sidebar.isCollapsed);
+	const [hideTerminalHandle, setHideTerminalHandle] = useState(terminal.isCollapsed);
 
 	useEffect(() => {
+		let timer: ReturnType<typeof setTimeout> | null = null;
+
 		if (sidebar.isCollapsed) {
-			const timer = setTimeout(() => setHideSidebarHandle(true), 200);
-			return () => clearTimeout(timer);
+			timer = setTimeout(() => setHideSidebarHandle(true), 200);
 		} else {
-			setHideSidebarHandle(false);
+			// Avoid synchronous setState inside effect body
+			timer = setTimeout(() => setHideSidebarHandle(false), 0);
 		}
+
+		return () => {
+			if (timer) clearTimeout(timer);
+		};
 	}, [sidebar.isCollapsed]);
 
 	useEffect(() => {
+		let timer: ReturnType<typeof setTimeout> | null = null;
+
 		if (terminal.isCollapsed) {
-			const timer = setTimeout(() => setHideTerminalHandle(true), 200);
-			return () => clearTimeout(timer);
+			timer = setTimeout(() => setHideTerminalHandle(true), 200);
 		} else {
-			setHideTerminalHandle(false);
+			// Avoid synchronous setState inside effect body
+			timer = setTimeout(() => setHideTerminalHandle(false), 0);
 		}
+
+		return () => {
+			if (timer) clearTimeout(timer);
+		};
 	}, [terminal.isCollapsed]);
 
 	useKeyboardShortcuts([
@@ -306,7 +318,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				</Panel>
 
 				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
-				<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
+				<ResizeHandle isCollapsed={hideSidebarHandle} orientation="vertical" />
 
 				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
