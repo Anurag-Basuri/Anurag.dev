@@ -90,7 +90,11 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 					whileTap={{ scale: 0.98 }}
 					onClick={onClick}
 					className={cn(
-						'relative h-6 px-2 rounded-md flex items-center gap-1.5 transition-all duration-200 group cursor-pointer overflow-hidden',
+						// Base styles
+						'relative flex items-center gap-1 md:gap-1.5 transition-all duration-200 group cursor-pointer overflow-hidden',
+						// Responsive sizing - larger touch target on mobile
+						'h-6 px-1.5 sm:px-2 rounded-md',
+						// Active/inactive states
 						isActive
 							? 'bg-white/10 border border-white/15 shadow-sm'
 							: 'bg-white/5 border border-transparent hover:bg-white/8 hover:border-white/10',
@@ -115,7 +119,9 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 
 					<span
 						className={cn(
-							'text-[10px] font-medium transition-colors duration-200 max-w-[80px] truncate hidden sm:block',
+							// Responsive text - hidden on small screens, visible on medium+
+							'text-[10px] font-medium transition-colors duration-200 truncate',
+							'hidden md:block max-w-[60px] lg:max-w-[80px]',
 							isActive ? 'text-white' : 'text-white/50 group-hover:text-white/70',
 						)}
 					>
@@ -451,11 +457,11 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 			</AnimatePresence>
 
 			{/* Main Bar */}
-			<div className="w-full shrink-0 h-8 px-4 sm:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative">
+			<div className="w-full shrink-0 h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative">
 				{/* Top gradient border */}
 				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
 
-				<div className="flex items-center gap-2 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide">
+				<div className="flex items-center gap-1.5 sm:gap-2 h-full flex-1 min-w-0 overflow-x-auto scrollbar-hide">
 					{/* Start Button */}
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -494,7 +500,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 					<div className="h-4 w-px bg-white/10 shrink-0" />
 
 					{/* Taskbar Items */}
-					<div className="flex items-center gap-1 h-full">
+					<div className="flex items-center gap-0.5 sm:gap-1 h-full min-w-0 flex-1">
 						<LayoutGroup>
 							<AnimatePresence mode="popLayout" initial={false}>
 								{openFilesState
@@ -516,7 +522,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 
 				{/* Right Side Actions */}
 				{!isMobile && (
-					<div className="flex items-center pl-4 border-l border-white/5">
+					<div className="flex items-center pl-2 sm:pl-3 md:pl-4 border-l border-white/5 shrink-0">
 						{/* Clock or localized status could go here */}
 
 						<HelpButton placement="taskbar" />
