@@ -66,8 +66,16 @@ export function WindowControls({
 						<motion.button
 							whileHover={{ scale: 1.15 }}
 							whileTap={{ scale: 0.95 }}
-							onClick={onClose}
-							className="relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors"
+							onClick={e => {
+								e.preventDefault();
+								e.stopPropagation();
+								onClose?.();
+							}}
+							disabled={!onClose}
+							className={cn(
+								'relative w-3 h-3 rounded-full flex items-center justify-center group/btn shadow-sm transition-colors',
+								!onClose && 'opacity-50 cursor-not-allowed',
+							)}
 							style={{ backgroundColor: COLORS.close.bg }}
 							aria-label={closeLabel}
 						>
