@@ -322,7 +322,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				</Panel>
 
 				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
-				<ResizeHandle isCollapsed={hideSidebarHandle} orientation="vertical" />
+				<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
 				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">

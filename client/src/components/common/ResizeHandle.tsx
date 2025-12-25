@@ -12,7 +12,8 @@ interface ResizeHandleProps {
 	orientation?: 'horizontal' | 'vertical';
 }
 
-export function ResizeHandle({
+export function 
+ResizeHandle({
 	className,
 	id,
 	isCollapsed = false,
@@ -62,64 +63,77 @@ export function ResizeHandle({
 			)}
 		>
 			{/* Rounded grip box */}
-			<div
-				className={cn(
-					'pointer-events-none',
-					'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
-					'flex items-center justify-center',
-					gripBoxSize,
+			{!isCollapsed ? (
+				<div
+					className={cn(
+						'pointer-events-none',
+						'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
+						'flex items-center justify-center',
+						gripBoxSize,
 
-					// Base styling
-					'rounded-lg border bg-card/70 backdrop-blur-md shadow-sm',
-					'border-border/50',
+						// Base styling
+						'rounded-lg border bg-card/70 backdrop-blur-md shadow-sm',
+						'border-border/50',
 
-					// Smooth transitions
-					'transition-all duration-200 ease-out',
+						// Smooth transitions
+						'transition-all duration-200 ease-out',
 
-					// Hover state - subtle lift with glow
-					'group-hover:scale-[1.08]',
-					'group-hover:bg-card/90',
-					'group-hover:border-emerald-500/40',
-					'group-hover:shadow-md group-hover:shadow-emerald-500/10',
+						// Hover state - subtle lift with glow
+						'group-hover:scale-[1.08]',
+						'group-hover:bg-card/90',
+						'group-hover:border-emerald-500/40',
+						'group-hover:shadow-md group-hover:shadow-emerald-500/10',
 
-					// Active state - dragging feedback
-					'group-active:scale-110',
-					'group-active:border-emerald-500/60',
-					'group-active:bg-emerald-500/5',
-					'group-active:shadow-lg group-active:shadow-emerald-500/20',
+						// Active state - dragging feedback
+						'group-active:scale-110',
+						'group-active:border-emerald-500/60',
+						'group-active:bg-emerald-500/5',
+						'group-active:shadow-lg group-active:shadow-emerald-500/20',
 
-					// Focus state
-					'group-focus-visible:border-emerald-500/50',
-					'group-focus-visible:shadow-md group-focus-visible:shadow-emerald-500/15',
-				)}
-			>
-				{/* 6 dots: two parallel lines of three */}
-				<div className={cn(dotsGrid, 'gap-1')}>
-					{Array.from({ length: 6 }).map((_, i) => (
-						<div
-							key={i}
-							className={cn(
-								'h-1 w-1 rounded-full',
-								'bg-foreground/35',
+						// Focus state
+						'group-focus-visible:border-emerald-500/50',
+						'group-focus-visible:shadow-md group-focus-visible:shadow-emerald-500/15',
+					)}
+				>
+					{/* 6 dots: two parallel lines of three */}
+					<div className={cn(dotsGrid, 'gap-1')}>
+						{Array.from({ length: 6 }).map((_, i) => (
+							<div
+								key={i}
+								className={cn(
+									'h-1 w-1 rounded-full',
+									'bg-foreground/35',
 
-								// Smooth transitions
-								'transition-all duration-200 ease-out',
+									// Smooth transitions
+									'transition-all duration-200 ease-out',
 
-								// Hover - dots brighten and grow
-								'group-hover:bg-emerald-400/60',
-								'group-hover:scale-110',
+									// Hover - dots brighten and grow
+									'group-hover:bg-emerald-400/60',
+									'group-hover:scale-110',
 
-								// Active - stronger effect
-								'group-active:bg-emerald-300/80',
-								'group-active:scale-125',
+									// Active - stronger effect
+									'group-active:bg-emerald-300/80',
+									'group-active:scale-125',
 
-								// Focus
-								'group-focus-visible:bg-emerald-400/50',
-							)}
-						/>
-					))}
+									// Focus
+									'group-focus-visible:bg-emerald-400/50',
+								)}
+							/>
+						))}
+					</div>
 				</div>
-			</div>
+			) : (
+				// Thin strip indicator
+				<div
+					className={cn(
+						'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
+						'flex items-center justify-center',
+						'bg-emerald-500/60',
+						isHorizontal ? 'h-1 w-full' : 'w-1 h-full',
+						'rounded-full',
+					)}
+				/>
+			)}
 		</Separator>
 	);
 }
