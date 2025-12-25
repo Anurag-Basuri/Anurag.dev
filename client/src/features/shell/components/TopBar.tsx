@@ -86,14 +86,14 @@ export const TopBar = memo(function TopBar({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<header
-				className="h-8 px-4 sm:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative"
+				className="h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative"
 				role="banner"
 			>
 				{/* Bottom gradient border */}
 				<div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
 
 				{/* Left Section */}
-				<div className="flex items-center gap-2 md:gap-2.5 min-w-0">
+				<div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 min-w-0">
 					{isMobile && (
 						<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
 							<SheetTrigger asChild>
