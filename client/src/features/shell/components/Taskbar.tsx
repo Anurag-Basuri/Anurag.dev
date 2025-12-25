@@ -451,8 +451,8 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 			</AnimatePresence>
 
 			{/* Main Bar */}
-			<div className="w-full shrink-0 h-8 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 lg:px-6 shadow-sm relative">
-				{/* Top Glow Line */}
+			<div className="w-full shrink-0 h-8 px-4 sm:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative">
+				{/* Top gradient border */}
 				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
 
 				<div className="flex items-center gap-2 h-full w-full sm:w-auto overflow-x-auto scrollbar-hide">
