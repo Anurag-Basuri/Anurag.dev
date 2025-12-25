@@ -450,7 +450,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 				)}
 			</AnimatePresence>
 
-			{/* Main Bar - Matches TopBar height */}
+			{/* Main Bar */}
 			<div className="w-full shrink-0 h-8 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 flex items-center justify-between z-40 px-3 sm:px-4 lg:px-6 shadow-sm relative">
 				{/* Top Glow Line */}
 				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
