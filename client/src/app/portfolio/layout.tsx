@@ -14,7 +14,11 @@ import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
-import { PANEL_CONFIG } from '@/lib/constants';
+import {
+	PANEL_CONFIG,
+	PANEL_COLLAPSE_THRESHOLD,
+	COLLAPSE_ANIMATION_DURATION,
+} from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
@@ -56,7 +60,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
-	const COLLAPSE_EPS = 1; // 1% threshold - more intentional
+	const COLLAPSE_EPS = PANEL_COLLAPSE_THRESHOLD;
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -76,7 +80,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		let timer: ReturnType<typeof setTimeout> | null = null;
 
 		if (sidebar.isCollapsed) {
-			timer = setTimeout(() => setHideSidebarHandle(true), 200);
+			timer = setTimeout(() => setHideSidebarHandle(true), COLLAPSE_ANIMATION_DURATION);
 		} else {
 			// Avoid synchronous setState inside effect body
 			timer = setTimeout(() => setHideSidebarHandle(false), 0);
@@ -91,7 +95,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		let timer: ReturnType<typeof setTimeout> | null = null;
 
 		if (terminal.isCollapsed) {
-			timer = setTimeout(() => setHideTerminalHandle(true), 200);
+			timer = setTimeout(() => setHideTerminalHandle(true), COLLAPSE_ANIMATION_DURATION);
 		} else {
 			// Avoid synchronous setState inside effect body
 			timer = setTimeout(() => setHideTerminalHandle(false), 0);

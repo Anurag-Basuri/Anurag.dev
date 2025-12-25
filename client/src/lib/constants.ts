@@ -188,3 +188,9 @@ export const PANEL_DESIGN = {
 		hover: '',
 	},
 } as const;
+
+/**
+ * Panel collapse configuration
+ */
+export const PANEL_COLLAPSE_THRESHOLD = 1; // 1% threshold for collapse
+export const COLLAPSE_ANIMATION_DURATION = 250; // Match spring physics duration
