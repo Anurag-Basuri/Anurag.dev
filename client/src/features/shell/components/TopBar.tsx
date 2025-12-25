@@ -86,15 +86,11 @@ export const TopBar = memo(function TopBar({
 	return (
 		<TooltipProvider delayDuration={300}>
 			<header
-				className="h-8 px-5 sm:px-4 lg:px-10 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative overflow-hidden animate-in slide-in-from-top-2 duration-500"
+				className="h-8 px-4 sm:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-b border-white/5 shadow-sm flex items-center justify-between z-50 select-none relative"
 				role="banner"
 			>
-				{/* Decorative gradient borders */}
-				<div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-400/30 to-transparent" />
-					<div className="absolute inset-y-0 left-0 w-px bg-white/5" />
-					<div className="absolute inset-y-0 right-0 w-px bg-white/5" />
-				</div>
+				{/* Bottom gradient border */}
+				<div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
 
 				{/* Left Section */}
 				<div className="flex items-center gap-2 md:gap-2.5 min-w-0">
