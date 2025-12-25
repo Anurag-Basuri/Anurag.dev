@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
-	const COLLAPSE_EPS = 2; // 2% threshold for collapse
+	const COLLAPSE_EPS = 1; // 1% threshold - more intentional
 
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -67,6 +67,28 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
 	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
+
+	// Delayed handle hiding for smooth animations
+	const [hideSidebarHandle, setHideSidebarHandle] = useState(false);
+	const [hideTerminalHandle, setHideTerminalHandle] = useState(false);
+
+	useEffect(() => {
+		if (sidebar.isCollapsed) {
+			const timer = setTimeout(() => setHideSidebarHandle(true), 200);
+			return () => clearTimeout(timer);
+		} else {
+			setHideSidebarHandle(false);
+		}
+	}, [sidebar.isCollapsed]);
+
+	useEffect(() => {
+		if (terminal.isCollapsed) {
+			const timer = setTimeout(() => setHideTerminalHandle(true), 200);
+			return () => clearTimeout(timer);
+		} else {
+			setHideTerminalHandle(false);
+		}
+	}, [terminal.isCollapsed]);
 
 	useKeyboardShortcuts([
 		{
@@ -347,7 +369,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					</Group>
 				</Panel>
 			</Group>
-		);	
+		);
 	};
 
 	const renderMobileLayout = () => {
