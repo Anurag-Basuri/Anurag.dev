@@ -3,12 +3,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useTerminalState } from './hooks/useTerminalState';
-import { TerminalLayout } from './components/TerminalLayout';
 import { TerminalHistory } from './components/TerminalHistory';
 import { TerminalPrompt } from './components/TerminalPrompt';
-import { CollapsedTerminal } from './components/CollapsedTerminal';
 import { useCLI } from './hooks/useCLI';
-import { TIMINGS, TRANSITIONS } from '@/lib/constants';
+import { SPRINGS } from '@/lib/constants';
+import { Terminal } from 'lucide-react';
+import { PanelHeader } from '@/components/layout/PanelHeader';
+import { CollapsedPanel } from '@/components/layout/CollapsedPanel';
+import { TerminalControls } from '@/components/common/WindowControls';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export function CLI() {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
@@ -16,51 +19,53 @@ export function CLI() {
 	const { handleKeyDown } = useCLI(terminalState);
 
 	return (
-		<div
-			className="h-full w-full transition-all"
-			style={{
-				opacity: terminal.isCollapsed ? 0 : 1,
-				filter: terminal.isCollapsed ? 'blur(2px)' : 'blur(0px)',
-				transitionDuration: `${TIMINGS.normal}ms`,
-			}}
-		>
+		<div className="h-full w-full">
 			<AnimatePresence mode="wait">
 				{terminal.isCollapsed ? (
-					<motion.div
+					<CollapsedPanel
 						key="collapsed-terminal"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.2 }}
-						className="h-full w-full"
-					>
-						<CollapsedTerminal onExpand={terminal.expand} />
-					</motion.div>
+						type="terminal"
+						icon={Terminal}
+						label="Terminal"
+						orientation="horizontal"
+						onExpand={terminal.expand}
+					/>
 				) : (
 					<motion.div
 						key="expanded-terminal"
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						exit={{ opacity: 0 }}
-						transition={{ duration: 0.2 }}
-						className="h-full"
+						initial={{ opacity: 0, scale: 0.98, y: 4, filter: 'blur(4px)' }}
+						animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+						exit={{ opacity: 0, scale: 0.96, y: 4, filter: 'blur(4px)' }}
+						transition={SPRINGS.normal}
+						className="h-full flex flex-col text-foreground font-mono text-sm overflow-hidden"
 					>
-						<TerminalLayout
-							currentPath={terminalState.currentPath}
-							historyLength={terminalState.history.length}
-							onClearHistory={terminalState.clearHistory}
-							onToggleCollapse={terminal.collapse}
-							onMaximize={terminal.maximize}
-							onMinimize={terminal.collapse}
-							onClose={terminal.collapse}
+						<PanelHeader
+							type="terminal"
+							icon={Terminal}
+							title="TERMINAL"
+							subtitle={terminalState.currentPath}
 							isFocused={terminalState.isFocused}
-						>
-							<TerminalHistory history={terminalState.history} />
+							controls={
+								<TerminalControls
+									onClose={terminal.collapse}
+									onMaximize={terminal.maximize}
+									onClearHistory={terminalState.clearHistory}
+								/>
+							}
+						/>
+
+						<div className="flex-1 min-h-0 flex flex-col relative">
+							<ScrollArea className="flex-1">
+								<div className="p-3">
+									<TerminalHistory history={terminalState.history} />
+								</div>
+							</ScrollArea>
+
 							<TerminalPrompt
 								terminalState={terminalState}
 								onKeyDown={handleKeyDown}
 							/>
-						</TerminalLayout>
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
