@@ -81,12 +81,12 @@ export const Z_INDEX = {
  */
 export const PANEL_CONFIG = {
 	HORIZONTAL: {
-		SIDEBAR: { defaultSize: '20%', minSize: '10%', maxSize: '30%', collapsedSize: '0%' },
+		SIDEBAR: { defaultSize: '20%', minSize: '3%', maxSize: '30%', collapsedSize: '3%' },
 		MAIN: { defaultSize: '80%', minSize: '50%' },
 	},
 	VERTICAL: {
 		CONTENT: { defaultSize: '65%', minSize: '30%' },
-		TERMINAL: { defaultSize: '35%', minSize: '10%', maxSize: '60%', collapsedSize: '0%' },
+		TERMINAL: { defaultSize: '35%', minSize: '5%', maxSize: '60%', collapsedSize: '5%' },
 	},
 	DEFAULTS: {
 		horizontal: [20, 80] as [number, number],
@@ -192,5 +192,5 @@ export const PANEL_DESIGN = {
 /**
  * Panel collapse configuration
  */
-export const PANEL_COLLAPSE_THRESHOLD = 1; // 1% threshold for collapse
+export const PANEL_COLLAPSE_THRESHOLD = 3; // 3% threshold matches sidebar collapsed size
 export const COLLAPSE_ANIMATION_DURATION = 250; // Match spring physics duration
