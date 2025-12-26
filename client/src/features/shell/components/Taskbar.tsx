@@ -135,7 +135,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								e.stopPropagation();
 								onClose(moduleId);
 							}}
-							className="ml-0.5 p-0.5 rounded-sm bg-transparent hover:bg-red-500/20 text-white/30 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-150 cursor-pointer"
+							className="ml-1 p-0.5 rounded-full bg-red-400/80 text-red-600 opacity-0 group-hover:opacity-90 transition-all duration-150 cursor-pointer"
 							role="button"
 							aria-label={`Close ${title}`}
 							tabIndex={0}
@@ -147,7 +147,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								}
 							}}
 						>
-							<X className="w-2 h-2" />
+							<X className="w-3 h-3" />
 						</div>
 					)}
 				</motion.button>
