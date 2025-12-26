@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useReducer } from 'react';
 import { useSetAtom } from 'jotai';
-import { openFilesAtom, createFileEntry } from '@/store';
+import { openFilesAtom, createFileEntry } from '@/store/atoms/files';
 import { useRouter } from 'next/navigation';
 import { processCommand, getCommandSuggestions } from '@/lib/commands';
 import type { CommandResponse } from '@/lib/commands';
