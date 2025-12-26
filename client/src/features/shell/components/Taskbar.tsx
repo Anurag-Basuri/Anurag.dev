@@ -104,7 +104,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 					{isActive && (
 						<motion.div
 							layoutId="active-taskbar-pill"
-							className="absolute inset-x-1 -bottom-0.5 h-0.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]"
+							className="absolute inset-x-1.5 -bottom-px h-0.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
 						/>
 					)}
 
@@ -135,7 +135,7 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 								e.stopPropagation();
 								onClose(moduleId);
 							}}
-							className="ml-1 p-0.5 rounded-full bg-red-400/80 text-red-600 opacity-0 group-hover:opacity-90 transition-all duration-150 cursor-pointer"
+							className="ml-1 p-0.5 rounded-full bg-red-400/80 text-red-600 opacity-0 group-hover:opacity-100 transition-all duration-150 cursor-pointer"
 							role="button"
 							aria-label={`Close ${title}`}
 							tabIndex={0}
@@ -356,9 +356,9 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: 20, scale: 0.95 }}
 							transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-							className="absolute bottom-10 left-3 sm:left-4 w-[calc(100%-1.5rem)] sm:w-72 z-50 bg-[#0a0a0a]/90 backdrop-blur-3xl border border-white/10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] p-3 rounded-xl overflow-hidden ring-1 ring-white/5"
+							className="absolute bottom-10 left-3 sm:left-4 w-[calc(100%-1.5rem)] sm:w-80 z-50 bg-[#0a0a0a]/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
 						>
-							<div className="absolute inset-x-0 top-0 h-[120px] bg-linear-to-b from-emerald-500/10 via-emerald-500/5 to-transparent pointer-events-none" />
+							<div className="absolute inset-x-0 top-0 h-[140px] bg-linear-to-b from-emerald-500/10 via-emerald-900/5 to-transparent pointer-events-none" />
 
 							<div className="relative z-10">
 								<div className="flex items-center gap-4 mb-6">
@@ -369,7 +369,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 											alt="Anurag Basuri"
 											width={52}
 											height={52}
-											className="w-13 h-13 rounded-full border-2 border-white/10 relative z-10 shadow-lg hover:scale-105 transition-transform duration-300"
+											className="w-13 h-13 rounded-full border-2 border-white/10 relative z-10 shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out"
 											priority
 										/>
 									</div>
@@ -394,7 +394,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 												onClick={() => handleNavigate(item.id)}
 												className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all text-sm flex items-center gap-3 group relative overflow-hidden"
 											>
-												<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors shadow-sm">
+												<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-all duration-300 shadow-sm border border-transparent group-hover:border-emerald-500/10">
 													<IconComponent className="w-4 h-4" />
 												</div>
 												<div className="flex-1 flex flex-col">
@@ -484,7 +484,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 
 								{/* Animated Glow on Hover */}
 								{!isStartOpen && (
-									<div className="absolute inset-0 bg-linear-to-tr from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+									<div className="absolute inset-0 bg-linear-to-tr from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 								)}
 							</motion.button>
 						</TooltipTrigger>
