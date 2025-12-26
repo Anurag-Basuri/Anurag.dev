@@ -82,73 +82,54 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 			<TooltipTrigger asChild>
 				<motion.button
 					layout
-					initial={{ opacity: 0, scale: 0.95, x: -8 }}
-					animate={{ opacity: 1, scale: 1, x: 0 }}
-					exit={{ opacity: 0, scale: 0.95, x: -8, transition: { duration: 0.1 } }}
-					transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-					whileHover={{ scale: 1.02 }}
-					whileTap={{ scale: 0.98 }}
+					initial={{ opacity: 0, x: -4 }}
+					animate={{ opacity: 1, x: 0 }}
+					exit={{ opacity: 0, x: -4 }}
+					transition={{ duration: 0.15, ease: 'easeOut' }}
 					onClick={onClick}
 					className={cn(
-						// Base styles
-						'relative flex items-center gap-1 md:gap-1.5 transition-all duration-200 group cursor-pointer overflow-hidden',
-						// Responsive sizing - larger touch target on mobile
-						'h-6 px-1.5 sm:px-2 rounded-md',
-						// Active/inactive states
+						'relative flex items-center gap-1.5 transition-colors duration-150 group cursor-pointer',
+						'h-6 px-2 rounded-md',
 						isActive
-							? 'bg-white/10 border border-white/15 shadow-sm'
-							: 'bg-white/5 border border-transparent hover:bg-white/8 hover:border-white/10',
+							? 'bg-white/10 text-white'
+							: 'bg-transparent text-white/50 hover:bg-white/5 hover:text-white/70',
 					)}
 				>
-					{/* Active Pill Indicator */}
 					{isActive && (
 						<motion.div
-							layoutId="active-taskbar-pill"
-							className="absolute inset-x-1.5 -bottom-px h-0.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+							layoutId="active-pill"
+							className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-emerald-400"
+							transition={{ duration: 0.2, ease: 'easeOut' }}
 						/>
 					)}
 
 					<IconComponent
 						className={cn(
-							'w-3 h-3 transition-colors duration-200 shrink-0',
-							isActive
-								? 'text-emerald-300'
-								: 'text-white/50 group-hover:text-white/70',
+							'w-3.5 h-3.5 shrink-0',
+							isActive ? 'text-emerald-400' : 'text-current',
 						)}
 					/>
 
 					<span
 						className={cn(
-							// Responsive text - hidden on small screens, visible on medium+
-							'text-[10px] font-medium transition-colors duration-200 truncate',
-							'hidden md:block max-w-[60px] lg:max-w-[80px]',
-							isActive ? 'text-white' : 'text-white/50 group-hover:text-white/70',
+							'text-[11px] font-medium truncate max-w-[80px]',
+							'hidden sm:block',
 						)}
 					>
 						{title}
 					</span>
 
-					{/* Close Button */}
 					{onClose && (
-						<div
+						<button
 							onClick={e => {
 								e.stopPropagation();
 								onClose(moduleId);
 							}}
-							className="ml-1 p-0.5 rounded-full bg-red-400/80 text-red-600 opacity-0 group-hover:opacity-100 transition-all duration-150 cursor-pointer"
-							role="button"
+							className="ml-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-white/10 transition-opacity duration-100"
 							aria-label={`Close ${title}`}
-							tabIndex={0}
-							onKeyDown={e => {
-								if (e.key === 'Enter' || e.key === ' ') {
-									e.preventDefault();
-									e.stopPropagation();
-									onClose(moduleId);
-								}
-							}}
 						>
-							<X className="w-3 h-3" />
-						</div>
+							<X className="w-2.5 h-2.5" />
+						</button>
 					)}
 				</motion.button>
 			</TooltipTrigger>
@@ -352,103 +333,89 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							ref={stateMenuRef}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							initial={{ opacity: 0, y: 20, scale: 0.95 }}
-							animate={{ opacity: 1, y: 0, scale: 1 }}
-							exit={{ opacity: 0, y: 20, scale: 0.95 }}
-							transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-							className="absolute bottom-10 left-3 sm:left-4 w-[calc(100%-1.5rem)] sm:w-80 z-50 bg-[#0a0a0a]/80 backdrop-blur-3xl backdrop-saturate-150 border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] p-4 rounded-2xl overflow-hidden ring-1 ring-white/5"
+							initial={{ opacity: 0, y: 8 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 8 }}
+							transition={{ duration: 0.15, ease: 'easeOut' }}
+							className="absolute bottom-10 left-3 sm:left-4 w-[calc(100%-1.5rem)] sm:w-72 z-50 bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 rounded-xl"
 						>
-							<div className="absolute inset-x-0 top-0 h-[140px] bg-linear-to-b from-emerald-500/10 via-emerald-900/5 to-transparent pointer-events-none" />
-
-							<div className="relative z-10">
-								<div className="flex items-center gap-4 mb-6">
-									<div className="relative group">
-										<div className="absolute -inset-4 bg-emerald-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500 rounded-full" />
-										<Image
-											src="/me.jpg"
-											alt="Anurag Basuri"
-											width={52}
-											height={52}
-											className="w-13 h-13 rounded-full border-2 border-white/10 relative z-10 shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out"
-											priority
-										/>
-									</div>
-									<div>
-										<div className="font-bold text-lg text-white tracking-wide">
-											Anurag Basuri
-										</div>
-										<div className="text-xs text-white/50 font-mono mt-0.5 flex items-center gap-1.5">
-											<span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-											Full-Stack Engineer
-										</div>
-									</div>
+							<div className="flex items-center gap-3 mb-5">
+								<Image
+									src="/me.jpg"
+									alt="Anurag Basuri"
+									width={48}
+									height={48}
+									className="w-12 h-12 rounded-full border border-white/10"
+									priority
+								/>
+								<div>
+									<div className="font-semibold text-white">Anurag Basuri</div>
+									<div className="text-xs text-white/50">Full-Stack Engineer</div>
 								</div>
+							</div>
 
-								<div className="grid gap-1.5 mb-5">
-									{menuItemsWithIcons.map((item, index) => {
-										const IconComponent = item.icon;
-										return (
-											<button
-												key={item.id}
-												ref={index === 0 ? firstMenuItemRef : null}
-												onClick={() => handleNavigate(item.id)}
-												className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all text-sm flex items-center gap-3 group relative overflow-hidden"
-											>
-												<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-all duration-300 shadow-sm border border-transparent group-hover:border-emerald-500/10">
-													<IconComponent className="w-4 h-4" />
-												</div>
-												<div className="flex-1 flex flex-col">
-													<span className="font-medium tracking-wide">
-														{item.label}
-													</span>
-													<span className="text-xs text-white/40">
-														{item.description}
-													</span>
-												</div>
-												<ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 group-hover:translate-x-0.5 transition-all" />
-											</button>
-										);
-									})}
-								</div>
+							<div className="grid gap-1.5 mb-5">
+								{menuItemsWithIcons.map((item, index) => {
+									const IconComponent = item.icon;
+									return (
+										<button
+											key={item.id}
+											ref={index === 0 ? firstMenuItemRef : null}
+											onClick={() => handleNavigate(item.id)}
+											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all text-sm flex items-center gap-3 group relative overflow-hidden"
+										>
+											<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-all duration-300 shadow-sm border border-transparent group-hover:border-emerald-500/10">
+												<IconComponent className="w-4 h-4" />
+											</div>
+											<div className="flex-1 flex flex-col">
+												<span className="font-medium tracking-wide">
+													{item.label}
+												</span>
+												<span className="text-xs text-white/40">
+													{item.description}
+												</span>
+											</div>
+											<ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 group-hover:translate-x-0.5 transition-all" />
+										</button>
+									);
+								})}
+							</div>
 
-								<div className="pt-4 border-t border-white/10 flex items-center justify-between">
-									<div className="flex items-center gap-2">
-										{socialLinks.map(link => (
-											<Tooltip key={link.label}>
-												<TooltipTrigger asChild>
-													<a
-														href={link.href}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/30 border border-transparent transition-all duration-200"
-													>
-														<link.icon className="w-4 h-4" />
-													</a>
-												</TooltipTrigger>
-												<TooltipContent side="top">
-													<p>{link.label}</p>
-												</TooltipContent>
-											</Tooltip>
-										))}
-									</div>
-									<div className="flex items-center gap-1">
-										<Tooltip>
+							<div className="pt-4 border-t border-white/10 flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									{socialLinks.map(link => (
+										<Tooltip key={link.label}>
 											<TooltipTrigger asChild>
-												<button
-													onClick={() => {
-														router.push('/');
-													}}
-													className="h-9 px-4 flex items-center gap-2 rounded-xl text-white/40 hover:text-white hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider group"
+												<a
+													href={link.href}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/30 border border-transparent transition-all duration-200"
 												>
-													<Power className="w-3.5 h-3.5 group-hover:text-red-400 transition-colors" />
-													<span>Restart</span>
-												</button>
+													<link.icon className="w-4 h-4" />
+												</a>
 											</TooltipTrigger>
 											<TooltipContent side="top">
-												Restart Session
+												<p>{link.label}</p>
 											</TooltipContent>
 										</Tooltip>
-									</div>
+									))}
+								</div>
+								<div className="flex items-center gap-1">
+									<Tooltip>
+										<TooltipTrigger asChild>
+											<button
+												onClick={() => {
+													router.push('/');
+												}}
+												className="h-9 px-4 flex items-center gap-2 rounded-xl text-white/40 hover:text-white hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider group"
+											>
+												<Power className="w-3.5 h-3.5 group-hover:text-red-400 transition-colors" />
+												<span>Restart</span>
+											</button>
+										</TooltipTrigger>
+										<TooltipContent side="top">Restart Session</TooltipContent>
+									</Tooltip>
 								</div>
 							</div>
 						</motion.div>
@@ -465,28 +432,21 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 					{/* Start Button */}
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<motion.button
-								whileHover={{ scale: 1.03 }}
-								whileTap={{ scale: 0.97 }}
+							<button
 								ref={startButtonRef}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-6 px-2 rounded-md flex items-center gap-1.5 transition-all duration-200 relative group shrink-0 border',
+									'h-6 px-2 rounded-md flex items-center gap-1.5 transition-colors duration-150 shrink-0',
 									isStartOpen
-										? 'bg-emerald-500/20 border-emerald-500/30 text-white'
-										: 'bg-white/5 border-transparent text-white/80 hover:bg-white/8 hover:border-white/10',
+										? 'bg-emerald-500/20 text-white'
+										: 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white',
 								)}
 							>
 								<Logo />
-								<span className="text-[11px] font-bold tracking-[0.15em] uppercase hidden lg:block">
+								<span className="text-[11px] font-semibold tracking-wide hidden sm:block">
 									Start
 								</span>
-
-								{/* Animated Glow on Hover */}
-								{!isStartOpen && (
-									<div className="absolute inset-0 bg-linear-to-tr from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-								)}
-							</motion.button>
+							</button>
 						</TooltipTrigger>
 						<TooltipContent
 							side="top"
@@ -497,26 +457,23 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 					</Tooltip>
 
 					{/* Divider */}
-					<div className="h-4 w-px bg-white/10 shrink-0" />
+					<div className="h-4 w-px bg-white/5 shrink-0" />
 
-					{/* Taskbar Items */}
-					<div className="flex items-center gap-0.5 sm:gap-1 h-full min-w-0 flex-1">
-						<LayoutGroup>
-							<AnimatePresence mode="popLayout" initial={false}>
-								{openFilesState
-									.map(f => normalizeModuleId(f.moduleId))
-									.filter((m): m is ModuleId => Boolean(m))
-									.map(moduleId => (
-										<TaskbarNavItem
-											key={moduleId}
-											moduleId={moduleId}
-											isActive={currentModule === moduleId}
-											onClick={() => handleNavigate(moduleId)}
-											onClose={handleCloseItem}
-										/>
-									))}
-							</AnimatePresence>
-						</LayoutGroup>
+					<div className="flex items-center gap-1 h-full min-w-0 flex-1">
+						<AnimatePresence mode="popLayout" initial={false}>
+							{openFilesState
+								.map(f => normalizeModuleId(f.moduleId))
+								.filter((m): m is ModuleId => Boolean(m))
+								.map(moduleId => (
+									<TaskbarNavItem
+										key={moduleId}
+										moduleId={moduleId}
+										isActive={currentModule === moduleId}
+										onClick={() => handleNavigate(moduleId)}
+										onClose={handleCloseItem}
+									/>
+								))}
+						</AnimatePresence>
 					</div>
 				</div>
 
