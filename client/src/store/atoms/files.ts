@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 export interface OpenFile {
 	moduleId: string;
@@ -20,14 +20,31 @@ export const createFileEntry = (moduleId: string): OpenFile => ({
 const getDefaultOpenFiles = (): OpenFile[] => [];
 
 /**
- * Atom to track currently open files in the application.
- * Persists to localStorage and initializes empty.
- * Initialized with proper SSR safety.
+ * SSR-safe storage that only uses localStorage on the client.
+ * During SSR, it returns the default value without errors.
  */
-export const openFilesAtom =
-	typeof window !== 'undefined'
-		? atomWithStorage<OpenFile[]>(STORAGE_KEY, getDefaultOpenFiles())
-		: atom<OpenFile[]>(getDefaultOpenFiles());
+const storage = createJSONStorage<OpenFile[]>(() => {
+	if (typeof window === 'undefined') {
+		// Return a no-op storage for SSR
+		return {
+			getItem: () => null,
+			setItem: () => {},
+			removeItem: () => {},
+		};
+	}
+	return localStorage;
+});
+
+/**
+ * Atom to track currently open files in the application.
+ * Persists to localStorage with proper SSR safety.
+ */
+export const openFilesAtom = atomWithStorage<OpenFile[]>(
+	STORAGE_KEY,
+	getDefaultOpenFiles(),
+	storage,
+	{ getOnInit: true },
+);
 
 // Export constants for use in other modules
 export { DEFAULT_MODULE_ID };
