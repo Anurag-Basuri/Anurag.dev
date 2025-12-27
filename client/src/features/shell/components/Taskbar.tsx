@@ -21,19 +21,43 @@ import {
 	type LucideIcon,
 	ChevronRight,
 	Instagram,
+	Sparkles,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/common/HelpButton';
 import { useAtom } from 'jotai';
 import { openFilesAtom, type OpenFile } from '@/store';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Compact logo component
-const Logo = () => (
-	<div className="w-4 h-4 flex items-center justify-center">
-		<div className="w-full h-full border-[1.5px] border-emerald-500 rounded-sm rotate-45 flex items-center justify-center bg-emerald-500/10">
-			<div className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-		</div>
+// Enhanced logo component with glow effect
+const Logo = ({ isActive = false }: { isActive?: boolean }) => (
+	<div className="w-4 h-4 flex items-center justify-center relative">
+		<motion.div
+			animate={isActive ? { rotate: 45, scale: 1.1 } : { rotate: 45, scale: 1 }}
+			transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+			className={cn(
+				'w-full h-full border-[1.5px] rounded-sm flex items-center justify-center transition-colors duration-200',
+				isActive
+					? 'border-emerald-400 bg-emerald-500/20'
+					: 'border-emerald-500/70 bg-emerald-500/10',
+			)}
+		>
+			<div
+				className={cn(
+					'w-1.5 h-1.5 rounded-full transition-all duration-200',
+					isActive
+						? 'bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,1)]'
+						: 'bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.6)]',
+				)}
+			/>
+		</motion.div>
+		{isActive && (
+			<motion.div
+				initial={{ opacity: 0, scale: 0.5 }}
+				animate={{ opacity: 1, scale: 1 }}
+				className="absolute inset-0 bg-emerald-500/20 blur-md rounded-full"
+			/>
+		)}
 	</div>
 );
 
@@ -325,97 +349,117 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => setIsStartOpen(false)}
-							className="fixed inset-0 bg-transparent z-40"
+							className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
 						/>
 
-						{/* Popover */}
+						{/* Start Menu Panel */}
 						<motion.div
 							ref={stateMenuRef}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							initial={{ opacity: 0, y: 8 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: 8 }}
-							transition={{ duration: 0.15, ease: 'easeOut' }}
-							className="absolute bottom-10 left-3 sm:left-4 w-[calc(100%-1.5rem)] sm:w-72 z-50 bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 shadow-2xl p-4 rounded-xl"
+							initial={{ opacity: 0, y: 12, scale: 0.98 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							exit={{ opacity: 0, y: 12, scale: 0.98 }}
+							transition={{ type: 'spring', duration: 0.25, bounce: 0.1 }}
+							className="absolute bottom-12 left-2 sm:left-4 w-[calc(100%-1rem)] sm:w-80 z-50"
 						>
-							<div className="flex items-center gap-3 mb-5">
-								<Image
-									src="/me.jpg"
-									alt="Anurag Basuri"
-									width={48}
-									height={48}
-									className="w-12 h-12 rounded-full border border-white/10"
-									priority
-								/>
-								<div>
-									<div className="font-semibold text-white">Anurag Basuri</div>
-									<div className="text-xs text-white/50">Full-Stack Engineer</div>
+							<div className="bg-[#080808]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl overflow-hidden">
+								{/* Header with profile */}
+								<div className="p-4 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-b border-white/5">
+									<div className="flex items-center gap-3">
+										<div className="relative">
+											<Image
+												src="/me.jpg"
+												alt="Anurag Basuri"
+												width={48}
+												height={48}
+												className="w-12 h-12 rounded-xl border border-white/10 shadow-lg"
+												priority
+											/>
+											<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#080808]" />
+										</div>
+										<div className="flex-1 min-w-0">
+											<div className="font-semibold text-white text-sm flex items-center gap-1.5">
+												Anurag Basuri
+												<Sparkles className="w-3 h-3 text-emerald-400" />
+											</div>
+											<div className="text-xs text-white/40">
+												Full-Stack Engineer
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
 
-							<div className="grid gap-1.5 mb-5">
-								{menuItemsWithIcons.map((item, index) => {
-									const IconComponent = item.icon;
-									return (
-										<button
-											key={item.id}
-											ref={index === 0 ? firstMenuItemRef : null}
-											onClick={() => handleNavigate(item.id)}
-											className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all text-sm flex items-center gap-3 group relative overflow-hidden"
-										>
-											<div className="p-2 rounded-lg bg-white/5 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 transition-all duration-300 shadow-sm border border-transparent group-hover:border-emerald-500/10">
-												<IconComponent className="w-4 h-4" />
-											</div>
-											<div className="flex-1 flex flex-col">
-												<span className="font-medium tracking-wide">
-													{item.label}
-												</span>
-												<span className="text-xs text-white/40">
-													{item.description}
-												</span>
-											</div>
-											<ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 group-hover:translate-x-0.5 transition-all" />
-										</button>
-									);
-								})}
-							</div>
-
-							<div className="pt-4 border-t border-white/10 flex items-center justify-between">
-								<div className="flex items-center gap-2">
-									{socialLinks.map(link => (
-										<Tooltip key={link.label}>
-											<TooltipTrigger asChild>
-												<a
-													href={link.href}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/5 text-white/40 hover:text-white hover:bg-emerald-500/20 hover:border-emerald-500/30 border border-transparent transition-all duration-200"
+								{/* Navigation Grid */}
+								<div className="p-2">
+									<div className="grid gap-0.5">
+										{menuItemsWithIcons.map((item, index) => {
+											const IconComponent = item.icon;
+											return (
+												<motion.button
+													key={item.id}
+													ref={index === 0 ? firstMenuItemRef : null}
+													onClick={() => handleNavigate(item.id)}
+													whileHover={{ x: 2 }}
+													whileTap={{ scale: 0.99 }}
+													className="w-full text-left px-3 py-2.5 rounded-xl text-white/70 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 group"
 												>
-													<link.icon className="w-4 h-4" />
-												</a>
+													<div className="w-9 h-9 rounded-lg bg-white/5 group-hover:bg-emerald-500/15 flex items-center justify-center transition-all duration-200 border border-transparent group-hover:border-emerald-500/20">
+														<IconComponent className="w-4 h-4 text-white/50 group-hover:text-emerald-400 transition-colors" />
+													</div>
+													<div className="flex-1 min-w-0">
+														<span className="block text-sm font-medium truncate">
+															{item.label}
+														</span>
+														<span className="block text-[10px] text-white/30 truncate">
+															{item.description}
+														</span>
+													</div>
+													<ChevronRight className="w-4 h-4 text-white/10 group-hover:text-white/30 group-hover:translate-x-0.5 transition-all" />
+												</motion.button>
+											);
+										})}
+									</div>
+								</div>
+
+								{/* Footer with social links */}
+								<div className="p-3 border-t border-white/5 bg-white/[0.02]">
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-1">
+											{socialLinks.map(link => (
+												<Tooltip key={link.label}>
+													<TooltipTrigger asChild>
+														<a
+															href={link.href}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="w-8 h-8 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/10 transition-all duration-200"
+														>
+															<link.icon className="w-4 h-4" />
+														</a>
+													</TooltipTrigger>
+													<TooltipContent side="top" className="text-xs">
+														{link.label}
+													</TooltipContent>
+												</Tooltip>
+											))}
+										</div>
+
+										<Tooltip>
+											<TooltipTrigger asChild>
+												<button
+													onClick={() => router.push('/')}
+													className="h-8 px-3 flex items-center gap-2 rounded-lg text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-all text-xs font-medium group"
+												>
+													<Power className="w-3.5 h-3.5" />
+													<span className="hidden sm:block">Restart</span>
+												</button>
 											</TooltipTrigger>
-											<TooltipContent side="top">
-												<p>{link.label}</p>
+											<TooltipContent side="top" className="text-xs">
+												Restart Session
 											</TooltipContent>
 										</Tooltip>
-									))}
-								</div>
-								<div className="flex items-center gap-1">
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<button
-												onClick={() => {
-													router.push('/');
-												}}
-												className="h-9 px-4 flex items-center gap-2 rounded-xl text-white/40 hover:text-white hover:bg-red-500/20 transition-all text-xs font-bold uppercase tracking-wider group"
-											>
-												<Power className="w-3.5 h-3.5 group-hover:text-red-400 transition-colors" />
-												<span>Restart</span>
-											</button>
-										</TooltipTrigger>
-										<TooltipContent side="top">Restart Session</TooltipContent>
-									</Tooltip>
+									</div>
 								</div>
 							</div>
 						</motion.div>
@@ -426,7 +470,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 			{/* Main Bar */}
 			<div className="w-full shrink-0 h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative">
 				{/* Top gradient border */}
-				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
 
 				<div className="flex items-center gap-1.5 sm:gap-2 h-full flex-1 min-w-0 overflow-x-auto scrollbar-hide">
 					{/* Start Button */}
@@ -437,12 +481,13 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
 									'h-6 px-2 rounded-md flex items-center justify-center gap-1.5 transition-all duration-200 shrink-0',
+									'border border-transparent',
 									isStartOpen
-										? 'bg-emerald-500/20 text-white shadow-[0_0_12px_rgba(16,185,129,0.15)]'
-										: 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white',
+										? 'bg-emerald-500/15 text-white border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+										: 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white hover:border-white/5',
 								)}
 							>
-								<Logo />
+								<Logo isActive={isStartOpen} />
 								<span className="text-[11px] font-semibold tracking-wide hidden md:block">
 									Start
 								</span>
@@ -450,7 +495,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 						</TooltipTrigger>
 						<TooltipContent
 							side="top"
-							className="bg-black/80 backdrop-blur text-white border-white/10"
+							className="bg-black/80 backdrop-blur text-white border-white/10 text-xs"
 						>
 							System Menu
 						</TooltipContent>
