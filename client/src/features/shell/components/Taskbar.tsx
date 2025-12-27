@@ -436,13 +436,16 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 								ref={startButtonRef}
 								onClick={() => setIsStartOpen(!isStartOpen)}
 								className={cn(
-									'h-6 w-8 rounded-md flex items-center justify-center transition-colors duration-150 shrink-0',
+									'h-6 px-2 rounded-md flex items-center justify-center gap-1.5 transition-all duration-200 shrink-0',
 									isStartOpen
-										? 'bg-emerald-500/20 text-white'
+										? 'bg-emerald-500/20 text-white shadow-[0_0_12px_rgba(16,185,129,0.15)]'
 										: 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white',
 								)}
 							>
 								<Logo />
+								<span className="text-[11px] font-semibold tracking-wide hidden md:block">
+									Start
+								</span>
 							</button>
 						</TooltipTrigger>
 						<TooltipContent

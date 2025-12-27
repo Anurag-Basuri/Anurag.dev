@@ -123,7 +123,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 						<button
 							onClick={() => setIsOpen(true)}
 							className={cn(
-								'h-6 w-8 rounded-md flex items-center justify-center transition-all duration-200 group',
+								'h-6 px-2 rounded-md flex items-center justify-center gap-1.5 transition-all duration-200 group',
 								'bg-transparent hover:bg-white/5',
 								'text-white/70 hover:text-white',
 								'focus:outline-none',
@@ -133,6 +133,9 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 							ref={triggerRef}
 						>
 							<HelpCircle className="w-4 h-4 transition-transform duration-200 group-hover:scale-110" />
+							<span className="text-[11px] font-semibold tracking-wide hidden md:block">
+								Help
+							</span>
 						</button>
 					</TooltipTrigger>
 					<TooltipContent side="top">Quick Help</TooltipContent>
