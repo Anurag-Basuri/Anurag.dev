@@ -365,7 +365,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 						>
 							<div className="bg-[#080808]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl overflow-hidden">
 								{/* Header with profile */}
-								<div className="p-4 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-b border-white/5">
+								<div className="p-4 bg-linear-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-b border-white/5">
 									<div className="flex items-center gap-3">
 										<div className="relative">
 											<Image
@@ -423,7 +423,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 								</div>
 
 								{/* Footer with social links */}
-								<div className="p-3 border-t border-white/5 bg-white/[0.02]">
+								<div className="p-3 border-t border-white/5 bg-white/2">
 									<div className="flex items-center justify-between">
 										<div className="flex items-center gap-1">
 											{socialLinks.map(link => (
@@ -470,7 +470,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 			{/* Main Bar */}
 			<div className="w-full shrink-0 h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative">
 				{/* Top gradient border */}
-				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
 
 				<div className="flex items-center gap-1.5 sm:gap-2 h-full flex-1 min-w-0 overflow-x-auto scrollbar-hide">
 					{/* Start Button */}
@@ -484,7 +484,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 									'border border-transparent',
 									isStartOpen
 										? 'bg-emerald-500/15 text-white border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
-										: 'bg-transparent text-white/70 hover:bg-white/5 hover:text-white hover:border-white/5',
+										: 'bg-transparent text-white/60 hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20',
 								)}
 							>
 								<Logo isActive={isStartOpen} />

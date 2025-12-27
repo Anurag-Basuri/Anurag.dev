@@ -123,7 +123,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 					className={cn(
 						'fixed bottom-6 right-6 z-40',
 						'w-11 h-11 sm:w-12 sm:h-12',
-						'bg-gradient-to-br from-emerald-500 to-emerald-600',
+						'bg-linear-to-br from-emerald-500 to-emerald-600',
 						'text-white rounded-full',
 						'shadow-lg shadow-emerald-500/25',
 						'hover:shadow-xl hover:shadow-emerald-500/30',
@@ -148,7 +148,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 								'flex items-center justify-center gap-1.5',
 								'transition-all duration-200 group',
 								'bg-transparent hover:bg-emerald-500/10',
-								'text-white/50 hover:text-emerald-400',
+								'text-white/60 hover:text-emerald-400',
 								'border border-transparent hover:border-emerald-500/20',
 								'focus:outline-none focus:ring-1 focus:ring-emerald-500/30',
 								className,
@@ -180,7 +180,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									animate={{ opacity: 1 }}
 									exit={{ opacity: 0 }}
 									onClick={() => setIsOpen(false)}
-									className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
+									className="fixed inset-0 bg-black/40 backdrop-blur-sm z-60"
 								/>
 
 								{/* Popover */}
@@ -190,7 +190,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 									exit={{ opacity: 0, scale: 0.95, y: 10 }}
 									transition={{ type: 'spring', duration: 0.25, bounce: 0.1 }}
 									className={cn(
-										'fixed z-[60]',
+										'fixed z-60',
 										// Mobile: full-width bottom sheet
 										'max-sm:left-2 max-sm:right-2 max-sm:bottom-2',
 										// Desktop: compact panel near trigger
@@ -204,7 +204,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 								>
 									<div className="bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl overflow-hidden">
 										{/* Header */}
-										<div className="px-4 py-3 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent">
+										<div className="px-4 py-3 border-b border-white/5 flex justify-between items-center bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-transparent">
 											<div className="flex items-center gap-2.5">
 												<div className="w-7 h-7 rounded-lg bg-emerald-500/20 flex items-center justify-center">
 													<Terminal className="w-3.5 h-3.5 text-emerald-400" />
@@ -259,7 +259,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 											</div>
 
 											{/* Divider */}
-											<div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+											<div className="h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
 
 											{/* Shortcuts Section */}
 											<div>
@@ -271,7 +271,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 													{shortcuts.map((item, i) => (
 														<div
 															key={i}
-															className="flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-white/[0.02] hover:bg-white/5 transition-colors"
+															className="flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg bg-white/2 hover:bg-white/5 transition-colors"
 														>
 															<span className="text-[10px] text-white/50">
 																{item.desc}
@@ -292,7 +292,7 @@ export function HelpButton({ placement = 'floating', className }: HelpButtonProp
 											</div>
 
 											{/* Pro Tip */}
-											<div className="flex items-start gap-2.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/10">
+											<div className="flex items-start gap-2.5 p-3 rounded-xl bg-linear-to-br from-emerald-500/10 to-transparent border border-emerald-500/10">
 												<Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
 												<p className="text-[11px] text-white/60 leading-relaxed">
 													<span className="text-emerald-400 font-medium">
