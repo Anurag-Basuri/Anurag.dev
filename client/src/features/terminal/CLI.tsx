@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useTerminalState } from './hooks/useTerminalState';
 import { useCLI } from './hooks/useCLI';
