@@ -22,102 +22,41 @@ import {
 	ChevronRight,
 	Instagram,
 	Sparkles,
-	Clock as ClockIcon,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { HelpButton } from '@/components/common/HelpButton';
 import { useAtom } from 'jotai';
 import { openFilesAtom } from '@/store';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ============================================================================
-// Constants & Animation Configs
-// ============================================================================
-
-const SPRING_CONFIG = { type: 'spring', stiffness: 400, damping: 30 } as const;
-const SPRING_SOFT = { type: 'spring', stiffness: 300, damping: 25 } as const;
-
-// ============================================================================
-// Logo Component
+// Logo Component (matches TopBar branding style)
 // ============================================================================
 
 const Logo = memo(function Logo({ isActive = false }: { isActive?: boolean }) {
 	return (
 		<div className="w-4 h-4 flex items-center justify-center relative">
-			<motion.div
-				animate={{
-					rotate: 45,
-					scale: isActive ? 1.1 : 1,
-				}}
-				transition={SPRING_CONFIG}
+			<div
 				className={cn(
-					'w-full h-full border-[1.5px] rounded-sm flex items-center justify-center',
-					'transition-colors duration-200',
+					'w-full h-full border-[1.5px] rounded-sm rotate-45 flex items-center justify-center',
+					'transition-all duration-200',
 					isActive
-						? 'border-emerald-400 bg-emerald-500/25'
+						? 'border-emerald-400 bg-emerald-500/25 scale-110'
 						: 'border-emerald-500/60 bg-emerald-500/10',
 				)}
 			>
-				<motion.div
-					animate={{
-						scale: isActive ? [1, 1.2, 1] : 1,
-						opacity: isActive ? 1 : 0.8,
-					}}
-					transition={{
-						scale: { duration: 0.3, times: [0, 0.5, 1] },
-						opacity: { duration: 0.2 },
-					}}
+				<div
 					className={cn(
-						'w-1.5 h-1.5 rounded-full',
+						'w-1.5 h-1.5 rounded-full transition-all duration-200',
 						isActive
 							? 'bg-emerald-300 shadow-[0_0_10px_rgba(52,211,153,1)]'
 							: 'bg-emerald-400 shadow-[0_0_4px_rgba(52,211,153,0.5)]',
 					)}
 				/>
-			</motion.div>
-			<AnimatePresence>
-				{isActive && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.5 }}
-						animate={{ opacity: 0.6, scale: 1.5 }}
-						exit={{ opacity: 0, scale: 0.5 }}
-						transition={SPRING_SOFT}
-						className="absolute inset-0 bg-emerald-500/30 blur-lg rounded-full pointer-events-none"
-					/>
-				)}
-			</AnimatePresence>
-		</div>
-	);
-});
-
-// ============================================================================
-// Clock Component
-// ============================================================================
-
-const TaskbarClock = memo(function ClockComponent() {
-	const [time, setTime] = useState<string>('');
-
-	useEffect(() => {
-		const updateTime = () => {
-			setTime(
-				new Date().toLocaleTimeString('en-US', {
-					hour: '2-digit',
-					minute: '2-digit',
-					hour12: true,
-				}),
-			);
-		};
-		updateTime();
-		const interval = setInterval(updateTime, 1000);
-		return () => clearInterval(interval);
-	}, []);
-
-	if (!time) return null;
-
-	return (
-		<div className="hidden lg:flex items-center gap-1.5 px-2 text-[10px] text-white/40 font-mono tabular-nums">
-			<ClockIcon className="w-3 h-3" />
-			<span>{time}</span>
+			</div>
+			{isActive && (
+				<div className="absolute inset-0 bg-emerald-500/30 blur-lg rounded-full pointer-events-none animate-pulse" />
+			)}
 		</div>
 	);
 });
@@ -138,11 +77,9 @@ type ModuleIconComponent = LucideIcon;
 
 const MODULE_ICON_BY_ID: Record<ModuleId, ModuleIconComponent> = (() => {
 	const icons = {} as Record<ModuleId, ModuleIconComponent>;
-
 	for (const id of VALID_MODULE_IDS) {
 		icons[id] = getModuleIcon(id);
 	}
-
 	return icons;
 })();
 
@@ -152,7 +89,7 @@ const MENU_ITEMS_WITH_ICONS = navigationItems.map(item => ({
 }));
 
 // ============================================================================
-// TaskbarNavItem Component
+// TaskbarNavItem Component (matches TopBar button styling)
 // ============================================================================
 
 const TaskbarNavItem = memo(function TaskbarNavItem({
@@ -168,105 +105,71 @@ const TaskbarNavItem = memo(function TaskbarNavItem({
 }) {
 	const IconComponent = MODULE_ICON_BY_ID[moduleId];
 	const title = getModuleTitle(moduleId);
-	const [isHovered, setIsHovered] = useState(false);
 
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<motion.button
-					layout="position"
-					layoutId={`tab-${moduleId}`}
-					initial={{ opacity: 0, scale: 0.9, x: -8 }}
-					animate={{ opacity: 1, scale: 1, x: 0 }}
-					exit={{ opacity: 0, scale: 0.9, x: -8 }}
-					transition={SPRING_CONFIG}
+				<button
 					onClick={onClick}
-					onMouseEnter={() => setIsHovered(true)}
-					onMouseLeave={() => setIsHovered(false)}
 					className={cn(
-						'relative flex items-center gap-1.5 cursor-pointer',
-						'h-6 px-2.5 rounded-lg',
-						'transition-colors duration-150',
-						'focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/50',
+						'relative flex items-center gap-1.5 cursor-pointer group',
+						'h-6 px-2 rounded-md',
+						'transition-all duration-200',
+						'focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+						'active:scale-95 hover:scale-105',
 						isActive
-							? 'bg-white/10 text-white'
+							? 'bg-white/10 text-white shadow-[0_0_12px_rgba(52,211,153,0.2)]'
 							: 'bg-transparent text-white/50 hover:bg-white/5 hover:text-white/80',
 					)}
 				>
-					{/* Active indicator pill */}
+					{/* Active indicator */}
 					{isActive && (
-						<motion.div
-							layoutId="active-indicator"
-							className="absolute inset-x-2 -bottom-[1px] h-[2px] rounded-full bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400"
-							transition={SPRING_SOFT}
-						/>
+						<div className="absolute inset-x-1 -bottom-[1px] h-[2px] rounded-full bg-emerald-400" />
 					)}
-
-					{/* Hover glow effect */}
-					<AnimatePresence>
-						{isHovered && !isActive && (
-							<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.15 }}
-								className="absolute inset-0 rounded-lg bg-gradient-to-t from-white/5 to-transparent pointer-events-none"
-							/>
-						)}
-					</AnimatePresence>
 
 					<IconComponent
 						className={cn(
-							'w-3.5 h-3.5 shrink-0 transition-all duration-200',
+							'w-3.5 h-3.5 shrink-0 transition-colors duration-200',
 							isActive
 								? 'text-emerald-400 drop-shadow-[0_0_4px_rgba(52,211,153,0.5)]'
 								: 'text-current',
 						)}
+						aria-hidden="true"
 					/>
 
 					<span
 						className={cn(
 							'text-[11px] font-medium truncate max-w-[72px]',
 							'hidden sm:block',
-							'transition-colors duration-150',
+							'transition-colors duration-200',
 						)}
 					>
 						{title}
 					</span>
 
-					{/* Close button */}
+					{/* Close button - shows on hover */}
 					{onClose && (
-						<AnimatePresence>
-							{(isHovered || isActive) && (
-								<motion.button
-									initial={{ opacity: 0, scale: 0.8 }}
-									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.8 }}
-									transition={{ duration: 0.1 }}
-									onClick={e => {
-										e.stopPropagation();
-										onClose(moduleId);
-									}}
-									className={cn(
-										'ml-0.5 p-0.5 rounded-md',
-										'hover:bg-white/15 active:bg-white/20',
-										'transition-colors duration-100',
-									)}
-									aria-label={`Close ${title}`}
-								>
-									<X className="w-2.5 h-2.5" />
-								</motion.button>
+						<button
+							onClick={e => {
+								e.stopPropagation();
+								onClose(moduleId);
+							}}
+							className={cn(
+								'ml-0.5 p-0.5 rounded-md',
+								'opacity-0 group-hover:opacity-100',
+								'hover:bg-white/15 active:bg-white/20',
+								'transition-all duration-150',
+								'focus:outline-none focus:opacity-100',
 							)}
-						</AnimatePresence>
+							aria-label={`Close ${title}`}
+						>
+							<X className="w-2.5 h-2.5" aria-hidden="true" />
+						</button>
 					)}
-				</motion.button>
+				</button>
 			</TooltipTrigger>
-			<TooltipContent
-				side="top"
-				sideOffset={8}
-				className="text-xs font-medium bg-[#0a0a0a]/95 backdrop-blur-xl border border-white/10 shadow-xl"
-			>
-				{title}
+			<TooltipContent side="top" sideOffset={8}>
+				<p>{title}</p>
 			</TooltipContent>
 		</Tooltip>
 	);
@@ -288,25 +191,24 @@ const SocialLink = memo(function SocialLink({
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<motion.a
+				<a
 					href={href}
 					target="_blank"
 					rel="noopener noreferrer"
-					whileHover={{ scale: 1.05, y: -1 }}
-					whileTap={{ scale: 0.95 }}
 					className={cn(
 						'w-8 h-8 flex items-center justify-center rounded-lg',
 						'text-white/30 hover:text-white',
 						'bg-transparent hover:bg-white/10',
-						'transition-colors duration-200',
-						'focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/50',
+						'transition-all duration-200',
+						'hover:scale-105 active:scale-95',
+						'focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 					)}
 				>
-					<Icon className="w-4 h-4" />
-				</motion.a>
+					<Icon className="w-4 h-4" aria-hidden="true" />
+				</a>
 			</TooltipTrigger>
-			<TooltipContent side="top" className="text-xs">
-				{label}
+			<TooltipContent side="top">
+				<p>{label}</p>
 			</TooltipContent>
 		</Tooltip>
 	);
@@ -330,20 +232,16 @@ const StartMenuItem = memo(function StartMenuItem({
 	const IconComponent = item.icon;
 
 	return (
-		<motion.button
+		<button
 			ref={index === 0 ? firstItemRef : null}
 			onClick={() => onNavigate(item.id)}
-			initial={{ opacity: 0, x: -12 }}
-			animate={{ opacity: 1, x: 0 }}
-			transition={{ delay: index * 0.03, ...SPRING_SOFT }}
-			whileHover={{ x: 4 }}
-			whileTap={{ scale: 0.98 }}
 			className={cn(
 				'w-full text-left px-3 py-2.5 rounded-xl',
 				'text-white/70 hover:bg-white/5 hover:text-white',
-				'transition-colors duration-150',
+				'transition-all duration-200',
 				'flex items-center gap-3 group',
-				'focus:outline-none focus-visible:bg-white/5',
+				'focus:outline-none focus:bg-white/5 focus:ring-2 focus:ring-emerald-400/40',
+				'hover:scale-[1.01] active:scale-[0.99]',
 			)}
 		>
 			<div
@@ -354,14 +252,20 @@ const StartMenuItem = memo(function StartMenuItem({
 					'transition-all duration-200',
 				)}
 			>
-				<IconComponent className="w-4 h-4 text-white/50 group-hover:text-emerald-400 transition-colors" />
+				<IconComponent
+					className="w-4 h-4 text-white/50 group-hover:text-emerald-400 transition-colors"
+					aria-hidden="true"
+				/>
 			</div>
 			<div className="flex-1 min-w-0">
 				<span className="block text-sm font-medium truncate">{item.label}</span>
 				<span className="block text-[10px] text-white/30 truncate">{item.description}</span>
 			</div>
-			<ChevronRight className="w-4 h-4 text-white/10 group-hover:text-white/40 group-hover:translate-x-0.5 transition-all" />
-		</motion.button>
+			<ChevronRight
+				className="w-4 h-4 text-white/10 group-hover:text-white/40 group-hover:translate-x-0.5 transition-all"
+				aria-hidden="true"
+			/>
+		</button>
 	);
 });
 
@@ -485,8 +389,8 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 	];
 
 	return (
-		<TooltipProvider delayDuration={400} skipDelayDuration={100}>
-			{/* Start Menu */}
+		<TooltipProvider delayDuration={300}>
+			{/* Start Menu - uses motion for open/close only */}
 			<AnimatePresence>
 				{isStartOpen && (
 					<>
@@ -497,7 +401,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.15 }}
 							onClick={() => setIsStartOpen(false)}
-							className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+							className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
 						/>
 
 						{/* Menu Panel */}
@@ -505,56 +409,39 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							ref={menuRef}
 							tabIndex={0}
 							onKeyDown={handleMenuKeyDown}
-							initial={{ opacity: 0, y: 16, scale: 0.96 }}
-							animate={{ opacity: 1, y: 0, scale: 1 }}
-							exit={{ opacity: 0, y: 16, scale: 0.96 }}
-							transition={SPRING_CONFIG}
-							className="fixed bottom-12 left-2 sm:left-4 w-[calc(100%-1rem)] sm:w-80 z-50"
+							initial={{ opacity: 0, y: 12 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: 12 }}
+							transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+							className="fixed bottom-10 left-2 sm:left-4 w-[calc(100%-1rem)] sm:w-80 z-50"
 						>
-							<div className="bg-[#080808]/98 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/60 rounded-2xl overflow-hidden">
+							<div className="bg-[#080808]/95 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-2xl overflow-hidden">
 								{/* Profile Header */}
 								<div className="p-4 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border-b border-white/5">
 									<div className="flex items-center gap-3">
 										<div className="relative">
-											<motion.div
-												initial={{ scale: 0.9, opacity: 0 }}
-												animate={{ scale: 1, opacity: 1 }}
-												transition={{ delay: 0.05, ...SPRING_SOFT }}
-											>
-												<Image
-													src="/me.jpg"
-													alt="Anurag Basuri"
-													width={48}
-													height={48}
-													className="w-12 h-12 rounded-xl border border-white/10 shadow-lg object-cover"
-													priority
-												/>
-											</motion.div>
-											<motion.div
-												initial={{ scale: 0 }}
-												animate={{ scale: 1 }}
-												transition={{
-													delay: 0.1,
-													type: 'spring',
-													stiffness: 500,
-												}}
-												className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#080808] shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+											<Image
+												src="/me.jpg"
+												alt="Anurag Basuri"
+												width={48}
+												height={48}
+												className="w-12 h-12 rounded-xl border border-white/10 shadow-lg object-cover"
+												priority
 											/>
+											<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#080808] shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
 										</div>
-										<motion.div
-											initial={{ opacity: 0, x: -8 }}
-											animate={{ opacity: 1, x: 0 }}
-											transition={{ delay: 0.08, ...SPRING_SOFT }}
-											className="flex-1 min-w-0"
-										>
+										<div className="flex-1 min-w-0">
 											<div className="font-semibold text-white text-sm flex items-center gap-1.5">
 												Anurag Basuri
-												<Sparkles className="w-3 h-3 text-emerald-400" />
+												<Sparkles
+													className="w-3 h-3 text-emerald-400"
+													aria-hidden="true"
+												/>
 											</div>
 											<div className="text-xs text-white/40">
 												Full-Stack Engineer
 											</div>
-										</motion.div>
+										</div>
 									</div>
 								</div>
 
@@ -574,12 +461,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 								</div>
 
 								{/* Footer */}
-								<motion.div
-									initial={{ opacity: 0 }}
-									animate={{ opacity: 1 }}
-									transition={{ delay: 0.15 }}
-									className="p-3 border-t border-white/5 bg-white/[0.02]"
-								>
+								<div className="p-3 border-t border-white/5 bg-white/[0.02]">
 									<div className="flex items-center justify-between">
 										<div className="flex items-center gap-0.5">
 											{socialLinks.map(link => (
@@ -589,114 +471,106 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 
 										<Tooltip>
 											<TooltipTrigger asChild>
-												<motion.button
+												<button
 													onClick={() => router.push('/')}
-													whileHover={{ scale: 1.02 }}
-													whileTap={{ scale: 0.98 }}
 													className={cn(
 														'h-8 px-3 flex items-center gap-2 rounded-lg',
 														'text-white/40 hover:text-red-400',
 														'hover:bg-red-500/10',
-														'transition-colors duration-150',
+														'transition-all duration-200',
+														'hover:scale-105 active:scale-95',
 														'text-xs font-medium',
+														'focus:outline-none focus:ring-2 focus:ring-red-400/40',
 													)}
 												>
-													<Power className="w-3.5 h-3.5" />
+													<Power
+														className="w-3.5 h-3.5"
+														aria-hidden="true"
+													/>
 													<span className="hidden sm:block">Restart</span>
-												</motion.button>
+												</button>
 											</TooltipTrigger>
-											<TooltipContent side="top" className="text-xs">
-												Restart Session
+											<TooltipContent side="top">
+												<p>Restart Session</p>
 											</TooltipContent>
 										</Tooltip>
 									</div>
-								</motion.div>
+								</div>
 							</div>
 						</motion.div>
 					</>
 				)}
 			</AnimatePresence>
 
-			{/* Main Taskbar */}
-			<div
-				className={cn(
-					'w-full shrink-0 h-9 px-2 sm:px-3 md:px-4',
-					'bg-[#050505]/85 backdrop-blur-xl backdrop-saturate-150',
-					'border-t border-white/[0.06]',
-					'flex items-center justify-between',
-					'z-40 relative',
-				)}
+			{/* Main Taskbar - matches TopBar styling exactly */}
+			<footer
+				className="h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl backdrop-saturate-150 border-t border-white/5 shadow-sm flex items-center justify-between z-40 relative select-none"
+				role="contentinfo"
 			>
-				{/* Top gradient accent */}
-				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/25 to-transparent" />
+				{/* Top gradient border - matches TopBar bottom gradient */}
+				<div
+					className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent"
+					aria-hidden="true"
+				/>
 
-				{/* Left section */}
-				<div className="flex items-center gap-2 h-full flex-1 min-w-0">
-					{/* Start Button */}
+				{/* Left Section */}
+				<div className="flex items-center gap-1.5 sm:gap-2 h-full flex-1 min-w-0">
+					{/* Start Button - matches TopBar button styling */}
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<motion.button
+							<button
 								ref={startButtonRef}
 								onClick={() => setIsStartOpen(!isStartOpen)}
-								whileHover={{ scale: 1.02 }}
-								whileTap={{ scale: 0.98 }}
 								className={cn(
-									'h-7 px-2.5 rounded-lg flex items-center justify-center gap-1.5',
-									'transition-all duration-200 shrink-0',
-									'border',
-									'focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500/50',
+									'h-6 px-2 rounded-md flex items-center justify-center gap-1.5',
+									'transition-all duration-200',
+									'hover:scale-105 active:scale-95',
+									'focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
 									isStartOpen
-										? 'bg-emerald-500/15 text-white border-emerald-500/30 shadow-[0_0_16px_rgba(16,185,129,0.15)]'
-										: 'bg-transparent text-white/60 border-transparent hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/20',
+										? 'bg-emerald-500/15 text-white border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+										: 'bg-transparent text-white/70 border border-transparent hover:bg-white/5 hover:text-white hover:border-white/10',
 								)}
+								aria-label="System Menu"
+								aria-expanded={isStartOpen}
 							>
 								<Logo isActive={isStartOpen} />
-								<span className="text-[11px] font-semibold tracking-wide hidden md:block">
+								<span className="text-[10px] font-bold tracking-[0.15em] uppercase hidden md:block">
 									Start
 								</span>
-							</motion.button>
+							</button>
 						</TooltipTrigger>
-						<TooltipContent
-							side="top"
-							sideOffset={8}
-							className="bg-[#0a0a0a]/95 backdrop-blur-xl text-white border-white/10 text-xs"
-						>
-							System Menu
+						<TooltipContent side="top">
+							<p>System Menu</p>
 						</TooltipContent>
 					</Tooltip>
 
-					{/* Divider */}
-					<div className="h-4 w-px bg-white/[0.06] shrink-0" />
+					{/* Divider - matches TopBar style */}
+					<div className="w-px h-3.5 bg-white/10 mx-0.5" aria-hidden="true" />
 
-					{/* Open Tabs */}
+					{/* Open Tabs Container - styled like TopBar control panel */}
 					<div className="flex items-center gap-1 h-full min-w-0 flex-1 overflow-x-auto scrollbar-hide">
-						<LayoutGroup>
-							<AnimatePresence mode="popLayout" initial={false}>
-								{openFilesState
-									.map(f => normalizeModuleId(f.moduleId))
-									.filter((m): m is ModuleId => Boolean(m))
-									.map(moduleId => (
-										<TaskbarNavItem
-											key={moduleId}
-											moduleId={moduleId}
-											isActive={currentModule === moduleId}
-											onClick={() => handleNavigate(moduleId)}
-											onClose={handleCloseItem}
-										/>
-									))}
-							</AnimatePresence>
-						</LayoutGroup>
+						{openFilesState
+							.map(f => normalizeModuleId(f.moduleId))
+							.filter((m): m is ModuleId => Boolean(m))
+							.map(moduleId => (
+								<TaskbarNavItem
+									key={moduleId}
+									moduleId={moduleId}
+									isActive={currentModule === moduleId}
+									onClick={() => handleNavigate(moduleId)}
+									onClose={handleCloseItem}
+								/>
+							))}
 					</div>
 				</div>
 
-				{/* Right section */}
+				{/* Right Section - matches TopBar right section styling */}
 				{!isMobile && (
-					<div className="flex items-center gap-1 pl-2 border-l border-white/[0.06] shrink-0">
-						<TaskbarClock />
+					<div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 pl-2 border-l border-white/10">
 						<HelpButton placement="taskbar" />
 					</div>
 				)}
-			</div>
+			</footer>
 		</TooltipProvider>
 	);
 });
