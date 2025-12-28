@@ -1,9 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LucideIcon, ChevronRight } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TIMINGS, SPRINGS } from '@/lib/constants';
+import { TIMINGS } from '@/lib/constants';
 
 interface PanelHeaderProps {
 	type: 'sidebar' | 'terminal';
@@ -21,7 +21,7 @@ interface PanelHeaderProps {
  * Used by both Sidebar and Terminal for perfect consistency
  */
 export function PanelHeader({
-	type,
+	type: _type,
 	icon: Icon,
 	title,
 	subtitle,
