@@ -135,7 +135,7 @@ const Typewriter = ({ texts }: { texts: string[] }) => {
 				setTimeout(() => setIsDeleting(true), delay);
 			} else if (isDeleting && displayText === '') {
 				setIsDeleting(false);
-				setIndex(prev => (prev + 1) % texts.length);
+				setIndex(i => (i + 1) % texts.length);
 			} else {
 				setDisplayText(
 					currentText.substring(0, displayText.length + (isDeleting ? -1 : 1)),
@@ -166,11 +166,11 @@ const GlitchText = ({ text }: { text: string }) => {
 			clearInterval(interval);
 
 			interval = setInterval(() => {
-				setDisplayText(prev =>
+				setDisplayText(
 					text
 						.split('')
-						.map((char, index) => {
-							if (index < iterations) return text[index];
+						.map((char, idx) => {
+							if (idx < iterations) return text[idx];
 							return chars[Math.floor(Math.random() * chars.length)];
 						})
 						.join(''),
@@ -213,7 +213,7 @@ export function Introduction() {
 		completionTimeoutRef.current = setTimeout(() => {
 			try {
 				sessionStorage.setItem(BOOT_SESSION_KEY, '1');
-			} catch (e) {}
+			} catch {}
 			setBootComplete(true);
 		}, BURST_DELAY);
 	}, [isCompleting, setBootComplete]);
