@@ -19,7 +19,7 @@ export function HelpButton({ onClick, className }: HelpButtonProps) {
 			className={cn(
 				'fixed bottom-6 right-6 z-40',
 				'w-11 h-11 sm:w-12 sm:h-12',
-				'bg-gradient-to-br from-emerald-500 to-emerald-600',
+				'bg-linear-to-br from-emerald-500 to-emerald-600',
 				'text-white rounded-full',
 				'shadow-lg shadow-emerald-500/25',
 				'hover:shadow-xl hover:shadow-emerald-500/30',
