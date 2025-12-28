@@ -1,7 +1,7 @@
 'use client';
 import { Terminal, ChevronsUpDown } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { TerminalControls } from '@/components/common/WindowControls';
+import { cn } from '@/lib/utils';
 
 interface TerminalHeaderProps {
 	currentPath: string;
@@ -24,9 +24,6 @@ export function TerminalHeader({
 	onClose,
 	isFocused = false,
 }: TerminalHeaderProps) {
-	function cn(...classes: (string | false | null | undefined)[]): string {
-		return classes.filter(Boolean).join(' ');
-	}
 	return (
 		<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
 			{/* Left: Traffic Lights + Title + Path */}
