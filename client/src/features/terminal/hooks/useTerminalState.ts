@@ -5,7 +5,6 @@ import { openFilesAtom, createFileEntry } from '@/store/atoms/files';
 import { useRouter } from 'next/navigation';
 import { processCommand, getCommandSuggestions } from '@/lib/commands';
 import type { CommandResponse } from '@/lib/commands';
-import { getModuleComponent } from '@/lib/moduleRegistry';
 import { useTheme } from 'next-themes';
 import type { HistoryItem } from '../types';
 import { initialTerminalState, terminalReducer } from '../terminalReducer';
@@ -138,10 +137,6 @@ export function useTerminalState() {
 		dispatch({ type: 'SET_INPUT', payload: suggestion });
 		dispatch({ type: 'SET_CURSOR_POS', payload: suggestion.length });
 		dispatch({ type: 'SET_ACTIVE_SUGGESTION_INDEX', payload: 0 });
-	}, []);
-
-	const pushCommandToHistory = useCallback((command: string) => {
-		dispatch({ type: 'ADD_CMD_TO_HISTORY', payload: command });
 	}, []);
 
 	const addToHistory = useCallback(
