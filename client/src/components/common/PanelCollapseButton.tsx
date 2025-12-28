@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -9,6 +10,14 @@ interface PanelCollapseButtonProps {
 	className?: string;
 }
 
+// Icon map to avoid creating components during render
+const ICONS = {
+	left: { collapsed: ChevronRight, expanded: ChevronLeft },
+	right: { collapsed: ChevronLeft, expanded: ChevronRight },
+	top: { collapsed: ChevronDown, expanded: ChevronUp },
+	bottom: { collapsed: ChevronUp, expanded: ChevronDown },
+} as const;
+
 /**
  * Collapse/Expand button for resizable panels
  * Shows appropriate chevron based on position and state
@@ -19,14 +28,11 @@ export function PanelCollapseButton({
 	position,
 	className,
 }: PanelCollapseButtonProps) {
-	const getIcon = () => {
-		if (position === 'left') return isCollapsed ? ChevronRight : ChevronLeft;
-		if (position === 'right') return isCollapsed ? ChevronLeft : ChevronRight;
-		if (position === 'top') return isCollapsed ? ChevronDown : ChevronUp;
-		return isCollapsed ? ChevronUp : ChevronDown;
-	};
-
-	const Icon = getIcon();
+	// Memoize icon selection to avoid ESLint component creation warning
+	const Icon = useMemo(() => {
+		const icons = ICONS[position];
+		return isCollapsed ? icons.collapsed : icons.expanded;
+	}, [position, isCollapsed]);
 
 	return (
 		<motion.button
