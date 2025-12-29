@@ -156,58 +156,71 @@ export function useTerminalState() {
 	const executeCommand = useCallback(
 		async (command: string) => {
 			const trimmedCommand = command.trim();
-			if (!trimmedCommand) return;
+			if (!trimmedCommand || state.isExecuting) return;
 
-			const response = await processCommand(trimmedCommand, state.currentPath);
+			// Set executing state
+			dispatch({ type: 'SET_EXECUTING', payload: true });
 
-			// Handle different response types
-			switch (response.type) {
-				case 'clear':
-					dispatch({ type: 'CLEAR_HISTORY' });
-					break;
+			try {
+				const response = await processCommand(trimmedCommand, state.currentPath);
 
-				case 'change_directory':
-					if (response.newPath) {
-						setCurrentPath(response.newPath);
-					}
-					addToHistory(trimmedCommand, { type: 'success', content: '' });
-					break;
+				// Handle different response types
+				switch (response.type) {
+					case 'clear':
+						dispatch({ type: 'CLEAR_HISTORY' });
+						break;
 
-				case 'open_module':
-					addToHistory(trimmedCommand, response);
-					if (response.moduleId) {
-						const moduleId = response.moduleId;
-						// Update open files atom
-						setOpenFiles(prev => {
-							if (prev.some(f => f.moduleId === moduleId)) return prev;
-							return [...prev, createFileEntry(moduleId)];
-						});
-						// Navigate to the module
-						router.push(`/portfolio/${moduleId}`);
-					}
-					break;
-
-				case 'set_theme':
-					addToHistory(trimmedCommand, response);
-					if (response.theme) {
-						if (response.theme === 'toggle') {
-							setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-						} else {
-							setTheme(response.theme);
+					case 'change_directory':
+						if (response.newPath) {
+							setCurrentPath(response.newPath);
 						}
-					}
-					break;
+						addToHistory(trimmedCommand, { type: 'success', content: '' });
+						break;
 
-				default:
-					addToHistory(trimmedCommand, response);
-					break;
+					case 'open_module':
+						addToHistory(trimmedCommand, response);
+						if (response.moduleId) {
+							const moduleId = response.moduleId;
+							// Update open files atom
+							setOpenFiles(prev => {
+								if (prev.some(f => f.moduleId === moduleId)) return prev;
+								return [...prev, createFileEntry(moduleId)];
+							});
+							// Navigate to the module
+							router.push(`/portfolio/${moduleId}`);
+						}
+						break;
+
+					case 'set_theme':
+						addToHistory(trimmedCommand, response);
+						if (response.theme) {
+							if (response.theme === 'toggle') {
+								setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+							} else {
+								setTheme(response.theme);
+							}
+						}
+						break;
+
+					default:
+						addToHistory(trimmedCommand, response);
+						break;
+				}
+
+				// Add to command history
+				dispatch({ type: 'ADD_CMD_TO_HISTORY', payload: trimmedCommand });
+			} catch (error) {
+				addToHistory(trimmedCommand, {
+					type: 'error',
+					content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				});
+			} finally {
+				dispatch({ type: 'SET_EXECUTING', payload: false });
 			}
-
-			// Add to command history
-			dispatch({ type: 'ADD_CMD_TO_HISTORY', payload: trimmedCommand });
 		},
 		[
 			state.currentPath,
+			state.isExecuting,
 			addToHistory,
 			setOpenFiles,
 			setTheme,
@@ -234,6 +247,7 @@ export function useTerminalState() {
 		historyIndex: state.historyIndex,
 		currentPath: state.currentPath,
 		isFocused: state.isFocused,
+		isExecuting: state.isExecuting,
 		activeSuggestionIndex: state.activeSuggestionIndex,
 		suggestions: state.suggestions,
 		showSuggestions,
