@@ -91,75 +91,84 @@ const Input = forwardRef<
 		path: string;
 		cursorPos: number;
 		isFocused: boolean;
+		isExecuting: boolean;
 		onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-		onKeyDown: (e: React.KeyboardEvent) => void;
+		onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 		onFocus: () => void;
 		onBlur: () => void;
 	}
->(({ value, path, cursorPos, isFocused, onChange, onKeyDown, onFocus, onBlur }, ref) => (
-	<div
-		className={cn(
-			STYLES.bar,
-			'border-t gap-2 cursor-text',
-			isFocused ? 'border-emerald-500/30' : 'border-white/5',
-		)}
-		onClick={() => (ref as React.RefObject<HTMLInputElement>)?.current?.focus()}
-	>
-		<ChevronRight
-			className={cn(STYLES.icon, isFocused ? 'text-emerald-400' : 'text-white/30')}
-		/>
-		<span
+>(
+	(
+		{ value, path, cursorPos, isFocused, isExecuting, onChange, onKeyDown, onFocus, onBlur },
+		ref,
+	) => (
+		<div
 			className={cn(
-				STYLES.text,
-				'font-semibold',
-				isFocused ? 'text-emerald-400' : 'text-white/40',
+				STYLES.bar,
+				'border-t gap-2 cursor-text',
+				isFocused ? 'border-emerald-500/30' : 'border-white/5',
 			)}
+			onClick={() => (ref as React.RefObject<HTMLInputElement>)?.current?.focus()}
 		>
-			{path}
-		</span>
-		<span
-			className={cn(
-				STYLES.text,
-				'font-bold',
-				isFocused ? 'text-emerald-500' : 'text-white/20',
-			)}
-		>
-			$
-		</span>
-		<div className="relative flex-1 min-w-0">
-			<input
-				ref={ref}
-				type="text"
-				value={value}
-				onChange={onChange}
-				onKeyDown={onKeyDown}
-				onFocus={onFocus}
-				onBlur={onBlur}
-				className="absolute inset-0 w-full bg-transparent text-transparent caret-transparent outline-none font-mono text-xs"
-				autoComplete="off"
-				autoCorrect="off"
-				spellCheck={false}
-				aria-label="Command input"
+			<ChevronRight
+				className={cn(STYLES.icon, isFocused ? 'text-emerald-400' : 'text-white/30')}
 			/>
-			<div
+			<span
 				className={cn(
 					STYLES.text,
-					'whitespace-pre pointer-events-none flex items-center',
-					isFocused ? 'text-white' : 'text-white/60',
+					'font-semibold',
+					isFocused ? 'text-emerald-400' : 'text-white/40',
 				)}
 			>
-				<span>{value.slice(0, cursorPos)}</span>
-				<span
-					className={cn(
-						'w-2 h-4 bg-emerald-400 animate-pulse',
-						!isFocused && 'opacity-0',
-					)}
+				{path}
+			</span>
+			<span
+				className={cn(
+					STYLES.text,
+					'font-bold',
+					isFocused ? 'text-emerald-500' : 'text-white/20',
+				)}
+			>
+				$
+			</span>
+			<div className="relative flex-1 min-w-0">
+				<input
+					ref={ref}
+					type="text"
+					value={value}
+					onChange={onChange}
+					onKeyDown={onKeyDown}
+					onFocus={onFocus}
+					onBlur={onBlur}
+					className="absolute inset-0 w-full bg-transparent text-transparent caret-transparent outline-none font-mono text-xs"
+					autoComplete="off"
+					autoCorrect="off"
+					spellCheck={false}
+					aria-label="Command input"
 				/>
-				<span className="opacity-50">{value.slice(cursorPos)}</span>
+				<div
+					className={cn(
+						STYLES.text,
+						'whitespace-pre pointer-events-none flex items-center',
+						isFocused ? 'text-white' : 'text-white/60',
+					)}
+				>
+					<span>{value.slice(0, cursorPos)}</span>
+					<span
+						className={cn(
+							'w-2 h-4 bg-emerald-400 animate-pulse',
+							!isFocused && 'opacity-0',
+						)}
+					/>
+					<span className="opacity-50">{value.slice(cursorPos)}</span>
+				</div>
+				{isExecuting && (
+					<span className="text-emerald-400 text-xs animate-pulse ml-2">●</span>
+				)}
 			</div>
 		</div>
-	</div>
-));
+	),
+);
 Input.displayName = 'Input';
 
 // ============================================================================
@@ -230,10 +239,19 @@ const HistoryEntry = ({ item }: { item: HistoryItem }) => (
 );
 
 const Welcome = () => (
-	<div className="text-xs font-mono text-white/30 space-y-1">
+	<div className="text-xs font-mono text-white/30 space-y-2">
 		<p>
 			Welcome! Type <span className="text-emerald-400">help</span> for commands.
 		</p>
+		<div className="text-white/20 text-[10px] space-y-0.5">
+			<p>
+				<span className="text-emerald-500/50">↑/↓</span> History
+				<span className="mx-2">•</span>
+				<span className="text-emerald-500/50">Tab</span> Autocomplete
+				<span className="mx-2">•</span>
+				<span className="text-emerald-500/50">Ctrl+L</span> Clear
+			</p>
+		</div>
 	</div>
 );
 
@@ -312,6 +330,7 @@ export function CLI() {
 				path={state.currentPath}
 				cursorPos={state.cursorPos}
 				isFocused={state.isFocused}
+				isExecuting={state.isExecuting}
 				onChange={e => {
 					state.setInput(e.target.value);
 					state.setCursorPos(e.target.selectionStart || 0);
