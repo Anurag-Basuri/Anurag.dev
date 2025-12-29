@@ -1,5 +1,8 @@
 import { HistoryItem } from './types';
 
+// Constants
+const DISPLAY_HISTORY_LIMIT = 100;
+
 // State Definition
 export interface TerminalState {
 	input: string;
@@ -9,6 +12,7 @@ export interface TerminalState {
 	historyIndex: number;
 	currentPath: string;
 	isFocused: boolean;
+	isExecuting: boolean;
 	suggestions: string[];
 	activeSuggestionIndex: number;
 }
@@ -24,6 +28,7 @@ export type TerminalAction =
 	| { type: 'SET_HISTORY_INDEX'; payload: number }
 	| { type: 'SET_CURRENT_PATH'; payload: string }
 	| { type: 'SET_FOCUSED'; payload: boolean }
+	| { type: 'SET_EXECUTING'; payload: boolean }
 	| { type: 'SET_SUGGESTIONS'; payload: string[] }
 	| { type: 'SET_ACTIVE_SUGGESTION_INDEX'; payload: number }
 	| { type: 'RESET_INPUT' };
@@ -37,6 +42,7 @@ export const initialTerminalState: TerminalState = {
 	historyIndex: -1,
 	currentPath: '~',
 	isFocused: false,
+	isExecuting: false,
 	suggestions: [],
 	activeSuggestionIndex: 0,
 };
@@ -48,8 +54,12 @@ export function terminalReducer(state: TerminalState, action: TerminalAction): T
 			return { ...state, input: action.payload };
 		case 'SET_CURSOR_POS':
 			return { ...state, cursorPos: action.payload };
-		case 'ADD_HISTORY_ITEM':
-			return { ...state, history: [...state.history, action.payload] };
+		case 'ADD_HISTORY_ITEM': {
+			const newHistory = [...state.history, action.payload];
+			// Trim history to prevent memory issues
+			const trimmedHistory = newHistory.slice(-DISPLAY_HISTORY_LIMIT);
+			return { ...state, history: trimmedHistory };
+		}
 		case 'CLEAR_HISTORY':
 			return { ...state, history: [] };
 		case 'SET_CMD_HISTORY':
@@ -64,6 +74,8 @@ export function terminalReducer(state: TerminalState, action: TerminalAction): T
 			return { ...state, currentPath: action.payload };
 		case 'SET_FOCUSED':
 			return { ...state, isFocused: action.payload };
+		case 'SET_EXECUTING':
+			return { ...state, isExecuting: action.payload };
 		case 'SET_SUGGESTIONS':
 			return { ...state, suggestions: action.payload };
 		case 'SET_ACTIVE_SUGGESTION_INDEX':
