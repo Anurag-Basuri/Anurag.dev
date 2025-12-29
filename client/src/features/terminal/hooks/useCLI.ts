@@ -4,7 +4,9 @@ import { useTerminalState } from './useTerminalState';
 
 export function useCLI(terminalState: ReturnType<typeof useTerminalState>) {
 	const handleKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			const input = e.currentTarget;
+
 			// Ctrl+L: Clear screen
 			if (e.ctrlKey && e.key === 'l') {
 				e.preventDefault();
@@ -12,17 +14,74 @@ export function useCLI(terminalState: ReturnType<typeof useTerminalState>) {
 				return;
 			}
 
-			// Ctrl+C: Clear input
+			// Ctrl+C: Clear input and show ^C
 			if (e.ctrlKey && e.key === 'c') {
 				e.preventDefault();
+				if (terminalState.input) {
+					terminalState.addToHistory(terminalState.input, {
+						type: 'error',
+						content: '^C',
+					});
+				}
 				terminalState.resetInput();
-				terminalState.addToHistory(terminalState.input, { type: 'error', content: '^C' });
 				return;
 			}
 
-			// Enter: Execute command
+			// Ctrl+U: Clear line (from cursor to start)
+			if (e.ctrlKey && e.key === 'u') {
+				e.preventDefault();
+				const afterCursor = terminalState.input.slice(terminalState.cursorPos);
+				terminalState.setInput(afterCursor);
+				terminalState.setCursorPos(0);
+				return;
+			}
+
+			// Ctrl+K: Clear line (from cursor to end)
+			if (e.ctrlKey && e.key === 'k') {
+				e.preventDefault();
+				const beforeCursor = terminalState.input.slice(0, terminalState.cursorPos);
+				terminalState.setInput(beforeCursor);
+				return;
+			}
+
+			// Ctrl+A: Move cursor to start
+			if (e.ctrlKey && e.key === 'a') {
+				e.preventDefault();
+				terminalState.setCursorPos(0);
+				input.setSelectionRange(0, 0);
+				return;
+			}
+
+			// Ctrl+E: Move cursor to end
+			if (e.ctrlKey && e.key === 'e') {
+				e.preventDefault();
+				const len = terminalState.input.length;
+				terminalState.setCursorPos(len);
+				input.setSelectionRange(len, len);
+				return;
+			}
+
+			// Home: Move cursor to start
+			if (e.key === 'Home') {
+				e.preventDefault();
+				terminalState.setCursorPos(0);
+				input.setSelectionRange(0, 0);
+				return;
+			}
+
+			// End: Move cursor to end
+			if (e.key === 'End') {
+				e.preventDefault();
+				const len = terminalState.input.length;
+				terminalState.setCursorPos(len);
+				input.setSelectionRange(len, len);
+				return;
+			}
+
+			// Enter: Execute command (blocked during execution)
 			if (e.key === 'Enter') {
 				e.preventDefault();
+				if (terminalState.isExecuting) return;
 				if (terminalState.input.trim()) {
 					terminalState.executeCommand(terminalState.input);
 					terminalState.resetInput();
@@ -61,7 +120,7 @@ export function useCLI(terminalState: ReturnType<typeof useTerminalState>) {
 				return;
 			}
 
-			// Arrow Up: Always navigate command history
+			// Arrow Up: Navigate command history
 			if (e.key === 'ArrowUp') {
 				e.preventDefault();
 				if (terminalState.cmdHistory.length > 0) {
@@ -77,7 +136,7 @@ export function useCLI(terminalState: ReturnType<typeof useTerminalState>) {
 				return;
 			}
 
-			// Arrow Down: Always navigate command history
+			// Arrow Down: Navigate command history
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
 				if (terminalState.historyIndex !== -1) {
