@@ -1,9 +1,12 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { TIMINGS } from '@/lib/constants';
+import { PANEL_TOKENS } from '@/lib/constants';
+
+// ============================================================================
+// Types
+// ============================================================================
 
 interface PanelHeaderProps {
 	type: 'sidebar' | 'terminal';
@@ -11,17 +14,19 @@ interface PanelHeaderProps {
 	title: string;
 	subtitle?: string | null;
 	controls?: React.ReactNode;
-	onCollapse?: () => void;
 	isFocused?: boolean;
 	className?: string;
 }
 
+// ============================================================================
+// Panel Header Component
+// ============================================================================
+
 /**
- * Industry-grade unified panel header
- * Used by both Sidebar and Terminal for perfect consistency
+ * Unified panel header for sidebar and terminal
+ * Uses centralized PANEL_TOKENS for consistent styling
  */
 export function PanelHeader({
-	type: _type,
 	icon: Icon,
 	title,
 	subtitle,
@@ -29,16 +34,20 @@ export function PanelHeader({
 	isFocused = false,
 	className,
 }: PanelHeaderProps) {
+	const { header, icons, accent } = PANEL_TOKENS;
+
 	return (
 		<header
 			className={cn(
-				'h-7 px-2',
-				'bg-zinc-900/95 backdrop-blur-md',
-				'border-b border-white/5',
+				header.height,
+				header.padding,
+				header.bg,
+				header.blur,
+				header.border,
+				header.shadow,
 				'flex items-center justify-between',
 				'shrink-0 select-none',
 				'relative z-20',
-				'shadow-sm',
 				className,
 			)}
 		>
@@ -53,10 +62,9 @@ export function PanelHeader({
 				<div className="flex items-center gap-1.5 text-xs font-mono transition-colors">
 					<Icon
 						className={cn(
-							'w-3.5 h-3.5 transition-all duration-200',
-							isFocused
-								? 'text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]'
-								: 'text-primary',
+							icons.md,
+							'transition-all duration-200',
+							isFocused ? `text-${accent.primary} ${accent.glow}` : 'text-primary',
 						)}
 						aria-hidden="true"
 					/>
@@ -94,13 +102,14 @@ export function PanelHeader({
 			</div>
 
 			{/* Draggable Indicator */}
-			<motion.div
-				className="absolute left-1/2 -translate-x-1/2 top-0 w-8 h-1 rounded-full bg-white/10"
-				whileHover={{
-					backgroundColor: 'rgba(52, 211, 153, 0.3)',
-					width: 48,
-					transition: { duration: TIMINGS.fast / 1000 },
-				}}
+			<div
+				className={cn(
+					'absolute left-1/2 -translate-x-1/2 top-0',
+					'w-8 h-1 rounded-full bg-white/10',
+					'hover:bg-emerald-400/30 hover:w-12',
+					'transition-all duration-150',
+				)}
+				aria-hidden="true"
 			/>
 		</header>
 	);
