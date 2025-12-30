@@ -111,11 +111,6 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const maximizeSidebar = useCallback(() => {
 		// Store current state for restore
 		preSidebarMaxSize.current = hSizes?.[0] ?? 20;
-		preTerminalCollapsed.current = terminalCollapsed;
-
-		// Collapse terminal
-		setTerminalCollapsed(true);
-		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
 
 		// Expand sidebar to max
 		setSidebarCollapsed(false);
@@ -136,17 +131,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			sidebar: prevSize,
 			main: 100 - prevSize,
 		});
-
-		// Restore terminal if it was open before
-		if (!preTerminalCollapsed.current) {
-			setTerminalCollapsed(false);
-			const terminalSize = vSizes?.[1] ?? 40;
-			verticalGroupRef.current?.setLayout({
-				content: 100 - terminalSize,
-				terminal: terminalSize,
-			});
-		}
-	}, [hSizes, vSizes, setTerminalCollapsed]);
+	}, [hSizes]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -188,11 +173,6 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const maximizeTerminal = useCallback(() => {
 		// Store current state for restore
 		preTerminalMaxSize.current = vSizes?.[1] ?? 40;
-		preSidebarCollapsed.current = sidebarCollapsed;
-
-		// Collapse sidebar
-		setSidebarCollapsed(true);
-		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
 
 		// Expand terminal to max
 		setTerminalCollapsed(false);
@@ -213,17 +193,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			content: 100 - prevSize,
 			terminal: prevSize,
 		});
-
-		// Restore sidebar if it was open before
-		if (!preSidebarCollapsed.current) {
-			setSidebarCollapsed(false);
-			const sidebarSize = hSizes?.[0] ?? 20;
-			horizontalGroupRef.current?.setLayout({
-				sidebar: sidebarSize,
-				main: 100 - sidebarSize,
-			});
-		}
-	}, [vSizes, hSizes, setSidebarCollapsed]);
+	}, [vSizes]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
