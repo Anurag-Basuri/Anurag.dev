@@ -63,7 +63,12 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 // ============================================================================
 // Main Sidebar Component
 // ============================================================================
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+	onMaximize?: () => void;
+	onCollapse?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ onMaximize, onCollapse }) => {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const router = useRouter();
 	const pathname = usePathname();
@@ -100,8 +105,8 @@ export const Sidebar: React.FC = () => {
 				title="EXPLORER"
 				controls={
 					<SidebarControls
-						onClose={sidebar.collapse}
-						onMaximize={sidebar.maximize}
+						onClose={onCollapse ?? sidebar.collapse}
+						onMaximize={onMaximize ?? sidebar.maximize}
 						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
 					/>
 				}
