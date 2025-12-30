@@ -228,7 +228,12 @@ Welcome.displayName = 'Welcome';
 // Main CLI Component
 // ============================================================================
 
-export function CLI() {
+interface CLIProps {
+	onMaximize?: () => void;
+	onCollapse?: () => void;
+}
+
+export function CLI({ onMaximize, onCollapse }: CLIProps) {
 	const terminal = useCollapsiblePanel({ type: 'terminal' });
 	const state = useTerminalState();
 	const { handleKeyDown } = useCLI(state);
@@ -293,9 +298,9 @@ export function CLI() {
 				isFocused={state.isFocused}
 				controls={
 					<TerminalControls
-						onClose={terminal.collapse}
+						onClose={onCollapse ?? terminal.collapse}
 						onClearHistory={state.clearHistory}
-						onMaximize={terminal.maximize}
+						onMaximize={onMaximize ?? terminal.maximize}
 					/>
 				}
 			/>
