@@ -119,28 +119,41 @@ function usePopover() {
 
 	useEffect(() => {
 		if (!isOpen) return;
-		const onEsc = (e: KeyboardEvent) =>
-			e.key === 'Escape' && (close(), triggerRef.current?.focus());
+
+		const onEsc = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				close();
+				triggerRef.current?.focus();
+			}
+		};
+
 		const onClick = (e: MouseEvent) => {
 			const t = e.target as Node;
-			if (!panelRef.current?.contains(t) && !triggerRef.current?.contains(t)) close();
+			if (!panelRef.current?.contains(t) && !triggerRef.current?.contains(t)) {
+				close();
+			}
 		};
+
 		document.addEventListener('keydown', onEsc);
 		document.addEventListener('mousedown', onClick);
+
 		return () => {
 			document.removeEventListener('keydown', onEsc);
 			document.removeEventListener('mousedown', onClick);
 		};
 	}, [isOpen, close]);
 
-	const trapFocus = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+	// Focus trap handler - defined as a regular function for ref safety
+	const handleTrapFocus = (e: React.KeyboardEvent<HTMLDivElement>) => {
 		if (!panelRef.current || e.key !== 'Tab') return;
+
 		const els = Array.from(
 			panelRef.current.querySelectorAll<HTMLElement>(
 				'button, a[href], [tabindex]:not([tabindex="-1"])',
 			),
 		);
 		if (!els.length) return;
+
 		const [first, last] = [els[0], els[els.length - 1]];
 		if (!e.shiftKey && document.activeElement === last) {
 			e.preventDefault();
@@ -149,9 +162,9 @@ function usePopover() {
 			e.preventDefault();
 			last.focus();
 		}
-	}, []);
+	};
 
-	return { isOpen, close, toggle, panelRef, triggerRef, trapFocus };
+	return { isOpen, close, toggle, panelRef, triggerRef, trapFocus: handleTrapFocus };
 }
 
 // ============================================================================
