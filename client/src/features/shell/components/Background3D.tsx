@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState, useCallback, MutableRefObject } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Points, PointMaterial, Line, Float } from '@react-three/drei';
+import { Points, PointMaterial } from '@react-three/drei';
 import { useTheme } from 'next-themes';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import type { Points as ThreePoints, Vector3 } from 'three';
+import type { Points as ThreePoints } from 'three';
 import * as THREE from 'three';
 import { useThemeColor } from '@/hooks/use-theme-colors';
 import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocessing';
@@ -31,26 +31,6 @@ const CONFIG = {
 		simpleDPR: 1,
 	},
 } as const;
-
-// --- Types ---
-interface Particle {
-	position: Vector3;
-	velocity: Vector3;
-	size: number;
-	originalSize: number;
-	opacity: number;
-	color: string;
-}
-
-interface ShootingStar {
-	position: Vector3;
-	velocity: Vector3;
-	trail: Vector3[];
-	maxTrailLength: number;
-	active: boolean;
-	life: number;
-	maxLife: number;
-}
 
 // --- Utilities ---
 function usePrefersReducedMotion() {

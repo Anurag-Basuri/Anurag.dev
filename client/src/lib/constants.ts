@@ -194,3 +194,59 @@ export const PANEL_DESIGN = {
  */
 export const PANEL_COLLAPSE_THRESHOLD = 3; // 3% threshold matches sidebar collapsed size
 export const COLLAPSE_ANIMATION_DURATION = 250; // Match spring physics duration
+
+/**
+ * Unified Panel Design Tokens
+ * Ensures consistency between sidebar, terminal, and all panel components
+ */
+export const PANEL_TOKENS = {
+	// Shared header styles
+	header: {
+		height: 'h-7',
+		padding: 'px-2',
+		bg: 'bg-zinc-900/95',
+		blur: 'backdrop-blur-md',
+		border: 'border-b border-white/5',
+		shadow: 'shadow-sm',
+	},
+	// Collapsed panel button styles
+	collapsed: {
+		bg: 'bg-zinc-900/50',
+		bgHover: 'hover:bg-zinc-900/70',
+		transition: 'transition-all duration-200',
+		iconSize: 'w-4 h-4',
+		iconColor: 'text-white/30',
+		iconColorHover: 'group-hover:text-emerald-400',
+		textSize: 'text-xs font-mono',
+		textColor: 'text-white/30',
+		textColorHover: 'group-hover:text-white/60',
+	},
+	// Input bar styles (shared between terminal input and suggestions)
+	inputBar: {
+		minHeight: 'min-h-[2rem]',
+		padding: 'px-2 sm:px-3',
+		bg: 'bg-zinc-900/95',
+		blur: 'backdrop-blur-md',
+		border: 'border-white/5',
+	},
+	// Accent colors for focus states and interactive elements
+	accent: {
+		primary: 'emerald-400',
+		secondary: 'emerald-500',
+		glow: 'drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]',
+		glowBg: 'shadow-[0_0_8px_rgba(52,211,153,0.3)]',
+	},
+	// Icon sizes
+	icons: {
+		xs: 'w-2 h-2',
+		sm: 'w-3 h-3',
+		md: 'w-3.5 h-3.5',
+		lg: 'w-4 h-4',
+	},
+	// Control button (traffic light) styles
+	control: {
+		size: 'w-3 h-3',
+		iconSize: 'w-2 h-2',
+		gap: 'gap-1.5',
+	},
+} as const;
