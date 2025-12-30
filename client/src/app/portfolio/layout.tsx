@@ -329,7 +329,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>
-							<Sidebar />
+							<Sidebar
+								onMaximize={handleSidebarMaximize}
+								onCollapse={sidebar.collapse}
+							/>
 						</Suspense>
 					</ErrorBoundary>
 				</Panel>
@@ -393,7 +396,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader height="h-32" />}>
-									<CLI />
+									<CLI
+										onMaximize={handleTerminalMaximize}
+										onCollapse={terminal.collapse}
+									/>
 								</Suspense>
 							</ErrorBoundary>
 						</Panel>
