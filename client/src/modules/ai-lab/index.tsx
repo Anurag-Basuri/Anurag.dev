@@ -6,7 +6,7 @@ import { Send, Bot, User, Sparkles, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 
 interface Message {
 	id: string;
@@ -84,7 +84,7 @@ export function AILabModule() {
 		<div className="flex flex-col h-full bg-black/20 backdrop-blur-sm">
 			{/* Header */}
 			<div className="px-6 pt-4 bg-black/20">
-				<ModuleHeader
+				<SectionHeader
 					label="AI Lab Beta"
 					icon={Bot}
 					title="Experiment_v1.0.2"
