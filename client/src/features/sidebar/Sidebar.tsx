@@ -25,11 +25,11 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 	return (
 		<button
 			onClick={onExpand}
-			className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer"
+			className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
 			aria-label="Expand sidebar"
 		>
 			{/* Vertical content container */}
-			<div className="flex flex-col items-center gap-3 group">
+			<div className="flex flex-col items-center gap-3">
 				{/* Top line */}
 				<div className="w-px h-8 bg-white/10 group-hover:bg-emerald-500/30 transition-colors duration-300" />
 
