@@ -100,17 +100,6 @@ export function PanelHeader({
 					)}
 				</div>
 			</div>
-
-			{/* Draggable Indicator */}
-			<div
-				className={cn(
-					'absolute left-1/2 -translate-x-1/2 top-0',
-					'w-8 h-1 rounded-full bg-white/10',
-					'hover:bg-emerald-400/30 hover:w-12',
-					'transition-all duration-150',
-				)}
-				aria-hidden="true"
-			/>
 		</header>
 	);
 }
