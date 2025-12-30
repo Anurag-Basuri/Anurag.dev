@@ -6,6 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import type { FileSystemItem } from '@/data/filesystem';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { Loader } from '@/components/common/Loader';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
@@ -23,7 +24,7 @@ import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
-	loading: () => <ComponentLoader height="h-32" />,
+	loading: () => <Loader height="h-32" />,
 });
 const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => mod.Sidebar), {
 	ssr: false,
@@ -32,24 +33,17 @@ const Taskbar = dynamic(
 	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
 	{
 		ssr: false,
-		loading: () => <ComponentLoader height="h-8" />,
+		loading: () => <Loader height="h-8" />,
 	},
 );
 const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(mod => mod.TopBar), {
 	ssr: false,
-	loading: () => <ComponentLoader height="h-8" />,
+	loading: () => <Loader height="h-8" />,
 });
 
 const WindowHeader = dynamic(
 	() => import('@/features/shell/components/WindowHeader').then(mod => mod.WindowHeader),
 	{ ssr: false },
-);
-
-// Component loaders at module scope
-const ComponentLoader = ({ height = 'h-full' }: { height?: string }) => (
-	<div className={cn('w-full bg-card/50 animate-pulse flex items-center justify-center', height)}>
-		<div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-	</div>
 );
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
@@ -309,7 +303,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
 					className="overflow-hidden bg-sidebar/40 border-r border-border/30 backdrop-blur-lg rounded-r-xl shadow-xl"
 				>
-					<Suspense fallback={<ComponentLoader />}>
+					<Suspense fallback={<Loader />}>
 						<Sidebar />
 					</Suspense>
 				</Panel>
@@ -370,7 +364,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							className="overflow-hidden min-h-0"
 						>
 							<ErrorBoundary>
-								<Suspense fallback={<ComponentLoader height="h-32" />}>
+								<Suspense fallback={<Loader height="h-32" />}>
 									<CLI />
 								</Suspense>
 							</ErrorBoundary>
@@ -398,7 +392,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			<BootGuard>
 				<ContextMenuProvider>
 					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
-						<Suspense fallback={<ComponentLoader height="h-8" />}>
+						<Suspense fallback={<Loader height="h-8" />}>
 							<TopBar
 								isMobile={isMobile}
 								sidebarCollapsed={sidebar.isCollapsed}
@@ -431,7 +425,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							)}
 						</AnimatePresence>
 
-						<Suspense fallback={<ComponentLoader height="h-8" />}>
+						<Suspense fallback={<Loader height="h-8" />}>
 							<Taskbar isMobile={isMobile} />
 						</Suspense>
 
