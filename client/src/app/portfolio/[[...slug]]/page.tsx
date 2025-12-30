@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
-import { ModuleLoader } from '@/components/common/ModuleLoader';
+import { ModuleLoader } from '@/components/common/Loader';
 import { EmptyState } from '@/components/editor/EmptyState';
 
 interface PageProps {
