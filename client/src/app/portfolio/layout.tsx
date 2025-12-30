@@ -66,6 +66,14 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		});
 	}, [hSizes]);
 
+	const handleSidebarMaximize = useCallback(() => {
+		const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
+		horizontalGroupRef.current?.setLayout({
+			sidebar: maxSize,
+			main: 100 - maxSize,
+		});
+	}, []);
+
 	const handleTerminalExpand = useCallback(() => {
 		verticalGroupRef.current?.setLayout({
 			content: vSizes?.[0] ?? 60,
@@ -73,8 +81,24 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		});
 	}, [vSizes]);
 
-	const sidebar = useCollapsiblePanel({ type: 'sidebar', onExpand: handleSidebarExpand });
-	const terminal = useCollapsiblePanel({ type: 'terminal', onExpand: handleTerminalExpand });
+	const handleTerminalMaximize = useCallback(() => {
+		const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
+		verticalGroupRef.current?.setLayout({
+			content: 100 - maxSize,
+			terminal: maxSize,
+		});
+	}, []);
+
+	const sidebar = useCollapsiblePanel({
+		type: 'sidebar',
+		onExpand: handleSidebarExpand,
+		onMaximize: handleSidebarMaximize,
+	});
+	const terminal = useCollapsiblePanel({
+		type: 'terminal',
+		onExpand: handleTerminalExpand,
+		onMaximize: handleTerminalMaximize,
+	});
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
 	// Sync panel resize when collapsed state changes from ANY source (including child components)
