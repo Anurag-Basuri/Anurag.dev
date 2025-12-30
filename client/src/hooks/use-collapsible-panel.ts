@@ -15,6 +15,7 @@ export interface CollapsiblePanelConfig {
 	type: PanelType;
 	onCollapse?: () => void;
 	onExpand?: () => void;
+	onMaximize?: () => void;
 }
 
 export interface CollapsiblePanelReturn {
@@ -31,6 +32,7 @@ export function useCollapsiblePanel({
 	type,
 	onCollapse,
 	onExpand,
+	onMaximize,
 }: CollapsiblePanelConfig): CollapsiblePanelReturn {
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
@@ -87,8 +89,10 @@ export function useCollapsiblePanel({
 			setIsCollapsed(false);
 		}
 		onExpand?.();
+		onMaximize?.();
 	}, [
 		onExpand,
+		onMaximize,
 		setIsCollapsed,
 		setModuleMaximized,
 		setModuleMinimized,
