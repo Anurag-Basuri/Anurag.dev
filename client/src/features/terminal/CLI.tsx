@@ -1,7 +1,6 @@
 'use client';
 
 import { forwardRef, useEffect, useRef, memo, useCallback } from 'react';
-import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useTerminalState } from './hooks/useTerminalState';
 import { useCLI } from './hooks/useCLI';
 import { Terminal, ChevronRight } from 'lucide-react';
@@ -9,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { PanelHeader } from '@/components/layout/PanelHeader';
 import { TerminalControls } from '@/components/common/WindowControls';
 import type { HistoryItem } from './types';
+import { usePanelControls } from '@/contexts/panel-context';
 
 // ============================================================================
 // Constants
@@ -228,13 +228,8 @@ Welcome.displayName = 'Welcome';
 // Main CLI Component
 // ============================================================================
 
-interface CLIProps {
-	onMaximize?: () => void;
-	onCollapse?: () => void;
-}
-
-export function CLI({ onMaximize, onCollapse }: CLIProps) {
-	const terminal = useCollapsiblePanel({ type: 'terminal' });
+export function CLI() {
+	const { terminal } = usePanelControls();
 	const state = useTerminalState();
 	const { handleKeyDown } = useCLI(state);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -298,9 +293,9 @@ export function CLI({ onMaximize, onCollapse }: CLIProps) {
 				isFocused={state.isFocused}
 				controls={
 					<TerminalControls
-						onClose={onCollapse ?? terminal.collapse}
+						onClose={terminal.collapse}
 						onClearHistory={state.clearHistory}
-						onMaximize={onMaximize ?? terminal.maximize}
+						onMaximize={terminal.maximize}
 					/>
 				}
 			/>

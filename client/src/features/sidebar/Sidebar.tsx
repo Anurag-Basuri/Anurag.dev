@@ -2,7 +2,6 @@
 
 import React, { useCallback, useMemo, memo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { SidebarProfile } from './SidebarProfile';
 import { FolderTree } from './FolderTree';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
@@ -15,6 +14,7 @@ import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/lib/constants';
+import { usePanelControls } from '@/contexts/panel-context';
 
 // ============================================================================
 // Collapsed Sidebar View
@@ -63,13 +63,8 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 // ============================================================================
 // Main Sidebar Component
 // ============================================================================
-interface SidebarProps {
-	onMaximize?: () => void;
-	onCollapse?: () => void;
-}
-
-export const Sidebar: React.FC<SidebarProps> = ({ onMaximize, onCollapse }) => {
-	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
+export const Sidebar: React.FC = () => {
+	const { sidebar } = usePanelControls();
 	const router = useRouter();
 	const pathname = usePathname();
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
@@ -105,8 +100,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onMaximize, onCollapse }) => {
 				title="EXPLORER"
 				controls={
 					<SidebarControls
-						onClose={onCollapse ?? sidebar.collapse}
-						onMaximize={onMaximize ?? sidebar.maximize}
+						onClose={sidebar.collapse}
+						onMaximize={sidebar.maximize}
 						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
 					/>
 				}
