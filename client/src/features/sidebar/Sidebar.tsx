@@ -19,7 +19,6 @@ import { PANEL_TOKENS } from '@/lib/constants';
 // ============================================================================
 // Collapsed Sidebar View
 // ============================================================================
-
 interface CollapsedSidebarProps {
 	onExpand: () => void;
 }
@@ -64,7 +63,6 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 // ============================================================================
 // Main Sidebar Component
 // ============================================================================
-
 export const Sidebar: React.FC = () => {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
 	const router = useRouter();

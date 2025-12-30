@@ -11,10 +11,7 @@ interface SectionHeaderProps {
 	actions?: ReactNode;
 }
 
-/**
- * Content section header for module pages
- * Displays the main title, description, and optional actions for a page section
- */
+// Section Header for module pages
 export function SectionHeader({
 	icon: Icon,
 	label,
