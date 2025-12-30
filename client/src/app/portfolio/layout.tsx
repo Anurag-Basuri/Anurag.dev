@@ -40,8 +40,8 @@ const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m
 	loading: () => <ComponentLoader height="h-8" />,
 });
 
-const ModuleHeader = dynamic(
-	() => import('@/features/shell/components/ModuleHeader').then(mod => mod.ModuleHeader),
+const WindowHeader = dynamic(
+	() => import('@/features/shell/components/WindowHeader').then(mod => mod.WindowHeader),
 	{ ssr: false },
 );
 
@@ -218,7 +218,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 		return (
 			<div className={cn('h-full flex flex-col min-w-0', className)}>
-				<ModuleHeader
+				<WindowHeader
 					icon={Icon}
 					title={title}
 					isMaximized={modulePanel.isMaximized}
