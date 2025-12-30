@@ -12,8 +12,6 @@ import { PanelHeader } from '@/components/layout/PanelHeader';
 import { SidebarControls } from '@/components/common/WindowControls';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { cn } from '@/lib/utils';
-import { PANEL_TOKENS } from '@/lib/constants';
 import { usePanelControls } from '@/contexts/panel-context';
 
 // ============================================================================
@@ -27,13 +25,28 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 	return (
 		<button
 			onClick={onExpand}
-			className="h-full w-full flex items-center justify-center gap-2 bg-transparent hover:bg-white/5 transition-colors duration-200 group"
+			className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer"
 			aria-label="Expand sidebar"
 		>
-			<FolderOpen className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-200" />
-			<span className="text-xs font-mono text-white/30 group-hover:text-white/60 transition-colors duration-200">
-				Explorer
-			</span>
+			{/* Vertical content container */}
+			<div className="flex flex-col items-center gap-3 group">
+				{/* Top line */}
+				<div className="w-px h-8 bg-white/10 group-hover:bg-emerald-500/30 transition-colors duration-300" />
+
+				{/* Icon */}
+				<FolderOpen className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+
+				{/* Vertical text */}
+				<span
+					className="text-xs font-mono tracking-widest text-white/30 group-hover:text-white/70 transition-colors duration-300 uppercase"
+					style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+				>
+					Explorer
+				</span>
+
+				{/* Bottom line */}
+				<div className="w-px h-8 bg-white/10 group-hover:bg-emerald-500/30 transition-colors duration-300" />
+			</div>
 		</button>
 	);
 });
