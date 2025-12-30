@@ -364,6 +364,17 @@
 	background-color: color-mix(in oklch, var(--ring) 18%, transparent);
 }
 
+/* Smooth panel transitions for expand/collapse */
+[data-panel] {
+	transition: flex-basis 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Disable transition during drag resize */
+[data-resize-handle-active] ~ [data-panel],
+[data-panel-group]:has([data-resize-handle-active]) [data-panel] {
+	transition: none !important;
+}
+
 /* Muted panels - subtle depth */
 .glass-panel {
 	background: color-mix(in oklch, var(--card) 92%, var(--primary) 8%);
