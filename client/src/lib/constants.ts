@@ -15,10 +15,7 @@ export const LAYOUT_STORAGE_KEYS = {
 	terminalCollapsed: 'layout:terminal-collapsed',
 } as const;
 
-/**
- * Unified Animation System
- * Provides consistent timing and easing across all components
- */
+// Legacy export for backwards compatibility
 export const TIMINGS = {
 	instant: 0,
 	fast: 150,
@@ -46,9 +43,7 @@ export const TRANSITIONS = {
 	blur: { duration: TIMINGS.normal / 1000 },
 } as const;
 
-/**
- * Design Tokens - Opacity System
- */
+// Legacy export for backwards compatibility
 export const OPACITY = {
 	ghost: 10,
 	subtle: 20,
@@ -61,10 +56,7 @@ export const OPACITY = {
 	full: 100,
 } as const;
 
-/**
- * Z-Index System
- * Ensures proper layering hierarchy
- */
+// Legacy export for backwards compatibility
 export const Z_INDEX = {
 	base: 0,
 	panels: 1,
@@ -76,9 +68,7 @@ export const Z_INDEX = {
 	maximized: 50,
 } as const;
 
-/**
- * Panel size constraints and defaults for resizable layout
- */
+// Legacy export for backwards compatibility
 export const PANEL_CONFIG = {
 	HORIZONTAL: {
 		SIDEBAR: { defaultSize: '20%', minSize: '3%', maxSize: '30%', collapsedSize: '3%' },
@@ -94,10 +84,7 @@ export const PANEL_CONFIG = {
 	},
 } as const;
 
-/**
- * Unified animation configuration for panels
- * Ensures consistent, smooth transitions across all panels
- */
+// Legacy export for backwards compatibility
 export const PANEL_ANIMATION = {
 	layout: SPRINGS.normal,
 	opacity: TRANSITIONS.fade,
@@ -105,9 +92,7 @@ export const PANEL_ANIMATION = {
 	filter: TRANSITIONS.blur,
 } as const;
 
-/**
- * Panel collapse animation variants
- */
+// Legacy export for backwards compatibility
 export const PANEL_COLLAPSE = {
 	expanded: {
 		opacity: 1,
@@ -121,9 +106,7 @@ export const PANEL_COLLAPSE = {
 	},
 } as const;
 
-/**
- * Unified Panel Styles
- */
+// Legacy export for backwards compatibility
 export const PANEL_STYLES = {
 	sidebar: {
 		bg: `bg-sidebar/${OPACITY.medium}`,
@@ -148,9 +131,7 @@ export const PANEL_STYLES = {
 	},
 } as const;
 
-/**
- * Interaction States
- */
+// Legacy export for backwards compatibility
 export const HOVER_STATES = {
 	button: 'hover:bg-white/10 transition-colors',
 	card: 'hover:shadow-lg hover:-translate-y-0.5 transition-all',
@@ -189,16 +170,11 @@ export const PANEL_DESIGN = {
 	},
 } as const;
 
-/**
- * Panel collapse configuration
- */
-export const PANEL_COLLAPSE_THRESHOLD = 3; // 3% threshold matches sidebar collapsed size
+// Legacy export for backwards compatibility
+export const PANEL_COLLAPSE_THRESHOLD = 5; // Increased threshold to 5% to safely capture 3% collapsed state
 export const COLLAPSE_ANIMATION_DURATION = 250; // Match spring physics duration
 
-/**
- * Unified Panel Design Tokens
- * Ensures consistency between sidebar, terminal, and all panel components
- */
+// Legacy export for backwards compatibility
 export const PANEL_TOKENS = {
 	// Shared header styles
 	header: {
