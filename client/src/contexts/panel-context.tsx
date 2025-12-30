@@ -94,7 +94,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseSidebar = useCallback(() => {
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		horizontalGroupRef.current?.setLayout({ sidebar: 0, main: 100 });
+		// Use collapsedSize (3%) for proper animation
+		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
 	}, [setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
@@ -114,7 +115,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 		// Collapse terminal
 		setTerminalCollapsed(true);
-		verticalGroupRef.current?.setLayout({ content: 100, terminal: 0 });
+		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
 
 		// Expand sidebar to max
 		setSidebarCollapsed(false);
@@ -170,7 +171,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseTerminal = useCallback(() => {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		verticalGroupRef.current?.setLayout({ content: 100, terminal: 0 });
+		// Use collapsedSize (3%) for proper animation
+		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
 	}, [setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
@@ -190,7 +192,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 		// Collapse sidebar
 		setSidebarCollapsed(true);
-		horizontalGroupRef.current?.setLayout({ sidebar: 0, main: 100 });
+		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
 
 		// Expand terminal to max
 		setTerminalCollapsed(false);
