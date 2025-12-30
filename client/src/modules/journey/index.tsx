@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Briefcase, GraduationCap, Award, Star, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 import { fadeInUp, viewportSettings } from '@/lib/animations';
 
 const categoryConfig: Record<
@@ -95,7 +95,7 @@ export function JourneyModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-12 max-w-5xl mx-auto pb-24 relative">
 				{/* Header */}
-				<ModuleHeader
+				<SectionHeader
 					icon={Briefcase}
 					label="Timeline"
 					title="journey"
