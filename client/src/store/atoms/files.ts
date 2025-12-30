@@ -1,4 +1,3 @@
-import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 export interface OpenFile {
