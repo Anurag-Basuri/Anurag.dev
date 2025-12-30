@@ -209,7 +209,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 			<Group
 				id="portfolio-main-h"
 				orientation="horizontal"
-				className="h-full w-full gap-1"
+				className="h-full w-full gap-3"
 				groupRef={horizontalGroupRef}
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
 				onLayoutChange={(layout: Layout) => {
@@ -242,7 +242,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
 					collapsible
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
-					className="overflow-hidden bg-sidebar/40 border-r border-border/30 backdrop-blur-lg rounded-r-xl shadow-xl"
+					className="overflow-hidden bg-black/20 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl transition-all duration-300"
 				>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>
@@ -259,7 +259,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					<Group
 						id="portfolio-main-v"
 						orientation="vertical"
-						className="h-full gap-1"
+						className="h-full gap-3"
 						groupRef={verticalGroupRef}
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
 						onLayoutChange={(layout: Layout) => {
@@ -288,7 +288,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							id="content"
 							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
 							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
-							className="overflow-hidden min-h-0"
+							className="overflow-hidden min-h-0 bg-black/20 backdrop-blur-md border border-white/5 rounded-2xl shadow-xl"
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader />}>{renderModuleContent()}</Suspense>
@@ -306,7 +306,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
 							collapsible
 							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
-							className="overflow-hidden min-h-0"
+							className="overflow-hidden min-h-0 bg-black/30 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl transition-all duration-300"
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader height="h-32" />}>
@@ -359,7 +359,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						/>
 					</Suspense>
 
-					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
+					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10 p-3">
 						{renderDesktopLayout()}
 						{renderMobileLayout()}
 					</div>
