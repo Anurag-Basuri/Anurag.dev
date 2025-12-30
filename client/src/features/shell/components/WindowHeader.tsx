@@ -29,7 +29,7 @@ export const WindowHeader = memo(function WindowHeader({
 	isFocused = true,
 }: WindowHeaderProps) {
 	return (
-		<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
+		<header className="h-9 px-3 border-b border-white/5 bg-white/5 flex items-center justify-between shrink-0 select-none z-20 relative">
 			{/* Left: Traffic Lights + Icon + Title */}
 			<div className="flex items-center gap-2">
 				<ModuleControls

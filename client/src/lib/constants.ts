@@ -202,9 +202,9 @@ export const COLLAPSE_ANIMATION_DURATION = 250; // Match spring physics duration
 export const PANEL_TOKENS = {
 	// Shared header styles
 	header: {
-		height: 'h-7',
-		padding: 'px-2',
-		bg: 'bg-zinc-900/95',
+		height: 'h-9',
+		padding: 'px-3',
+		bg: 'bg-white/5',
 		blur: 'backdrop-blur-md',
 		border: 'border-b border-white/5',
 		shadow: 'shadow-sm',
@@ -225,7 +225,7 @@ export const PANEL_TOKENS = {
 	inputBar: {
 		minHeight: 'min-h-[2rem]',
 		padding: 'px-2 sm:px-3',
-		bg: 'bg-zinc-900/95',
+		bg: 'bg-zinc-900/40',
 		blur: 'backdrop-blur-md',
 		border: 'border-white/5',
 	},

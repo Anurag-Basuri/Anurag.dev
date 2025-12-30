@@ -15,7 +15,7 @@ import { usePanelControls } from '@/contexts/panel-context';
 // ============================================================================
 
 const STYLES = {
-	bar: 'min-h-[2rem] px-2 sm:px-3 bg-zinc-900/95 backdrop-blur-md border-white/5 flex items-center shrink-0',
+	bar: 'min-h-[2rem] px-2 sm:px-3 bg-zinc-900/40 backdrop-blur-md border-white/5 flex items-center shrink-0',
 	icon: 'w-3.5 h-3.5 shrink-0',
 	text: 'text-xs font-mono',
 } as const;
@@ -294,7 +294,7 @@ export function CLI() {
 
 	return (
 		<div
-			className="h-full flex flex-col bg-black/20 overflow-hidden"
+			className="h-full flex flex-col bg-transparent overflow-hidden"
 			onClick={handleContainerClick}
 		>
 			<PanelHeader
