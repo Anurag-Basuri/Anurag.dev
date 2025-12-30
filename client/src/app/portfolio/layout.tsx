@@ -394,6 +394,18 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	return (
 		<ErrorBoundary>
 			<BootGuard>
+				<AnimatePresence>
+					{modulePanel.isMaximized && (
+						<motion.div
+							initial={{ opacity: 0, scale: 0.95 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0, scale: 0.95 }}
+							className="fixed inset-0 z-100 bg-black"
+						>
+							{renderModuleContent('maximized-content')}
+						</motion.div>
+					)}
+				</AnimatePresence>
 				<ContextMenuProvider>
 					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
 						<Suspense fallback={<Loader height="h-8" />}>
@@ -415,19 +427,6 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							{renderDesktopLayout()}
 							{renderMobileLayout()}
 						</div>
-
-						<AnimatePresence>
-							{modulePanel.isMaximized && (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.95 }}
-									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.95 }}
-									className="fixed inset-0 z-100 bg-black"
-								>
-									{renderModuleContent('maximized-content')}
-								</motion.div>
-							)}
-						</AnimatePresence>
 
 						<Suspense fallback={<Loader height="h-8" />}>
 							<Taskbar isMobile={isMobile} />
