@@ -18,25 +18,6 @@ const nextConfig: NextConfig = {
 		imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 	},
 
-	// Bundle analyzer (optional - enable when needed)
-	// webpack: (config, { isServer }) => {
-	// 	if (!isServer) {
-	// 		config.optimization.splitChunks = {
-	// 			chunks: 'all',
-	// 			cacheGroups: {
-	// 				default: false,
-	// 				vendors: false,
-	// 				commons: {
-	// 					name: 'commons',
-	// 					chunks: 'all',
-	// 					minChunks: 2,
-	// 				},
-	// 			},
-	// 		};
-	// 	}
-	// 	return config;
-	// },
-
 	// Experimental features
 	experimental: {
 		optimizePackageImports: ['@/components', 'lucide-react', 'framer-motion', 'gsap'],
