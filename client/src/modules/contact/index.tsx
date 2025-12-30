@@ -19,7 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 
 function ContactSkeleton() {
 	return (
@@ -142,7 +142,7 @@ export function ContactModule() {
 		<ScrollArea className="h-full">
 			<div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto pb-20">
 				{/* Standardized Header */}
-				<ModuleHeader
+				<SectionHeader
 					icon={MessageSquare}
 					label="Communication Channel"
 					title="Get In Touch"

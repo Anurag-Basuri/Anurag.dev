@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 
 function CertificationsSkeleton() {
 	return (
@@ -69,7 +69,7 @@ export function CertificationModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-5xl mx-auto pb-20">
 				{/* Header */}
-				<ModuleHeader
+				<SectionHeader
 					label="Certifications"
 					icon={ShieldCheck}
 					title="Verified Attributes"

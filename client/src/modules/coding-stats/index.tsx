@@ -16,7 +16,7 @@ import {
 	ExternalLink,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 import { staggerContainer, staggerItem, fadeInUp } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 
@@ -459,7 +459,7 @@ export function CodingStatsModule() {
 	return (
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-7xl mx-auto pb-32">
-				<ModuleHeader
+				<SectionHeader
 					icon={Terminal}
 					label="Analytics"
 					title="Coding Performance"

@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/lib/animations';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 
 function BlogSkeleton() {
 	return (
@@ -65,7 +65,7 @@ export function BlogModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-12 max-w-6xl mx-auto pb-24">
 				{/* Header */}
-				<ModuleHeader
+				<SectionHeader
 					label="Blogs"
 					icon={BookOpen}
 					title="Engineering Log"

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/lib/animations';
-import { ModuleHeader } from '@/modules/shared/ModuleHeader';
+import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
 
 function ProjectsSkeleton() {
@@ -83,7 +83,7 @@ export function ProjectsModule() {
 		<ScrollArea className="h-full">
 			<div className="p-6 md:p-10 max-w-7xl mx-auto pb-32">
 				{/* Header & Filters */}
-				<ModuleHeader
+				<SectionHeader
 					icon={Box}
 					label="Portfolio"
 					title="Featured Projects"
