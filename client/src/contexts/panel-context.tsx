@@ -111,6 +111,11 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const maximizeSidebar = useCallback(() => {
 		// Store current state for restore
 		preSidebarMaxSize.current = hSizes?.[0] ?? 20;
+		preTerminalCollapsed.current = terminalCollapsed; // Save terminal state
+
+		// Collapse terminal to focus on sidebar
+		setTerminalCollapsed(true);
+		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
 
 		// Expand sidebar to max
 		setSidebarCollapsed(false);
@@ -131,7 +136,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			sidebar: prevSize,
 			main: 100 - prevSize,
 		});
-	}, [hSizes]);
+
+		// Restore terminal ONLY if it was open before maximization
+		if (!preTerminalCollapsed.current) {
+			setTerminalCollapsed(false);
+			const terminalSize = vSizes?.[1] ?? 40;
+			verticalGroupRef.current?.setLayout({
+				content: 100 - terminalSize,
+				terminal: terminalSize,
+			});
+		}
+	}, [hSizes, vSizes, setTerminalCollapsed]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -173,6 +188,11 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const maximizeTerminal = useCallback(() => {
 		// Store current state for restore
 		preTerminalMaxSize.current = vSizes?.[1] ?? 40;
+		preSidebarCollapsed.current = sidebarCollapsed; // Save sidebar state
+
+		// Collapse sidebar to focus on terminal
+		setSidebarCollapsed(true);
+		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
 
 		// Expand terminal to max
 		setTerminalCollapsed(false);
@@ -193,7 +213,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			content: 100 - prevSize,
 			terminal: prevSize,
 		});
-	}, [vSizes]);
+
+		// Restore sidebar ONLY if it was open before maximization
+		if (!preSidebarCollapsed.current) {
+			setSidebarCollapsed(false);
+			const sidebarSize = hSizes?.[0] ?? 20;
+			horizontalGroupRef.current?.setLayout({
+				sidebar: sidebarSize,
+				main: 100 - sidebarSize,
+			});
+		}
+	}, [vSizes, hSizes, setSidebarCollapsed]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
