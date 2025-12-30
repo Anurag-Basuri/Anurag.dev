@@ -303,9 +303,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
 					className="overflow-hidden bg-sidebar/40 border-r border-border/30 backdrop-blur-lg rounded-r-xl shadow-xl"
 				>
-					<Suspense fallback={<Loader />}>
-						<Sidebar />
-					</Suspense>
+					<ErrorBoundary>
+						<Suspense fallback={<Loader />}>
+							<Sidebar />
+						</Suspense>
+					</ErrorBoundary>
 				</Panel>
 
 				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
@@ -347,7 +349,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
 							className="overflow-hidden min-h-0"
 						>
-							{renderModuleContent()}
+							<ErrorBoundary>
+								<Suspense fallback={<Loader />}>{renderModuleContent()}</Suspense>
+							</ErrorBoundary>
 						</Panel>
 
 						{/* Vertical ResizeHandle */}
