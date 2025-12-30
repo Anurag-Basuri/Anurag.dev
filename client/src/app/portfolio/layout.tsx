@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,8 @@ import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
-import type { GroupImperativeHandle, Layout } from 'react-resizable-panels';
+import type { Layout } from 'react-resizable-panels';
+import { PanelProvider, usePanelControls } from '@/contexts/panel-context';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -46,7 +47,11 @@ const WindowHeader = dynamic(
 	{ ssr: false },
 );
 
-export default function PortfolioLayout({ children }: { children: ReactNode }) {
+// ============================================================================
+// Inner Layout Component (uses PanelContext)
+// ============================================================================
+
+function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
@@ -55,67 +60,11 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
-	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
+	// Use the centralized panel controls
+	const { sidebar, terminal, horizontalGroupRef, verticalGroupRef } = usePanelControls();
 
-	// Callbacks to resize panels on expand
-	const handleSidebarExpand = useCallback(() => {
-		horizontalGroupRef.current?.setLayout({
-			sidebar: hSizes?.[0] ?? 20,
-			main: hSizes?.[1] ?? 80,
-		});
-	}, [hSizes]);
-
-	const handleSidebarMaximize = useCallback(() => {
-		const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-		horizontalGroupRef.current?.setLayout({
-			sidebar: maxSize,
-			main: 100 - maxSize,
-		});
-	}, []);
-
-	const handleTerminalExpand = useCallback(() => {
-		verticalGroupRef.current?.setLayout({
-			content: vSizes?.[0] ?? 60,
-			terminal: vSizes?.[1] ?? 40,
-		});
-	}, [vSizes]);
-
-	const handleTerminalMaximize = useCallback(() => {
-		const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-		verticalGroupRef.current?.setLayout({
-			content: 100 - maxSize,
-			terminal: maxSize,
-		});
-	}, []);
-
-	const sidebar = useCollapsiblePanel({
-		type: 'sidebar',
-		onExpand: handleSidebarExpand,
-		onMaximize: handleSidebarMaximize,
-	});
-	const terminal = useCollapsiblePanel({
-		type: 'terminal',
-		onExpand: handleTerminalExpand,
-		onMaximize: handleTerminalMaximize,
-	});
+	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
-
-	// Sync panel resize when collapsed state changes from ANY source (including child components)
-	useEffect(() => {
-		if (!sidebar.isCollapsed) {
-			// Small delay to ensure layout is ready
-			const timer = setTimeout(handleSidebarExpand, 50);
-			return () => clearTimeout(timer);
-		}
-	}, [sidebar.isCollapsed, handleSidebarExpand]);
-
-	useEffect(() => {
-		if (!terminal.isCollapsed) {
-			const timer = setTimeout(handleTerminalExpand, 50);
-			return () => clearTimeout(timer);
-		}
-	}, [terminal.isCollapsed, handleTerminalExpand]);
 
 	useKeyboardShortcuts([
 		{
@@ -253,38 +202,6 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 		);
 	};
 
-	// Synchronize horizontal panel layout with sidebar collapse state
-	useEffect(() => {
-		const api = horizontalGroupRef.current;
-		if (!api) return;
-
-		const [defaultH] = PANEL_CONFIG.DEFAULTS.horizontal;
-		if (sidebar.isCollapsed) {
-			api.setLayout({ sidebar: 0, main: 100 });
-		} else {
-			api.setLayout({
-				sidebar: hSizes?.[0] ?? defaultH,
-				main: hSizes?.[1] ?? 100 - defaultH,
-			});
-		}
-	}, [sidebar.isCollapsed, hSizes]);
-
-	// Synchronize vertical panel layout with terminal collapse state
-	useEffect(() => {
-		const api = verticalGroupRef.current;
-		if (!api) return;
-
-		const [defaultV] = PANEL_CONFIG.DEFAULTS.vertical;
-		if (terminal.isCollapsed) {
-			api.setLayout({ content: 100, terminal: 0 });
-		} else {
-			api.setLayout({
-				content: vSizes?.[0] ?? defaultV,
-				terminal: vSizes?.[1] ?? 100 - defaultV,
-			});
-		}
-	}, [terminal.isCollapsed, vSizes]);
-
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
@@ -311,7 +228,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						}
 					}
 
-					// Don’t overwrite stored sizes with the collapsed layout
+					// Don't overwrite stored sizes with the collapsed layout
 					if (!nextCollapsed) {
 						setHSizes([sidebarSize, mainSize]);
 					}
@@ -329,10 +246,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 				>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>
-							<Sidebar
-								onMaximize={handleSidebarMaximize}
-								onCollapse={sidebar.collapse}
-							/>
+							<Sidebar />
 						</Suspense>
 					</ErrorBoundary>
 				</Panel>
@@ -396,10 +310,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader height="h-32" />}>
-									<CLI
-										onMaximize={handleTerminalMaximize}
-										onCollapse={terminal.collapse}
-									/>
+									<CLI />
 								</Suspense>
 							</ErrorBoundary>
 						</Panel>
@@ -422,59 +333,69 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	};
 
 	return (
+		<>
+			<AnimatePresence>
+				{modulePanel.isMaximized && (
+					<motion.div
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0.95 }}
+						className="fixed inset-0 z-100 bg-black"
+					>
+						{renderModuleContent('maximized-content')}
+					</motion.div>
+				)}
+			</AnimatePresence>
+			<ContextMenuProvider>
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
+					<Suspense fallback={<Loader height="h-8" />}>
+						<TopBar
+							isMobile={isMobile}
+							sidebarCollapsed={sidebar.isCollapsed}
+							terminalCollapsed={terminal.isCollapsed}
+							onToggleSidebar={sidebar.toggle}
+							onToggleTerminal={terminal.toggle}
+							onFileSelect={handleFileSelect}
+						/>
+					</Suspense>
+
+					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
+						{renderDesktopLayout()}
+						{renderMobileLayout()}
+					</div>
+
+					<Suspense fallback={<Loader height="h-8" />}>
+						<Taskbar isMobile={isMobile} />
+					</Suspense>
+
+					<Toaster
+						position="top-right"
+						toastOptions={{
+							duration: 3000,
+							style: {
+								background: 'var(--background)',
+								color: 'var(--foreground)',
+								border: '1px solid var(--border)',
+							},
+						}}
+					/>
+				</div>
+			</ContextMenuProvider>
+		</>
+	);
+}
+
+// ============================================================================
+// Main Layout (wraps with PanelProvider)
+// ============================================================================
+
+export default function PortfolioLayout({ children }: { children: ReactNode }) {
+	return (
 		<ErrorBoundary>
 			<BootGuard>
-				<AnimatePresence>
-					{modulePanel.isMaximized && (
-						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0, scale: 0.95 }}
-							className="fixed inset-0 z-100 bg-black"
-						>
-							{renderModuleContent('maximized-content')}
-						</motion.div>
-					)}
-				</AnimatePresence>
-				<ContextMenuProvider>
-					<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
-						<Suspense fallback={<Loader height="h-8" />}>
-							<TopBar
-								isMobile={isMobile}
-								sidebarCollapsed={sidebar.isCollapsed}
-								terminalCollapsed={terminal.isCollapsed}
-								onToggleSidebar={
-									sidebar.isCollapsed ? sidebar.expand : sidebar.collapse
-								}
-								onToggleTerminal={
-									terminal.isCollapsed ? terminal.expand : terminal.collapse
-								}
-								onFileSelect={handleFileSelect}
-							/>
-						</Suspense>
-
-						<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10">
-							{renderDesktopLayout()}
-							{renderMobileLayout()}
-						</div>
-
-						<Suspense fallback={<Loader height="h-8" />}>
-							<Taskbar isMobile={isMobile} />
-						</Suspense>
-
-						<Toaster
-							position="top-right"
-							toastOptions={{
-								duration: 3000,
-								style: {
-									background: 'var(--background)',
-									color: 'var(--foreground)',
-									border: '1px solid var(--border)',
-								},
-							}}
-						/>
-					</div>
-				</ContextMenuProvider>
+				<PanelProvider>
+					<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
+				</PanelProvider>
 			</BootGuard>
 		</ErrorBoundary>
 	);
