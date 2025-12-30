@@ -4,8 +4,10 @@ import { forwardRef, useEffect, useRef, memo, useCallback } from 'react';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { useTerminalState } from './hooks/useTerminalState';
 import { useCLI } from './hooks/useCLI';
-import { Terminal, ChevronRight, Trash2, Maximize2, Minus, Loader2 } from 'lucide-react';
+import { Terminal, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PanelHeader } from '@/components/layout/PanelHeader';
+import { TerminalControls } from '@/components/common/WindowControls';
 import type { HistoryItem } from './types';
 
 // ============================================================================
@@ -17,90 +19,6 @@ const STYLES = {
 	icon: 'w-3.5 h-3.5 shrink-0',
 	text: 'text-xs font-mono',
 } as const;
-
-// ============================================================================
-// Header Component
-// ============================================================================
-
-const Header = memo(
-	({
-		path,
-		isFocused,
-		isExecuting,
-		onClear,
-		onMinimize,
-		onMaximize,
-	}: {
-		path: string;
-		isFocused: boolean;
-		isExecuting: boolean;
-		onClear: () => void;
-		onMinimize: () => void;
-		onMaximize: () => void;
-	}) => (
-		<header className={cn(STYLES.bar, 'border-b justify-between gap-2 sm:gap-4')}>
-			<div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
-				{isExecuting ? (
-					<Loader2 className={cn(STYLES.icon, 'text-emerald-400 animate-spin')} />
-				) : (
-					<Terminal
-						className={cn(
-							STYLES.icon,
-							'transition-colors duration-200',
-							isFocused ? 'text-emerald-400' : 'text-white/40',
-						)}
-					/>
-				)}
-				<span
-					className={cn(
-						STYLES.text,
-						'font-semibold tracking-tight transition-colors duration-200 hidden sm:inline',
-						isFocused ? 'text-emerald-300' : 'text-white/60',
-					)}
-				>
-					TERMINAL
-				</span>
-				<span className="text-white/20 hidden sm:inline">—</span>
-				<span
-					className={cn(
-						STYLES.text,
-						'truncate transition-colors duration-200',
-						isFocused ? 'text-emerald-200/80' : 'text-white/40',
-					)}
-				>
-					{path}
-				</span>
-			</div>
-			<div className="flex items-center gap-0.5 sm:gap-1">
-				<button
-					onClick={onClear}
-					className="p-1.5 sm:p-2 rounded-md hover:bg-white/10 text-white/40 hover:text-white transition-all duration-150 active:scale-95"
-					title="Clear (Ctrl+L)"
-					aria-label="Clear terminal"
-				>
-					<Trash2 className="w-3.5 h-3.5" />
-				</button>
-				<button
-					onClick={onMaximize}
-					className="p-1.5 sm:p-2 rounded-md hover:bg-white/10 text-white/40 hover:text-white transition-all duration-150 active:scale-95 hidden sm:flex"
-					title="Maximize"
-					aria-label="Maximize terminal"
-				>
-					<Maximize2 className="w-3.5 h-3.5" />
-				</button>
-				<button
-					onClick={onMinimize}
-					className="p-1.5 sm:p-2 rounded-md hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all duration-150 active:scale-95"
-					title="Minimize"
-					aria-label="Minimize terminal"
-				>
-					<Minus className="w-3.5 h-3.5" />
-				</button>
-			</div>
-		</header>
-	),
-);
-Header.displayName = 'Header';
 
 // ============================================================================
 // Input Component
@@ -367,13 +285,19 @@ export function CLI() {
 			className="h-full flex flex-col bg-black/20 overflow-hidden"
 			onClick={handleContainerClick}
 		>
-			<Header
-				path={state.currentPath}
+			<PanelHeader
+				type="terminal"
+				icon={Terminal}
+				title="TERMINAL"
+				subtitle={state.currentPath}
 				isFocused={state.isFocused}
-				isExecuting={state.isExecuting}
-				onClear={state.clearHistory}
-				onMinimize={terminal.collapse}
-				onMaximize={terminal.maximize}
+				controls={
+					<TerminalControls
+						onClose={terminal.collapse}
+						onClearHistory={state.clearHistory}
+						onMaximize={terminal.maximize}
+					/>
+				}
 			/>
 
 			<div
