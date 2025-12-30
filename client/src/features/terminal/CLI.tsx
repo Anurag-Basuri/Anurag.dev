@@ -269,13 +269,25 @@ export function CLI() {
 		return (
 			<button
 				onClick={terminal.expand}
-				className="h-full w-full flex items-center justify-center gap-2 bg-transparent hover:bg-white/5 transition-colors duration-200 group"
+				className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
 				aria-label="Expand terminal"
 			>
-				<Terminal className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-200" />
-				<span className="text-xs font-mono text-white/30 group-hover:text-white/60 transition-colors duration-200">
-					Terminal
-				</span>
+				{/* Horizontal content container */}
+				<div className="flex items-center gap-4">
+					{/* Left line */}
+					<div className="h-px w-8 bg-white/10 group-hover:bg-emerald-500/40 transition-colors duration-300" />
+
+					{/* Icon */}
+					<Terminal className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+
+					{/* Text */}
+					<span className="text-xs font-mono tracking-widest text-white/30 group-hover:text-white/70 transition-colors duration-300 uppercase">
+						Terminal
+					</span>
+
+					{/* Right line */}
+					<div className="h-px w-8 bg-white/10 group-hover:bg-emerald-500/40 transition-colors duration-300" />
+				</div>
 			</button>
 		);
 	}
