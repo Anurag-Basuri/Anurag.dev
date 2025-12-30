@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { SidebarProfile } from './SidebarProfile';
@@ -8,12 +8,62 @@ import { FolderTree } from './FolderTree';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { resolveModuleFromSlug } from '@/lib/routes';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderOpen, ChevronRight } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 import { PanelHeader } from '@/components/layout/PanelHeader';
 import { SidebarControls } from '@/components/common/WindowControls';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
 import { cn } from '@/lib/utils';
+import { PANEL_TOKENS } from '@/lib/constants';
+
+// ============================================================================
+// Collapsed Sidebar View
+// ============================================================================
+
+interface CollapsedSidebarProps {
+	onExpand: () => void;
+}
+
+const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
+	const { collapsed } = PANEL_TOKENS;
+
+	return (
+		<button
+			onClick={onExpand}
+			className={cn(
+				'h-full w-full flex items-center justify-center gap-2',
+				collapsed.bg,
+				collapsed.bgHover,
+				collapsed.transition,
+				'group active:scale-[0.98]',
+			)}
+			aria-label="Expand sidebar"
+		>
+			<FolderOpen
+				className={cn(
+					PANEL_TOKENS.icons.lg,
+					collapsed.iconColor,
+					collapsed.iconColorHover,
+					'transition-colors duration-200',
+				)}
+			/>
+			<span
+				className={cn(
+					collapsed.textSize,
+					collapsed.textColor,
+					collapsed.textColorHover,
+					'transition-colors duration-200',
+				)}
+			>
+				Explorer
+			</span>
+		</button>
+	);
+});
+
+// ============================================================================
+// Main Sidebar Component
+// ============================================================================
 
 export const Sidebar: React.FC = () => {
 	const sidebar = useCollapsiblePanel({ type: 'sidebar' });
@@ -38,31 +88,9 @@ export const Sidebar: React.FC = () => {
 		[router],
 	);
 
-	// Collapsed state - minimal inline indicator
+	// Collapsed state - matches terminal's collapsed design
 	if (sidebar.isCollapsed) {
-		return (
-			<button
-				onClick={sidebar.expand}
-				className={cn(
-					'h-full w-full',
-					'flex flex-col items-center justify-center gap-3 py-6',
-					'bg-sidebar/40 backdrop-blur-md',
-					'border-0 outline-none cursor-pointer',
-					'transition-colors duration-200',
-					'hover:bg-sidebar/60',
-					'group',
-				)}
-			>
-				<FolderOpen className="w-4 h-4 text-white/40 group-hover:text-emerald-400 transition-colors" />
-				<span
-					className="text-[10px] font-medium tracking-widest text-white/30 group-hover:text-white/60 transition-colors"
-					style={{ writingMode: 'vertical-rl' }}
-				>
-					EXPLORER
-				</span>
-				<ChevronRight className="w-3 h-3 text-white/20 group-hover:text-emerald-400 transition-colors" />
-			</button>
-		);
+		return <CollapsedSidebar onExpand={sidebar.expand} />;
 	}
 
 	// Expanded state
@@ -81,7 +109,7 @@ export const Sidebar: React.FC = () => {
 				}
 			/>
 
-			<SidebarProfile onCollapse={sidebar.collapse} onExpand={sidebar.maximize} />
+			<SidebarProfile />
 
 			<div className="flex-1 min-h-0">
 				<ScrollArea className="h-full">
