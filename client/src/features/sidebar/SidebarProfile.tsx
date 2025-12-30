@@ -2,11 +2,10 @@
 
 import React, { memo } from 'react';
 import Image from 'next/image';
-import { Download, Linkedin, Github, Mail, FolderOpen } from 'lucide-react';
+import { Linkedin, Github, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { SidebarControls } from '@/components/common/WindowControls';
 
 interface SidebarProfileProps {
 	onCollapse?: () => void;
@@ -21,28 +20,6 @@ export const SidebarProfile = memo(function SidebarProfile({
 
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">
-			{/* Header - standardized to h-7 */}
-			<header className="h-7 px-2 border-b border-white/5 bg-zinc-900/90 backdrop-blur-sm flex items-center justify-between shrink-0 select-none z-20 relative">
-				<div className="flex items-center gap-2">
-					<SidebarControls
-						onClose={onCollapse}
-						onMaximize={onExpand}
-						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
-					/>
-
-					{/* Separator */}
-					<div className="h-3.5 w-px bg-white/10" aria-hidden="true" />
-
-					{/* Explorer Title */}
-					<div className="flex items-center gap-1.5 text-xs font-mono">
-						<FolderOpen className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-						<span className="text-emerald-300 font-medium tracking-tight">
-							EXPLORER
-						</span>
-					</div>
-				</div>
-			</header>
-
 			{/* Profile Section - compact with better grouping */}
 			<div className="p-3 border-b border-sidebar-border/20 bg-white/2">
 				<div className="flex items-center gap-3 mb-2">
