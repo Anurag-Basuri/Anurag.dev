@@ -153,18 +153,22 @@ export const SidebarControls = memo(function SidebarControls({
 	onClose,
 	onToggleFolders,
 	onMaximize,
+	isMaximized = false,
 }: {
 	onClose?: () => void;
 	onToggleFolders?: () => void;
 	onMaximize?: () => void;
+	isMaximized?: boolean;
 }) {
 	return (
 		<WindowControls
 			onClose={onClose}
 			onMinimize={onToggleFolders}
 			onMaximize={onMaximize}
+			isMaximized={isMaximized}
 			minimizeIcon={ChevronsUpDown}
 			minimizeLabel="Toggle All Folders"
+			maximizeLabel={isMaximized ? 'Restore' : 'Focus Mode'}
 		/>
 	);
 });
@@ -173,18 +177,22 @@ export const TerminalControls = memo(function TerminalControls({
 	onClose,
 	onClearHistory,
 	onMaximize,
+	isMaximized = false,
 }: {
 	onClose?: () => void;
 	onClearHistory?: () => void;
 	onMaximize?: () => void;
+	isMaximized?: boolean;
 }) {
 	return (
 		<WindowControls
 			onClose={onClose}
 			onMinimize={onClearHistory}
 			onMaximize={onMaximize}
+			isMaximized={isMaximized}
 			minimizeIcon={Trash2}
 			minimizeLabel="Clear History"
+			maximizeLabel={isMaximized ? 'Restore' : 'Focus Mode'}
 		/>
 	);
 });
