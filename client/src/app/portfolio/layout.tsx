@@ -247,10 +247,10 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				orientation="horizontal"
 				className={cn('h-full w-full', LAYOUT_SPACING.gap)}
 				groupRef={horizontalGroupRef}
-				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
-				onLayoutChange={(layout: Layout) => {
-					const sidebarSize = layout.sidebar;
-					const mainSize = layout.main;
+				defaultLayout={[hSizes?.[0] ?? 20, hSizes?.[1] ?? 80]}
+				onLayoutChange={(layout: number[]) => {
+					const sidebarSize = layout[0];
+					const mainSize = layout[1];
 					if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
 
 					const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
@@ -297,10 +297,10 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						orientation="vertical"
 						className={cn('h-full', LAYOUT_SPACING.gap)}
 						groupRef={verticalGroupRef}
-						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
-						onLayoutChange={(layout: Layout) => {
-							const contentSize = layout.content;
-							const terminalSize = layout.terminal;
+						defaultLayout={[vSizes?.[0] ?? 60, vSizes?.[1] ?? 40]}
+						onLayoutChange={(layout: number[]) => {
+							const contentSize = layout[0];
+							const terminalSize = layout[1];
 							if (typeof contentSize !== 'number' || typeof terminalSize !== 'number')
 								return;
 

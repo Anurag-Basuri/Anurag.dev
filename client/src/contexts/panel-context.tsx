@@ -78,24 +78,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	// ========================================================================
 
 	const collapseSidebar = useCallback(() => {
-		console.log('[PanelContext] collapseSidebar called');
-		console.log('[PanelContext] horizontalGroupRef.current:', horizontalGroupRef.current);
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
 		// Set layout to collapsed size (3%)
-		if (horizontalGroupRef.current) {
-			console.log('[PanelContext] Calling setLayout for sidebar collapse');
-			horizontalGroupRef.current.setLayout({ sidebar: 3, main: 97 });
-		} else {
-			console.warn('[PanelContext] horizontalGroupRef.current is null!');
-		}
+		horizontalGroupRef.current?.setLayout([3, 97]);
 	}, [setSidebarCollapsed, horizontalGroupRef]);
 
 	const expandSidebar = useCallback(() => {
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
 		// Set layout to default size (20%)
-		horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
+		horizontalGroupRef.current?.setLayout([20, 80]);
 	}, [setSidebarCollapsed, horizontalGroupRef]);
 
 	const toggleSidebar = useCallback(() => {
@@ -110,13 +103,13 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		if (sidebarMaximized) {
 			// Restore to default
 			setSidebarMaximized(false);
-			horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
+			horizontalGroupRef.current?.setLayout([20, 80]);
 		} else {
 			// Maximize sidebar
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			horizontalGroupRef.current?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
+			horizontalGroupRef.current?.setLayout([maxSize, 100 - maxSize]);
 		}
 	}, [sidebarMaximized, setSidebarCollapsed, horizontalGroupRef]);
 
@@ -128,14 +121,14 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
 		// Set layout to collapsed size (3%)
-		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
+		verticalGroupRef.current?.setLayout([97, 3]);
 	}, [setTerminalCollapsed, verticalGroupRef]);
 
 	const expandTerminal = useCallback(() => {
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		// Set layout to default size (40%)
-		verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
+		// Set layout to default size (40%) - Content: 60, Terminal: 40
+		verticalGroupRef.current?.setLayout([60, 40]);
 	}, [setTerminalCollapsed, verticalGroupRef]);
 
 	const toggleTerminal = useCallback(() => {
@@ -150,13 +143,13 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		if (terminalMaximized) {
 			// Restore to default
 			setTerminalMaximized(false);
-			verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
+			verticalGroupRef.current?.setLayout([60, 40]);
 		} else {
 			// Maximize terminal
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			verticalGroupRef.current?.setLayout({ content: 100 - maxSize, terminal: maxSize });
+			verticalGroupRef.current?.setLayout([100 - maxSize, maxSize]);
 		}
 	}, [terminalMaximized, setTerminalCollapsed, verticalGroupRef]);
 
