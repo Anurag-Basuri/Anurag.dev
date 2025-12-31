@@ -4,14 +4,14 @@ import React, {
 	createContext,
 	useContext,
 	useCallback,
-	useRef,
 	useState,
+	useMemo,
 	type ReactNode,
 } from 'react';
 import { useAtom } from 'jotai';
 import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
 import { PANEL_CONFIG } from '@/lib/constants';
-import type { GroupImperativeHandle } from 'react-resizable-panels';
+import { useGroupCallbackRef, type GroupImperativeHandle } from 'react-resizable-panels';
 
 // ============================================================================
 // Types
@@ -30,8 +30,9 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
-	horizontalGroupRef: React.RefObject<GroupImperativeHandle | null>;
-	verticalGroupRef: React.RefObject<GroupImperativeHandle | null>;
+	// Callback refs for proper connection
+	setHorizontalGroupRef: React.Dispatch<React.SetStateAction<GroupImperativeHandle | null>>;
+	setVerticalGroupRef: React.Dispatch<React.SetStateAction<GroupImperativeHandle | null>>;
 }
 
 interface PanelProviderProps {
@@ -61,9 +62,9 @@ export function usePanelControls() {
 // ============================================================================
 
 export function PanelProvider({ children }: PanelProviderProps) {
-	// Create refs INSIDE the provider - this ensures they're stable
-	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
-	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
+	// Use the library's callback ref hooks for proper ref management
+	const [horizontalGroup, setHorizontalGroupRef] = useGroupCallbackRef();
+	const [verticalGroup, setVerticalGroupRef] = useGroupCallbackRef();
 
 	// Jotai atoms for persisted collapsed state
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
@@ -80,14 +81,18 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseSidebar = useCallback(() => {
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
-	}, [setSidebarCollapsed]);
+		if (horizontalGroup) {
+			horizontalGroup.setLayout({ sidebar: 3, main: 97 });
+		}
+	}, [setSidebarCollapsed, horizontalGroup]);
 
 	const expandSidebar = useCallback(() => {
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-		horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
-	}, [setSidebarCollapsed]);
+		if (horizontalGroup) {
+			horizontalGroup.setLayout({ sidebar: 20, main: 80 });
+		}
+	}, [setSidebarCollapsed, horizontalGroup]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -99,17 +104,19 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
-			// Restore to default
 			setSidebarMaximized(false);
-			horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
+			if (horizontalGroup) {
+				horizontalGroup.setLayout({ sidebar: 20, main: 80 });
+			}
 		} else {
-			// Maximize sidebar
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			horizontalGroupRef.current?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
+			if (horizontalGroup) {
+				horizontalGroup.setLayout({ sidebar: maxSize, main: 100 - maxSize });
+			}
 		}
-	}, [sidebarMaximized, setSidebarCollapsed]);
+	}, [sidebarMaximized, setSidebarCollapsed, horizontalGroup]);
 
 	// ========================================================================
 	// Terminal Controls
@@ -118,14 +125,18 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseTerminal = useCallback(() => {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
-	}, [setTerminalCollapsed]);
+		if (verticalGroup) {
+			verticalGroup.setLayout({ content: 97, terminal: 3 });
+		}
+	}, [setTerminalCollapsed, verticalGroup]);
 
 	const expandTerminal = useCallback(() => {
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
-	}, [setTerminalCollapsed]);
+		if (verticalGroup) {
+			verticalGroup.setLayout({ content: 60, terminal: 40 });
+		}
+	}, [setTerminalCollapsed, verticalGroup]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
@@ -138,41 +149,65 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
 			setTerminalMaximized(false);
-			verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
+			if (verticalGroup) {
+				verticalGroup.setLayout({ content: 60, terminal: 40 });
+			}
 		} else {
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			verticalGroupRef.current?.setLayout({ content: 100 - maxSize, terminal: maxSize });
+			if (verticalGroup) {
+				verticalGroup.setLayout({ content: 100 - maxSize, terminal: maxSize });
+			}
 		}
-	}, [terminalMaximized, setTerminalCollapsed]);
+	}, [terminalMaximized, setTerminalCollapsed, verticalGroup]);
 
 	// ========================================================================
-	// Context Value
+	// Context Value - memoized to prevent unnecessary re-renders
 	// ========================================================================
 
-	const value: PanelContextValue = {
-		sidebar: {
-			collapse: collapseSidebar,
-			expand: expandSidebar,
-			toggle: toggleSidebar,
-			toggleMaximize: toggleMaximizeSidebar,
-			setCollapsedState: setSidebarCollapsed,
-			isCollapsed: sidebarCollapsed,
-			isMaximized: sidebarMaximized,
-		},
-		terminal: {
-			collapse: collapseTerminal,
-			expand: expandTerminal,
-			toggle: toggleTerminal,
-			toggleMaximize: toggleMaximizeTerminal,
-			setCollapsedState: setTerminalCollapsed,
-			isCollapsed: terminalCollapsed,
-			isMaximized: terminalMaximized,
-		},
-		horizontalGroupRef,
-		verticalGroupRef,
-	};
+	const value = useMemo<PanelContextValue>(
+		() => ({
+			sidebar: {
+				collapse: collapseSidebar,
+				expand: expandSidebar,
+				toggle: toggleSidebar,
+				toggleMaximize: toggleMaximizeSidebar,
+				setCollapsedState: setSidebarCollapsed,
+				isCollapsed: sidebarCollapsed,
+				isMaximized: sidebarMaximized,
+			},
+			terminal: {
+				collapse: collapseTerminal,
+				expand: expandTerminal,
+				toggle: toggleTerminal,
+				toggleMaximize: toggleMaximizeTerminal,
+				setCollapsedState: setTerminalCollapsed,
+				isCollapsed: terminalCollapsed,
+				isMaximized: terminalMaximized,
+			},
+			setHorizontalGroupRef,
+			setVerticalGroupRef,
+		}),
+		[
+			collapseSidebar,
+			expandSidebar,
+			toggleSidebar,
+			toggleMaximizeSidebar,
+			setSidebarCollapsed,
+			sidebarCollapsed,
+			sidebarMaximized,
+			collapseTerminal,
+			expandTerminal,
+			toggleTerminal,
+			toggleMaximizeTerminal,
+			setTerminalCollapsed,
+			terminalCollapsed,
+			terminalMaximized,
+			setHorizontalGroupRef,
+			setVerticalGroupRef,
+		],
+	);
 
 	return <PanelContext.Provider value={value}>{children}</PanelContext.Provider>;
 }
