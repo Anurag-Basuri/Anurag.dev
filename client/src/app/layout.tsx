@@ -77,6 +77,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
 	width: 'device-width',
 	initialScale: 1,
+	maximumScale: 5,
 	themeColor: [
 		{ media: '(prefers-color-scheme: light)', color: '#ffffff' },
 		{ media: '(prefers-color-scheme: dark)', color: '#000000' },
@@ -94,12 +95,12 @@ export default function RootLayout({
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 			</head>
-			<body className="antialiased">
+			<body className="antialiased bg-black text-white overflow-hidden">
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
-					enableSystem
-					disableTransitionOnChange={false}
+					enableSystem={false}
+					disableTransitionOnChange
 				>
 					<JotaiProvider>{children}</JotaiProvider>
 				</ThemeProvider>
