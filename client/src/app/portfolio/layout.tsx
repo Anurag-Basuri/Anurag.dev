@@ -238,7 +238,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
 					collapsible
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
-					className="overflow-hidden bg-black/20 backdrop-blur-2xl border border-white/5 rounded-2xl shadow-2xl transition-all duration-300"
+					className="overflow-hidden bg-linear-to-br from-black/25 via-black/20 to-black/15 backdrop-blur-2xl border border-white/8 rounded-2xl shadow-2xl ring-1 ring-inset ring-white/5 transition-all duration-300"
 				>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>
@@ -281,7 +281,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							id="content"
 							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
 							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
-							className="overflow-hidden min-h-0 bg-black/20 backdrop-blur-md border border-white/5 rounded-2xl shadow-xl"
+							className="overflow-hidden min-h-0 bg-linear-to-br from-black/20 via-black/15 to-black/10 backdrop-blur-xl border border-white/8 rounded-2xl shadow-xl ring-1 ring-inset ring-white/5"
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader />}>{renderModuleContent()}</Suspense>
@@ -299,7 +299,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
 							collapsible
 							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
-							className="overflow-hidden min-h-0 bg-black/30 backdrop-blur-xl border border-white/5 rounded-2xl shadow-2xl transition-all duration-300"
+							className="overflow-hidden min-h-0 bg-linear-to-br from-black/30 via-black/25 to-black/20 backdrop-blur-2xl border border-white/8 rounded-2xl shadow-2xl ring-1 ring-inset ring-white/5 transition-all duration-300"
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader height="h-32" />}>
