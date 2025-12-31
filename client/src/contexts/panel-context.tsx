@@ -11,7 +11,12 @@ import React, {
 import { useAtom } from 'jotai';
 import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
 import { PANEL_CONFIG } from '@/lib/constants';
-import { useGroupCallbackRef, type GroupImperativeHandle } from 'react-resizable-panels';
+import {
+	useGroupCallbackRef,
+	usePanelCallbackRef,
+	type GroupImperativeHandle,
+	type PanelImperativeHandle,
+} from 'react-resizable-panels';
 
 // ============================================================================
 // Types
@@ -30,13 +35,10 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
-	// Callback refs for proper connection
 	setHorizontalGroupRef: React.Dispatch<React.SetStateAction<GroupImperativeHandle | null>>;
 	setVerticalGroupRef: React.Dispatch<React.SetStateAction<GroupImperativeHandle | null>>;
-}
-
-interface PanelProviderProps {
-	children: ReactNode;
+	setSidebarPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
+	setTerminalPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
 }
 
 // ============================================================================
@@ -61,10 +63,13 @@ export function usePanelControls() {
 // Provider
 // ============================================================================
 
-export function PanelProvider({ children }: PanelProviderProps) {
+export function PanelProvider({ children }: { children: ReactNode }) {
 	// Use the library's callback ref hooks for proper ref management
 	const [horizontalGroup, setHorizontalGroupRef] = useGroupCallbackRef();
 	const [verticalGroup, setVerticalGroupRef] = useGroupCallbackRef();
+
+	const [sidebarPanel, setSidebarPanelRef] = usePanelCallbackRef();
+	const [terminalPanel, setTerminalPanelRef] = usePanelCallbackRef();
 
 	// Jotai atoms for persisted collapsed state
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
@@ -81,41 +86,41 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseSidebar = useCallback(() => {
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		if (horizontalGroup) {
+
+		if (sidebarPanel) {
+			sidebarPanel.collapse();
+		} else if (horizontalGroup) {
 			horizontalGroup.setLayout({ sidebar: 3, main: 97 });
 		}
-	}, [setSidebarCollapsed, horizontalGroup]);
+	}, [setSidebarCollapsed, sidebarPanel, horizontalGroup]);
 
 	const expandSidebar = useCallback(() => {
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-		if (horizontalGroup) {
+
+		if (sidebarPanel) {
+			sidebarPanel.expand();
+		} else if (horizontalGroup) {
 			horizontalGroup.setLayout({ sidebar: 20, main: 80 });
 		}
-	}, [setSidebarCollapsed, horizontalGroup]);
+	}, [setSidebarCollapsed, sidebarPanel, horizontalGroup]);
 
 	const toggleSidebar = useCallback(() => {
-		if (sidebarCollapsed) {
-			expandSidebar();
-		} else {
-			collapseSidebar();
-		}
-	}, [sidebarCollapsed, collapseSidebar, expandSidebar]);
+		(sidebarCollapsed ? expandSidebar : collapseSidebar)();
+	}, [sidebarCollapsed, expandSidebar, collapseSidebar]);
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
 			setSidebarMaximized(false);
-			if (horizontalGroup) {
-				horizontalGroup.setLayout({ sidebar: 20, main: 80 });
-			}
-		} else {
-			setSidebarMaximized(true);
-			setSidebarCollapsed(false);
-			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			if (horizontalGroup) {
-				horizontalGroup.setLayout({ sidebar: maxSize, main: 100 - maxSize });
-			}
+			horizontalGroup?.setLayout({ sidebar: 20, main: 80 });
+			return;
 		}
+
+		setSidebarMaximized(true);
+		setSidebarCollapsed(false);
+
+		const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
+		horizontalGroup?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
 	}, [sidebarMaximized, setSidebarCollapsed, horizontalGroup]);
 
 	// ========================================================================
@@ -125,41 +130,41 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseTerminal = useCallback(() => {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		if (verticalGroup) {
+
+		if (terminalPanel) {
+			terminalPanel.collapse();
+		} else if (verticalGroup) {
 			verticalGroup.setLayout({ content: 97, terminal: 3 });
 		}
-	}, [setTerminalCollapsed, verticalGroup]);
+	}, [setTerminalCollapsed, terminalPanel, verticalGroup]);
 
 	const expandTerminal = useCallback(() => {
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		if (verticalGroup) {
+
+		if (terminalPanel) {
+			terminalPanel.expand();
+		} else if (verticalGroup) {
 			verticalGroup.setLayout({ content: 60, terminal: 40 });
 		}
-	}, [setTerminalCollapsed, verticalGroup]);
+	}, [setTerminalCollapsed, terminalPanel, verticalGroup]);
 
 	const toggleTerminal = useCallback(() => {
-		if (terminalCollapsed) {
-			expandTerminal();
-		} else {
-			collapseTerminal();
-		}
-	}, [terminalCollapsed, collapseTerminal, expandTerminal]);
+		(terminalCollapsed ? expandTerminal : collapseTerminal)();
+	}, [terminalCollapsed, expandTerminal, collapseTerminal]);
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
 			setTerminalMaximized(false);
-			if (verticalGroup) {
-				verticalGroup.setLayout({ content: 60, terminal: 40 });
-			}
-		} else {
-			setTerminalMaximized(true);
-			setTerminalCollapsed(false);
-			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			if (verticalGroup) {
-				verticalGroup.setLayout({ content: 100 - maxSize, terminal: maxSize });
-			}
+			verticalGroup?.setLayout({ content: 60, terminal: 40 });
+			return;
 		}
+
+		setTerminalMaximized(true);
+		setTerminalCollapsed(false);
+
+		const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
+		verticalGroup?.setLayout({ content: 100 - maxSize, terminal: maxSize });
 	}, [terminalMaximized, setTerminalCollapsed, verticalGroup]);
 
 	// ========================================================================
@@ -188,6 +193,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			},
 			setHorizontalGroupRef,
 			setVerticalGroupRef,
+			setSidebarPanelRef,
+			setTerminalPanelRef,
 		}),
 		[
 			collapseSidebar,
@@ -206,6 +213,8 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			terminalMaximized,
 			setHorizontalGroupRef,
 			setVerticalGroupRef,
+			setSidebarPanelRef,
+			setTerminalPanelRef,
 		],
 	);
 
