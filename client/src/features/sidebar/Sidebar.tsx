@@ -34,11 +34,11 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 				<div className="collapsed-line-shimmer w-px h-8 rounded-full" />
 
 				{/* Icon with pulse */}
-				<FolderOpen className="collapsed-icon-pulse w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+				<FolderOpen className="collapsed-icon-pulse w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors duration-300" />
 
 				{/* Vertical text */}
 				<span
-					className="text-xs font-mono tracking-widest text-white/30 group-hover:text-white/70 transition-colors duration-300 uppercase"
+					className="text-xs font-mono tracking-widest text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors duration-300 uppercase"
 					style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
 				>
 					Explorer

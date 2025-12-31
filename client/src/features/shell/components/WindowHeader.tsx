@@ -15,10 +15,7 @@ interface WindowHeaderProps {
 	isFocused?: boolean;
 }
 
-/**
- * Window title bar header with macOS traffic light controls
- * Used for module windows in the portfolio shell
- */
+// Window Header Component
 export const WindowHeader = memo(function WindowHeader({
 	icon: Icon,
 	title,
@@ -29,7 +26,7 @@ export const WindowHeader = memo(function WindowHeader({
 	isFocused = true,
 }: WindowHeaderProps) {
 	return (
-		<header className="h-9 px-3 border-b border-white/5 bg-white/5 flex items-center justify-between shrink-0 select-none z-20 relative">
+		<header className="h-9 px-3 border-b border-border/30 bg-muted/30 flex items-center justify-between shrink-0 select-none z-20 relative">
 			{/* Left: Traffic Lights + Icon + Title */}
 			<div className="flex items-center gap-2">
 				<ModuleControls
@@ -40,7 +37,7 @@ export const WindowHeader = memo(function WindowHeader({
 				/>
 
 				{/* Separator */}
-				<div className="h-3.5 w-px bg-white/10" aria-hidden="true" />
+				<div className="h-3.5 w-px bg-border/50" aria-hidden="true" />
 
 				{/* Module Icon + Title */}
 				<div className="flex items-center gap-1.5 text-xs font-mono transition-colors">
