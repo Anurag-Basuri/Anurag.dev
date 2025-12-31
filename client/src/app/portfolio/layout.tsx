@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
-import type { Layout, GroupImperativeHandle } from 'react-resizable-panels';
+import type { Layout } from 'react-resizable-panels';
 import { PanelProvider, usePanelControls } from '@/contexts/panel-context';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -73,9 +73,9 @@ const MOTION_PRESETS = {
 
 // Consistent spacing tokens
 const LAYOUT_SPACING = {
-	gap: 'gap-1', // Minimal consistent gaps between panels
-	padding: 'p-1', // Outer padding around layout
-	inner: 'p-1', // Inner content padding
+	gap: 'gap-1',
+	padding: 'p-1',
+	inner: 'p-1',
 } as const;
 
 // ============================================================================
@@ -91,46 +91,52 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	// Use the centralized panel controls - refs are now in context
-	const { sidebar, terminal, horizontalGroupRef, verticalGroupRef } = usePanelControls();
+	// Use the centralized panel controls
+	const { sidebar, terminal, setHorizontalGroupRef, setVerticalGroupRef } = usePanelControls();
 
 	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
-	useKeyboardShortcuts([
-		{
-			key: 'b',
-			ctrl: true,
-			handler: () => sidebar.toggle(),
-			description: 'Toggle sidebar',
-		},
-		{
-			key: 'j',
-			ctrl: true,
-			handler: () => terminal.toggle(),
-			description: 'Toggle terminal',
-		},
-		{
-			key: 'Escape',
-			handler: () => {
-				if (modulePanel.isMaximized) {
-					modulePanel.restore();
-				}
+	// Memoize shortcuts to prevent effect re-runs
+	const shortcuts = useMemo(
+		() => [
+			{
+				key: 'b',
+				ctrl: true,
+				handler: sidebar.toggle,
+				description: 'Toggle sidebar',
 			},
-			description: 'Close maximized panel',
-		},
-		{
-			key: 'k',
-			ctrl: true,
-			shift: true,
-			handler: () => {
-				document
-					.querySelector<HTMLInputElement>('input[aria-label="Command input"]')
-					?.focus();
+			{
+				key: 'j',
+				ctrl: true,
+				handler: terminal.toggle,
+				description: 'Toggle terminal',
 			},
-			description: 'Focus terminal',
-		},
-	]);
+			{
+				key: 'Escape',
+				handler: () => {
+					if (modulePanel.isMaximized) {
+						modulePanel.restore();
+					}
+				},
+				description: 'Close maximized panel',
+			},
+			{
+				key: 'k',
+				ctrl: true,
+				shift: true,
+				handler: () => {
+					document
+						.querySelector<HTMLInputElement>('input[aria-label="Command input"]')
+						?.focus();
+				},
+				description: 'Focus terminal',
+			},
+		],
+		[sidebar.toggle, terminal.toggle, modulePanel],
+	);
+
+	useKeyboardShortcuts(shortcuts);
 
 	const [openFiles, setOpenFiles] = useAtom(openFilesAtom);
 
@@ -233,6 +239,46 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		);
 	};
 
+	// Handle layout changes for horizontal group
+	const handleHorizontalLayoutChange = useCallback(
+		(layout: Layout) => {
+			const sidebarSize = layout['sidebar'];
+			const mainSize = layout['main'];
+			if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
+
+			const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
+
+			if (nextCollapsed !== sidebar.isCollapsed) {
+				sidebar.setCollapsedState(nextCollapsed);
+			}
+
+			if (!nextCollapsed) {
+				setHSizes([sidebarSize, mainSize]);
+			}
+		},
+		[COLLAPSE_EPS, sidebar, setHSizes],
+	);
+
+	// Handle layout changes for vertical group
+	const handleVerticalLayoutChange = useCallback(
+		(layout: Layout) => {
+			const contentSize = layout['content'];
+			const terminalSize = layout['terminal'];
+			if (typeof contentSize !== 'number' || typeof terminalSize !== 'number') return;
+
+			const nextCollapsed = terminalSize <= COLLAPSE_EPS;
+
+			if (nextCollapsed !== terminal.isCollapsed) {
+				terminal.setCollapsedState(nextCollapsed);
+			}
+
+			if (!nextCollapsed) {
+				setVSizes([contentSize, terminalSize]);
+			}
+		},
+		[COLLAPSE_EPS, terminal, setVSizes],
+	);
+
 	const renderDesktopLayout = () => {
 		if (isMobile) return null;
 
@@ -241,25 +287,9 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				id="portfolio-main-h"
 				orientation="horizontal"
 				className={cn('h-full w-full', LAYOUT_SPACING.gap)}
-				groupRef={horizontalGroupRef}
+				groupRef={setHorizontalGroupRef}
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
-				onLayoutChange={(layout: Layout) => {
-					const sidebarSize = layout['sidebar'];
-					const mainSize = layout['main'];
-					if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
-
-					const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
-
-					// Keep atom in sync with drag-collapse (use direct state update, not collapse/expand which call setLayout)
-					if (nextCollapsed !== sidebar.isCollapsed) {
-						sidebar.setCollapsedState(nextCollapsed);
-					}
-
-					// Don't overwrite stored sizes with the collapsed layout
-					if (!nextCollapsed) {
-						setHSizes([sidebarSize, mainSize]);
-					}
-				}}
+				onLayoutChange={handleHorizontalLayoutChange}
 			>
 				{/* Sidebar */}
 				<Panel
@@ -291,25 +321,9 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						id="portfolio-main-v"
 						orientation="vertical"
 						className={cn('h-full', LAYOUT_SPACING.gap)}
-						groupRef={verticalGroupRef}
+						groupRef={setVerticalGroupRef}
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
-						onLayoutChange={(layout: Layout) => {
-							const contentSize = layout['content'];
-							const terminalSize = layout['terminal'];
-							if (typeof contentSize !== 'number' || typeof terminalSize !== 'number')
-								return;
-
-							const nextCollapsed = terminalSize <= COLLAPSE_EPS;
-
-							// Keep atom in sync with drag-collapse (use direct state update, not collapse/expand which call setLayout)
-							if (nextCollapsed !== terminal.isCollapsed) {
-								terminal.setCollapsedState(nextCollapsed);
-							}
-
-							if (!nextCollapsed) {
-								setVSizes([contentSize, terminalSize]);
-							}
-						}}
+						onLayoutChange={handleVerticalLayoutChange}
 					>
 						{/* Content Area */}
 						<Panel
