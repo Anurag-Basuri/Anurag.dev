@@ -13,8 +13,14 @@ import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import { useKeyboardShortcuts } from '@/hooks/use-keyboard-shortcuts';
 import { BootGuard } from '@/components/layout/BootGuard';
-import { useAtom } from 'jotai';
-import { mainHorizontalSizesAtom, mainVerticalSizesAtom, openFilesAtom } from '@/store';
+import { useAtom, useSetAtom } from 'jotai';
+import {
+	mainHorizontalSizesAtom,
+	mainVerticalSizesAtom,
+	openFilesAtom,
+	sidebarCollapsedAtom,
+	terminalCollapsedAtom,
+} from '@/store';
 import { PANEL_CONFIG, PANEL_COLLAPSE_THRESHOLD } from '@/lib/constants';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
@@ -48,7 +54,7 @@ const WindowHeader = dynamic(
 );
 
 // ============================================================================
-// Consistent Design Tokens for Professional Appearance
+// Design Tokens
 // ============================================================================
 
 const PANEL_STYLES = {
@@ -61,7 +67,6 @@ const PANEL_STYLES = {
 	maximized: 'bg-black shadow-2xl',
 } as const;
 
-// Animation presets for consistent motion
 const MOTION_PRESETS = {
 	fadeScale: {
 		initial: { opacity: 0, scale: 0.98 },
@@ -71,7 +76,6 @@ const MOTION_PRESETS = {
 	},
 } as const;
 
-// Consistent spacing tokens
 const LAYOUT_SPACING = {
 	gap: 'gap-1',
 	padding: 'p-1',
@@ -79,7 +83,7 @@ const LAYOUT_SPACING = {
 } as const;
 
 // ============================================================================
-// Inner Layout Component (uses PanelContext)
+// Inner Layout Component
 // ============================================================================
 
 function PortfolioLayoutInner({ children }: { children: ReactNode }) {
@@ -91,7 +95,10 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	// Use the centralized panel controls
+	// Direct atom setters for syncing from drag
+	const setSidebarCollapsed = useSetAtom(sidebarCollapsedAtom);
+	const setTerminalCollapsed = useSetAtom(terminalCollapsedAtom);
+
 	const {
 		sidebar,
 		terminal,
@@ -101,22 +108,24 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		setTerminalPanelRef,
 	} = usePanelControls();
 
-	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
-	// Memoize shortcuts to prevent effect re-runs
+	// Memoize shortcuts - use stable references
+	const toggleSidebar = sidebar.toggle;
+	const toggleTerminal = terminal.toggle;
+
 	const shortcuts = useMemo(
 		() => [
 			{
 				key: 'b',
 				ctrl: true,
-				handler: sidebar.toggle,
+				handler: toggleSidebar,
 				description: 'Toggle sidebar',
 			},
 			{
 				key: 'j',
 				ctrl: true,
-				handler: terminal.toggle,
+				handler: toggleTerminal,
 				description: 'Toggle terminal',
 			},
 			{
@@ -140,7 +149,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				description: 'Focus terminal',
 			},
 		],
-		[sidebar.toggle, terminal.toggle, modulePanel],
+		[toggleSidebar, toggleTerminal, modulePanel],
 	);
 
 	useKeyboardShortcuts(shortcuts);
@@ -165,7 +174,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 
 	const currentModuleId = getModuleIdFromPathname(pathname);
 
-	// Synchronize open files with navigation.
 	useEffect(() => {
 		if (!currentModuleId) return;
 
@@ -181,7 +189,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	}, [pathname, currentModuleId, setOpenFiles]);
 
 	useEffect(() => {
-		// If user navigates to a module, ensure it isn't stuck minimized
 		if (currentModuleId) modulePanel.expand();
 	}, [currentModuleId, modulePanel]);
 
@@ -197,17 +204,11 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		if (!currentModuleId) return;
 
 		const nextModule = getNextModuleAfterClose(currentModuleId);
-
-		// Close behaves like taskbar close: remove from open files
 		setOpenFiles(prev => prev.filter(f => f.moduleId !== currentModuleId));
 
-		// If maximized, restore first so overlay doesn't stick
 		if (modulePanel.isMaximized) modulePanel.restore();
-
-		// Collapse state (even though we navigate away) keeps internal state consistent
 		modulePanel.collapse();
 
-		// Navigate like taskbar close
 		if (nextModule) router.push(`/portfolio/${nextModule}`);
 		else router.push('/portfolio');
 	}, [currentModuleId, getNextModuleAfterClose, modulePanel, router, setOpenFiles]);
@@ -246,44 +247,44 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		);
 	};
 
-	// Handle layout changes for horizontal group
+	// Sync collapsed state when user drags to collapse
 	const handleHorizontalLayoutChange = useCallback(
 		(layout: Layout) => {
 			const sidebarSize = layout['sidebar'];
 			const mainSize = layout['main'];
 			if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
 
-			const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
+			const isNowCollapsed = sidebarSize <= COLLAPSE_EPS;
 
-			if (nextCollapsed !== sidebar.isCollapsed) {
-				sidebar.setCollapsedState(nextCollapsed);
+			// Only update if state actually changed
+			if (isNowCollapsed !== sidebar.isCollapsed) {
+				setSidebarCollapsed(isNowCollapsed);
 			}
 
-			if (!nextCollapsed) {
+			if (!isNowCollapsed) {
 				setHSizes([sidebarSize, mainSize]);
 			}
 		},
-		[COLLAPSE_EPS, sidebar, setHSizes],
+		[COLLAPSE_EPS, sidebar.isCollapsed, setSidebarCollapsed, setHSizes],
 	);
 
-	// Handle layout changes for vertical group
 	const handleVerticalLayoutChange = useCallback(
 		(layout: Layout) => {
 			const contentSize = layout['content'];
 			const terminalSize = layout['terminal'];
 			if (typeof contentSize !== 'number' || typeof terminalSize !== 'number') return;
 
-			const nextCollapsed = terminalSize <= COLLAPSE_EPS;
+			const isNowCollapsed = terminalSize <= COLLAPSE_EPS;
 
-			if (nextCollapsed !== terminal.isCollapsed) {
-				terminal.setCollapsedState(nextCollapsed);
+			if (isNowCollapsed !== terminal.isCollapsed) {
+				setTerminalCollapsed(isNowCollapsed);
 			}
 
-			if (!nextCollapsed) {
+			if (!isNowCollapsed) {
 				setVSizes([contentSize, terminalSize]);
 			}
 		},
-		[COLLAPSE_EPS, terminal, setVSizes],
+		[COLLAPSE_EPS, terminal.isCollapsed, setTerminalCollapsed, setVSizes],
 	);
 
 	const renderDesktopLayout = () => {
@@ -298,7 +299,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
 				onLayoutChange={handleHorizontalLayoutChange}
 			>
-				{/* Sidebar */}
 				<Panel
 					id="sidebar"
 					panelRef={setSidebarPanelRef}
@@ -320,10 +320,8 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					</ErrorBoundary>
 				</Panel>
 
-				{/* Horizontal ResizeHandle - hides when sidebar collapsed */}
 				<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
-				{/* Main Content + Terminal */}
 				<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
 					<Group
 						id="portfolio-main-v"
@@ -333,7 +331,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
 						onLayoutChange={handleVerticalLayoutChange}
 					>
-						{/* Content Area */}
 						<Panel
 							id="content"
 							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
@@ -345,10 +342,8 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							</ErrorBoundary>
 						</Panel>
 
-						{/* Vertical ResizeHandle */}
 						<ResizeHandle isCollapsed={terminal.isCollapsed} orientation="horizontal" />
 
-						{/* Terminal */}
 						<Panel
 							id="terminal"
 							panelRef={setTerminalPanelRef}
@@ -446,7 +441,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 }
 
 // ============================================================================
-// Main Layout (wraps with PanelProvider)
+// Main Layout
 // ============================================================================
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
