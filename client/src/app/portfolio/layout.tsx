@@ -52,17 +52,12 @@ const WindowHeader = dynamic(
 // ============================================================================
 
 const PANEL_STYLES = {
-	// Base glassmorphism for all panels
-	base: 'overflow-hidden backdrop-blur-2xl border border-white/8 rounded-2xl ring-1 ring-inset ring-white/5 transition-all duration-300',
-	// Collapsed state - no borders or shadows
+	base: 'overflow-hidden backdrop-blur-2xl border border-white/8 rounded-lg ring-1 ring-inset ring-white/5 transition-all duration-300',
 	collapsed: 'border-transparent ring-transparent shadow-none bg-transparent',
-	// Gradient backgrounds with different opacities for hierarchy
 	sidebar: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-2xl',
 	content: 'bg-linear-to-br from-black/20 via-black/15 to-black/10 shadow-xl',
 	terminal: 'bg-linear-to-br from-black/30 via-black/25 to-black/20 shadow-2xl',
-	// Mobile specific
 	mobile: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-xl',
-	// Maximized overlay
 	maximized: 'bg-black shadow-2xl',
 } as const;
 
@@ -78,9 +73,9 @@ const MOTION_PRESETS = {
 
 // Consistent spacing tokens
 const LAYOUT_SPACING = {
-	gap: 'gap-2', // Minimal consistent gaps between panels
-	padding: 'p-2', // Outer padding around layout
-	inner: 'p-2', // Inner content padding
+	gap: 'gap-1', // Minimal consistent gaps between panels
+	padding: 'p-1', // Outer padding around layout
+	inner: 'p-1', // Inner content padding
 } as const;
 
 // ============================================================================
