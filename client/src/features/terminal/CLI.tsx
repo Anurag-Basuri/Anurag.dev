@@ -15,7 +15,7 @@ import { usePanelControls } from '@/contexts/panel-context';
 // ============================================================================
 
 const STYLES = {
-	bar: 'min-h-[2rem] px-2 sm:px-3 bg-zinc-900/40 backdrop-blur-md border-white/5 flex items-center shrink-0',
+	bar: 'h-9 px-3 bg-white/5 backdrop-blur-md border-white/5 flex items-center shrink-0',
 	icon: 'w-3.5 h-3.5 shrink-0',
 	text: 'text-xs font-mono',
 } as const;
