@@ -63,10 +63,16 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 				aria-selected={isFocused}
 				aria-expanded={isFolder ? isExpanded : undefined}
 				className={cn(
-					'flex items-center py-1 px-2 cursor-pointer select-none text-md transition-all duration-200 rounded-md group relative my-0.5 outline-none',
-					isActive ? 'text-emerald-300' : 'text-white/70 hover:text-white',
-					level > 0 && 'ml-3.5',
-					isFocused && 'bg-white/10 ring-1 ring-inset ring-white/20',
+					// Base styles
+					'flex items-center py-1.5 px-2 cursor-pointer select-none',
+					'text-xs sm:text-sm transition-all duration-200 rounded-md group relative my-0.5 outline-none',
+					// Left border indicator (like terminal history)
+					'border-l-2',
+					isActive
+						? 'border-emerald-500 text-emerald-300 bg-emerald-500/5'
+						: 'border-transparent text-white/70 hover:text-white hover:border-white/20',
+					level > 0 && 'ml-3',
+					isFocused && 'bg-white/10 ring-1 ring-inset ring-emerald-500/30',
 				)}
 				onClick={handleClick}
 				onMouseEnter={() => setIsHovered(true)}
@@ -113,7 +119,7 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 
 				<span
 					className={cn(
-						'truncate relative z-10 font-medium tracking-tight',
+						'truncate relative z-10 font-medium tracking-tight text-xs sm:text-sm',
 						isActive && 'font-semibold',
 					)}
 				>
