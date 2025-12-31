@@ -106,11 +106,13 @@ const Input = forwardRef<
 					<span>{value.slice(0, cursorPos)}</span>
 					<span
 						className={cn(
-							'w-0.5 h-4 bg-emerald-400 transition-opacity duration-100',
-							isFocused ? 'animate-pulse' : 'opacity-0',
+							'inline-block w-[2px] h-[14px] bg-emerald-400 rounded-sm',
+							isFocused
+								? 'animate-[cursor-blink_1s_ease-in-out_infinite]'
+								: 'opacity-0',
 						)}
 					/>
-					<span className="opacity-50">{value.slice(cursorPos)}</span>
+					<span className="text-white/40">{value.slice(cursorPos)}</span>
 				</div>
 			</div>
 		</div>
@@ -174,25 +176,31 @@ Suggestions.displayName = 'Suggestions';
 const HistoryEntry = memo(({ item, isNew }: { item: HistoryItem; isNew?: boolean }) => (
 	<div
 		className={cn(
-			'space-y-1 transition-all duration-300',
+			'space-y-1.5 py-1',
+			'border-l-2 border-transparent hover:border-emerald-500/20 pl-2 -ml-2',
+			'transition-all duration-200',
 			isNew && 'animate-in fade-in slide-in-from-bottom-2',
 		)}
 	>
 		{item.command && (
 			<div className="flex items-start gap-1.5 sm:gap-2 text-xs font-mono">
-				<ChevronRight className="w-3 h-3 text-emerald-500/50 shrink-0 mt-0.5" />
-				<span className="text-white/40 truncate max-w-[80px] sm:max-w-none">
+				<ChevronRight className="w-3 h-3 text-emerald-500/60 shrink-0 mt-0.5" />
+				<span className="text-white/35 truncate max-w-[80px] sm:max-w-none">
 					{item.path}
 				</span>
-				<span className="text-emerald-500/50">$</span>
-				<span className="text-white/80 break-all">{item.command}</span>
+				<span className="text-emerald-500/60">$</span>
+				<span className="text-white/90 break-all font-medium">{item.command}</span>
 			</div>
 		)}
 		{item.response.content && (
 			<div
 				className={cn(
-					'text-xs font-mono pl-4 sm:pl-5 whitespace-pre-wrap wrap-break-word',
-					item.response.type === 'error' ? 'text-red-400/80' : 'text-white/60',
+					'text-xs font-mono pl-4 sm:pl-5 whitespace-pre-wrap wrap-break-word leading-relaxed',
+					item.response.type === 'error'
+						? 'text-red-400/90 bg-red-500/5 rounded px-2 py-1 -ml-2'
+						: item.response.type === 'success'
+						? 'text-emerald-400/80'
+						: 'text-white/55',
 				)}
 			>
 				{item.response.content}
@@ -203,24 +211,24 @@ const HistoryEntry = memo(({ item, isNew }: { item: HistoryItem; isNew?: boolean
 HistoryEntry.displayName = 'HistoryEntry';
 
 const Welcome = memo(() => (
-	<div className="text-xs font-mono text-white/30 space-y-2 animate-in fade-in duration-500">
-		<p>
-			Welcome! Type <span className="text-emerald-400">help</span> for commands.
-		</p>
-		<div className="text-white/20 text-[10px] space-y-0.5">
-			<p className="flex flex-wrap gap-x-2 gap-y-0.5">
-				<span>
-					<span className="text-emerald-500/50">↑/↓</span> History
-				</span>
-				<span className="hidden sm:inline">•</span>
-				<span>
-					<span className="text-emerald-500/50">Tab</span> Autocomplete
-				</span>
-				<span className="hidden sm:inline">•</span>
-				<span>
-					<span className="text-emerald-500/50">Ctrl+L</span> Clear
-				</span>
+	<div className="text-xs font-mono space-y-3 animate-in fade-in duration-700">
+		<div className="flex items-center gap-2">
+			<div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+			<p className="text-white/50">
+				Welcome! Type <span className="text-emerald-400 font-semibold">help</span> for
+				available commands.
 			</p>
+		</div>
+		<div className="flex flex-wrap gap-3 text-[10px] text-white/30">
+			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
+				<span className="text-emerald-500/70">↑↓</span> History
+			</kbd>
+			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
+				<span className="text-emerald-500/70">Tab</span> Complete
+			</kbd>
+			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
+				<span className="text-emerald-500/70">Ctrl+L</span> Clear
+			</kbd>
 		</div>
 	</div>
 ));
