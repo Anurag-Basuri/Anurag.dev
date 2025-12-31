@@ -5,119 +5,130 @@
    CSS Variables for Theming
    ========================= */
 :root {
-	/* Light Mode - Enhanced Contrast & Visibility */
-	--background: oklch(0.98 0.005 240); /* Crisp white background */
-	--foreground: oklch(0.15 0.04 255); /* Much darker text for strong contrast */
+	/* Light Mode - Professional IDE-inspired theme */
+	--background: oklch(0.985 0.002 240); /* Clean off-white */
+	--foreground: oklch(0.2 0.02 260); /* Deep blue-gray text */
 
-	--card: oklch(0.99 0.005 240); /* Slightly tinted white surface */
+	--card: oklch(1 0 0); /* Pure white cards */
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(1 0 0); /* Pure white popover */
+	--popover: oklch(1 0 0);
 	--popover-foreground: var(--foreground);
 
-	/* Primary - Stronger, more saturated blue/indigo */
-	--primary: oklch(0.5 0.25 260); /* More vibrant and visible */
+	/* Primary - Professional teal/emerald */
+	--primary: oklch(0.55 0.18 165);
 	--primary-foreground: oklch(0.98 0 0);
 
-	/* Secondary - More visible slate */
-	--secondary: oklch(0.92 0.03 240);
-	--secondary-foreground: oklch(0.25 0.06 255);
+	/* Secondary - Soft gray */
+	--secondary: oklch(0.94 0.01 260);
+	--secondary-foreground: oklch(0.35 0.03 260);
 
-	/* Muted - Stronger for better hierarchy */
-	--muted: oklch(0.94 0.02 240);
-	--muted-foreground: oklch(0.4 0.05 255); /* Darker for visibility */
+	/* Muted - Subtle backgrounds */
+	--muted: oklch(0.96 0.005 260);
+	--muted-foreground: oklch(0.45 0.02 260);
 
-	/* Accent - Vibrant Cyan */
-	--accent: oklch(0.55 0.2 220); /* More saturated */
-	--accent-foreground: oklch(0.98 0 0);
+	/* Accent - Vibrant for highlights */
+	--accent: oklch(0.92 0.03 260);
+	--accent-foreground: oklch(0.25 0.04 260);
 
 	--destructive: oklch(0.55 0.22 25);
 	--destructive-foreground: oklch(0.98 0 0);
 
-	/* Border - High visibility */
-	--border: oklch(1 0 0); /* white */
-	--input: oklch(1 0 0);
-	--ring: oklch(1 0 0);
+	/* Border - Subtle but visible */
+	--border: oklch(0.88 0.01 260);
+	--input: oklch(0.92 0.01 260);
+	--ring: oklch(0.55 0.18 165);
 
 	--radius: 0.5rem;
 
 	/* Sidebar specific - Light Mode */
-	--sidebar: oklch(0.96 0.02 240); /* More distinct */
+	--sidebar: oklch(0.975 0.005 260);
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.9 0.04 240);
-	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.8 0.03 240); /* More visible */
+	--sidebar-accent: oklch(0.94 0.02 165);
+	--sidebar-accent-foreground: oklch(0.3 0.05 165);
+	--sidebar-border: oklch(0.9 0.01 260);
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Light */
-	--terminal-bg: oklch(0.97 0.01 240);
-	--terminal-text: oklch(0.15 0.04 255);
-	--terminal-cursor: oklch(0.5 0.25 260);
+	--terminal-bg: oklch(0.98 0.005 260);
+	--terminal-text: oklch(0.2 0.02 260);
+	--terminal-cursor: oklch(0.55 0.18 165);
 
-	/* Elevation / Shadows (Light) - Enhanced for depth */
-	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.08);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.15), 0 2px 4px -2px rgb(0 0 0 / 0.12);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.12);
-	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.12);
-	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 8px 40px -4px rgba(0, 0, 0, 0.18),
-		0 4px 16px -2px rgba(0, 0, 0, 0.1);
+	/* Panel overlay colors - for glassmorphism */
+	--panel-overlay: oklch(1 0 0 / 0.8);
+	--panel-overlay-hover: oklch(0.97 0.01 260 / 0.9);
+
+	/* Elevation / Shadows (Light) */
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 40px -4px rgba(0, 0, 0, 0.12),
+		0 4px 16px -2px rgba(0, 0, 0, 0.08);
 }
 
 .dark {
 	/* Dark Mode - High Contrast & Readability */
-	--background: oklch(0.18 0.03 260); /* Lighter for better readability */
-	--foreground: oklch(0.98 0.01 220); /* Very bright white for maximum contrast */
+	--background: oklch(0.14 0.02 260);
+	--foreground: oklch(0.95 0.01 220);
 
-	--card: oklch(0.2 0.04 260); /* More distinct with subtle tint */
+	--card: oklch(0.18 0.025 260);
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(0.19 0.04 260);
+	--popover: oklch(0.16 0.025 260);
 	--popover-foreground: var(--foreground);
 
-	/* Primary - Brighter Emerald for better visibility */
-	--primary: oklch(0.8 0.22 155); /* Much brighter, more saturated */
-	--primary-foreground: oklch(0.1 0.03 260);
+	/* Primary - Bright Emerald */
+	--primary: oklch(0.75 0.2 160);
+	--primary-foreground: oklch(0.12 0.02 260);
 
-	--secondary: oklch(0.25 0.05 260);
-	--secondary-foreground: oklch(0.88 0.16 155);
+	--secondary: oklch(0.22 0.03 260);
+	--secondary-foreground: oklch(0.85 0.12 160);
 
 	/* Muted - Stronger contrast */
-	--muted: oklch(0.25 0.04 260);
-	--muted-foreground: oklch(0.75 0.04 250); /* Brighter for visibility */
+	--muted: oklch(0.22 0.025 260);
+	--muted-foreground: oklch(0.7 0.03 250);
 
-	/* Accent - More vibrant */
-	--accent: oklch(0.28 0.08 280);
-	--accent-foreground: oklch(0.95 0.1 280);
+	/* Accent */
+	--accent: oklch(0.25 0.05 280);
+	--accent-foreground: oklch(0.92 0.08 280);
 
-	--destructive: oklch(0.6 0.24 25); /* Brighter red */
+	--destructive: oklch(0.58 0.22 25);
 	--destructive-foreground: oklch(0.98 0 0);
 
-	/* Border - Maximum visibility */
-	--border: oklch(0.55 0.05 260); /* Much brighter for visibility against dark backgrounds */
-	--input: oklch(0.28 0.05 260);
-	--ring: oklch(0.8 0.22 155);
+	/* Border */
+	--border: oklch(0.3 0.03 260);
+	--input: oklch(0.25 0.03 260);
+	--ring: oklch(0.75 0.2 160);
 
 	/* Sidebar specific - Dark Mode */
-	--sidebar: oklch(0.14 0.03 260); /* Darker than main bg for depth */
+	--sidebar: oklch(0.12 0.02 260);
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.3 0.06 280);
+	--sidebar-accent: oklch(0.28 0.05 280);
 	--sidebar-accent-foreground: var(--accent-foreground);
-	--sidebar-border: oklch(0.35 0.05 260 / 0.7); /* More visible */
+	--sidebar-border: oklch(0.28 0.03 260);
 	--sidebar-ring: var(--ring);
 
 	/* Terminal Colors - Dark */
-	--terminal-bg: oklch(0.13 0.03 260);
-	--terminal-text: oklch(0.95 0.02 220);
-	--terminal-cursor: oklch(0.8 0.22 155);
+	--terminal-bg: oklch(0.11 0.02 260);
+	--terminal-text: oklch(0.92 0.015 220);
+	--terminal-cursor: oklch(0.75 0.2 160);
 
-	/* Elevation / Shadows (Dark) - Enhanced with brighter glow */
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 20px 50px -10px rgba(0, 0, 0, 0.8),
-		0 8px 20px -2px rgba(16, 185, 129, 0.3); /* Stronger emerald glow */
+	/* Panel overlay colors - for glassmorphism */
+	--panel-overlay: oklch(0.08 0.02 260 / 0.85);
+	--panel-overlay-hover: oklch(0.12 0.02 260 / 0.9);
+
+	/* Elevation / Shadows (Dark) */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 50px -10px rgba(0, 0, 0, 0.7),
+		0 8px 20px -2px rgba(16, 185, 129, 0.2);
 }
 
 /* ================
