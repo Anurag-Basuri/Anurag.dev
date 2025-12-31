@@ -78,10 +78,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	// ========================================================================
 
 	const collapseSidebar = useCallback(() => {
+		console.log('[PanelContext] collapseSidebar called');
+		console.log('[PanelContext] horizontalGroupRef.current:', horizontalGroupRef.current);
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
 		// Set layout to collapsed size (3%)
-		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
+		if (horizontalGroupRef.current) {
+			console.log('[PanelContext] Calling setLayout for sidebar collapse');
+			horizontalGroupRef.current.setLayout({ sidebar: 3, main: 97 });
+		} else {
+			console.warn('[PanelContext] horizontalGroupRef.current is null!');
+		}
 	}, [setSidebarCollapsed, horizontalGroupRef]);
 
 	const expandSidebar = useCallback(() => {
