@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { EmptyState } from '@/components/editor/EmptyState';
-import type { Layout } from 'react-resizable-panels';
+import type { Layout, GroupImperativeHandle } from 'react-resizable-panels';
 import { PanelProvider, usePanelControls } from '@/contexts/panel-context';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
@@ -51,7 +51,17 @@ const WindowHeader = dynamic(
 // Inner Layout Component (uses PanelContext)
 // ============================================================================
 
-function PortfolioLayoutInner({ children }: { children: ReactNode }) {
+interface PortfolioLayoutInnerProps {
+	children: ReactNode;
+	horizontalGroupRef: React.RefObject<GroupImperativeHandle | null>;
+	verticalGroupRef: React.RefObject<GroupImperativeHandle | null>;
+}
+
+function PortfolioLayoutInner({
+	children,
+	horizontalGroupRef,
+	verticalGroupRef,
+}: PortfolioLayoutInnerProps) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
@@ -61,7 +71,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
 	// Use the centralized panel controls
-	const { sidebar, terminal, horizontalGroupRef, verticalGroupRef } = usePanelControls();
+	const { sidebar, terminal } = usePanelControls();
 
 	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
@@ -219,13 +229,9 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 
 					const nextCollapsed = sidebarSize <= COLLAPSE_EPS;
 
-					// Keep atom in sync with drag-collapse
+					// Keep atom in sync with drag-collapse (use direct state update, not collapse/expand which call setLayout)
 					if (nextCollapsed !== sidebar.isCollapsed) {
-						if (nextCollapsed) {
-							sidebar.collapse();
-						} else {
-							sidebar.expand();
-						}
+						sidebar.setCollapsedState(nextCollapsed);
 					}
 
 					// Don't overwrite stored sizes with the collapsed layout
@@ -270,12 +276,9 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 
 							const nextCollapsed = terminalSize <= COLLAPSE_EPS;
 
+							// Keep atom in sync with drag-collapse (use direct state update, not collapse/expand which call setLayout)
 							if (nextCollapsed !== terminal.isCollapsed) {
-								if (nextCollapsed) {
-									terminal.collapse();
-								} else {
-									terminal.expand();
-								}
+								terminal.setCollapsedState(nextCollapsed);
 							}
 
 							if (!nextCollapsed) {
@@ -390,11 +393,23 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 // ============================================================================
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
+	// Create refs locally - these will be passed to both PanelProvider and Group components
+	const horizontalGroupRef = useRef<GroupImperativeHandle>(null);
+	const verticalGroupRef = useRef<GroupImperativeHandle>(null);
+
 	return (
 		<ErrorBoundary>
 			<BootGuard>
-				<PanelProvider>
-					<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
+				<PanelProvider
+					horizontalGroupRef={horizontalGroupRef}
+					verticalGroupRef={verticalGroupRef}
+				>
+					<PortfolioLayoutInner
+						horizontalGroupRef={horizontalGroupRef}
+						verticalGroupRef={verticalGroupRef}
+					>
+						{children}
+					</PortfolioLayoutInner>
 				</PanelProvider>
 			</BootGuard>
 		</ErrorBoundary>
