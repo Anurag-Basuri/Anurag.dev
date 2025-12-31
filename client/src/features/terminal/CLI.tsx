@@ -15,7 +15,7 @@ import { usePanelControls } from '@/contexts/panel-context';
 // ============================================================================
 
 const STYLES = {
-	bar: 'h-9 px-3 bg-white/5 backdrop-blur-md border-white/5 flex items-center shrink-0',
+	bar: 'h-9 px-3 bg-muted/30 backdrop-blur-md border-border/30 flex items-center shrink-0',
 	icon: 'w-3.5 h-3.5 shrink-0',
 	text: 'text-xs font-mono',
 } as const;
@@ -47,8 +47,8 @@ const Input = forwardRef<
 				STYLES.bar,
 				'border-t gap-1.5 sm:gap-2 cursor-text transition-all duration-300',
 				isFocused
-					? 'border-emerald-500/40 bg-zinc-900/80 ring-1 ring-emerald-500/20 shadow-[0_0_12px_rgba(52,211,153,0.1)]'
-					: 'border-white/5 hover:border-white/10 hover:bg-zinc-900/40',
+					? 'border-primary/40 bg-muted/60 ring-1 ring-primary/20 shadow-sm'
+					: 'border-border/30 hover:border-border/50 hover:bg-muted/40',
 				isExecuting && 'opacity-60 pointer-events-none',
 			)}
 			onClick={() => (ref as React.RefObject<HTMLInputElement>)?.current?.focus()}
@@ -57,14 +57,14 @@ const Input = forwardRef<
 				className={cn(
 					STYLES.icon,
 					'transition-colors duration-200',
-					isFocused ? 'text-emerald-400' : 'text-white/30',
+					isFocused ? 'text-primary' : 'text-muted-foreground/50',
 				)}
 			/>
 			<span
 				className={cn(
 					STYLES.text,
 					'font-semibold transition-colors duration-200 hidden sm:inline',
-					isFocused ? 'text-emerald-400' : 'text-white/40',
+					isFocused ? 'text-primary' : 'text-muted-foreground/60',
 				)}
 			>
 				{path}
@@ -73,7 +73,7 @@ const Input = forwardRef<
 				className={cn(
 					STYLES.text,
 					'font-bold transition-colors duration-200',
-					isFocused ? 'text-emerald-500' : 'text-white/20',
+					isFocused ? 'text-primary' : 'text-muted-foreground/40',
 				)}
 			>
 				$
@@ -100,19 +100,19 @@ const Input = forwardRef<
 					className={cn(
 						STYLES.text,
 						'whitespace-pre pointer-events-none flex items-center transition-colors duration-200',
-						isFocused ? 'text-white' : 'text-white/60',
+						isFocused ? 'text-foreground' : 'text-foreground/60',
 					)}
 				>
 					<span>{value.slice(0, cursorPos)}</span>
 					<span
 						className={cn(
-							'inline-block w-[2px] h-[14px] bg-emerald-400 rounded-sm',
+							'inline-block w-[2px] h-[14px] bg-primary rounded-sm',
 							isFocused
 								? 'animate-[cursor-blink_1s_ease-in-out_infinite]'
 								: 'opacity-0',
 						)}
 					/>
-					<span className="text-white/40">{value.slice(cursorPos)}</span>
+					<span className="text-muted-foreground/60">{value.slice(cursorPos)}</span>
 				</div>
 			</div>
 		</div>
@@ -144,8 +144,8 @@ const Suggestions = memo(
 					'border-t gap-1.5 sm:gap-2 flex-wrap h-auto py-1.5 sm:py-2 animate-in fade-in slide-in-from-bottom-1 duration-150',
 				)}
 			>
-				<span className="text-[10px] font-bold text-emerald-500/50 uppercase tracking-widest flex items-center gap-1">
-					<span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-emerald-500/50" />
+				<span className="text-[10px] font-bold text-primary/50 uppercase tracking-widest flex items-center gap-1">
+					<span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-primary/50" />
 					<span className="hidden sm:inline">Tab</span>
 				</span>
 				{items.map((s, i) => (
@@ -156,8 +156,8 @@ const Suggestions = memo(
 						className={cn(
 							'px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs font-mono transition-all duration-150 active:scale-95',
 							i === activeIndex
-								? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-								: 'bg-white/5 text-white/60 border border-transparent hover:bg-white/10 hover:text-white',
+								? 'bg-primary/15 text-primary border border-primary/30'
+								: 'bg-muted/50 text-muted-foreground border border-transparent hover:bg-muted hover:text-foreground',
 						)}
 					>
 						{s}
@@ -177,19 +177,19 @@ const HistoryEntry = memo(({ item, isNew }: { item: HistoryItem; isNew?: boolean
 	<div
 		className={cn(
 			'space-y-1.5 py-1',
-			'border-l-2 border-transparent hover:border-emerald-500/20 pl-2 -ml-2',
+			'border-l-2 border-transparent hover:border-primary/20 pl-2 -ml-2',
 			'transition-all duration-200',
 			isNew && 'animate-in fade-in slide-in-from-bottom-2',
 		)}
 	>
 		{item.command && (
 			<div className="flex items-start gap-1.5 sm:gap-2 text-xs font-mono">
-				<ChevronRight className="w-3 h-3 text-emerald-500/60 shrink-0 mt-0.5" />
-				<span className="text-white/35 truncate max-w-[80px] sm:max-w-none">
+				<ChevronRight className="w-3 h-3 text-primary/60 shrink-0 mt-0.5" />
+				<span className="text-muted-foreground/50 truncate max-w-[80px] sm:max-w-none">
 					{item.path}
 				</span>
-				<span className="text-emerald-500/60">$</span>
-				<span className="text-white/90 break-all font-medium">{item.command}</span>
+				<span className="text-primary/60">$</span>
+				<span className="text-foreground/90 break-all font-medium">{item.command}</span>
 			</div>
 		)}
 		{item.response.content && (
@@ -197,10 +197,10 @@ const HistoryEntry = memo(({ item, isNew }: { item: HistoryItem; isNew?: boolean
 				className={cn(
 					'text-xs font-mono pl-4 sm:pl-5 whitespace-pre-wrap wrap-break-word leading-relaxed',
 					item.response.type === 'error'
-						? 'text-red-400/90 bg-red-500/5 rounded px-2 py-1 -ml-2'
+						? 'text-destructive/90 bg-destructive/5 rounded px-2 py-1 -ml-2'
 						: item.response.type === 'success'
-						? 'text-emerald-400/80'
-						: 'text-white/55',
+						? 'text-primary/80'
+						: 'text-muted-foreground',
 				)}
 			>
 				{item.response.content}
@@ -213,21 +213,21 @@ HistoryEntry.displayName = 'HistoryEntry';
 const Welcome = memo(() => (
 	<div className="text-xs font-mono space-y-3 animate-in fade-in duration-700">
 		<div className="flex items-center gap-2">
-			<div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-			<p className="text-white/50">
-				Welcome! Type <span className="text-emerald-400 font-semibold">help</span> for
-				available commands.
+			<div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+			<p className="text-muted-foreground">
+				Welcome! Type <span className="text-primary font-semibold">help</span> for available
+				commands.
 			</p>
 		</div>
-		<div className="flex flex-wrap gap-3 text-[10px] text-white/30">
-			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
-				<span className="text-emerald-500/70">↑↓</span> History
+		<div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground/50">
+			<kbd className="px-1.5 py-0.5 bg-muted/50 rounded border border-border/50">
+				<span className="text-primary/70">↑↓</span> History
 			</kbd>
-			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
-				<span className="text-emerald-500/70">Tab</span> Complete
+			<kbd className="px-1.5 py-0.5 bg-muted/50 rounded border border-border/50">
+				<span className="text-primary/70">Tab</span> Complete
 			</kbd>
-			<kbd className="px-1.5 py-0.5 bg-white/5 rounded border border-white/10">
-				<span className="text-emerald-500/70">Ctrl+L</span> Clear
+			<kbd className="px-1.5 py-0.5 bg-muted/50 rounded border border-border/50">
+				<span className="text-primary/70">Ctrl+L</span> Clear
 			</kbd>
 		</div>
 	</div>
@@ -288,10 +288,10 @@ export function CLI() {
 					<div className="collapsed-line-shimmer h-px w-8 rounded-full" />
 
 					{/* Icon with pulse */}
-					<Terminal className="collapsed-icon-pulse w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+					<Terminal className="collapsed-icon-pulse w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors duration-300" />
 
 					{/* Text */}
-					<span className="text-xs font-mono tracking-widest text-white/30 group-hover:text-white/70 transition-colors duration-300 uppercase">
+					<span className="text-xs font-mono tracking-widest text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors duration-300 uppercase">
 						Terminal
 					</span>
 
@@ -328,7 +328,7 @@ export function CLI() {
 				className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 space-y-2"
 				style={{
 					scrollbarWidth: 'thin',
-					scrollbarColor: 'rgba(255,255,255,0.1) transparent',
+					scrollbarColor: 'var(--muted-foreground) transparent',
 				}}
 				role="log"
 				aria-live="polite"
