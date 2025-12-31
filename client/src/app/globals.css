@@ -441,6 +441,18 @@
 	animation: subtle-pulse 3s ease-in-out infinite;
 }
 
+/* Terminal cursor blink animation */
+@keyframes cursor-blink {
+	0%,
+	50% {
+		opacity: 1;
+	}
+	51%,
+	100% {
+		opacity: 0;
+	}
+}
+
 /* Shimmer effect for collapsed panel lines */
 @keyframes shimmer {
 	0% {
