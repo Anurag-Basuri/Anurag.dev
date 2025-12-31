@@ -58,13 +58,13 @@ const WindowHeader = dynamic(
 // ============================================================================
 
 const PANEL_STYLES = {
-	base: 'overflow-hidden backdrop-blur-2xl border border-white/8 rounded-lg ring-1 ring-inset ring-white/5 transition-all duration-300',
+	base: 'overflow-hidden backdrop-blur-2xl border border-border/30 rounded-lg ring-1 ring-inset ring-border/20 transition-all duration-300',
 	collapsed: 'border-transparent ring-transparent shadow-none bg-transparent',
-	sidebar: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-2xl',
-	content: 'bg-linear-to-br from-black/20 via-black/15 to-black/10 shadow-xl',
-	terminal: 'bg-linear-to-br from-black/30 via-black/25 to-black/20 shadow-2xl',
-	mobile: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-xl',
-	maximized: 'bg-black shadow-2xl',
+	sidebar: 'bg-sidebar/80 dark:bg-sidebar/60 shadow-md dark:shadow-2xl',
+	content: 'bg-card/70 dark:bg-card/50 shadow-sm dark:shadow-xl',
+	terminal: 'bg-sidebar/90 dark:bg-sidebar/70 shadow-md dark:shadow-2xl',
+	mobile: 'bg-card/80 dark:bg-card/60 shadow-sm dark:shadow-xl',
+	maximized: 'bg-background shadow-xl',
 } as const;
 
 const MOTION_PRESETS = {
@@ -397,7 +397,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				)}
 			</AnimatePresence>
 			<ContextMenuProvider>
-				<div className="fixed inset-0 flex flex-col overflow-hidden bg-black font-sans selection:bg-emerald-500/30">
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background font-sans selection:bg-primary/30">
 					<Suspense fallback={<Loader height="h-8" />}>
 						<TopBar
 							isMobile={isMobile}

@@ -95,7 +95,7 @@ export default function RootLayout({
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 			</head>
-			<body className="antialiased bg-black text-white overflow-hidden">
+			<body className="antialiased bg-background text-foreground overflow-hidden">
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
