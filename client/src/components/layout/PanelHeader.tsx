@@ -48,6 +48,8 @@ export function PanelHeader({
 				'flex items-center justify-between',
 				'shrink-0 select-none',
 				'relative z-20',
+				'transition-all duration-200',
+				'hover:bg-white/[0.07]',
 				className,
 			)}
 		>

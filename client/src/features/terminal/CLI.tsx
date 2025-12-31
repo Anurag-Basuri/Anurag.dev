@@ -45,8 +45,10 @@ const Input = forwardRef<
 		<div
 			className={cn(
 				STYLES.bar,
-				'border-t gap-1.5 sm:gap-2 cursor-text transition-all duration-200',
-				isFocused ? 'border-emerald-500/30 bg-zinc-900' : 'border-white/5',
+				'border-t gap-1.5 sm:gap-2 cursor-text transition-all duration-300',
+				isFocused
+					? 'border-emerald-500/40 bg-zinc-900/80 ring-1 ring-emerald-500/20 shadow-[0_0_12px_rgba(52,211,153,0.1)]'
+					: 'border-white/5 hover:border-white/10 hover:bg-zinc-900/40',
 				isExecuting && 'opacity-60 pointer-events-none',
 			)}
 			onClick={() => (ref as React.RefObject<HTMLInputElement>)?.current?.focus()}
