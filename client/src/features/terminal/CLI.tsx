@@ -269,24 +269,24 @@ export function CLI() {
 		return (
 			<button
 				onClick={terminal.expand}
-				className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
+				className="collapsed-panel-btn h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
 				aria-label="Expand terminal"
 			>
 				{/* Horizontal content container */}
 				<div className="flex items-center gap-4">
-					{/* Left line */}
-					<div className="h-px w-8 bg-white/10 group-hover:bg-emerald-500/40 transition-colors duration-300" />
+					{/* Left line with shimmer */}
+					<div className="collapsed-line-shimmer h-px w-8 rounded-full" />
 
-					{/* Icon */}
-					<Terminal className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+					{/* Icon with pulse */}
+					<Terminal className="collapsed-icon-pulse w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
 
 					{/* Text */}
 					<span className="text-xs font-mono tracking-widest text-white/30 group-hover:text-white/70 transition-colors duration-300 uppercase">
 						Terminal
 					</span>
 
-					{/* Right line */}
-					<div className="h-px w-8 bg-white/10 group-hover:bg-emerald-500/40 transition-colors duration-300" />
+					{/* Right line with shimmer */}
+					<div className="collapsed-line-shimmer h-px w-8 rounded-full" />
 				</div>
 			</button>
 		);
