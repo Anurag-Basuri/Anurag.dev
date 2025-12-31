@@ -48,12 +48,12 @@ export const SidebarProfile = memo(function SidebarProfile() {
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">
 			{/* Profile Section */}
-			<div className="p-3 border-b border-sidebar-border/20 bg-white/2">
+			<div className="p-2 sm:p-3 border-b border-sidebar-border/20 bg-white/2">
 				{/* Avatar + Info Row */}
-				<div className="flex items-center gap-3 mb-2">
+				<div className="flex items-center gap-2 sm:gap-3 mb-2">
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full overflow-hidden border border-border/40 ring-1 ring-emerald-400/20">
+						<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-border/40 ring-1 ring-emerald-400/20">
 							<Image
 								src="/logo.png"
 								alt="AnuragOS Logo"
@@ -66,7 +66,7 @@ export const SidebarProfile = memo(function SidebarProfile() {
 						{/* Online indicator */}
 						<div
 							className={cn(
-								'absolute -bottom-0.5 -right-0.5 w-3 h-3',
+								'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3',
 								'bg-primary rounded-full border-2 border-background',
 								'shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse',
 							)}
@@ -75,10 +75,10 @@ export const SidebarProfile = memo(function SidebarProfile() {
 
 					{/* Info */}
 					<div className="min-w-0 flex-1">
-						<h3 className="font-semibold text-sm text-foreground truncate leading-tight">
+						<h3 className="font-semibold text-xs sm:text-sm text-foreground truncate leading-tight">
 							Anurag Basuri
 						</h3>
-						<p className="text-[10px] text-muted-foreground font-mono truncate">
+						<p className="text-[9px] sm:text-[10px] text-muted-foreground font-mono truncate">
 							Full Stack Engineer
 						</p>
 					</div>
