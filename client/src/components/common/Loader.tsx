@@ -28,8 +28,11 @@ export function Loader({
 				showMessage ? 'min-h-[200px]' : '',
 			)}
 		>
-			<div className="flex flex-col items-center gap-4">
-				<div className="w-6 h-6 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+			<div className="flex flex-col items-center gap-3">
+				<div
+					className="w-5 h-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"
+					style={{ boxShadow: '0 0 12px rgba(52,211,153,0.3)' }}
+				/>
 				{showMessage && (
 					<div className="text-[10px] text-emerald-500/60 font-mono tracking-wider uppercase animate-pulse">
 						{message}
