@@ -92,7 +92,14 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
 	// Use the centralized panel controls
-	const { sidebar, terminal, setHorizontalGroupRef, setVerticalGroupRef } = usePanelControls();
+	const {
+		sidebar,
+		terminal,
+		setHorizontalGroupRef,
+		setVerticalGroupRef,
+		setSidebarPanelRef,
+		setTerminalPanelRef,
+	} = usePanelControls();
 
 	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
@@ -294,6 +301,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				{/* Sidebar */}
 				<Panel
 					id="sidebar"
+					panelRef={setSidebarPanelRef}
 					defaultSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize}
 					minSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize}
 					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
@@ -343,6 +351,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						{/* Terminal */}
 						<Panel
 							id="terminal"
+							panelRef={setTerminalPanelRef}
 							defaultSize={PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize}
 							minSize={PANEL_CONFIG.VERTICAL.TERMINAL.minSize}
 							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
