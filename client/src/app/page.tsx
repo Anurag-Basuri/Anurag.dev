@@ -1,14 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
+// Server-side redirect - more efficient than client-side
 export default function HomePage() {
-	const router = useRouter();
-
-	useEffect(() => {
-		router.replace('/portfolio');
-	}, [router]);
-
-	return null;
+	redirect('/portfolio');
 }
