@@ -4,17 +4,12 @@ import React, {
 	createContext,
 	useContext,
 	useCallback,
-	useRef,
 	useState,
 	type ReactNode,
+	type RefObject,
 } from 'react';
 import { useAtom } from 'jotai';
-import {
-	sidebarCollapsedAtom,
-	terminalCollapsedAtom,
-	mainHorizontalSizesAtom,
-	mainVerticalSizesAtom,
-} from '@/store';
+import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
 import { PANEL_CONFIG } from '@/lib/constants';
 import type { GroupImperativeHandle } from 'react-resizable-panels';
 
@@ -25,10 +20,9 @@ import type { GroupImperativeHandle } from 'react-resizable-panels';
 interface PanelControls {
 	collapse: () => void;
 	expand: () => void;
-	maximize: () => void;
-	restore: () => void;
 	toggle: () => void;
 	toggleMaximize: () => void;
+	setCollapsedState: (collapsed: boolean) => void; // Direct state update (no setLayout)
 	isCollapsed: boolean;
 	isMaximized: boolean;
 }
@@ -36,8 +30,12 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
-	horizontalGroupRef: React.RefObject<GroupImperativeHandle | null>;
-	verticalGroupRef: React.RefObject<GroupImperativeHandle | null>;
+}
+
+interface PanelProviderProps {
+	children: ReactNode;
+	horizontalGroupRef: RefObject<GroupImperativeHandle | null>;
+	verticalGroupRef: RefObject<GroupImperativeHandle | null>;
 }
 
 // ============================================================================
@@ -62,30 +60,18 @@ export function usePanelControls() {
 // Provider
 // ============================================================================
 
-interface PanelProviderProps {
-	children: ReactNode;
-}
-
-export function PanelProvider({ children }: PanelProviderProps) {
-	// Atoms for collapsed state
+export function PanelProvider({
+	children,
+	horizontalGroupRef,
+	verticalGroupRef,
+}: PanelProviderProps) {
+	// Jotai atoms for persisted collapsed state
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
-	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
-	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	// Maximized state tracking
+	// Local state for maximized (not persisted)
 	const [sidebarMaximized, setSidebarMaximized] = useState(false);
 	const [terminalMaximized, setTerminalMaximized] = useState(false);
-
-	// Store pre-maximize sizes for restore
-	const preSidebarMaxSize = useRef<number | null>(null);
-	const preTerminalMaxSize = useRef<number | null>(null);
-	const preTerminalCollapsed = useRef<boolean>(false);
-	const preSidebarCollapsed = useRef<boolean>(false);
-
-	// Refs for layout control
-	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
-	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
 
 	// ========================================================================
 	// Sidebar Controls
@@ -94,59 +80,16 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseSidebar = useCallback(() => {
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		// Use collapsedSize (3%) for proper animation
+		// Set layout to collapsed size (3%)
 		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
-	}, [setSidebarCollapsed]);
+	}, [setSidebarCollapsed, horizontalGroupRef]);
 
 	const expandSidebar = useCallback(() => {
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-		const defaultSize = hSizes?.[0] ?? 20;
-		horizontalGroupRef.current?.setLayout({
-			sidebar: defaultSize,
-			main: 100 - defaultSize,
-		});
-	}, [setSidebarCollapsed, hSizes]);
-
-	const maximizeSidebar = useCallback(() => {
-		// Store current state for restore
-		preSidebarMaxSize.current = hSizes?.[0] ?? 20;
-		preTerminalCollapsed.current = terminalCollapsed; // Save terminal state
-
-		// Collapse terminal to focus on sidebar
-		setTerminalCollapsed(true);
-		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
-
-		// Expand sidebar to max
-		setSidebarCollapsed(false);
-		setSidebarMaximized(true);
-		const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-		horizontalGroupRef.current?.setLayout({
-			sidebar: maxSize,
-			main: 100 - maxSize,
-		});
-	}, [setSidebarCollapsed, setTerminalCollapsed, hSizes, terminalCollapsed]);
-
-	const restoreSidebar = useCallback(() => {
-		setSidebarMaximized(false);
-
-		// Restore sidebar to previous size
-		const prevSize = preSidebarMaxSize.current ?? hSizes?.[0] ?? 20;
-		horizontalGroupRef.current?.setLayout({
-			sidebar: prevSize,
-			main: 100 - prevSize,
-		});
-
-		// Restore terminal ONLY if it was open before maximization
-		if (!preTerminalCollapsed.current) {
-			setTerminalCollapsed(false);
-			const terminalSize = vSizes?.[1] ?? 40;
-			verticalGroupRef.current?.setLayout({
-				content: 100 - terminalSize,
-				terminal: terminalSize,
-			});
-		}
-	}, [hSizes, vSizes, setTerminalCollapsed]);
+		// Set layout to default size (20%)
+		horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
+	}, [setSidebarCollapsed, horizontalGroupRef]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -158,11 +101,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
-			restoreSidebar();
+			// Restore to default
+			setSidebarMaximized(false);
+			horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
 		} else {
-			maximizeSidebar();
+			// Maximize sidebar
+			setSidebarMaximized(true);
+			setSidebarCollapsed(false);
+			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
+			horizontalGroupRef.current?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
 		}
-	}, [sidebarMaximized, maximizeSidebar, restoreSidebar]);
+	}, [sidebarMaximized, setSidebarCollapsed, horizontalGroupRef]);
 
 	// ========================================================================
 	// Terminal Controls
@@ -171,59 +120,16 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseTerminal = useCallback(() => {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		// Use collapsedSize (3%) for proper animation
+		// Set layout to collapsed size (3%)
 		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
-	}, [setTerminalCollapsed]);
+	}, [setTerminalCollapsed, verticalGroupRef]);
 
 	const expandTerminal = useCallback(() => {
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		const defaultSize = vSizes?.[1] ?? 40;
-		verticalGroupRef.current?.setLayout({
-			content: 100 - defaultSize,
-			terminal: defaultSize,
-		});
-	}, [setTerminalCollapsed, vSizes]);
-
-	const maximizeTerminal = useCallback(() => {
-		// Store current state for restore
-		preTerminalMaxSize.current = vSizes?.[1] ?? 40;
-		preSidebarCollapsed.current = sidebarCollapsed; // Save sidebar state
-
-		// Collapse sidebar to focus on terminal
-		setSidebarCollapsed(true);
-		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
-
-		// Expand terminal to max
-		setTerminalCollapsed(false);
-		setTerminalMaximized(true);
-		const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-		verticalGroupRef.current?.setLayout({
-			content: 100 - maxSize,
-			terminal: maxSize,
-		});
-	}, [setSidebarCollapsed, setTerminalCollapsed, vSizes, sidebarCollapsed]);
-
-	const restoreTerminal = useCallback(() => {
-		setTerminalMaximized(false);
-
-		// Restore terminal to previous size
-		const prevSize = preTerminalMaxSize.current ?? vSizes?.[1] ?? 40;
-		verticalGroupRef.current?.setLayout({
-			content: 100 - prevSize,
-			terminal: prevSize,
-		});
-
-		// Restore sidebar ONLY if it was open before maximization
-		if (!preSidebarCollapsed.current) {
-			setSidebarCollapsed(false);
-			const sidebarSize = hSizes?.[0] ?? 20;
-			horizontalGroupRef.current?.setLayout({
-				sidebar: sidebarSize,
-				main: 100 - sidebarSize,
-			});
-		}
-	}, [vSizes, hSizes, setSidebarCollapsed]);
+		// Set layout to default size (40%)
+		verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
+	}, [setTerminalCollapsed, verticalGroupRef]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
@@ -235,11 +141,17 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
-			restoreTerminal();
+			// Restore to default
+			setTerminalMaximized(false);
+			verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
 		} else {
-			maximizeTerminal();
+			// Maximize terminal
+			setTerminalMaximized(true);
+			setTerminalCollapsed(false);
+			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
+			verticalGroupRef.current?.setLayout({ content: 100 - maxSize, terminal: maxSize });
 		}
-	}, [terminalMaximized, maximizeTerminal, restoreTerminal]);
+	}, [terminalMaximized, setTerminalCollapsed, verticalGroupRef]);
 
 	// ========================================================================
 	// Context Value
@@ -249,25 +161,21 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		sidebar: {
 			collapse: collapseSidebar,
 			expand: expandSidebar,
-			maximize: maximizeSidebar,
-			restore: restoreSidebar,
 			toggle: toggleSidebar,
 			toggleMaximize: toggleMaximizeSidebar,
+			setCollapsedState: setSidebarCollapsed, // Direct state update (no setLayout)
 			isCollapsed: sidebarCollapsed,
 			isMaximized: sidebarMaximized,
 		},
 		terminal: {
 			collapse: collapseTerminal,
 			expand: expandTerminal,
-			maximize: maximizeTerminal,
-			restore: restoreTerminal,
 			toggle: toggleTerminal,
 			toggleMaximize: toggleMaximizeTerminal,
+			setCollapsedState: setTerminalCollapsed, // Direct state update (no setLayout)
 			isCollapsed: terminalCollapsed,
 			isMaximized: terminalMaximized,
 		},
-		horizontalGroupRef,
-		verticalGroupRef,
 	};
 
 	return <PanelContext.Provider value={value}>{children}</PanelContext.Provider>;
