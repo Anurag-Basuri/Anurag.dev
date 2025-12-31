@@ -420,7 +420,11 @@
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: radial-gradient(circle at center, rgba(52, 211, 153, 0.08) 0%, transparent 70%);
+	background: radial-gradient(
+		circle at center,
+		color-mix(in oklch, var(--primary) 8%, transparent) 0%,
+		transparent 70%
+	);
 	opacity: 0;
 	transition: opacity 300ms ease;
 }
@@ -430,8 +434,9 @@
 }
 
 .collapsed-panel-btn:hover {
-	background: rgba(255, 255, 255, 0.03);
-	box-shadow: 0 0 30px rgba(52, 211, 153, 0.1), inset 0 0 20px rgba(52, 211, 153, 0.05);
+	background: color-mix(in oklch, var(--foreground) 3%, transparent);
+	box-shadow: 0 0 30px color-mix(in oklch, var(--primary) 10%, transparent),
+		inset 0 0 20px color-mix(in oklch, var(--primary) 5%, transparent);
 }
 
 .collapsed-panel-btn:active {
@@ -467,22 +472,13 @@
 	}
 }
 
-/* Shimmer effect for collapsed panel lines */
-@keyframes shimmer {
-	0% {
-		background-position: -100% 0;
-	}
-	100% {
-		background-position: 200% 0;
-	}
-}
-
+/* Shimmer effect for collapsed panel lines - Theme aware */
 .collapsed-line-shimmer {
 	background: linear-gradient(
 		90deg,
-		rgba(255, 255, 255, 0.1) 0%,
-		rgba(52, 211, 153, 0.3) 50%,
-		rgba(255, 255, 255, 0.1) 100%
+		color-mix(in oklch, var(--muted-foreground) 10%, transparent) 0%,
+		color-mix(in oklch, var(--primary) 30%, transparent) 50%,
+		color-mix(in oklch, var(--muted-foreground) 10%, transparent) 100%
 	);
 	background-size: 200% 100%;
 	animation: shimmer 3s ease-in-out infinite;
