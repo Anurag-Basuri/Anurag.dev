@@ -48,6 +48,33 @@ const WindowHeader = dynamic(
 );
 
 // ============================================================================
+// Consistent Design Tokens for Professional Appearance
+// ============================================================================
+
+const PANEL_STYLES = {
+	// Base glassmorphism for all panels
+	base: 'overflow-hidden backdrop-blur-2xl border border-white/8 rounded-2xl ring-1 ring-inset ring-white/5 transition-all duration-300',
+	// Gradient backgrounds with different opacities for hierarchy
+	sidebar: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-2xl',
+	content: 'bg-linear-to-br from-black/20 via-black/15 to-black/10 shadow-xl',
+	terminal: 'bg-linear-to-br from-black/30 via-black/25 to-black/20 shadow-2xl',
+	// Mobile specific
+	mobile: 'bg-linear-to-br from-black/25 via-black/20 to-black/15 shadow-xl',
+	// Maximized overlay
+	maximized: 'bg-black shadow-2xl',
+} as const;
+
+// Animation presets for consistent motion
+const MOTION_PRESETS = {
+	fadeScale: {
+		initial: { opacity: 0, scale: 0.98 },
+		animate: { opacity: 1, scale: 1 },
+		exit: { opacity: 0, scale: 0.98 },
+		transition: { duration: 0.2, ease: [0.34, 1.56, 0.64, 1] },
+	},
+} as const;
+
+// ============================================================================
 // Inner Layout Component (uses PanelContext)
 // ============================================================================
 
@@ -238,7 +265,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
 					collapsible
 					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
-					className="overflow-hidden bg-linear-to-br from-black/25 via-black/20 to-black/15 backdrop-blur-2xl border border-white/8 rounded-2xl shadow-2xl ring-1 ring-inset ring-white/5 transition-all duration-300"
+					className={cn(PANEL_STYLES.base, PANEL_STYLES.sidebar)}
 				>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>
@@ -281,7 +308,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							id="content"
 							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
 							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
-							className="overflow-hidden min-h-0 bg-linear-to-br from-black/20 via-black/15 to-black/10 backdrop-blur-xl border border-white/8 rounded-2xl shadow-xl ring-1 ring-inset ring-white/5"
+							className={cn(PANEL_STYLES.base, PANEL_STYLES.content, 'min-h-0')}
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader />}>{renderModuleContent()}</Suspense>
@@ -299,7 +326,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
 							collapsible
 							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
-							className="overflow-hidden min-h-0 bg-linear-to-br from-black/30 via-black/25 to-black/20 backdrop-blur-2xl border border-white/8 rounded-2xl shadow-2xl ring-1 ring-inset ring-white/5 transition-all duration-300"
+							className={cn(PANEL_STYLES.base, PANEL_STYLES.terminal, 'min-h-0')}
 						>
 							<ErrorBoundary>
 								<Suspense fallback={<Loader height="h-32" />}>
@@ -317,8 +344,8 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		if (!isMobile) return null;
 
 		return (
-			<div className="h-full w-full flex flex-col">
-				<div className="h-full w-full bg-linear-to-br from-card/80 to-card/60 backdrop-blur-xl rounded-xl shadow-xl border border-border/20">
+			<div className="h-full w-full flex flex-col p-1">
+				<div className={cn(PANEL_STYLES.base, PANEL_STYLES.mobile, 'h-full w-full')}>
 					{renderModuleContent()}
 				</div>
 			</div>
@@ -327,15 +354,14 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 
 	return (
 		<>
-			<AnimatePresence>
+			<AnimatePresence mode="wait">
 				{modulePanel.isMaximized && (
 					<motion.div
-						initial={{ opacity: 0, scale: 0.95 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.95 }}
-						className="fixed inset-0 z-100 bg-black"
+						key="maximized-overlay"
+						{...MOTION_PRESETS.fadeScale}
+						className={cn('fixed inset-0 z-100', PANEL_STYLES.maximized)}
 					>
-						{renderModuleContent('maximized-content')}
+						{renderModuleContent('maximized-content p-4')}
 					</motion.div>
 				)}
 			</AnimatePresence>
