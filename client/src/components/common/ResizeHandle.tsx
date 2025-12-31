@@ -35,13 +35,15 @@ export function ResizeHandle({
 				className,
 			)}
 		>
-			{/* Pill grip */}
+			{/* Pill grip with glow on active */}
 			<div
 				className={cn(
 					'absolute rounded-full bg-white/20 transition-all duration-200',
+					// Glow effect on active
+					'group-active:shadow-[0_0_12px_rgba(52,211,153,0.5)]',
 					isHorizontal
-						? 'h-1 w-8 group-hover:w-12 group-hover:bg-white/40 group-active:bg-emerald-400/70'
-						: 'w-1 h-8 group-hover:h-12 group-hover:bg-white/40 group-active:bg-emerald-400/70',
+						? 'h-1 w-10 group-hover:w-14 group-hover:bg-white/40 group-active:bg-emerald-400/80 group-active:h-1.5'
+						: 'w-1 h-10 group-hover:h-14 group-hover:bg-white/40 group-active:bg-emerald-400/80 group-active:w-1.5',
 				)}
 			/>
 		</Separator>
