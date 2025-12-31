@@ -22,7 +22,7 @@ interface PanelControls {
 	expand: () => void;
 	toggle: () => void;
 	toggleMaximize: () => void;
-	setCollapsedState: (collapsed: boolean) => void; // Direct state update (no setLayout)
+	setCollapsedState: (collapsed: boolean) => void;
 	isCollapsed: boolean;
 	isMaximized: boolean;
 }
@@ -80,16 +80,14 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseSidebar = useCallback(() => {
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		// Set layout to collapsed size (3%)
-		horizontalGroupRef.current?.setLayout([3, 97]);
-	}, [setSidebarCollapsed, horizontalGroupRef]);
+		horizontalGroupRef.current?.setLayout({ sidebar: 3, main: 97 });
+	}, [setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-		// Set layout to default size (20%)
-		horizontalGroupRef.current?.setLayout([20, 80]);
-	}, [setSidebarCollapsed, horizontalGroupRef]);
+		horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
+	}, [setSidebarCollapsed]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -103,15 +101,15 @@ export function PanelProvider({ children }: PanelProviderProps) {
 		if (sidebarMaximized) {
 			// Restore to default
 			setSidebarMaximized(false);
-			horizontalGroupRef.current?.setLayout([20, 80]);
+			horizontalGroupRef.current?.setLayout({ sidebar: 20, main: 80 });
 		} else {
 			// Maximize sidebar
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			horizontalGroupRef.current?.setLayout([maxSize, 100 - maxSize]);
+			horizontalGroupRef.current?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
 		}
-	}, [sidebarMaximized, setSidebarCollapsed, horizontalGroupRef]);
+	}, [sidebarMaximized, setSidebarCollapsed]);
 
 	// ========================================================================
 	// Terminal Controls
@@ -120,16 +118,14 @@ export function PanelProvider({ children }: PanelProviderProps) {
 	const collapseTerminal = useCallback(() => {
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		// Set layout to collapsed size (3%)
-		verticalGroupRef.current?.setLayout([97, 3]);
-	}, [setTerminalCollapsed, verticalGroupRef]);
+		verticalGroupRef.current?.setLayout({ content: 97, terminal: 3 });
+	}, [setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		// Set layout to default size (40%) - Content: 60, Terminal: 40
-		verticalGroupRef.current?.setLayout([60, 40]);
-	}, [setTerminalCollapsed, verticalGroupRef]);
+		verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
+	}, [setTerminalCollapsed]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
@@ -141,17 +137,15 @@ export function PanelProvider({ children }: PanelProviderProps) {
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
-			// Restore to default
 			setTerminalMaximized(false);
-			verticalGroupRef.current?.setLayout([60, 40]);
+			verticalGroupRef.current?.setLayout({ content: 60, terminal: 40 });
 		} else {
-			// Maximize terminal
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
 			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			verticalGroupRef.current?.setLayout([100 - maxSize, maxSize]);
+			verticalGroupRef.current?.setLayout({ content: 100 - maxSize, terminal: maxSize });
 		}
-	}, [terminalMaximized, setTerminalCollapsed, verticalGroupRef]);
+	}, [terminalMaximized, setTerminalCollapsed]);
 
 	// ========================================================================
 	// Context Value
@@ -163,7 +157,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			expand: expandSidebar,
 			toggle: toggleSidebar,
 			toggleMaximize: toggleMaximizeSidebar,
-			setCollapsedState: setSidebarCollapsed, // Direct state update (no setLayout)
+			setCollapsedState: setSidebarCollapsed,
 			isCollapsed: sidebarCollapsed,
 			isMaximized: sidebarMaximized,
 		},
@@ -172,7 +166,7 @@ export function PanelProvider({ children }: PanelProviderProps) {
 			expand: expandTerminal,
 			toggle: toggleTerminal,
 			toggleMaximize: toggleMaximizeTerminal,
-			setCollapsedState: setTerminalCollapsed, // Direct state update (no setLayout)
+			setCollapsedState: setTerminalCollapsed,
 			isCollapsed: terminalCollapsed,
 			isMaximized: terminalMaximized,
 		},
