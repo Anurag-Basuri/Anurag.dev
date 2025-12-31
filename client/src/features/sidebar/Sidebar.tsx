@@ -25,16 +25,16 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 	return (
 		<button
 			onClick={onExpand}
-			className="h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
+			className="collapsed-panel-btn h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
 			aria-label="Expand sidebar"
 		>
 			{/* Vertical content container */}
 			<div className="flex flex-col items-center gap-3">
-				{/* Top line */}
-				<div className="w-px h-8 bg-white/10 group-hover:bg-emerald-500/30 transition-colors duration-300" />
+				{/* Top line with shimmer */}
+				<div className="collapsed-line-shimmer w-px h-8 rounded-full" />
 
-				{/* Icon */}
-				<FolderOpen className="w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
+				{/* Icon with pulse */}
+				<FolderOpen className="collapsed-icon-pulse w-4 h-4 text-white/30 group-hover:text-emerald-400 transition-colors duration-300" />
 
 				{/* Vertical text */}
 				<span
@@ -44,8 +44,8 @@ const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedS
 					Explorer
 				</span>
 
-				{/* Bottom line */}
-				<div className="w-px h-8 bg-white/10 group-hover:bg-emerald-500/30 transition-colors duration-300" />
+				{/* Bottom line with shimmer */}
+				<div className="collapsed-line-shimmer w-px h-8 rounded-full" />
 			</div>
 		</button>
 	);
