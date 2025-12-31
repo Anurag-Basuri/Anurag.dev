@@ -4,9 +4,9 @@ import React, {
 	createContext,
 	useContext,
 	useCallback,
+	useRef,
 	useState,
 	type ReactNode,
-	type RefObject,
 } from 'react';
 import { useAtom } from 'jotai';
 import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
@@ -30,12 +30,12 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
+	horizontalGroupRef: React.RefObject<GroupImperativeHandle | null>;
+	verticalGroupRef: React.RefObject<GroupImperativeHandle | null>;
 }
 
 interface PanelProviderProps {
 	children: ReactNode;
-	horizontalGroupRef: RefObject<GroupImperativeHandle | null>;
-	verticalGroupRef: RefObject<GroupImperativeHandle | null>;
 }
 
 // ============================================================================
@@ -60,11 +60,11 @@ export function usePanelControls() {
 // Provider
 // ============================================================================
 
-export function PanelProvider({
-	children,
-	horizontalGroupRef,
-	verticalGroupRef,
-}: PanelProviderProps) {
+export function PanelProvider({ children }: PanelProviderProps) {
+	// Create refs INSIDE the provider - this ensures they're stable
+	const horizontalGroupRef = useRef<GroupImperativeHandle | null>(null);
+	const verticalGroupRef = useRef<GroupImperativeHandle | null>(null);
+
 	// Jotai atoms for persisted collapsed state
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
@@ -176,6 +176,8 @@ export function PanelProvider({
 			isCollapsed: terminalCollapsed,
 			isMaximized: terminalMaximized,
 		},
+		horizontalGroupRef,
+		verticalGroupRef,
 	};
 
 	return <PanelContext.Provider value={value}>{children}</PanelContext.Provider>;
