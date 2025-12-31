@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Home, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Home, ArrowLeft, AlertCircle, FileQuestion } from 'lucide-react';
 
 export default function AppNotFound() {
 	return (
@@ -50,6 +50,37 @@ export default function AppNotFound() {
 					</button>
 				</div>
 			</motion.div>
+		</div>
+	);
+}
+
+export function PortfolioNotFound() {
+	return (
+		<div className="h-full w-full flex items-center justify-center p-6">
+			<div className="max-w-md w-full text-center">
+				{/* Icon */}
+				<div className="relative inline-block mb-6">
+					<div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
+					<div className="relative bg-blue-500/10 p-4 rounded-2xl border border-blue-500/20">
+						<FileQuestion className="w-10 h-10 text-blue-400" />
+					</div>
+				</div>
+
+				{/* Content */}
+				<h1 className="text-xl font-bold text-white mb-2">Module Not Found</h1>
+				<p className="text-white/60 text-sm mb-8">
+					The requested module doesn't exist or has been moved.
+				</p>
+
+				{/* Actions */}
+				<Link
+					href="/portfolio"
+					className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors border border-emerald-500/30 text-sm font-medium"
+				>
+					<Home className="w-4 h-4" />
+					Back to Portfolio
+				</Link>
+			</div>
 		</div>
 	);
 }
