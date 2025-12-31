@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { Suspense, useCallback, useEffect, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -51,17 +51,7 @@ const WindowHeader = dynamic(
 // Inner Layout Component (uses PanelContext)
 // ============================================================================
 
-interface PortfolioLayoutInnerProps {
-	children: ReactNode;
-	horizontalGroupRef: React.RefObject<GroupImperativeHandle | null>;
-	verticalGroupRef: React.RefObject<GroupImperativeHandle | null>;
-}
-
-function PortfolioLayoutInner({
-	children,
-	horizontalGroupRef,
-	verticalGroupRef,
-}: PortfolioLayoutInnerProps) {
+function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 	const router = useRouter();
 	const pathname = usePathname();
@@ -70,8 +60,8 @@ function PortfolioLayoutInner({
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	// Use the centralized panel controls
-	const { sidebar, terminal } = usePanelControls();
+	// Use the centralized panel controls - refs are now in context
+	const { sidebar, terminal, horizontalGroupRef, verticalGroupRef } = usePanelControls();
 
 	// Module panel still uses the old hook (it's separate concern)
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
@@ -393,23 +383,11 @@ function PortfolioLayoutInner({
 // ============================================================================
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
-	// Create refs locally - these will be passed to both PanelProvider and Group components
-	const horizontalGroupRef = useRef<GroupImperativeHandle>(null);
-	const verticalGroupRef = useRef<GroupImperativeHandle>(null);
-
 	return (
 		<ErrorBoundary>
 			<BootGuard>
-				<PanelProvider
-					horizontalGroupRef={horizontalGroupRef}
-					verticalGroupRef={verticalGroupRef}
-				>
-					<PortfolioLayoutInner
-						horizontalGroupRef={horizontalGroupRef}
-						verticalGroupRef={verticalGroupRef}
-					>
-						{children}
-					</PortfolioLayoutInner>
+				<PanelProvider>
+					<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
 				</PanelProvider>
 			</BootGuard>
 		</ErrorBoundary>
