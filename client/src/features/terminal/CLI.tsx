@@ -315,7 +315,7 @@ export function CLI() {
 
 			<div
 				ref={scrollRef}
-				className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 sm:p-3 space-y-2 sm:space-y-3"
+				className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 space-y-2"
 				style={{
 					scrollbarWidth: 'thin',
 					scrollbarColor: 'rgba(255,255,255,0.1) transparent',

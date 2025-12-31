@@ -74,6 +74,13 @@ const MOTION_PRESETS = {
 	},
 } as const;
 
+// Consistent spacing tokens
+const LAYOUT_SPACING = {
+	gap: 'gap-2', // Minimal consistent gaps between panels
+	padding: 'p-2', // Outer padding around layout
+	inner: 'p-2', // Inner content padding
+} as const;
+
 // ============================================================================
 // Inner Layout Component (uses PanelContext)
 // ============================================================================
@@ -236,7 +243,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 			<Group
 				id="portfolio-main-h"
 				orientation="horizontal"
-				className="h-full w-full gap-3"
+				className={cn('h-full w-full', LAYOUT_SPACING.gap)}
 				groupRef={horizontalGroupRef}
 				defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
 				onLayoutChange={(layout: Layout) => {
@@ -282,7 +289,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					<Group
 						id="portfolio-main-v"
 						orientation="vertical"
-						className="h-full gap-3"
+						className={cn('h-full', LAYOUT_SPACING.gap)}
 						groupRef={verticalGroupRef}
 						defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
 						onLayoutChange={(layout: Layout) => {
@@ -378,7 +385,12 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						/>
 					</Suspense>
 
-					<div className="flex-1 min-h-0 w-full overflow-hidden relative z-10 p-3">
+					<div
+						className={cn(
+							'flex-1 min-h-0 w-full overflow-hidden relative z-10',
+							LAYOUT_SPACING.padding,
+						)}
+					>
 						{renderDesktopLayout()}
 						{renderMobileLayout()}
 					</div>
