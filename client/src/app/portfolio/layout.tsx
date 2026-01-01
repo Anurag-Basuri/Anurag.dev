@@ -302,11 +302,11 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				<Panel
 					id="sidebar"
 					panelRef={setSidebarPanelRef}
-					defaultSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize}
-					minSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize}
-					maxSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize}
+					defaultSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize)}
+					minSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize)}
+					maxSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize)}
 					collapsible
-					collapsedSize={PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize}
+					collapsedSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize)}
 					className={cn(
 						PANEL_STYLES.base,
 						PANEL_STYLES.sidebar,
@@ -333,8 +333,8 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					>
 						<Panel
 							id="content"
-							defaultSize={PANEL_CONFIG.VERTICAL.CONTENT.defaultSize}
-							minSize={PANEL_CONFIG.VERTICAL.CONTENT.minSize}
+							defaultSize={parseFloat(PANEL_CONFIG.VERTICAL.CONTENT.defaultSize)}
+							minSize={parseFloat(PANEL_CONFIG.VERTICAL.CONTENT.minSize)}
 							className={cn(PANEL_STYLES.base, PANEL_STYLES.content, 'min-h-0')}
 						>
 							<ErrorBoundary>
@@ -347,11 +347,11 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 						<Panel
 							id="terminal"
 							panelRef={setTerminalPanelRef}
-							defaultSize={PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize}
-							minSize={PANEL_CONFIG.VERTICAL.TERMINAL.minSize}
-							maxSize={PANEL_CONFIG.VERTICAL.TERMINAL.maxSize}
+							defaultSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize)}
+							minSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.minSize)}
+							maxSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize)}
 							collapsible
-							collapsedSize={PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize}
+							collapsedSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize)}
 							className={cn(
 								PANEL_STYLES.base,
 								PANEL_STYLES.terminal,
