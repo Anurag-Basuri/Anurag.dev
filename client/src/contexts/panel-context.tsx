@@ -82,26 +82,10 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	// ========================================================================
 	// Sync panel state on mount/ref change
 	// ========================================================================
-	useEffect(() => {
-		if (!sidebarPanel) return;
-
-		// Sync initial state: if Jotai says collapsed, collapse the panel
-		if (sidebarCollapsed && !sidebarPanel.isCollapsed()) {
-			sidebarPanel.collapse();
-		} else if (!sidebarCollapsed && sidebarPanel.isCollapsed()) {
-			sidebarPanel.expand();
-		}
-	}, [sidebarPanel, sidebarCollapsed]);
-
-	useEffect(() => {
-		if (!terminalPanel) return;
-
-		if (terminalCollapsed && !terminalPanel.isCollapsed()) {
-			terminalPanel.collapse();
-		} else if (!terminalCollapsed && terminalPanel.isCollapsed()) {
-			terminalPanel.expand();
-		}
-	}, [terminalPanel, terminalCollapsed]);
+	// ========================================================================
+	// Sync panel state on mount/ref change
+	// NOTE: Initial sync is handled by defaultCollapsed prop on Panels to avoid crash
+	// ========================================================================
 
 	// ========================================================================
 	// Sidebar Controls
@@ -124,20 +108,29 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const toggleSidebar = useCallback(() => {
-		// Use panel's actual state if available, otherwise use Jotai state
-		const isCurrentlyCollapsed = sidebarPanel ? sidebarPanel.isCollapsed() : sidebarCollapsed;
+		try {
+			// Use panel's actual state if available, otherwise use Jotai state
+			const isCurrentlyCollapsed = sidebarPanel
+				? sidebarPanel.isCollapsed()
+				: sidebarCollapsed;
 
-		if (isCurrentlyCollapsed) {
-			expandSidebar();
-		} else {
-			collapseSidebar();
+			if (isCurrentlyCollapsed) {
+				expandSidebar();
+			} else {
+				collapseSidebar();
+			}
+		} catch (e) {
+			console.warn('Sidebar toggle failed', e);
+			// Fallback to strict toggle based on atom
+			if (sidebarCollapsed) expandSidebar();
+			else collapseSidebar();
 		}
 	}, [sidebarPanel, sidebarCollapsed, expandSidebar, collapseSidebar]);
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
 			setSidebarMaximized(false);
-			horizontalGroup?.setLayout({ sidebar: 20, main: 80 });
+			sidebarPanel?.resize(20);
 		} else {
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
@@ -145,9 +138,9 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 				sidebarPanel.expand();
 			}
 			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			horizontalGroup?.setLayout({ sidebar: maxSize, main: 100 - maxSize });
+			sidebarPanel?.resize(maxSize);
 		}
-	}, [sidebarMaximized, setSidebarCollapsed, sidebarPanel, horizontalGroup]);
+	}, [sidebarMaximized, setSidebarCollapsed, sidebarPanel]);
 
 	// ========================================================================
 	// Terminal Controls
@@ -170,21 +163,27 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [terminalPanel, setTerminalCollapsed]);
 
 	const toggleTerminal = useCallback(() => {
-		const isCurrentlyCollapsed = terminalPanel
-			? terminalPanel.isCollapsed()
-			: terminalCollapsed;
+		try {
+			const isCurrentlyCollapsed = terminalPanel
+				? terminalPanel.isCollapsed()
+				: terminalCollapsed;
 
-		if (isCurrentlyCollapsed) {
-			expandTerminal();
-		} else {
-			collapseTerminal();
+			if (isCurrentlyCollapsed) {
+				expandTerminal();
+			} else {
+				collapseTerminal();
+			}
+		} catch (e) {
+			console.warn('Terminal toggle failed', e);
+			if (terminalCollapsed) expandTerminal();
+			else collapseTerminal();
 		}
 	}, [terminalPanel, terminalCollapsed, expandTerminal, collapseTerminal]);
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
 			setTerminalMaximized(false);
-			verticalGroup?.setLayout({ content: 60, terminal: 40 });
+			terminalPanel?.resize(40);
 		} else {
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
@@ -192,9 +191,9 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 				terminalPanel.expand();
 			}
 			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			verticalGroup?.setLayout({ content: 100 - maxSize, terminal: maxSize });
+			terminalPanel?.resize(maxSize);
 		}
-	}, [terminalMaximized, setTerminalCollapsed, terminalPanel, verticalGroup]);
+	}, [terminalMaximized, setTerminalCollapsed, terminalPanel]);
 
 	// ========================================================================
 	// Context Value - memoized to prevent unnecessary re-renders
