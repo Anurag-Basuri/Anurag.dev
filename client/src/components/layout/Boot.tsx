@@ -8,7 +8,6 @@ import gsap from 'gsap';
 import { Rocket, Brain, Terminal } from 'lucide-react';
 
 // Constants
-const BOOT_SESSION_KEY = 'anurag-portfolio-boot';
 const ANIMATION_DURATION = 1.6;
 const BURST_DELAY = 400;
 const MATRIX_CHARS = 'संगणकदात्तयंत्रतर्कजालसंकेतविधिस्मृति01';
@@ -42,14 +41,23 @@ const MatrixRain = memo(function MatrixRain() {
 		const ctx = canvas.getContext('2d', { alpha: false });
 		if (!ctx) return;
 
+		let resizeTimeout: NodeJS.Timeout;
+
 		const resize = () => {
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 		};
+		// Initial size
 		resize();
-		window.addEventListener('resize', resize);
 
-		const columns = Math.floor(canvas.width / MATRIX_FONT_SIZE);
+		// Debounced resize
+		const handleResize = () => {
+			clearTimeout(resizeTimeout);
+			resizeTimeout = setTimeout(resize, 200);
+		};
+		window.addEventListener('resize', handleResize);
+
+		const columns = Math.ceil(window.innerWidth / MATRIX_FONT_SIZE); // Use ceil to cover fully
 		const drops: number[] = Array.from({ length: columns }, () => Math.random() * -100);
 		let lastTime = 0;
 
@@ -69,10 +77,11 @@ const MatrixRain = memo(function MatrixRain() {
 
 			for (let i = 0; i < drops.length; i++) {
 				const char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+				// Randomly brighter characters
 				if (Math.random() > 0.98) {
 					ctx.fillStyle = '#6ee7b7';
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
-					ctx.fillStyle = '#059669';
+					ctx.fillStyle = '#059669'; // Reset
 				} else {
 					ctx.fillText(char, i * MATRIX_FONT_SIZE, drops[i] * MATRIX_FONT_SIZE);
 				}
@@ -84,9 +93,11 @@ const MatrixRain = memo(function MatrixRain() {
 			animRef.current = requestAnimationFrame(draw);
 		};
 		animRef.current = requestAnimationFrame(draw);
+
 		return () => {
 			if (animRef.current) cancelAnimationFrame(animRef.current);
-			window.removeEventListener('resize', resize);
+			window.removeEventListener('resize', handleResize);
+			clearTimeout(resizeTimeout);
 		};
 	}, []);
 
@@ -111,7 +122,7 @@ const HexGrid = memo(function HexGrid({ opacity }: { opacity: number }) {
 const TiltCard = ({ children }: { children: ReactNode }) => {
 	return (
 		<div className="relative z-20 cursor-default px-4 w-full flex justify-center perspective-[1000px]">
-			<div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 p-8 sm:p-14 rounded-2xl shadow-[0_0_50px_-10px_rgba(16,185,129,0.15)] relative overflow-hidden group w-full max-w-xl transition-transform duration-300 hover:scale-[1.01] hover:shadow-[0_0_60px_-5px_rgba(16,185,129,0.25)]">
+			<div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 p-8 sm:p-14 rounded-2xl shadow-[0_0_50px_-10px_rgba(16,185,129,0.15)] relative overflow-hidden group w-full max-w-xl transition-transform duration-300 hover:scale-[1.005] hover:shadow-[0_0_60px_-5px_rgba(16,185,129,0.25)]">
 				{/* Inner Glow */}
 				<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 				<div className="relative z-10">{children}</div>
@@ -152,48 +163,6 @@ const Typewriter = ({ texts }: { texts: string[] }) => {
 			<span className="animate-pulse ml-1 inline-block w-2.5 h-4 bg-emerald-500 align-middle"></span>
 		</span>
 	);
-};
-
-const GlitchText = ({ text }: { text: string }) => {
-	const [displayText, setDisplayText] = useState(text);
-
-	useEffect(() => {
-		let interval: NodeJS.Timeout;
-		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-
-		const scramble = () => {
-			let iterations = 0;
-			clearInterval(interval);
-
-			interval = setInterval(() => {
-				setDisplayText(
-					text
-						.split('')
-						.map((char, idx) => {
-							if (idx < iterations) return text[idx];
-							return chars[Math.floor(Math.random() * chars.length)];
-						})
-						.join(''),
-				);
-
-				if (iterations >= text.length) clearInterval(interval);
-				iterations += 1 / 3;
-			}, 30);
-		};
-
-		const randomTrigger = setInterval(() => {
-			if (Math.random() > 0.85) scramble();
-		}, 3000);
-
-		scramble();
-
-		return () => {
-			clearInterval(interval);
-			clearInterval(randomTrigger);
-		};
-	}, [text]);
-
-	return <span>{displayText}</span>;
 };
 
 export function Introduction() {
@@ -272,9 +241,11 @@ export function Introduction() {
 	}, []);
 
 	// Replaced motion.div with standard div
+	// Fixed Z-index to use inline style for maximum safety against Tailwind configuration issues
 	return (
 		<div
-			className="fixed inset-0 z-9999 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center"
+			className="fixed inset-0 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center"
+			style={{ zIndex: 9999 }}
 			aria-label="Booting Portfolio"
 			role="alert"
 			aria-busy="true"
@@ -298,8 +269,8 @@ export function Introduction() {
 							<h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white/90 uppercase">
 								Anurag&apos;s
 							</h1>
-							<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400 animate-gradient-x">
-								<GlitchText text="PORTFOLIO" />
+							<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400 animate-in fade-in zoom-in duration-1000">
+								PORTFOLIO
 							</div>
 						</div>
 
