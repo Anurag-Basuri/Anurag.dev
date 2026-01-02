@@ -211,9 +211,6 @@ export function Introduction() {
 		setProgress(100);
 
 		completionTimeoutRef.current = setTimeout(() => {
-			try {
-				sessionStorage.setItem(BOOT_SESSION_KEY, '1');
-			} catch {}
 			setBootComplete(true);
 		}, BURST_DELAY);
 	}, [isCompleting, setBootComplete]);
@@ -277,8 +274,10 @@ export function Introduction() {
 	// Replaced motion.div with standard div
 	return (
 		<div
-			className="fixed inset-0 z-50 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center animate-in fade-in duration-300"
+			className="fixed inset-0 z-9999 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center"
 			aria-label="Booting Portfolio"
+			role="alert"
+			aria-busy="true"
 		>
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/15 via-[#020202] to-black opacity-90" />
 			<MatrixRain />
