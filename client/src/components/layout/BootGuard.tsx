@@ -15,24 +15,14 @@ const Introduction = dynamic(
 );
 
 export function BootGuard({ children }: { children: React.ReactNode }) {
-	const [bootComplete, setBootComplete] = useAtom(bootCompleteAtom);
-	const [isChecking, setIsChecking] = React.useState(true);
+	const [bootComplete] = useAtom(bootCompleteAtom);
 
-	React.useEffect(() => {
-		// Check if we've already booted this session
-		const hasBooted = sessionStorage.getItem('anurag-portfolio-boot');
-		if (hasBooted) {
-			setBootComplete(true);
-		}
-		setIsChecking(false);
-	}, [setBootComplete]);
-
-	// Prevent flash of content or boot sequence while checking storage
-	if (isChecking) return null;
-
-	if (!bootComplete) {
-		return <Introduction />;
-	}
-
-	return <>{children}</>;
+	// "Overlay" pattern: Always render children (app content) so they load/mount in background.
+	// Render Introduction (Boot Screen) on top with a high z-index.
+	return (
+		<>
+			{children}
+			{!bootComplete && <Introduction />}
+		</>
+	);
 }
