@@ -10,8 +10,8 @@ const BootFallback = () => (
 	<div className="fixed inset-0 bg-[#020202]" style={{ zIndex: 9999 }} aria-label="Loading..." />
 );
 
-// Dynamically import the full boot animation
-const BootScreen = dynamic(() => import('@/features/boot').then(mod => mod.BootScreen), {
+// Dynamically import the full boot animation - use direct path, not barrel export
+const BootScreen = dynamic(() => import('@/features/boot/BootScreen').then(mod => mod.BootScreen), {
 	ssr: false,
 	loading: BootFallback,
 });
