@@ -22,18 +22,12 @@ import { EmptyState } from '@/components/editor/EmptyState';
 import { PanelProvider, usePanelControls } from '@/contexts/panel-context';
 
 // Feature imports
-import {
-	TopBar,
-	Taskbar,
-	WindowHeader,
-	PANEL_STYLES,
-	MOTION_PRESETS,
-	LAYOUT_SPACING,
-	useModuleNavigation,
-	useLayoutShortcuts,
-	DesktopLayout,
-	MobileLayout,
-} from '@/features/shell';
+import { WindowHeader } from '@/features/shell/components/WindowHeader';
+import { PANEL_STYLES, MOTION_PRESETS, LAYOUT_SPACING } from '@/features/shell/constants';
+import { useModuleNavigation } from '@/features/shell/hooks/useModuleNavigation';
+import { useLayoutShortcuts } from '@/features/shell/hooks/useLayoutShortcuts';
+import { DesktopLayout } from '@/features/shell/components/DesktopLayout';
+import { MobileLayout } from '@/features/shell/components/MobileLayout';
 
 // Dynamic imports for heavy components
 const TopBarDynamic = dynamic(
