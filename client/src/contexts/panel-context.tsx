@@ -6,11 +6,15 @@ import React, {
 	useCallback,
 	useState,
 	useMemo,
-	useEffect,
 	type ReactNode,
 } from 'react';
 import { useAtom } from 'jotai';
-import { sidebarCollapsedAtom, terminalCollapsedAtom } from '@/store';
+import {
+	sidebarCollapsedAtom,
+	terminalCollapsedAtom,
+	mainHorizontalSizesAtom,
+	mainVerticalSizesAtom,
+} from '@/store';
 import { PANEL_CONFIG } from '@/lib/constants';
 import {
 	useGroupCallbackRef,
@@ -30,6 +34,8 @@ interface PanelControls {
 	toggleMaximize: () => void;
 	isCollapsed: boolean;
 	isMaximized: boolean;
+	onCollapse: () => void;
+	onExpand: () => void;
 }
 
 interface PanelContextValue {
@@ -40,10 +46,6 @@ interface PanelContextValue {
 	setSidebarPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
 	setTerminalPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
 }
-
-// ============================================================================
-// Context
-// ============================================================================
 
 const PanelContext = createContext<PanelContextValue | null>(null);
 
@@ -64,73 +66,55 @@ export function usePanelControls() {
 // ============================================================================
 
 export function PanelProvider({ children }: { children: ReactNode }) {
-	// Use the library's callback ref hooks for proper ref management
-	const [horizontalGroup, setHorizontalGroupRef] = useGroupCallbackRef();
-	const [verticalGroup, setVerticalGroupRef] = useGroupCallbackRef();
-
+	// Panel refs from library
+	const [, setHorizontalGroupRef] = useGroupCallbackRef();
+	const [, setVerticalGroupRef] = useGroupCallbackRef();
 	const [sidebarPanel, setSidebarPanelRef] = usePanelCallbackRef();
 	const [terminalPanel, setTerminalPanelRef] = usePanelCallbackRef();
 
-	// Persisted collapsed state
+	// Persisted collapsed state (single source of truth)
 	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
 	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
+
+	// Persisted sizes for restore
+	const [hSizes] = useAtom(mainHorizontalSizesAtom);
+	const [vSizes] = useAtom(mainVerticalSizesAtom);
 
 	// Local maximized state
 	const [sidebarMaximized, setSidebarMaximized] = useState(false);
 	const [terminalMaximized, setTerminalMaximized] = useState(false);
 
 	// ========================================================================
-	// Sync panel state on mount/ref change
-	// ========================================================================
-	// ========================================================================
-	// Sync panel state on mount/ref change
-	// NOTE: Initial sync is handled by defaultCollapsed prop on Panels to avoid crash
-	// ========================================================================
-
-	// ========================================================================
 	// Sidebar Controls
 	// ========================================================================
 
 	const collapseSidebar = useCallback(() => {
-		if (sidebarPanel) {
-			sidebarPanel.collapse();
-		}
+		sidebarPanel?.collapse();
 		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
 	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
-		if (sidebarPanel) {
-			sidebarPanel.expand();
-		}
+		sidebarPanel?.expand();
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
 	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const toggleSidebar = useCallback(() => {
-		try {
-			// Use panel's actual state if available, otherwise use Jotai state
-			const isCurrentlyCollapsed = sidebarPanel
-				? sidebarPanel.isCollapsed()
-				: sidebarCollapsed;
-
-			if (isCurrentlyCollapsed) {
-				expandSidebar();
-			} else {
-				collapseSidebar();
-			}
-		} catch (e) {
-			console.warn('Sidebar toggle failed', e);
-			// Fallback to strict toggle based on atom
-			if (sidebarCollapsed) expandSidebar();
-			else collapseSidebar();
+		if (sidebarCollapsed) {
+			expandSidebar();
+		} else {
+			collapseSidebar();
 		}
-	}, [sidebarPanel, sidebarCollapsed, expandSidebar, collapseSidebar]);
+	}, [sidebarCollapsed, expandSidebar, collapseSidebar]);
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
 			setSidebarMaximized(false);
-			sidebarPanel?.resize(20);
+			// Restore to persisted size
+			const restoreSize =
+				hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+			sidebarPanel?.resize(restoreSize);
 		} else {
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
@@ -140,50 +124,49 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
 			sidebarPanel?.resize(maxSize);
 		}
-	}, [sidebarMaximized, setSidebarCollapsed, sidebarPanel]);
+	}, [sidebarMaximized, setSidebarCollapsed, sidebarPanel, hSizes]);
+
+	// Callbacks for Panel component (called by react-resizable-panels)
+	const onSidebarCollapse = useCallback(() => {
+		setSidebarCollapsed(true);
+		setSidebarMaximized(false);
+	}, [setSidebarCollapsed]);
+
+	const onSidebarExpand = useCallback(() => {
+		setSidebarCollapsed(false);
+	}, [setSidebarCollapsed]);
 
 	// ========================================================================
 	// Terminal Controls
 	// ========================================================================
 
 	const collapseTerminal = useCallback(() => {
-		if (terminalPanel) {
-			terminalPanel.collapse();
-		}
+		terminalPanel?.collapse();
 		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
 	}, [terminalPanel, setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
-		if (terminalPanel) {
-			terminalPanel.expand();
-		}
+		terminalPanel?.expand();
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
 	}, [terminalPanel, setTerminalCollapsed]);
 
 	const toggleTerminal = useCallback(() => {
-		try {
-			const isCurrentlyCollapsed = terminalPanel
-				? terminalPanel.isCollapsed()
-				: terminalCollapsed;
-
-			if (isCurrentlyCollapsed) {
-				expandTerminal();
-			} else {
-				collapseTerminal();
-			}
-		} catch (e) {
-			console.warn('Terminal toggle failed', e);
-			if (terminalCollapsed) expandTerminal();
-			else collapseTerminal();
+		if (terminalCollapsed) {
+			expandTerminal();
+		} else {
+			collapseTerminal();
 		}
-	}, [terminalPanel, terminalCollapsed, expandTerminal, collapseTerminal]);
+	}, [terminalCollapsed, expandTerminal, collapseTerminal]);
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
 			setTerminalMaximized(false);
-			terminalPanel?.resize(40);
+			// Restore to persisted size
+			const restoreSize =
+				vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+			terminalPanel?.resize(restoreSize);
 		} else {
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
@@ -193,7 +176,17 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
 			terminalPanel?.resize(maxSize);
 		}
-	}, [terminalMaximized, setTerminalCollapsed, terminalPanel]);
+	}, [terminalMaximized, setTerminalCollapsed, terminalPanel, vSizes]);
+
+	// Callbacks for Panel component (called by react-resizable-panels)
+	const onTerminalCollapse = useCallback(() => {
+		setTerminalCollapsed(true);
+		setTerminalMaximized(false);
+	}, [setTerminalCollapsed]);
+
+	const onTerminalExpand = useCallback(() => {
+		setTerminalCollapsed(false);
+	}, [setTerminalCollapsed]);
 
 	// ========================================================================
 	// Context Value - memoized to prevent unnecessary re-renders
@@ -208,6 +201,8 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 				toggleMaximize: toggleMaximizeSidebar,
 				isCollapsed: sidebarCollapsed,
 				isMaximized: sidebarMaximized,
+				onCollapse: onSidebarCollapse,
+				onExpand: onSidebarExpand,
 			},
 			terminal: {
 				collapse: collapseTerminal,
@@ -216,6 +211,8 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 				toggleMaximize: toggleMaximizeTerminal,
 				isCollapsed: terminalCollapsed,
 				isMaximized: terminalMaximized,
+				onCollapse: onTerminalCollapse,
+				onExpand: onTerminalExpand,
 			},
 			setHorizontalGroupRef,
 			setVerticalGroupRef,
@@ -229,12 +226,16 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 			toggleMaximizeSidebar,
 			sidebarCollapsed,
 			sidebarMaximized,
+			onSidebarCollapse,
+			onSidebarExpand,
 			collapseTerminal,
 			expandTerminal,
 			toggleTerminal,
 			toggleMaximizeTerminal,
 			terminalCollapsed,
 			terminalMaximized,
+			onTerminalCollapse,
+			onTerminalExpand,
 			setHorizontalGroupRef,
 			setVerticalGroupRef,
 			setSidebarPanelRef,
