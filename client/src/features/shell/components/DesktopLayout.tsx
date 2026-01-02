@@ -9,7 +9,16 @@ import { PANEL_CONFIG, PANEL_COLLAPSE_THRESHOLD } from '@/lib/constants';
 import { PANEL_STYLES, LAYOUT_SPACING } from '../constants';
 import dynamic from 'next/dynamic';
 import type { Layout } from 'react-resizable-panels';
+import { usePanelControls } from '@/contexts/panel-context';
+import { useAtom, useSetAtom } from 'jotai';
+import {
+	mainHorizontalSizesAtom,
+	mainVerticalSizesAtom,
+	sidebarCollapsedAtom,
+	terminalCollapsedAtom,
+} from '@/store';
 
+// Dynamic imports for heavy components
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
 	loading: () => <Loader height="h-32" />,
@@ -19,37 +28,28 @@ const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(mod => m
 	ssr: false,
 });
 
+// Simplified props - only children needed now
 interface DesktopLayoutProps {
 	children: ReactNode;
-	sidebar: { isCollapsed: boolean };
-	terminal: { isCollapsed: boolean };
-	hSizes: number[] | null;
-	vSizes: number[] | null;
-	setHSizes: (sizes: number[]) => void;
-	setVSizes: (sizes: number[]) => void;
-	setSidebarCollapsed: (collapsed: boolean) => void;
-	setTerminalCollapsed: (collapsed: boolean) => void;
-	setHorizontalGroupRef: (ref: unknown) => void;
-	setVerticalGroupRef: (ref: unknown) => void;
-	setSidebarPanelRef: (ref: unknown) => void;
-	setTerminalPanelRef: (ref: unknown) => void;
 }
 
-export function DesktopLayout({
-	children,
-	sidebar,
-	terminal,
-	hSizes,
-	vSizes,
-	setHSizes,
-	setVSizes,
-	setSidebarCollapsed,
-	setTerminalCollapsed,
-	setHorizontalGroupRef,
-	setVerticalGroupRef,
-	setSidebarPanelRef,
-	setTerminalPanelRef,
-}: DesktopLayoutProps) {
+export function DesktopLayout({ children }: DesktopLayoutProps) {
+	// Access panel controls from context (reduces prop drilling)
+	const {
+		sidebar,
+		terminal,
+		setHorizontalGroupRef,
+		setVerticalGroupRef,
+		setSidebarPanelRef,
+		setTerminalPanelRef,
+	} = usePanelControls();
+
+	// Access store atoms directly
+	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
+	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+	const setSidebarCollapsed = useSetAtom(sidebarCollapsedAtom);
+	const setTerminalCollapsed = useSetAtom(terminalCollapsedAtom);
+
 	const COLLAPSE_EPS = PANEL_COLLAPSE_THRESHOLD;
 
 	const handleHorizontalLayoutChange = useCallback(
