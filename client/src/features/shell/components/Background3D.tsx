@@ -12,6 +12,7 @@ import { EffectComposer, Bloom, Noise, Vignette } from '@react-three/postprocess
 import { BlendFunction } from 'postprocessing';
 
 // --- Configuration ---
+// Performance settings and visual constants
 const CONFIG = {
 	STARS: {
 		DISTANT: { count: 2000, radius: 300, size: 0.015, opacity: 0.15, rotationSpeed: 0.004 },
@@ -31,6 +32,8 @@ const CONFIG = {
 		simpleDPR: 1,
 	},
 } as const;
+
+type StarLayer = keyof typeof CONFIG.STARS;
 
 // --- Utilities ---
 function usePrefersReducedMotion() {
@@ -59,7 +62,7 @@ function generateStarPoints(
 	count: number,
 	radius: number,
 	shape: 'sphere' | 'disc' | 'galaxy' = 'sphere',
-) {
+): { positions: Float32Array; colors: Float32Array } {
 	const points = new Float32Array(count * 3);
 	const colors = new Float32Array(count * 3);
 
