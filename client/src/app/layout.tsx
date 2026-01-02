@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ThemeProvider } from 'next-themes';
 import { JotaiProvider } from '@/components/providers/jotai-provider';
+import { BootGuard } from '@/components/layout/BootGuard';
 import { Inter } from 'next/font/google';
 
 const inter = Inter({
@@ -79,8 +80,8 @@ export const viewport: Viewport = {
 	initialScale: 1,
 	maximumScale: 5,
 	themeColor: [
-		{ media: '(prefers-color-scheme: light)', color: '#ffffff' },
-		{ media: '(prefers-color-scheme: dark)', color: '#000000' },
+		{ media: '(prefers-color-scheme: light)', color: '#020202' },
+		{ media: '(prefers-color-scheme: dark)', color: '#020202' },
 	],
 };
 
@@ -94,15 +95,39 @@ export default function RootLayout({
 			<head>
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+				{/* Critical CSS: Black screen before JS loads to prevent flash */}
+				<style
+					dangerouslySetInnerHTML={{
+						__html: `
+							html, body { background-color: #020202 !important; }
+							body::before {
+								content: '';
+								position: fixed;
+								inset: 0;
+								background: #020202;
+								z-index: 99999;
+								pointer-events: none;
+								opacity: 1;
+								transition: opacity 0.3s ease-out;
+							}
+							body.boot-complete::before {
+								opacity: 0;
+								pointer-events: none;
+							}
+						`,
+					}}
+				/>
 			</head>
-			<body className="antialiased bg-background text-foreground overflow-hidden">
+			<body className="antialiased bg-[#020202] text-foreground overflow-hidden">
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
 					enableSystem={false}
 					disableTransitionOnChange
 				>
-					<JotaiProvider>{children}</JotaiProvider>
+					<JotaiProvider>
+						<BootGuard>{children}</BootGuard>
+					</JotaiProvider>
 				</ThemeProvider>
 			</body>
 		</html>
