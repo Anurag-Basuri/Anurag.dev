@@ -9,13 +9,6 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
-import { useAtom, useSetAtom } from 'jotai';
-import {
-	mainHorizontalSizesAtom,
-	mainVerticalSizesAtom,
-	sidebarCollapsedAtom,
-	terminalCollapsedAtom,
-} from '@/store';
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { EmptyState } from '@/components/editor/EmptyState';
@@ -50,19 +43,8 @@ const TaskbarDynamic = dynamic(
 function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
 
-	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
-	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
-	const setSidebarCollapsed = useSetAtom(sidebarCollapsedAtom);
-	const setTerminalCollapsed = useSetAtom(terminalCollapsedAtom);
-
-	const {
-		sidebar,
-		terminal,
-		setHorizontalGroupRef,
-		setVerticalGroupRef,
-		setSidebarPanelRef,
-		setTerminalPanelRef,
-	} = usePanelControls();
+	// Panel controls for TopBar (DesktopLayout uses context internally)
+	const { sidebar, terminal } = usePanelControls();
 
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
@@ -143,24 +125,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 							LAYOUT_SPACING.padding,
 						)}
 					>
-						{!isMobile && (
-							<DesktopLayout
-								sidebar={sidebar}
-								terminal={terminal}
-								hSizes={hSizes}
-								vSizes={vSizes}
-								setHSizes={setHSizes}
-								setVSizes={setVSizes}
-								setSidebarCollapsed={setSidebarCollapsed}
-								setTerminalCollapsed={setTerminalCollapsed}
-								setHorizontalGroupRef={setHorizontalGroupRef}
-								setVerticalGroupRef={setVerticalGroupRef}
-								setSidebarPanelRef={setSidebarPanelRef}
-								setTerminalPanelRef={setTerminalPanelRef}
-							>
-								{renderModuleContent()}
-							</DesktopLayout>
-						)}
+						{!isMobile && <DesktopLayout>{renderModuleContent()}</DesktopLayout>}
 						{isMobile && <MobileLayout>{renderModuleContent()}</MobileLayout>}
 					</div>
 
