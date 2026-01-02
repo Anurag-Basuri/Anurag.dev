@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, memo } from 'react';
 import type { FileSystemItem } from '@/types/file-system';
 import { useAtomValue } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
@@ -112,7 +112,14 @@ export function FolderTree({ items, onSelect, activeModuleId }: FolderTreeProps)
 }
 
 // Recursive tree renderer
-function RecursiveFolderTree({ items, level }: { items: FileSystemItem[]; level: number }) {
+// Recursive tree renderer - Memoized to prevent full tree re-renders on leaf changes
+const RecursiveFolderTree = memo(function RecursiveFolderTree({
+	items,
+	level,
+}: {
+	items: FileSystemItem[];
+	level: number;
+}) {
 	return (
 		<div className="relative">
 			{level > 0 && (
@@ -126,4 +133,4 @@ function RecursiveFolderTree({ items, level }: { items: FileSystemItem[]; level:
 			))}
 		</div>
 	);
-}
+});

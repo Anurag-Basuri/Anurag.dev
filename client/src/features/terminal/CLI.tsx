@@ -181,6 +181,7 @@ const HistoryEntry = memo(({ item, isNew }: { item: HistoryItem; isNew?: boolean
 			'transition-all duration-200',
 			isNew && 'animate-in fade-in slide-in-from-bottom-2',
 		)}
+		style={{ contentVisibility: 'auto', containIntrinsicSize: '24px' }}
 	>
 		{item.command && (
 			<div className="flex items-start gap-1.5 sm:gap-2 text-xs font-mono">
@@ -325,7 +326,7 @@ export function CLI() {
 
 			<div
 				ref={scrollRef}
-				className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 space-y-2"
+				className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-2 space-y-2 will-change-scroll"
 				style={{
 					scrollbarWidth: 'thin',
 					scrollbarColor: 'var(--muted-foreground) transparent',
@@ -360,15 +361,18 @@ export function CLI() {
 				cursorPos={state.cursorPos}
 				isFocused={state.isFocused}
 				isExecuting={state.isExecuting}
-				onChange={e => {
-					state.setInput(e.target.value);
-					state.setCursorPos(e.target.selectionStart || 0);
-					state.setActiveSuggestionIndex(0);
-					state.setHistoryIndex(-1);
-				}}
+				onChange={useCallback(
+					(e: React.ChangeEvent<HTMLInputElement>) => {
+						state.setInput(e.target.value);
+						state.setCursorPos(e.target.selectionStart || 0);
+						state.setActiveSuggestionIndex(0);
+						state.setHistoryIndex(-1);
+					},
+					[state],
+				)}
 				onKeyDown={handleKeyDown}
-				onFocus={() => state.setIsFocused(true)}
-				onBlur={() => state.setIsFocused(false)}
+				onFocus={useCallback(() => state.setIsFocused(true), [state])}
+				onBlur={useCallback(() => state.setIsFocused(false), [state])}
 			/>
 		</div>
 	);
