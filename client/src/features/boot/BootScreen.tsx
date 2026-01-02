@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, type FC } from 'react';
 import { Rocket, Brain, Terminal } from 'lucide-react';
 import { MatrixRain } from './MatrixRain';
 import { BootProgress } from './BootProgress';
 import { useBootSequence } from './useBootSequence';
 import { ROLES } from './constants';
 
+// ============================================================================
 // Internal Components
+// ============================================================================
+
+// Decorative hex grid background pattern. Fades out during boot completion transition.
 const HexGrid = memo(function HexGrid({ visible }: { visible: boolean }) {
 	return (
 		<div
@@ -20,7 +24,12 @@ const HexGrid = memo(function HexGrid({ visible }: { visible: boolean }) {
 	);
 });
 
-const Typewriter = memo(function Typewriter({ texts }: { texts: readonly string[] }) {
+interface TypewriterProps {
+	texts: readonly string[];
+}
+
+// Animated typewriter effect that cycles through an array of texts. Types out each string, pauses, then deletes and moves to the next.
+const Typewriter = memo(function Typewriter({ texts }: TypewriterProps) {
 	const [index, setIndex] = useState(0);
 	const [displayText, setDisplayText] = useState('');
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -46,15 +55,21 @@ const Typewriter = memo(function Typewriter({ texts }: { texts: readonly string[
 	}, [displayText, isDeleting, index, texts]);
 
 	return (
-		<span className="inline-block text-emerald-400 font-bold min-h-[1.5em]">
+		<span className="inline-block text-emerald-400 font-bold min-h-[1.5em]" aria-live="polite">
 			{displayText}
-			<span className="animate-pulse ml-1 inline-block w-2.5 h-4 bg-emerald-500 align-middle" />
+			<span
+				className="animate-pulse ml-1 inline-block w-2.5 h-4 bg-emerald-500 align-middle"
+				aria-hidden="true"
+			/>
 		</span>
 	);
 });
 
-// --- Main Component ---
+// ============================================================================
+// Main Component
+// ============================================================================
 
+// Boot screen component that displays during application initialization. Features Matrix rain effect, typewriter animation, and progress bar. Can be skipped via keyboard (Space/Enter/Escape) or button click.
 export function BootScreen() {
 	const { status, progress, isCompleting, skip } = useBootSequence();
 
