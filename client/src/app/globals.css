@@ -5,135 +5,132 @@
    CSS Variables for Theming
    ========================= */
 :root {
-	/* Light Mode - "Soft Slate" (Reduced Contrast) */
-	/* Background: Very soft cool grey, not blinding white */
-	--background: oklch(0.97 0.005 240);
-	/* Foreground: Deep slate, not pitch black (reduces eye strain) */
-	--foreground: oklch(0.35 0.03 260);
 
-	/* Card: Slightly distinct from background, soft and unified */
-	--card: oklch(0.985 0.003 240);
-	--card-foreground: var(--foreground);
+	/* Light Mode - Clean, High-Trust, readable */
+	--background: oklch(0.99 0.003 240); /* Pure tint, not sterile white */
+	--foreground: oklch(0.13 0.028 260); /* Slate-900 equivalent */
 
-	--popover: oklch(0.985 0.003 240);
-	--popover-foreground: var(--foreground);
+	/* Card: Layered elevation */
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.13 0.028 260);
 
-	/* Primary: Muted Indigo/Teal blend - Professional & Calm */
-	--primary: oklch(0.6 0.12 230);
-	--primary-foreground: oklch(0.98 0.01 240);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.13 0.028 260);
 
-	/* Secondary: Subtle cool grey */
-	--secondary: oklch(0.93 0.01 240);
-	--secondary-foreground: oklch(0.4 0.03 260);
+	/* Primary: Indigo (Brand) - Trustworthy & Technical */
+	--primary: oklch(0.48 0.16 270); /* Indigo-600 */
+	--primary-foreground: oklch(0.99 0 0); /* White */
 
-	/* Muted: Bases for subtle borders/bgs */
-	--muted: oklch(0.94 0.01 240);
-	--muted-foreground: oklch(0.55 0.03 260);
+	/* Secondary: Slate (Neutral) - Subdued */
+	--secondary: oklch(0.96 0.005 250); /* Slate-100 */
+	--secondary-foreground: oklch(0.13 0.028 260);
 
-	/* Accent: Soft highlighting */
-	--accent: oklch(0.92 0.02 240);
-	--accent-foreground: oklch(0.4 0.04 260);
+	/* Muted: Subtle dividers and backgrounds */
+	--muted: oklch(0.96 0.005 250);
+	--muted-foreground: oklch(0.45 0.03 260); /* Slate-500 */
 
-	--destructive: oklch(0.6 0.15 20);
-	--destructive-foreground: oklch(0.98 0 0);
+	/* Accent: Interactive states */
+	--accent: oklch(0.96 0.01 250); /* Slate-100/200 blend */
+	--accent-foreground: oklch(0.13 0.028 260);
 
-	/* Border: Very subtle, barely there */
-	--border: oklch(0.9 0.01 240);
-	--input: oklch(0.92 0.01 240);
-	--ring: oklch(0.7 0.1 230);
+	/* Functional Status Colors */
+	--destructive: oklch(0.58 0.2 25); /* Red-600 */
+	--destructive-foreground: oklch(0.99 0 0);
+
+	/* Borders & Inputs */
+	--border: oklch(0.88 0.01 260); /* Slate-200 */
+	--input: oklch(0.92 0.01 260); /* Slate-100 */
+	--ring: oklch(0.48 0.16 270); /* Indigo-600 */
 
 	--radius: 0.5rem;
 
-	/* Sidebar: Matches background but slightly shifted */
-	--sidebar: oklch(0.96 0.005 240);
-	--sidebar-foreground: var(--foreground);
+	/* Sidebar - Distinct navigation area */
+	--sidebar: oklch(0.98 0.005 250);
+	--sidebar-foreground: oklch(0.35 0.03 260);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.93 0.02 240);
+	--sidebar-accent: oklch(0.94 0.01 250);
 	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.9 0.01 240);
+	--sidebar-border: oklch(0.92 0.01 260);
 	--sidebar-ring: var(--ring);
 
-	/* Terminal: Soft light theme */
-	--terminal-bg: oklch(0.965 0.005 240);
-	--terminal-text: oklch(0.35 0.03 260);
+	/* Terminal: Higher contrast for readability */
+	--terminal-bg: oklch(0.98 0.003 240);
+	--terminal-text: oklch(0.2 0.02 260);
 	--terminal-cursor: var(--primary);
 
-	/* Glassmorphism helpers */
-	--panel-overlay: oklch(0.97 0.005 240 / 0.85);
-	--panel-overlay-hover: oklch(0.95 0.01 240 / 0.9);
+	--panel-overlay: oklch(1 0 0 / 0.85);
+	--panel-overlay-hover: oklch(0.98 0 0 / 0.9);
 
-	/* Shadows: Softer, diffused */
-	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.03);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.03);
-	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.03);
-	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 8px 40px -4px rgba(0, 0, 0, 0.08);
+	/* Professional Shadows (Tailwind-style) */
+	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 10px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
 .dark {
-	/* Dark Mode - "Deep Ocean Slate" (Reduced Contrast) */
-	/* Background: Rich, deep slate. Not black. easier on eyes. */
-	--background: oklch(0.2 0.03 265);
-	/* Foreground: Soft grey-white, avoiding max brightness */
-	--foreground: oklch(0.9 0.01 240);
+	/* Dark Mode - "Midnight Slate" */
+	/* Background: Deep, rich slate (not pure black) for reduced eye strain */
+	--background: oklch(0.12 0.03 260); /* Slate-950 equivalent */
+	--foreground: oklch(0.98 0.005 240); /* Slate-50 */
 
-	/* Card: A few shades lighter than bg, maintaining hue */
-	--card: oklch(0.23 0.03 265);
+	/* Card: One step lighter than BG */
+	--card: oklch(0.15 0.03 260);
 	--card-foreground: var(--foreground);
 
-	--popover: oklch(0.22 0.03 265);
+	--popover: oklch(0.15 0.03 260);
 	--popover-foreground: var(--foreground);
 
-	/* Primary: Pastel Cyan/Blue - Glowing but soft */
-	--primary: oklch(0.7 0.1 220);
-	--primary-foreground: oklch(0.2 0.03 265);
+	/* Primary: Bright Indigo/Violet - Accessible against dark */
+	--primary: oklch(0.65 0.18 270); /* Indigo-400 */
+	--primary-foreground: oklch(0.98 0 0);
 
-	/* Secondary: Darker/muted slate */
-	--secondary: oklch(0.28 0.03 265);
-	--secondary-foreground: oklch(0.85 0.05 220);
+	/* Secondary: Deep muted slate */
+	--secondary: oklch(0.2 0.03 260); /* Slate-800 */
+	--secondary-foreground: oklch(0.98 0.005 240);
 
-	/* Muted: Low contrast elements */
-	--muted: oklch(0.28 0.03 265);
-	--muted-foreground: oklch(0.7 0.02 240);
+	/* Muted */
+	--muted: oklch(0.2 0.03 260);
+	--muted-foreground: oklch(0.65 0.03 260); /* Slate-400 */
 
-	/* Accent: Slightly brighter for hover states */
-	--accent: oklch(0.3 0.04 265);
-	--accent-foreground: oklch(0.95 0.01 240);
+	/* Accent: Interactive hover states */
+	--accent: oklch(0.22 0.035 260); /* Slate-700/800 blend */
+	--accent-foreground: oklch(0.98 0.005 240);
 
-	--destructive: oklch(0.6 0.18 25);
-	--destructive-foreground: oklch(0.95 0 0);
+	--destructive: oklch(0.45 0.15 25);
+	--destructive-foreground: oklch(0.98 0 0);
 
-	/* Border: Low contrast, just enough to separate */
-	--border: oklch(0.3 0.03 265);
-	--input: oklch(0.28 0.03 265);
-	--ring: oklch(0.5 0.1 220);
+	/* Borders: Subtle definition */
+	--border: oklch(0.22 0.03 260); /* Slate-800 */
+	--input: oklch(0.22 0.03 260);
+	--ring: oklch(0.65 0.18 270);
 
-	/* Sidebar: Deep tones */
-	--sidebar: oklch(0.18 0.03 265);
-	--sidebar-foreground: var(--foreground);
+	/* Sidebar: Slightly deeper to recede */
+	--sidebar: oklch(0.11 0.03 260);
+	--sidebar-foreground: oklch(0.7 0.03 260);
 	--sidebar-primary: var(--primary);
 	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.25 0.04 265);
+	--sidebar-accent: oklch(0.18 0.03 260);
 	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.25 0.03 265);
+	--sidebar-border: oklch(0.18 0.03 260);
 	--sidebar-ring: var(--ring);
 
-	/* Terminal: Matches dark theme */
-	--terminal-bg: oklch(0.17 0.03 265);
-	--terminal-text: oklch(0.85 0.01 240);
+	/* Terminal: Dark coding environment */
+	--terminal-bg: oklch(0.09 0.02 260);
+	--terminal-text: oklch(0.9 0.01 240);
 	--terminal-cursor: var(--primary);
 
-	/* Glassmorphism */
-	--panel-overlay: oklch(0.18 0.03 265 / 0.85);
-	--panel-overlay-hover: oklch(0.22 0.03 265 / 0.9);
+	--panel-overlay: oklch(0.1 0.03 260 / 0.85);
+	--panel-overlay-hover: oklch(0.15 0.03 260 / 0.9);
 
-	/* Shadows: Deep and rich */
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
-	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
-	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+	/* Shadows: Deep ambient occlusion */
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+	--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 50px -10px rgba(0, 0, 0, 0.7);
 }
 
 /* ================
