@@ -7,12 +7,14 @@ interface Props {
 	children: ReactNode;
 	fallback?: ReactNode;
 	onError?: (error: Error, errorInfo: ErrorInfo) => void;
+	maxRetries?: number;
 }
 
 interface State {
 	hasError: boolean;
 	error: Error | null;
 	errorInfo: ErrorInfo | null;
+	retryCount: number;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -20,6 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
 		hasError: false,
 		error: null,
 		errorInfo: null,
+		retryCount: 0,
 	};
 
 	public static getDerivedStateFromError(error: Error): Partial<State> {
@@ -40,7 +43,20 @@ export class ErrorBoundary extends Component<Props, State> {
 	}
 
 	private handleReset = () => {
-		this.setState({ hasError: false, error: null, errorInfo: null });
+		const maxRetries = this.props.maxRetries ?? 3;
+
+		if (this.state.retryCount >= maxRetries) {
+			// Max retries exceeded, reload the page
+			window.location.reload();
+			return;
+		}
+
+		this.setState(prev => ({
+			hasError: false,
+			error: null,
+			errorInfo: null,
+			retryCount: prev.retryCount + 1,
+		}));
 	};
 
 	private handleReload = () => {
@@ -67,9 +83,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
 						{/* Content */}
 						<h2 className="text-lg font-bold text-white mb-2">Something Went Wrong</h2>
-						<p className="text-sm text-white/50 mb-4">
+						<p className="text-sm text-white/50 mb-2">
 							This component encountered an error and couldn't render.
 						</p>
+						{this.state.retryCount > 0 && (
+							<p className="text-xs text-amber-400/60 mb-4">
+								Retry attempt {this.state.retryCount} of{' '}
+								{this.props.maxRetries ?? 3}
+							</p>
+						)}
 
 						{/* Error details in dev */}
 						{isDev && error && (
