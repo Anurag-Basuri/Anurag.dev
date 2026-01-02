@@ -8,15 +8,31 @@ import { BOOT_CONFIG, BOOT_PHASES } from './constants';
 
 const { PHASE_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
 
+// ============================================================================
+// Types
+// ============================================================================
+
 interface UseBootSequenceReturn {
+	// Current boot phase status message
 	status: string;
+	// Progress percentage (0-100)
 	progress: number;
+	// Whether the boot sequence is in the final completion phase
 	isCompleting: boolean;
+	// Function to skip the boot sequence immediately
 	skip: () => void;
 }
 
-// Custom hook encapsulating all boot sequence logic.
-// Handles GSAP timeline, progress state, and skip functionality.
+// ============================================================================
+// Hook Implementation
+// ============================================================================
+
+// Custom hook that manages the boot sequence animation. Handles GSAP timeline for phase transitions, progress state updates, and provides skip functionality via keyboard or button.
+// @returns Boot sequence state and controls
+// @example
+// ```tsx
+// const { status, progress, isCompleting, skip } = useBootSequence();
+// ```
 export function useBootSequence(): UseBootSequenceReturn {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
 	const [status, setStatus] = useState('INITIALIZING...');
