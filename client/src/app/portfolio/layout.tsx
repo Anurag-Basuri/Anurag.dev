@@ -9,7 +9,6 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
-import { BootGuard } from '@/components/layout/BootGuard';
 import { useAtom, useSetAtom } from 'jotai';
 import {
 	mainHorizontalSizesAtom,
@@ -73,14 +72,21 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
+	// Safe access to optional properties
+	const isMaximized = modulePanel.isMaximized ?? false;
+
 	// Custom hooks
-	const { currentModuleId, handleFileSelect, dismissCurrentModule } =
-		useModuleNavigation(modulePanel);
+	const { currentModuleId, handleFileSelect, dismissCurrentModule } = useModuleNavigation({
+		isMaximized,
+		restore: modulePanel.restore,
+		collapse: modulePanel.collapse,
+		expand: modulePanel.expand,
+	});
 
 	useLayoutShortcuts({
 		toggleSidebar: sidebar.toggle,
 		toggleTerminal: terminal.toggle,
-		isMaximized: modulePanel.isMaximized,
+		isMaximized,
 		restore: modulePanel.restore,
 	});
 
@@ -96,10 +102,8 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 				<WindowHeader
 					icon={Icon}
 					title={title}
-					isMaximized={modulePanel.isMaximized}
-					onMaximize={
-						modulePanel.isMaximized ? modulePanel.restore : modulePanel.maximize
-					}
+					isMaximized={isMaximized}
+					onMaximize={isMaximized ? modulePanel.restore : modulePanel.maximize}
 					onMinimize={dismissCurrentModule}
 					onClose={dismissCurrentModule}
 				/>
@@ -114,7 +118,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		<>
 			{/* Maximized Overlay */}
 			<AnimatePresence mode="wait">
-				{modulePanel.isMaximized && (
+				{isMaximized && (
 					<motion.div
 						key="maximized-overlay"
 						{...MOTION_PRESETS.fadeScale}
@@ -191,11 +195,9 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	return (
 		<ErrorBoundary>
-			<BootGuard>
-				<PanelProvider>
-					<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
-				</PanelProvider>
-			</BootGuard>
+			<PanelProvider>
+				<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
+			</PanelProvider>
 		</ErrorBoundary>
 	);
 }
