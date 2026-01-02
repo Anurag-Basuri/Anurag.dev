@@ -46,14 +46,6 @@ const TaskbarDynamic = dynamic(
 	},
 );
 
-const Background3DDynamic = dynamic(
-	() => import('@/features/shell/components/Background3D').then(mod => mod.Background3D),
-	{
-		ssr: false,
-		loading: () => null,
-	},
-);
-
 // Inner Layout Component
 function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
@@ -134,13 +126,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 			{/* Main Layout */}
 			<ContextMenuProvider>
 				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background font-sans selection:bg-primary/30">
-					{/* Background Layer */}
-					<div className="absolute inset-0 z-0">
-						<Suspense fallback={null}>
-							<Background3DDynamic />
-						</Suspense>
-					</div>
-
 					<Suspense fallback={<Loader height="h-8" />}>
 						<TopBarDynamic
 							isMobile={isMobile}
