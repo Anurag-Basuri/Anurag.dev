@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamically import Introduction to isolate it
 const Introduction = dynamic(
-	() => import('@/components/layout/Introduction').then(mod => mod.Introduction),
+	() => import('@/components/layout/Boot').then(mod => mod.Introduction),
 	{
 		ssr: false,
 		loading: () => null,
