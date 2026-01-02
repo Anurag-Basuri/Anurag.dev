@@ -19,6 +19,11 @@ const BootScreen = dynamic(() => import('@/features/boot/BootScreen').then(mod =
 export function BootGuard({ children }: { children: React.ReactNode }) {
 	const [bootComplete] = useAtom(bootCompleteAtom);
 
+	// Mark body as hydrated immediately so CSS overlay fades
+	useEffect(() => {
+		document.body.classList.add('hydrated');
+	}, []);
+
 	// Add/remove body class to control CSS overlay fade
 	useEffect(() => {
 		if (bootComplete) {

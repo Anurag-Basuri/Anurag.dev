@@ -105,14 +105,18 @@ export default function RootLayout({
 								position: fixed;
 								inset: 0;
 								background: #020202;
-								z-index: 99999;
+								z-index: 9998;
 								pointer-events: none;
 								opacity: 1;
-								transition: opacity 0.3s ease-out;
+								transition: opacity 0.5s ease-out 0.1s;
 							}
 							body.boot-complete::before {
 								opacity: 0;
 								pointer-events: none;
+							}
+							/* Hide the overlay once React hydrates and BootScreen takes over */
+							body.hydrated::before {
+								opacity: 0;
 							}
 						`,
 					}}
