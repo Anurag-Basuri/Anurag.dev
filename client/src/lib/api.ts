@@ -26,6 +26,16 @@ export type {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
+// Error type classification for better debugging
+function classifyError(error: unknown): string {
+	if (error instanceof Error) {
+		if (error.name === 'AbortError') return 'TIMEOUT';
+		if (error.message.includes('fetch')) return 'NETWORK';
+		if (error.message.includes('API Error')) return 'API';
+	}
+	return 'UNKNOWN';
+}
+
 class ApiService {
 	private async fetchWithFallback<T>(endpoint: string, fallbackData: T): Promise<T> {
 		try {
@@ -49,7 +59,11 @@ class ApiService {
 			const data = await response.json();
 			return data as T;
 		} catch (error) {
-			console.warn(`[API] Connection failed for ${endpoint}. Using fallback data.`, error);
+			const errorType = classifyError(error);
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+			// Log with error classification for easier debugging
+			console.warn(`[API:${errorType}] ${endpoint} failed: ${errorMessage}. Using fallback.`);
 			return fallbackData;
 		}
 	}
@@ -80,20 +94,33 @@ class ApiService {
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {
 		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for POST
+
 			const response = await fetch(`${API_BASE_URL}/contact`, {
 				method: 'POST',
+				signal: controller.signal,
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify(data),
 			});
 
+			clearTimeout(timeoutId);
+
 			if (!response.ok) throw new Error('Failed to send message');
 
 			return { success: true, message: 'Message sent successfully!' };
 		} catch (error) {
-			console.warn('[API] Failed to submit contact form.', error);
-			return { success: false, message: 'Offline mode: Message logged (simulated).' };
+			const errorType = classifyError(error);
+			console.warn(`[API:${errorType}] Contact form submission failed.`);
+
+			const message =
+				errorType === 'TIMEOUT'
+					? 'Request timed out. Please try again.'
+					: 'Offline mode: Message logged (simulated).';
+
+			return { success: false, message };
 		}
 	}
 }
