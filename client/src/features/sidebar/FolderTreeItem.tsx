@@ -69,10 +69,10 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 					// Left border indicator (like terminal history)
 					'border-l-2',
 					isActive
-						? 'border-emerald-500 text-emerald-300 bg-emerald-500/5'
-						: 'border-transparent text-white/70 hover:text-white hover:border-white/20',
+						? 'border-primary text-primary bg-primary/10 font-bold'
+						: 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50 hover:border-primary/20',
 					level > 0 && 'ml-3',
-					isFocused && 'bg-white/10 ring-1 ring-inset ring-emerald-500/30',
+					isFocused && 'bg-primary/5 ring-1 ring-inset ring-primary/20',
 				)}
 				onClick={handleClick}
 				onMouseEnter={() => setIsHovered(true)}
@@ -83,9 +83,7 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 						layoutId={isActive ? 'folder-active' : undefined}
 						className={cn(
 							'absolute inset-0 rounded-sm pointer-events-none',
-							isActive
-								? 'bg-emerald-500/10 border border-emerald-500/20'
-								: 'bg-white/5',
+							isActive ? 'bg-primary/5 border border-primary/10' : 'bg-transparent',
 						)}
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
@@ -94,7 +92,7 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 					/>
 				)}
 
-				<span className="mr-1.5 shrink-0 w-4 flex items-center justify-center text-muted-foreground/60 group-hover:text-foreground/80 transition-colors">
+				<span className="mr-1.5 shrink-0 w-4 flex items-center justify-center text-muted-foreground/40 group-hover:text-foreground/60 transition-colors">
 					{isFolder && (
 						<motion.span
 							animate={{ rotate: isExpanded ? 90 : 0 }}
@@ -108,9 +106,9 @@ export const FolderTreeItem = memo(function FolderTreeItem({ item, level }: Fold
 				<span className="mr-2 relative z-10 shrink-0">
 					{isFolder ? (
 						isExpanded ? (
-							<FolderOpen className="w-4 h-4 text-emerald-500/90" />
+							<FolderOpen className="w-4 h-4 text-primary" />
 						) : (
-							<Folder className="w-4 h-4 text-emerald-500/70 group-hover:text-emerald-500 transition-colors" />
+							<Folder className="w-4 h-4 text-muted-foreground group-hover:text-primary/70 transition-colors" />
 						)
 					) : (
 						<FileIcon name={item.name} className="w-4 h-4" />

@@ -66,7 +66,7 @@ export function PanelHeader({
 						className={cn(
 							icons.md,
 							'transition-all duration-200',
-							isFocused ? `text-${accent.primary} ${accent.glow}` : 'text-primary',
+							isFocused ? `text-primary ${accent.glow}` : 'text-muted-foreground',
 						)}
 						aria-hidden="true"
 					/>
@@ -74,7 +74,7 @@ export function PanelHeader({
 					<span
 						className={cn(
 							'font-semibold tracking-tight transition-colors duration-200',
-							isFocused ? 'text-emerald-300' : 'text-muted-foreground',
+							isFocused ? 'text-foreground' : 'text-muted-foreground',
 						)}
 					>
 						{title}
@@ -85,7 +85,7 @@ export function PanelHeader({
 							<span
 								className={cn(
 									'transition-colors duration-200',
-									isFocused ? 'text-emerald-500/70' : 'text-muted-foreground/40',
+									isFocused ? 'text-primary/70' : 'text-muted-foreground/40',
 								)}
 							>
 								—
@@ -93,7 +93,7 @@ export function PanelHeader({
 							<span
 								className={cn(
 									'font-medium transition-colors duration-200',
-									isFocused ? 'text-emerald-200' : 'text-accent',
+									isFocused ? 'text-primary' : 'text-muted-foreground/60',
 								)}
 							>
 								{subtitle}
