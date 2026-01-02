@@ -52,37 +52,43 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 
 	const COLLAPSE_EPS = PANEL_COLLAPSE_THRESHOLD;
 
+	// Horizontal Layout Handler (Sidebar vs Main)
 	const handleHorizontalLayoutChange = useCallback(
-		(layout: Layout) => {
-			const sidebarSize = layout['sidebar'];
-			const mainSize = layout['main'];
-			if (typeof sidebarSize !== 'number' || typeof mainSize !== 'number') return;
+		(sizes: any) => {
+			if (!Array.isArray(sizes) || sizes.length !== 2) return;
 
+			const sidebarSize = sizes[0];
+			const mainSize = sizes[1];
+
+			// Detect collapse based on size
 			const isNowCollapsed = sidebarSize <= COLLAPSE_EPS;
 			if (isNowCollapsed !== sidebar.isCollapsed) {
 				setSidebarCollapsed(isNowCollapsed);
 			}
 
 			if (!isNowCollapsed) {
-				setHSizes([sidebarSize, mainSize]);
+				setHSizes(sizes);
 			}
 		},
 		[COLLAPSE_EPS, sidebar.isCollapsed, setSidebarCollapsed, setHSizes],
 	);
 
+	// Vertical Layout Handler (Content vs Terminal)
 	const handleVerticalLayoutChange = useCallback(
-		(layout: Layout) => {
-			const contentSize = layout['content'];
-			const terminalSize = layout['terminal'];
-			if (typeof contentSize !== 'number' || typeof terminalSize !== 'number') return;
+		(sizes: any) => {
+			if (!Array.isArray(sizes) || sizes.length !== 2) return;
 
+			const contentSize = sizes[0];
+			const terminalSize = sizes[1];
+
+			// Detect collapse based on size
 			const isNowCollapsed = terminalSize <= COLLAPSE_EPS;
 			if (isNowCollapsed !== terminal.isCollapsed) {
 				setTerminalCollapsed(isNowCollapsed);
 			}
 
 			if (!isNowCollapsed) {
-				setVSizes([contentSize, terminalSize]);
+				setVSizes(sizes);
 			}
 		},
 		[COLLAPSE_EPS, terminal.isCollapsed, setTerminalCollapsed, setVSizes],
@@ -94,7 +100,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 			orientation="horizontal"
 			className={cn('h-full w-full', LAYOUT_SPACING.gap)}
 			groupRef={setHorizontalGroupRef}
-			defaultLayout={{ sidebar: hSizes?.[0] ?? 20, main: hSizes?.[1] ?? 80 }}
+			defaultLayout={(hSizes ?? [20, 80]) as any}
 			onLayoutChange={handleHorizontalLayoutChange}
 		>
 			<Panel
@@ -120,13 +126,13 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 
 			<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
-			<Panel id="main" defaultSize="80%" minSize="50%" className="min-w-0">
+			<Panel id="main" defaultSize={80} minSize={50} className="min-w-0">
 				<Group
 					id="portfolio-main-v"
 					orientation="vertical"
 					className={cn('h-full', LAYOUT_SPACING.gap)}
 					groupRef={setVerticalGroupRef}
-					defaultLayout={{ content: vSizes?.[0] ?? 60, terminal: vSizes?.[1] ?? 40 }}
+					defaultLayout={(vSizes ?? [60, 40]) as any}
 					onLayoutChange={handleVerticalLayoutChange}
 				>
 					<Panel
