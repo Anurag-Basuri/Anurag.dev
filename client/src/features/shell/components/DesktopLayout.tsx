@@ -96,6 +96,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 				className={cn(
 					PANEL_STYLES.base,
 					PANEL_STYLES.sidebar,
+					'shadow-none focus-within:ring-1 focus-within:ring-primary/10',
 					sidebar.isCollapsed && PANEL_STYLES.collapsed,
 				)}
 			>
@@ -119,7 +120,11 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 						id="content"
 						defaultSize={vSizes?.[0] ?? 60}
 						minSize={parseFloat(PANEL_CONFIG.VERTICAL.CONTENT.minSize)}
-						className={cn(PANEL_STYLES.base, PANEL_STYLES.content, 'min-h-0')}
+						className={cn(
+							PANEL_STYLES.base,
+							PANEL_STYLES.content,
+							'min-h-0 ring-1 ring-primary/10',
+						)}
 					>
 						<ErrorBoundary>
 							<Suspense fallback={<Loader />}>{children}</Suspense>
@@ -140,7 +145,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 						className={cn(
 							PANEL_STYLES.base,
 							PANEL_STYLES.terminal,
-							'min-h-0',
+							'min-h-0 shadow-none focus-within:ring-1 focus-within:ring-primary/10',
 							terminal.isCollapsed && PANEL_STYLES.collapsed,
 						)}
 					>

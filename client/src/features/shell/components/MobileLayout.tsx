@@ -10,8 +10,10 @@ interface MobileLayoutProps {
 
 export function MobileLayout({ children }: MobileLayoutProps) {
 	return (
-		<div className="h-full w-full flex flex-col p-1">
-			<div className={cn(PANEL_STYLES.base, PANEL_STYLES.mobile, 'h-full w-full')}>
+		<div className="h-full w-full flex flex-col px-3 py-2 sm:px-4 sm:py-3 pb-[env(safe-area-inset-bottom)]">
+			<div
+				className={cn(PANEL_STYLES.base, PANEL_STYLES.mobile, 'h-full w-full rounded-2xl')}
+			>
 				{children}
 			</div>
 		</div>

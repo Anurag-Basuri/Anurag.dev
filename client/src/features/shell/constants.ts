@@ -2,13 +2,13 @@
 // Styling constants for the portfolio layout
 
 export const PANEL_STYLES = {
-	base: 'overflow-hidden backdrop-blur-2xl border border-border/30 rounded-lg ring-1 ring-inset ring-border/20 transition-all duration-300',
+	base: 'overflow-hidden backdrop-blur-xl border border-border/25 rounded-xl ring-1 ring-inset ring-border/15 transition-[border,box-shadow,background-color] duration-300',
 	collapsed: 'border-transparent ring-transparent shadow-none bg-transparent',
-	sidebar: 'bg-sidebar/80 dark:bg-sidebar/60 shadow-md dark:shadow-2xl',
-	content: 'bg-card/70 dark:bg-card/50 shadow-sm dark:shadow-xl',
-	terminal: 'bg-sidebar/90 dark:bg-sidebar/70 shadow-md dark:shadow-2xl',
-	mobile: 'bg-card/80 dark:bg-card/60 shadow-sm dark:shadow-xl',
-	maximized: 'bg-background shadow-xl',
+	sidebar: 'bg-sidebar/70 dark:bg-sidebar/55 shadow-sm dark:shadow-lg',
+	content: 'bg-card/75 dark:bg-card/55 shadow-lg ring-1 ring-primary/10',
+	terminal: 'bg-sidebar/75 dark:bg-sidebar/60 shadow-sm dark:shadow-lg',
+	mobile: 'bg-card/80 dark:bg-card/60 shadow-md',
+	maximized: 'bg-background shadow-2xl',
 } as const;
 
 export const MOTION_PRESETS = {
@@ -21,7 +21,7 @@ export const MOTION_PRESETS = {
 } as const;
 
 export const LAYOUT_SPACING = {
-	gap: 'gap-1',
-	padding: 'p-1',
-	inner: 'p-1',
+	gap: 'gap-2',
+	padding: 'p-2',
+	inner: 'p-2',
 } as const;
