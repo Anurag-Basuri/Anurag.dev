@@ -1,19 +1,29 @@
 'use client';
 
-import React, {
+import {
 	createContext,
 	useContext,
 	useCallback,
-	useState,
 	useMemo,
+	useState,
 	type ReactNode,
+	type Dispatch,
+	type SetStateAction,
 } from 'react';
-import { useAtom } from 'jotai';
-import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
+import { useAtom, useSetAtom } from 'jotai';
+import {
+	mainHorizontalSizesAtom,
+	mainVerticalSizesAtom,
+	sidebarCollapsedAtom,
+	terminalCollapsedAtom,
+} from '@/store';
 import { PANEL_CONFIG } from '@/lib/constants';
 import { usePanelCallbackRef, type PanelImperativeHandle } from 'react-resizable-panels';
 
-// Interface for individual panel controls
+// ============================================================================
+// Types
+// ============================================================================
+
 interface PanelControls {
 	collapse: () => void;
 	expand: () => void;
@@ -26,15 +36,18 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
-	setSidebarPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
-	setTerminalPanelRef: React.Dispatch<React.SetStateAction<PanelImperativeHandle | null>>;
+	setSidebarPanelRef: Dispatch<SetStateAction<PanelImperativeHandle | null>>;
+	setTerminalPanelRef: Dispatch<SetStateAction<PanelImperativeHandle | null>>;
 	persistHorizontalSizes: (sizes: number[]) => void;
 	persistVerticalSizes: (sizes: number[]) => void;
 }
 
 const PanelContext = createContext<PanelContextValue | null>(null);
 
-// Hook to use the PanelContext
+// ============================================================================
+// Hook
+// ============================================================================
+
 export function usePanelControls() {
 	const context = useContext(PanelContext);
 	if (!context) {
@@ -43,132 +56,131 @@ export function usePanelControls() {
 	return context;
 }
 
-// PanelProvider component
+// ============================================================================
+// Provider
+// ============================================================================
+
 export function PanelProvider({ children }: { children: ReactNode }) {
-	// Panel refs from library - these are the single source of truth for collapsed state
+	// Panel refs from library
 	const [sidebarPanel, setSidebarPanelRef] = usePanelCallbackRef();
 	const [terminalPanel, setTerminalPanelRef] = usePanelCallbackRef();
 
-	// Persisted sizes for restore (Jotai only for localStorage, not active state)
-	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
-	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
+	// Collapsed state from Jotai (persisted to localStorage)
+	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
+	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
 
-	// Local maximized state (not persisted)
+	// Maximized state (local, not persisted)
 	const [sidebarMaximized, setSidebarMaximized] = useState(false);
 	const [terminalMaximized, setTerminalMaximized] = useState(false);
 
-	// Trigger re-renders when collapsed state changes
-	const [, forceUpdate] = useState(0);
-	const triggerUpdate = useCallback(() => forceUpdate(n => n + 1), []);
+	// Size atoms for persistence
+	const [hSizes] = useAtom(mainHorizontalSizesAtom);
+	const [vSizes] = useAtom(mainVerticalSizesAtom);
+	const setHSizes = useSetAtom(mainHorizontalSizesAtom);
+	const setVSizes = useSetAtom(mainVerticalSizesAtom);
 
-	// Derive collapsed state from library panel refs
-	const sidebarCollapsed = sidebarPanel?.isCollapsed() ?? false;
-	const terminalCollapsed = terminalPanel?.isCollapsed() ?? false;
-
+	// ========================================================================
 	// Sidebar Controls
+	// ========================================================================
+
 	const collapseSidebar = useCallback(() => {
 		sidebarPanel?.collapse();
+		setSidebarCollapsed(true);
 		setSidebarMaximized(false);
-		triggerUpdate();
-	}, [sidebarPanel, triggerUpdate]);
+	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
 		sidebarPanel?.expand();
+		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-		triggerUpdate();
-	}, [sidebarPanel, triggerUpdate]);
+	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const toggleSidebar = useCallback(() => {
-		if (sidebarPanel?.isCollapsed()) {
-			sidebarPanel.expand();
+		if (sidebarCollapsed) {
+			expandSidebar();
 		} else {
-			sidebarPanel?.collapse();
+			collapseSidebar();
 		}
-		setSidebarMaximized(false);
-		triggerUpdate();
-	}, [sidebarPanel, triggerUpdate]);
+	}, [sidebarCollapsed, expandSidebar, collapseSidebar]);
 
 	const toggleMaximizeSidebar = useCallback(() => {
 		if (sidebarMaximized) {
 			setSidebarMaximized(false);
-			// Restore to persisted size
 			const restoreSize =
 				hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
 			sidebarPanel?.resize(restoreSize);
 		} else {
 			setSidebarMaximized(true);
-			if (sidebarPanel?.isCollapsed()) {
-				sidebarPanel.expand();
-			}
-			const maxSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize);
-			sidebarPanel?.resize(maxSize);
+			setSidebarCollapsed(false);
+			sidebarPanel?.expand();
+			sidebarPanel?.resize(parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize));
 		}
-		triggerUpdate();
-	}, [sidebarMaximized, sidebarPanel, hSizes, triggerUpdate]);
+	}, [sidebarMaximized, sidebarPanel, hSizes, setSidebarCollapsed]);
 
+	// ========================================================================
 	// Terminal Controls
+	// ========================================================================
+
 	const collapseTerminal = useCallback(() => {
 		terminalPanel?.collapse();
+		setTerminalCollapsed(true);
 		setTerminalMaximized(false);
-		triggerUpdate();
-	}, [terminalPanel, triggerUpdate]);
+	}, [terminalPanel, setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
 		terminalPanel?.expand();
+		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-		triggerUpdate();
-	}, [terminalPanel, triggerUpdate]);
+	}, [terminalPanel, setTerminalCollapsed]);
 
 	const toggleTerminal = useCallback(() => {
-		if (terminalPanel?.isCollapsed()) {
-			terminalPanel.expand();
+		if (terminalCollapsed) {
+			expandTerminal();
 		} else {
-			terminalPanel?.collapse();
+			collapseTerminal();
 		}
-		setTerminalMaximized(false);
-		triggerUpdate();
-	}, [terminalPanel, triggerUpdate]);
+	}, [terminalCollapsed, expandTerminal, collapseTerminal]);
 
 	const toggleMaximizeTerminal = useCallback(() => {
 		if (terminalMaximized) {
 			setTerminalMaximized(false);
-			// Restore to persisted size
 			const restoreSize =
 				vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
 			terminalPanel?.resize(restoreSize);
 		} else {
 			setTerminalMaximized(true);
-			if (terminalPanel?.isCollapsed()) {
-				terminalPanel.expand();
-			}
-			const maxSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize);
-			terminalPanel?.resize(maxSize);
+			setTerminalCollapsed(false);
+			terminalPanel?.expand();
+			terminalPanel?.resize(parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize));
 		}
-		triggerUpdate();
-	}, [terminalMaximized, terminalPanel, vSizes, triggerUpdate]);
+	}, [terminalMaximized, terminalPanel, vSizes, setTerminalCollapsed]);
 
-	// Size persistence (called by DesktopLayout on resize end)
+	// ========================================================================
+	// Size Persistence
+	// ========================================================================
+
 	const persistHorizontalSizes = useCallback(
 		(sizes: number[]) => {
-			// Only persist if sidebar is not collapsed (don't save collapsed size)
-			if (!sidebarPanel?.isCollapsed() && sizes[0] > 5) {
+			if (sizes.length === 2 && sizes[0] > 5) {
 				setHSizes(sizes);
 			}
 		},
-		[sidebarPanel, setHSizes],
+		[setHSizes],
 	);
 
 	const persistVerticalSizes = useCallback(
 		(sizes: number[]) => {
-			// Only persist if terminal is not collapsed (don't save collapsed size)
-			if (!terminalPanel?.isCollapsed() && sizes[1] > 5) {
+			if (sizes.length === 2 && sizes[1] > 5) {
 				setVSizes(sizes);
 			}
 		},
-		[terminalPanel, setVSizes],
+		[setVSizes],
 	);
 
-	// Context Value - memoized to prevent unnecessary re-renders
+	// ========================================================================
+	// Context Value
+	// ========================================================================
+
 	const value = useMemo<PanelContextValue>(
 		() => ({
 			sidebar: {
