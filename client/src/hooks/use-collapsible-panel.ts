@@ -2,14 +2,9 @@
 
 import { useCallback } from 'react';
 import { useAtom } from 'jotai';
-import {
-	sidebarCollapsedAtom,
-	terminalCollapsedAtom,
-	moduleMaximizedAtom,
-	moduleMinimizedAtom,
-} from '@/store';
+import { moduleMaximizedAtom, moduleMinimizedAtom } from '@/store';
 
-export type PanelType = 'sidebar' | 'terminal' | 'module';
+export type PanelType = 'module';
 
 export interface CollapsiblePanelConfig {
 	type: PanelType;
@@ -28,31 +23,24 @@ export interface CollapsiblePanelReturn {
 	restore: () => void;
 }
 
+// Hook for managing collapsible panel state
+// Uses Jotai atoms for module state management
 export function useCollapsiblePanel({
 	type,
 	onCollapse,
 	onExpand,
 	onMaximize,
 }: CollapsiblePanelConfig): CollapsiblePanelReturn {
-	const [sidebarCollapsed, setSidebarCollapsed] = useAtom(sidebarCollapsedAtom);
-	const [terminalCollapsed, setTerminalCollapsed] = useAtom(terminalCollapsedAtom);
 	const [moduleMinimized, setModuleMinimized] = useAtom(moduleMinimizedAtom);
 	const [moduleMaximized, setModuleMaximized] = useAtom(moduleMaximizedAtom);
 
-	const isCollapsed =
-		type === 'sidebar'
-			? sidebarCollapsed
-			: type === 'terminal'
-			? terminalCollapsed
-			: moduleMinimized;
+	const isCollapsed = moduleMinimized;
 
 	const setIsCollapsed = useCallback(
 		(val: boolean) => {
-			if (type === 'sidebar') setSidebarCollapsed(val);
-			else if (type === 'terminal') setTerminalCollapsed(val);
-			else setModuleMinimized(val);
+			setModuleMinimized(val);
 		},
-		[type, setSidebarCollapsed, setTerminalCollapsed, setModuleMinimized],
+		[setModuleMinimized],
 	);
 
 	const toggle = useCallback(() => {
@@ -76,40 +64,19 @@ export function useCollapsiblePanel({
 	}, [onCollapse, setIsCollapsed]);
 
 	const maximize = useCallback(() => {
-		if (type === 'module') {
-			setModuleMaximized(true);
-			setModuleMinimized(false);
-		} else if (type === 'sidebar') {
-			// When sidebar maximizes, collapse terminal
-			setTerminalCollapsed(true);
-			setIsCollapsed(false);
-		} else if (type === 'terminal') {
-			// When terminal maximizes, collapse sidebar
-			setSidebarCollapsed(true);
-			setIsCollapsed(false);
-		}
+		setModuleMaximized(true);
+		setModuleMinimized(false);
 		onExpand?.();
 		onMaximize?.();
-	}, [
-		onExpand,
-		onMaximize,
-		setIsCollapsed,
-		setModuleMaximized,
-		setModuleMinimized,
-		setSidebarCollapsed,
-		setTerminalCollapsed,
-		type,
-	]);
+	}, [onExpand, onMaximize, setModuleMaximized, setModuleMinimized]);
 
 	const restore = useCallback(() => {
-		if (type === 'module') {
-			setModuleMaximized(false);
-		}
-	}, [setModuleMaximized, type]);
+		setModuleMaximized(false);
+	}, [setModuleMaximized]);
 
 	return {
 		isCollapsed,
-		isMaximized: type === 'module' ? moduleMaximized : false,
+		isMaximized: moduleMaximized,
 		toggle,
 		expand,
 		collapse,
