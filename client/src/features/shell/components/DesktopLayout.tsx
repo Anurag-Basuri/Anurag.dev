@@ -12,7 +12,6 @@ import { usePanelControls } from '@/contexts/panel-context';
 import { useAtom } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
 
-// Dynamic imports for heavy components
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
 	loading: () => <Loader height="h-32" />,
@@ -26,9 +25,7 @@ interface DesktopLayoutProps {
 	children: ReactNode;
 }
 
-// Main layout component for the portfolio
 export function DesktopLayout({ children }: DesktopLayoutProps) {
-	// Access panel controls from context
 	const {
 		sidebar,
 		terminal,
@@ -38,15 +35,12 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 		setTerminalPanelRef,
 	} = usePanelControls();
 
-	// Persisted sizes
 	const [hSizes, setHSizes] = useAtom(mainHorizontalSizesAtom);
 	const [vSizes, setVSizes] = useAtom(mainVerticalSizesAtom);
 
-	// Track previous collapse state to detect changes
 	const prevSidebarCollapsed = useRef(sidebar.isCollapsed);
 	const prevTerminalCollapsed = useRef(terminal.isCollapsed);
 
-	// Horizontal Layout Handler - Detects collapse via size threshold
 	const handleHorizontalLayoutChange = useCallback(
 		(sizes: number[]) => {
 			if (!Array.isArray(sizes) || sizes.length !== 2) return;
@@ -54,7 +48,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 			const sidebarSize = sizes[0];
 			const isNowCollapsed = sidebarSize <= PANEL_COLLAPSE_THRESHOLD;
 
-			// Sync collapse state if changed
 			if (isNowCollapsed !== prevSidebarCollapsed.current) {
 				prevSidebarCollapsed.current = isNowCollapsed;
 				if (isNowCollapsed) {
@@ -64,7 +57,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 				}
 			}
 
-			// Only persist non-collapsed sizes
 			if (!isNowCollapsed) {
 				setHSizes(sizes);
 			}
@@ -72,7 +64,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 		[sidebar, setHSizes],
 	);
 
-	// Vertical Layout Handler - Detects collapse via size threshold
 	const handleVerticalLayoutChange = useCallback(
 		(sizes: number[]) => {
 			if (!Array.isArray(sizes) || sizes.length !== 2) return;
@@ -80,7 +71,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 			const terminalSize = sizes[1];
 			const isNowCollapsed = terminalSize <= PANEL_COLLAPSE_THRESHOLD;
 
-			// Sync collapse state if changed
 			if (isNowCollapsed !== prevTerminalCollapsed.current) {
 				prevTerminalCollapsed.current = isNowCollapsed;
 				if (isNowCollapsed) {
@@ -90,7 +80,6 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 				}
 			}
 
-			// Only persist non-collapsed sizes
 			if (!isNowCollapsed) {
 				setVSizes(sizes);
 			}
@@ -109,7 +98,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 			<Panel
 				id="sidebar"
 				panelRef={setSidebarPanelRef}
-				defaultSize={sidebar.isCollapsed ? 3 : hSizes?.[0] ?? 20}
+				defaultSize={sidebar.isCollapsed ? 3 : (hSizes?.[0] ?? 20)}
 				minSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize)}
 				maxSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize)}
 				collapsible
@@ -153,7 +142,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 					<Panel
 						id="terminal"
 						panelRef={setTerminalPanelRef}
-						defaultSize={terminal.isCollapsed ? 3 : vSizes?.[1] ?? 40}
+						defaultSize={terminal.isCollapsed ? 3 : (vSizes?.[1] ?? 40)}
 						minSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.minSize)}
 						maxSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize)}
 						collapsible
