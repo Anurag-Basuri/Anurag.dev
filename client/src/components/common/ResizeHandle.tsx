@@ -7,39 +7,19 @@ import {
 	type PanelProps as LibPanelProps,
 	type GroupProps as LibGroupProps,
 	type PanelImperativeHandle,
-	type PanelSize,
 	type Layout,
 } from 'react-resizable-panels';
 import { cn } from '@/lib/utils';
-import {
-	type ReactNode,
-	type Dispatch,
-	type SetStateAction,
-	useRef,
-	useCallback,
-	type Ref,
-} from 'react';
+import { type ReactNode, type Dispatch, type SetStateAction, useCallback, type Ref } from 'react';
 
-// Panel - wraps Library Panel to add collapse/expand callbacks
+// Panel - wraps Library Panel to accept callback-style panelRef
 interface PanelProps extends Omit<LibPanelProps, 'panelRef'> {
 	// Accept the callback-ref style from usePanelCallbackRef
 	panelRef?: Dispatch<SetStateAction<PanelImperativeHandle | null>>;
 	children?: ReactNode;
-	// Custom collapse/expand callbacks triggered when panel crosses threshold
-	onCollapse?: () => void;
-	onExpand?: () => void;
 }
 
-export function Panel({
-	panelRef,
-	children,
-	onCollapse,
-	onExpand,
-	onResize,
-	...props
-}: PanelProps) {
-	const prevCollapsedRef = useRef<boolean | null>(null);
-
+export function Panel({ panelRef, children, onResize, ...props }: PanelProps) {
 	// Convert callback-style ref to regular ref for the library
 	const libPanelRef = useCallback(
 		(handle: PanelImperativeHandle | null) => {
@@ -48,31 +28,8 @@ export function Panel({
 		[panelRef],
 	) as unknown as Ref<PanelImperativeHandle>;
 
-	// Combine our collapse/expand callbacks with onResize
-	const handleResize = (size: PanelSize, id: string | number | undefined) => {
-		onResize?.(size, id);
-
-		// Detect collapse/expand based on size changes
-		const collapsedSize =
-			typeof props.collapsedSize === 'number'
-				? props.collapsedSize
-				: parseFloat(String(props.collapsedSize ?? '3'));
-
-		const isCollapsed = size.asPercentage <= collapsedSize + 0.5;
-
-		// Only trigger callbacks when state actually changes
-		if (prevCollapsedRef.current !== null) {
-			if (!prevCollapsedRef.current && isCollapsed) {
-				onCollapse?.();
-			} else if (prevCollapsedRef.current && !isCollapsed) {
-				onExpand?.();
-			}
-		}
-		prevCollapsedRef.current = isCollapsed;
-	};
-
 	return (
-		<LibPanel panelRef={libPanelRef} onResize={handleResize} {...props}>
+		<LibPanel panelRef={libPanelRef} onResize={onResize} {...props}>
 			{children}
 		</LibPanel>
 	);

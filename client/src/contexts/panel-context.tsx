@@ -6,6 +6,8 @@ import {
 	useCallback,
 	useMemo,
 	useState,
+	useEffect,
+	useRef,
 	type ReactNode,
 	type Dispatch,
 	type SetStateAction,
@@ -36,6 +38,8 @@ interface PanelControls {
 interface PanelContextValue {
 	sidebar: PanelControls;
 	terminal: PanelControls;
+	setSidebarCollapsedState: (collapsed: boolean) => void;
+	setTerminalCollapsedState: (collapsed: boolean) => void;
 	setSidebarPanelRef: Dispatch<SetStateAction<PanelImperativeHandle | null>>;
 	setTerminalPanelRef: Dispatch<SetStateAction<PanelImperativeHandle | null>>;
 	persistHorizontalSizes: (sizes: number[]) => void;
@@ -78,6 +82,8 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	const [vSizes] = useAtom(mainVerticalSizesAtom);
 	const setHSizes = useSetAtom(mainHorizontalSizesAtom);
 	const setVSizes = useSetAtom(mainVerticalSizesAtom);
+	const sidebarInitializedRef = useRef(false);
+	const terminalInitializedRef = useRef(false);
 
 	// ========================================================================
 	// Sidebar Controls
@@ -90,10 +96,15 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
-		sidebarPanel?.expand();
+		const restoreSize =
+			hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+		if (sidebarPanel?.isCollapsed()) {
+			sidebarPanel.expand();
+		}
+		sidebarPanel?.resize(restoreSize);
 		setSidebarCollapsed(false);
 		setSidebarMaximized(false);
-	}, [sidebarPanel, setSidebarCollapsed]);
+	}, [sidebarPanel, setSidebarCollapsed, hSizes]);
 
 	const toggleSidebar = useCallback(() => {
 		if (sidebarCollapsed) {
@@ -112,7 +123,9 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		} else {
 			setSidebarMaximized(true);
 			setSidebarCollapsed(false);
-			sidebarPanel?.expand();
+			if (sidebarPanel?.isCollapsed()) {
+				sidebarPanel.expand();
+			}
 			sidebarPanel?.resize(parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize));
 		}
 	}, [sidebarMaximized, sidebarPanel, hSizes, setSidebarCollapsed]);
@@ -128,10 +141,15 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [terminalPanel, setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
-		terminalPanel?.expand();
+		const restoreSize =
+			vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+		if (terminalPanel?.isCollapsed()) {
+			terminalPanel.expand();
+		}
+		terminalPanel?.resize(restoreSize);
 		setTerminalCollapsed(false);
 		setTerminalMaximized(false);
-	}, [terminalPanel, setTerminalCollapsed]);
+	}, [terminalPanel, setTerminalCollapsed, vSizes]);
 
 	const toggleTerminal = useCallback(() => {
 		if (terminalCollapsed) {
@@ -150,7 +168,9 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		} else {
 			setTerminalMaximized(true);
 			setTerminalCollapsed(false);
-			terminalPanel?.expand();
+			if (terminalPanel?.isCollapsed()) {
+				terminalPanel.expand();
+			}
 			terminalPanel?.resize(parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize));
 		}
 	}, [terminalMaximized, terminalPanel, vSizes, setTerminalCollapsed]);
@@ -177,6 +197,48 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		[setVSizes],
 	);
 
+	const setSidebarCollapsedState = useCallback(
+		(collapsed: boolean) => {
+			setSidebarCollapsed(collapsed);
+			if (collapsed) setSidebarMaximized(false);
+		},
+		[setSidebarCollapsed],
+	);
+
+	const setTerminalCollapsedState = useCallback(
+		(collapsed: boolean) => {
+			setTerminalCollapsed(collapsed);
+			if (collapsed) setTerminalMaximized(false);
+		},
+		[setTerminalCollapsed],
+	);
+
+	useEffect(() => {
+		if (!sidebarPanel || sidebarInitializedRef.current) return;
+		sidebarInitializedRef.current = true;
+		if (sidebarCollapsed) {
+			sidebarPanel.collapse();
+			return;
+		}
+		const restoreSize =
+			hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+		sidebarPanel.expand();
+		sidebarPanel.resize(restoreSize);
+	}, [sidebarPanel, sidebarCollapsed, hSizes]);
+
+	useEffect(() => {
+		if (!terminalPanel || terminalInitializedRef.current) return;
+		terminalInitializedRef.current = true;
+		if (terminalCollapsed) {
+			terminalPanel.collapse();
+			return;
+		}
+		const restoreSize =
+			vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+		terminalPanel.expand();
+		terminalPanel.resize(restoreSize);
+	}, [terminalPanel, terminalCollapsed, vSizes]);
+
 	// ========================================================================
 	// Context Value
 	// ========================================================================
@@ -199,6 +261,8 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 				isCollapsed: terminalCollapsed,
 				isMaximized: terminalMaximized,
 			},
+			setSidebarCollapsedState,
+			setTerminalCollapsedState,
 			setSidebarPanelRef,
 			setTerminalPanelRef,
 			persistHorizontalSizes,
@@ -217,6 +281,8 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 			toggleMaximizeTerminal,
 			terminalCollapsed,
 			terminalMaximized,
+			setSidebarCollapsedState,
+			setTerminalCollapsedState,
 			setSidebarPanelRef,
 			setTerminalPanelRef,
 			persistHorizontalSizes,

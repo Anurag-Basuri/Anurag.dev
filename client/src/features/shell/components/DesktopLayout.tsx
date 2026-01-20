@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic';
 import { usePanelControls } from '@/contexts/panel-context';
 import { useAtomValue } from 'jotai';
 import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
+import type { PanelSize } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -31,6 +32,8 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 		terminal,
 		setSidebarPanelRef,
 		setTerminalPanelRef,
+		setSidebarCollapsedState,
+		setTerminalCollapsedState,
 		persistHorizontalSizes,
 		persistVerticalSizes,
 	} = usePanelControls();
@@ -55,6 +58,25 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 		[persistVerticalSizes],
 	);
 
+	const sidebarCollapsedSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize);
+	const terminalCollapsedSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize);
+
+	const handleSidebarResize = useCallback(
+		(size: PanelSize) => {
+			const isCollapsed = size.asPercentage <= sidebarCollapsedSize + 0.5;
+			setSidebarCollapsedState(isCollapsed);
+		},
+		[setSidebarCollapsedState, sidebarCollapsedSize],
+	);
+
+	const handleTerminalResize = useCallback(
+		(size: PanelSize) => {
+			const isCollapsed = size.asPercentage <= terminalCollapsedSize + 0.5;
+			setTerminalCollapsedState(isCollapsed);
+		},
+		[setTerminalCollapsedState, terminalCollapsedSize],
+	);
+
 	return (
 		<Group
 			id="portfolio-main-h"
@@ -70,8 +92,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 				maxSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize)}
 				collapsible
 				collapsedSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize)}
-				onCollapse={sidebar.collapse}
-				onExpand={sidebar.expand}
+				onResize={handleSidebarResize}
 				className={cn(
 					PANEL_STYLES.base,
 					PANEL_STYLES.sidebar,
@@ -115,8 +136,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 						maxSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize)}
 						collapsible
 						collapsedSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize)}
-						onCollapse={terminal.collapse}
-						onExpand={terminal.expand}
+						onResize={handleTerminalResize}
 						className={cn(
 							PANEL_STYLES.base,
 							PANEL_STYLES.terminal,
