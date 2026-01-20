@@ -82,8 +82,6 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	const [vSizes] = useAtom(mainVerticalSizesAtom);
 	const setHSizes = useSetAtom(mainHorizontalSizesAtom);
 	const setVSizes = useSetAtom(mainVerticalSizesAtom);
-	const sidebarInitializedRef = useRef(false);
-	const terminalInitializedRef = useRef(false);
 
 	// ========================================================================
 	// Sidebar Controls
@@ -96,8 +94,7 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [sidebarPanel, setSidebarCollapsed]);
 
 	const expandSidebar = useCallback(() => {
-		const restoreSize =
-			hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+		const restoreSize = hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
 		if (sidebarPanel?.isCollapsed()) {
 			sidebarPanel.expand();
 		}
@@ -141,8 +138,7 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	}, [terminalPanel, setTerminalCollapsed]);
 
 	const expandTerminal = useCallback(() => {
-		const restoreSize =
-			vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+		const restoreSize = vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
 		if (terminalPanel?.isCollapsed()) {
 			terminalPanel.expand();
 		}
@@ -213,30 +209,64 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		[setTerminalCollapsed],
 	);
 
+	// ========================================================================
+	// Sync Jotai state → Library state (continuous, not just initialization)
+	// ========================================================================
+
+	// Track if we're in the middle of a programmatic action to avoid feedback loops
+	const sidebarActionRef = useRef(false);
+	const terminalActionRef = useRef(false);
+
+	// Sync sidebar collapsed state to library
 	useEffect(() => {
-		if (!sidebarPanel || sidebarInitializedRef.current) return;
-		sidebarInitializedRef.current = true;
-		if (sidebarCollapsed) {
-			sidebarPanel.collapse();
+		if (!sidebarPanel) return;
+
+		// Prevent feedback loop - only act if this is a state-driven change
+		if (sidebarActionRef.current) {
+			sidebarActionRef.current = false;
 			return;
 		}
-		const restoreSize =
-			hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
-		sidebarPanel.expand();
-		sidebarPanel.resize(restoreSize);
+
+		const libraryIsCollapsed = sidebarPanel.isCollapsed();
+
+		// Only sync if there's a mismatch
+		if (sidebarCollapsed !== libraryIsCollapsed) {
+			sidebarActionRef.current = true;
+			if (sidebarCollapsed) {
+				sidebarPanel.collapse();
+			} else {
+				const restoreSize =
+					hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+				sidebarPanel.expand();
+				sidebarPanel.resize(restoreSize);
+			}
+		}
 	}, [sidebarPanel, sidebarCollapsed, hSizes]);
 
+	// Sync terminal collapsed state to library
 	useEffect(() => {
-		if (!terminalPanel || terminalInitializedRef.current) return;
-		terminalInitializedRef.current = true;
-		if (terminalCollapsed) {
-			terminalPanel.collapse();
+		if (!terminalPanel) return;
+
+		// Prevent feedback loop
+		if (terminalActionRef.current) {
+			terminalActionRef.current = false;
 			return;
 		}
-		const restoreSize =
-			vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
-		terminalPanel.expand();
-		terminalPanel.resize(restoreSize);
+
+		const libraryIsCollapsed = terminalPanel.isCollapsed();
+
+		// Only sync if there's a mismatch
+		if (terminalCollapsed !== libraryIsCollapsed) {
+			terminalActionRef.current = true;
+			if (terminalCollapsed) {
+				terminalPanel.collapse();
+			} else {
+				const restoreSize =
+					vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+				terminalPanel.expand();
+				terminalPanel.resize(restoreSize);
+			}
+		}
 	}, [terminalPanel, terminalCollapsed, vSizes]);
 
 	// ========================================================================
