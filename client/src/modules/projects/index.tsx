@@ -343,31 +343,6 @@ export function ProjectsModule() {
 													))}
 												</div>
 											</div>
-
-											{/* Features */}
-											{selectedProject.features && (
-												<div className="space-y-4">
-													<div className="flex items-center gap-2 text-xs font-bold text-emerald-500 uppercase tracking-[0.2em]">
-														<Star className="w-4 h-4" />
-														<span>Key Highlights</span>
-													</div>
-													<ul className="grid grid-cols-1 gap-3">
-														{selectedProject.features.map(
-															(feature, idx) => (
-																<li
-																	key={idx}
-																	className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-white/5"
-																>
-																	<div className="mt-1 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-																	<span className="text-sm text-white/70 leading-relaxed">
-																		{feature}
-																	</span>
-																</li>
-															),
-														)}
-													</ul>
-												</div>
-											)}
 										</div>
 									</ScrollArea>
 

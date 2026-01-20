@@ -17,8 +17,6 @@ export interface Project {
 	featured: boolean;
 	priority: number;
 
-	features?: string[];
-
 	stars?: number | null;
 	forks?: number | null;
 
