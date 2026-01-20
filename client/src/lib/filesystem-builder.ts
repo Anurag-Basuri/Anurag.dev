@@ -9,9 +9,7 @@ const joinPath = (parent: string, child: string) => {
 };
 
 export const FileSystemBuilder = {
-	/**
-	 * Creates a folder with children, handling ID prefixing automatically.
-	 */
+	// Creates a folder with children, handling ID prefixing automatically.
 	folder: (
 		name: string,
 		id: string,
@@ -30,9 +28,7 @@ export const FileSystemBuilder = {
 		};
 	},
 
-	/**
-	 * Creates a simple file.
-	 */
+	// Creates a simple file.
 	file: (name: string, content: string = ''): ((parentId: string) => FileSystemItem) => {
 		return (parentId: string) => ({
 			name,
@@ -42,10 +38,7 @@ export const FileSystemBuilder = {
 		});
 	},
 
-	/**
-	 * Creates an executable app shortcut.
-	 * Enforces valid moduleId.
-	 */
+	// Creates an executable app shortcut.
 	app: (
 		moduleId: AppModuleId,
 		overrides?: Partial<FileSystemItem>,
