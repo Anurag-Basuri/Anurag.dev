@@ -126,7 +126,10 @@ export const TopBar = memo(function TopBar({
 										className="w-3 h-3 text-primary/70 group-hover:text-primary transition-colors"
 										aria-hidden="true"
 									/>
-									<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums group-hover:text-foreground transition-colors">
+									<span
+										className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums group-hover:text-foreground transition-colors"
+										suppressHydrationWarning
+									>
 										{currentTime}
 									</span>
 								</div>
@@ -150,7 +153,10 @@ export const TopBar = memo(function TopBar({
 									aria-live="polite"
 								>
 									<Clock className="w-3 h-3 text-primary/70" aria-hidden="true" />
-									<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums">
+									<span
+										className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums"
+										suppressHydrationWarning
+									>
 										{currentTime}
 									</span>
 								</div>
