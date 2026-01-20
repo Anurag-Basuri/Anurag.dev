@@ -3,25 +3,14 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
-import {
-	Menu,
-	Terminal as TerminalIcon,
-	ChevronDown,
-	Clock,
-	Wifi,
-	WifiOff,
-	Battery,
-	Folder,
-	FolderOpen,
-} from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree, SidebarProfile } from '@/features/sidebar';
-import { INITIAL_FILE_SYSTEM, type FileSystemItem } from '@/data/filesystem';
-import { cn } from '@/lib/utils';
+import { type FileSystemItem } from '@/data/filesystem';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
+import { StatusBar } from './StatusBar';
+import { MobileExplorerSheet } from './MobileExplorerSheet';
+import { ControlPanel } from './ControlPanel';
 
 interface TopBarProps {
 	isMobile: boolean;
@@ -43,7 +32,7 @@ export const TopBar = memo(function TopBar({
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 
-	// Keep UI same, but disconnect "backend-ish" integrations.
+	// Static values for UI consistency
 	const batteryLevel = 100;
 	const isOnline = true;
 
@@ -95,55 +84,11 @@ export const TopBar = memo(function TopBar({
 				{/* Left Section */}
 				<div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 min-w-0">
 					{isMobile && (
-						<Sheet open={isExplorerOpen} onOpenChange={setIsExplorerOpen}>
-							<SheetTrigger asChild>
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<button
-											className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring/40 min-h-[44px] min-w-[44px] flex items-center justify-center active:scale-95"
-											aria-label="Open file explorer"
-										>
-											<Menu className="w-5 h-5" aria-hidden="true" />
-										</button>
-									</TooltipTrigger>
-									<TooltipContent side="bottom">
-										<p>Open Explorer</p>
-									</TooltipContent>
-								</Tooltip>
-							</SheetTrigger>
-
-							<SheetContent
-								side="left"
-								className="w-[min(320px,85vw)] p-0 bg-background/95 backdrop-blur-xl border-r border-border/20 flex flex-col"
-							>
-								<SheetTitle className="sr-only">File Explorer</SheetTitle>
-
-								<div className="shrink-0">
-									<SidebarProfile />
-								</div>
-
-								<div className="flex-1 overflow-hidden">
-									<ScrollArea className="h-full">
-										<div className="p-4">
-											<FolderTree
-												items={INITIAL_FILE_SYSTEM}
-												onSelect={item => {
-													onFileSelect(item);
-													setIsExplorerOpen(false);
-												}}
-											/>
-										</div>
-									</ScrollArea>
-								</div>
-
-								<div className="p-4 border-t border-border/50 flex items-center justify-between bg-muted/30">
-									<span className="text-xs text-muted-foreground font-medium">
-										Theme
-									</span>
-									<ThemeToggle />
-								</div>
-							</SheetContent>
-						</Sheet>
+						<MobileExplorerSheet
+							isOpen={isExplorerOpen}
+							onOpenChange={setIsExplorerOpen}
+							onFileSelect={onFileSelect}
+						/>
 					)}
 
 					{/* Branding */}
@@ -159,7 +104,6 @@ export const TopBar = memo(function TopBar({
 									priority
 								/>
 							</div>
-
 							<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-foreground/90 group-hover:text-foreground transition-colors truncate">
 								ANURAG&apos;S <span className="text-primary">PORTFOLIO</span>
 							</span>
@@ -167,7 +111,7 @@ export const TopBar = memo(function TopBar({
 					)}
 				</div>
 
-				{/* Center Section: Clock (Desktop centered, Mobile in right section) */}
+				{/* Center Section: Clock (Desktop only) */}
 				{!isMobile && (
 					<div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
 						<Tooltip>
@@ -196,7 +140,7 @@ export const TopBar = memo(function TopBar({
 
 				{/* Right Section */}
 				<div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
-					{/* Mobile Clock - Compact version */}
+					{/* Mobile Clock */}
 					{isMobile && (
 						<Tooltip>
 							<TooltipTrigger asChild>
@@ -217,194 +161,23 @@ export const TopBar = memo(function TopBar({
 						</Tooltip>
 					)}
 
-					{/* System Status Indicators - Tablet/Desktop */}
-					<div className="hidden md:flex items-center gap-2 lg:gap-2.5 px-2 lg:px-2.5 py-0.5 rounded-full bg-muted/50 border border-border/50 h-6 hover:bg-muted transition-colors duration-200">
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div
-									className="flex items-center gap-1.5 cursor-help"
-									role="status"
-								>
-									{isOnline ? (
-										<span
-											className="relative flex h-2.5 w-2.5"
-											aria-label="System online"
-										>
-											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-											<span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary shadow-[0_0_8px_var(--primary)]" />
-										</span>
-									) : (
-										<span
-											className="relative flex h-2.5 w-2.5 bg-destructive rounded-full"
-											aria-label="System offline"
-										/>
-									)}
-									<span className="text-[9px] uppercase font-bold tracking-[0.15em] text-muted-foreground">
-										{isOnline ? 'Online' : 'Offline'}
-									</span>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p>
-									{isOnline ? 'System is online and ready' : 'System is offline'}
-								</p>
-							</TooltipContent>
-						</Tooltip>
+					{/* System Status Indicators - Desktop */}
+					<StatusBar isOnline={isOnline} batteryLevel={batteryLevel} />
 
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<button
-									className="focus:outline-none focus:ring-2 focus:ring-ring/40 rounded-full p-0.5 hover:scale-110 transition-transform duration-200"
-									aria-label="Network status"
-								>
-									{isOnline ? (
-										<Wifi
-											className="w-3 h-3 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-											aria-hidden="true"
-										/>
-									) : (
-										<WifiOff
-											className="w-3 h-3 text-destructive/60"
-											aria-hidden="true"
-										/>
-									)}
-								</button>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p>{isOnline ? 'Network Connected' : 'Network Disconnected'}</p>
-							</TooltipContent>
-						</Tooltip>
-
-						{batteryLevel < 100 && (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										className="focus:outline-none focus:ring-2 focus:ring-ring/40 rounded-full p-0.5 flex items-center gap-1 hover:scale-105 transition-transform duration-200"
-										aria-label={`Battery level ${batteryLevel}%`}
-									>
-										<Battery
-											className={cn(
-												'w-3 h-3',
-												batteryLevel > 20
-													? 'text-muted-foreground/60'
-													: 'text-destructive',
-											)}
-											aria-hidden="true"
-										/>
-										<span className="text-[8px] font-mono text-muted-foreground/60">
-											{batteryLevel}%
-										</span>
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>Battery: {batteryLevel}%</p>
-								</TooltipContent>
-							</Tooltip>
-						)}
-					</div>
-
-					{/* Theme Toggle - visible on every screen size */}
+					{/* Theme Toggle */}
 					<div className="flex items-center">
 						<ThemeToggle />
 					</div>
 
-					{/* Control Panel - Tablet/Desktop */}
+					{/* Control Panel - Desktop */}
 					{!isMobile && (
-						<nav
-							className="flex items-center gap-0.5 sm:gap-1 bg-muted/30 p-0.5 sm:p-1 rounded-lg border border-border/50 shadow-sm"
-							role="navigation"
-							aria-label="View controls"
-						>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={handleContactClick}
-										className="h-6 px-2 sm:px-2.5 rounded-md bg-primary/10 hover:bg-primary/20 hover:shadow-md text-[9px] font-bold uppercase tracking-wider text-primary hover:text-primary transition-all duration-200 border border-primary/20 hover:border-primary/30 focus:outline-none focus:ring-2 focus:ring-ring/60 active:scale-95 hover:scale-105"
-										aria-label="Open contact form"
-									>
-										Contact
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>Get in touch</p>
-								</TooltipContent>
-							</Tooltip>
-
-							<div
-								className="w-px h-3.5 bg-border/50 mx-0.5 sm:mx-1"
-								aria-hidden="true"
-							/>
-
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={onToggleSidebar}
-										className={cn(
-											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-border/50 focus:outline-none focus:ring-2 focus:ring-ring/60 active:scale-95 hover:scale-105',
-											sidebarCollapsed
-												? 'text-muted-foreground hover:text-foreground hover:bg-muted'
-												: 'text-primary bg-primary/10 shadow-sm hover:bg-primary/20',
-										)}
-										aria-label={
-											sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
-										}
-										aria-pressed={!sidebarCollapsed}
-									>
-										{sidebarCollapsed ? (
-											<Folder className="w-3.5 h-3.5" aria-hidden="true" />
-										) : (
-											<FolderOpen
-												className="w-3.5 h-3.5"
-												aria-hidden="true"
-											/>
-										)}
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>
-										{sidebarCollapsed ? 'Expand' : 'Collapse'} Sidebar
-										<span className="ml-2 text-xs text-muted-foreground">
-											Ctrl+B
-										</span>
-									</p>
-								</TooltipContent>
-							</Tooltip>
-
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<button
-										onClick={onToggleTerminal}
-										className={cn(
-											'h-6 w-7 flex items-center justify-center rounded-md transition-all duration-200 border border-border/50 focus:outline-none focus:ring-2 focus:ring-ring/60 active:scale-95 hover:scale-105',
-											terminalCollapsed
-												? 'text-muted-foreground hover:text-foreground hover:bg-muted'
-												: 'text-primary bg-primary/10 shadow-sm hover:bg-primary/20',
-										)}
-										aria-label={
-											terminalCollapsed
-												? 'Expand terminal'
-												: 'Collapse terminal'
-										}
-										aria-pressed={!terminalCollapsed}
-									>
-										{terminalCollapsed ? (
-											<TerminalIcon
-												className="w-3.5 h-3.5"
-												aria-hidden="true"
-											/>
-										) : (
-											<ChevronDown
-												className="w-3.5 h-3.5"
-												aria-hidden="true"
-											/>
-										)}
-									</button>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>{terminalCollapsed ? 'Expand' : 'Collapse'} Terminal</p>
-								</TooltipContent>
-							</Tooltip>
-						</nav>
+						<ControlPanel
+							sidebarCollapsed={sidebarCollapsed}
+							terminalCollapsed={terminalCollapsed}
+							onToggleSidebar={onToggleSidebar}
+							onToggleTerminal={onToggleTerminal}
+							onContactClick={handleContactClick}
+						/>
 					)}
 				</div>
 			</header>
