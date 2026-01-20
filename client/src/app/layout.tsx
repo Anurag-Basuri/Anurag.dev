@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import { JotaiProvider } from '@/components/providers/jotai-provider';
 import { BootGuard } from '@/components/layout/BootGuard';
 import { Inter } from 'next/font/google';
+import { siteConfig, siteKeywords } from '@/lib/siteConfig';
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -13,48 +14,36 @@ const inter = Inter({
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Anurag Basuri | Software Developer',
-		template: '%s | Anurag Basuri',
+		default: siteConfig.title,
+		template: `%s | ${siteConfig.name}`,
 	},
-	description:
-		'Full-stack engineer passionate about building elegant solutions. Explore my portfolio of web applications, AI experiments, and technical articles.',
-	keywords: [
-		'Anurag Basuri',
-		'Full Stack Engineer',
-		'Web Developer',
-		'Portfolio',
-		'React',
-		'Next.js',
-		'TypeScript',
-		'AI',
-		'Machine Learning',
-	],
-	authors: [{ name: 'Anurag Basuri', url: 'https://github.com/Anurag-Basuri' }],
-	creator: 'Anurag Basuri',
-	metadataBase: new URL('https://anuragbasuri.com'),
+	description: siteConfig.description,
+	keywords: siteKeywords,
+	authors: [{ name: siteConfig.name, url: siteConfig.links.github }],
+	creator: siteConfig.creator,
+	metadataBase: new URL(siteConfig.url),
 	openGraph: {
 		type: 'website',
 		locale: 'en_US',
-		url: 'https://anuragbasuri.com',
-		siteName: 'Anurag Basuri Portfolio',
-		title: 'Anurag Basuri | Full Stack Engineer',
-		description:
-			'Full-stack engineer passionate about building elegant solutions. Explore my portfolio of web applications, AI experiments, and technical articles.',
+		url: siteConfig.url,
+		siteName: `${siteConfig.name} Portfolio`,
+		title: siteConfig.title,
+		description: siteConfig.description,
 		images: [
 			{
-				url: '/og-image.png',
+				url: siteConfig.ogImage,
 				width: 1200,
 				height: 630,
-				alt: 'Anurag Basuri Portfolio',
+				alt: `${siteConfig.name} Portfolio`,
 			},
 		],
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Anurag Basuri | Full Stack Engineer',
-		description: 'Full-stack engineer passionate about building elegant solutions.',
-		creator: '@AnuragBasuri',
-		images: ['/og-image.png'],
+		title: siteConfig.title,
+		description: siteConfig.description,
+		creator: siteConfig.links.twitter,
+		images: [siteConfig.ogImage],
 	},
 	robots: {
 		index: true,
@@ -114,7 +103,6 @@ export default function RootLayout({
 								opacity: 0;
 								pointer-events: none;
 							}
-							/* Hide the overlay once React hydrates and BootScreen takes over */
 							body.hydrated::before {
 								opacity: 0;
 							}
