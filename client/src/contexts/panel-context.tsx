@@ -210,63 +210,36 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 	);
 
 	// ========================================================================
-	// Sync Jotai state → Library state (continuous, not just initialization)
+	// One-time sync Jotai state → Library state (initial mount only)
 	// ========================================================================
 
-	// Track if we're in the middle of a programmatic action to avoid feedback loops
-	const sidebarActionRef = useRef(false);
-	const terminalActionRef = useRef(false);
+	const sidebarInitializedRef = useRef(false);
+	const terminalInitializedRef = useRef(false);
 
-	// Sync sidebar collapsed state to library
 	useEffect(() => {
-		if (!sidebarPanel) return;
-
-		// Prevent feedback loop - only act if this is a state-driven change
-		if (sidebarActionRef.current) {
-			sidebarActionRef.current = false;
+		if (!sidebarPanel || sidebarInitializedRef.current) return;
+		sidebarInitializedRef.current = true;
+		if (sidebarCollapsed) {
+			sidebarPanel.collapse();
 			return;
 		}
-
-		const libraryIsCollapsed = sidebarPanel.isCollapsed();
-
-		// Only sync if there's a mismatch
-		if (sidebarCollapsed !== libraryIsCollapsed) {
-			sidebarActionRef.current = true;
-			if (sidebarCollapsed) {
-				sidebarPanel.collapse();
-			} else {
-				const restoreSize =
-					hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
-				sidebarPanel.expand();
-				sidebarPanel.resize(restoreSize);
-			}
-		}
+		const restoreSize =
+			hSizes?.[0] ?? parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.defaultSize);
+		sidebarPanel.expand();
+		sidebarPanel.resize(restoreSize);
 	}, [sidebarPanel, sidebarCollapsed, hSizes]);
 
-	// Sync terminal collapsed state to library
 	useEffect(() => {
-		if (!terminalPanel) return;
-
-		// Prevent feedback loop
-		if (terminalActionRef.current) {
-			terminalActionRef.current = false;
+		if (!terminalPanel || terminalInitializedRef.current) return;
+		terminalInitializedRef.current = true;
+		if (terminalCollapsed) {
+			terminalPanel.collapse();
 			return;
 		}
-
-		const libraryIsCollapsed = terminalPanel.isCollapsed();
-
-		// Only sync if there's a mismatch
-		if (terminalCollapsed !== libraryIsCollapsed) {
-			terminalActionRef.current = true;
-			if (terminalCollapsed) {
-				terminalPanel.collapse();
-			} else {
-				const restoreSize =
-					vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
-				terminalPanel.expand();
-				terminalPanel.resize(restoreSize);
-			}
-		}
+		const restoreSize =
+			vSizes?.[1] ?? parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.defaultSize);
+		terminalPanel.expand();
+		terminalPanel.resize(restoreSize);
 	}, [terminalPanel, terminalCollapsed, vSizes]);
 
 	// ========================================================================
