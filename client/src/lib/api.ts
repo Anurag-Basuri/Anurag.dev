@@ -26,6 +26,13 @@ export type {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
+// Circuit Breaker Configuration
+const CIRCUIT_BREAKER_CONFIG = {
+	FAILURE_THRESHOLD: 3, // Number of failures before opening circuit
+	RESET_TIMEOUT: 60000, // Wait 1 minute before trying backend again
+	REQUEST_TIMEOUT: 3000, // 3s before aborting a request
+};
+
 // Error type classification for better debugging
 function classifyError(error: unknown): string {
 	if (error instanceof Error) {
@@ -37,17 +44,48 @@ function classifyError(error: unknown): string {
 }
 
 class ApiService {
+	private failures: number = 0;
+	private circuitOpen: boolean = false;
+	private nextTry: number = 0;
+	private isOnline: boolean = false; // Optimistic initial state, updates on interaction
+
+	// Returns the current status of the API service
+	public getStatus(): { online: boolean; usingFallback: boolean } {
+		return {
+			online: this.isOnline,
+			usingFallback: this.circuitOpen,
+		};
+	}
+
+	// Main wrapper for data fetching with Circuit Breaker pattern.
 	private async fetchWithFallback<T>(endpoint: string, fallbackData: T): Promise<T> {
+		const now = Date.now();
+
+		// 1. Fast Fail: If circuit is open and we haven't waited long enough, return fallback immediately.
+		if (this.circuitOpen) {
+			if (now < this.nextTry) {
+				return fallbackData;
+			} else {
+				// Cooldown over, let's try one request to see if it's back
+				this.circuitOpen = false;
+				this.failures = 0;
+			}
+		}
+
 		try {
-			// Set a short timeout for the check so we don't block the UI too long
+			// 2. Attempt Request
 			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+			const timeoutId = setTimeout(
+				() => controller.abort(),
+				CIRCUIT_BREAKER_CONFIG.REQUEST_TIMEOUT,
+			);
 
 			const response = await fetch(`${API_BASE_URL}${endpoint}`, {
 				signal: controller.signal,
 				headers: {
 					'Content-Type': 'application/json',
 				},
+				cache: 'no-store',
 			});
 
 			clearTimeout(timeoutId);
@@ -56,14 +94,33 @@ class ApiService {
 				throw new Error(`API Error: ${response.statusText}`);
 			}
 
+			// 3. Success: Reset failure counters
 			const data = await response.json();
+			this.failures = 0;
+			this.isOnline = true;
 			return data as T;
 		} catch (error) {
 			const errorType = classifyError(error);
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-			// Log with error classification for easier debugging
-			console.warn(`[API:${errorType}] ${endpoint} failed: ${errorMessage}. Using fallback.`);
+			// 4. Handle Failure
+			this.failures++;
+
+			if (this.failures >= CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD) {
+				this.circuitOpen = true;
+				this.nextTry = Date.now() + CIRCUIT_BREAKER_CONFIG.RESET_TIMEOUT;
+				this.isOnline = false;
+				console.warn(
+					`[Circuit Breaker] Opened. Backend considered offline for ${
+						CIRCUIT_BREAKER_CONFIG.RESET_TIMEOUT / 1000
+					}s. Reason: ${errorMessage}`,
+				);
+			} else {
+				console.warn(
+					`[API:${errorType}] ${endpoint} failed (${this.failures}/${CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD}): ${errorMessage}`,
+				);
+			}
+
 			return fallbackData;
 		}
 	}
@@ -93,6 +150,13 @@ class ApiService {
 	}
 
 	async submitContact(data: ContactMessage): Promise<{ success: boolean; message: string }> {
+		if (this.circuitOpen) {
+			return {
+				success: false,
+				message: 'System is offline. Message recorded locally (Simulated).',
+			};
+		}
+
 		try {
 			const controller = new AbortController();
 			const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout for POST
@@ -115,12 +179,15 @@ class ApiService {
 			const errorType = classifyError(error);
 			console.warn(`[API:${errorType}] Contact form submission failed.`);
 
-			const message =
-				errorType === 'TIMEOUT'
-					? 'Request timed out. Please try again.'
-					: 'Offline mode: Message logged (simulated).';
-
-			return { success: false, message };
+			// Special handling for contact form: We don't necessarily want to open the circuit just for one failed POST,
+			// but we can if we want to be strict. For now, just return error.
+			return {
+				success: false,
+				message:
+					errorType === 'TIMEOUT'
+						? 'Request timed out. Please try again.'
+						: 'Unable to reach server. Please try again later.',
+			};
 		}
 	}
 }
