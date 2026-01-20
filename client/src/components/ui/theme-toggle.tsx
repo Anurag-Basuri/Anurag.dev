@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export function ThemeToggle() {
@@ -22,47 +22,64 @@ export function ThemeToggle() {
 
 	return (
 		<div className="relative">
-			<TooltipProvider delayDuration={500} skipDelayDuration={200}>
+			<TooltipProvider delayDuration={400}>
 				<Tooltip>
 					<TooltipTrigger asChild>
 						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							whileHover={{ scale: 1.08 }}
+							whileTap={{ scale: 0.92 }}
 							onClick={() => setTheme(isDark ? 'light' : 'dark')}
-							className="relative h-8 w-8 rounded-md bg-muted/50 hover:bg-muted border border-border/50 hover:border-border flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-ring/40"
+							className="relative h-8 w-8 rounded-lg bg-muted/60 hover:bg-muted border border-border/60 hover:border-primary/40 flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-ring/50 overflow-hidden"
 							aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
 						>
-							{/* Sun icon - visible in dark mode */}
+							{/* Ambient glow effect */}
 							<motion.div
-								className="absolute inset-0 flex items-center justify-center"
-								initial={false}
+								className="absolute inset-0 rounded-lg"
 								animate={{
-									rotate: isDark ? 0 : -90,
-									scale: isDark ? 1 : 0,
-									opacity: isDark ? 1 : 0,
+									boxShadow: isDark
+										? 'inset 0 0 12px rgba(251, 191, 36, 0.15)'
+										: 'inset 0 0 12px rgba(99, 102, 241, 0.12)',
 								}}
-								transition={{ duration: 0.2 }}
-							>
-								<Sun className="h-4 w-4 text-amber-400" />
-							</motion.div>
+								transition={{ duration: 0.4 }}
+							/>
 
-							{/* Moon icon - visible in light mode */}
-							<motion.div
-								className="absolute inset-0 flex items-center justify-center"
-								initial={false}
-								animate={{
-									rotate: isDark ? 90 : 0,
-									scale: isDark ? 0 : 1,
-									opacity: isDark ? 0 : 1,
-								}}
-								transition={{ duration: 0.2 }}
-							>
-								<Moon className="h-4 w-4 text-primary" />
-							</motion.div>
+							<AnimatePresence mode="wait" initial={false}>
+								{isDark ? (
+									<motion.div
+										key="sun"
+										initial={{ rotate: -90, scale: 0, opacity: 0 }}
+										animate={{ rotate: 0, scale: 1, opacity: 1 }}
+										exit={{ rotate: 90, scale: 0, opacity: 0 }}
+										transition={{
+											type: 'spring',
+											stiffness: 200,
+											damping: 15,
+										}}
+										className="absolute"
+									>
+										<Sun className="h-4 w-4 text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" />
+									</motion.div>
+								) : (
+									<motion.div
+										key="moon"
+										initial={{ rotate: 90, scale: 0, opacity: 0 }}
+										animate={{ rotate: 0, scale: 1, opacity: 1 }}
+										exit={{ rotate: -90, scale: 0, opacity: 0 }}
+										transition={{
+											type: 'spring',
+											stiffness: 200,
+											damping: 15,
+										}}
+										className="absolute"
+									>
+										<Moon className="h-4 w-4 text-primary drop-shadow-[0_0_4px_rgba(99,102,241,0.4)]" />
+									</motion.div>
+								)}
+							</AnimatePresence>
 						</motion.button>
 					</TooltipTrigger>
-					<TooltipContent side="bottom">
-						{isDark ? 'Light mode' : 'Dark mode'}
+					<TooltipContent side="bottom" className="text-xs">
+						{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
