@@ -58,6 +58,10 @@ export function CLI() {
 		[state],
 	);
 
+	// Handle focus/blur
+	const handleFocus = useCallback(() => state.setIsFocused(true), [state]);
+	const handleBlur = useCallback(() => state.setIsFocused(false), [state]);
+
 	// Collapsed state
 	if (terminal.isCollapsed) {
 		return (
@@ -138,8 +142,8 @@ export function CLI() {
 				isExecuting={state.isExecuting}
 				onChange={handleInputChange}
 				onKeyDown={handleKeyDown}
-				onFocus={useCallback(() => state.setIsFocused(true), [state])}
-				onBlur={useCallback(() => state.setIsFocused(false), [state])}
+				onFocus={handleFocus}
+				onBlur={handleBlur}
 			/>
 		</div>
 	);
