@@ -30,6 +30,17 @@ A full-stack developer portfolio with a unique terminal-style interface. Feature
 └───────────────┘                  └────────────────┘
 ```
 
+### 🛡️ Hybrid Data Strategy (Circuit Breaker)
+
+The frontend implements an industry-grade **Circuit Breaker** pattern for maximum reliability:
+
+1.  **Online Mode**: Fetches data from the `Fastify` backend.
+2.  **Failover**: If the backend is unreachable (3 consecutive failures), the system "opens the circuit".
+3.  **Offline Mode**: Instantly serves optimized static data from local files (`client/src/data`) with **zero latency**.
+4.  **Auto-Recovery**: Automatically attempts to reconnect to the backend every 60 seconds (half-open state).
+
+This ensures the portfolio **never goes down**, even if the API server crashes or the user loses internet connection.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -180,6 +191,7 @@ Frontend will run on http://localhost:3000
 - ✅ Dark theme with terminal aesthetics
 - 🚧 AI Lab module
 - 🚧 Admin dashboard
+- ✅ Hybrid Data Layer (Circuit Breaker & Offline Support)
 
 ## 🔧 Development
 
