@@ -132,26 +132,6 @@ export const PANEL_STYLES = {
 } as const;
 
 // Legacy export for backwards compatibility
-export const HOVER_STATES = {
-	button: 'hover:bg-white/10 transition-colors',
-	card: 'hover:shadow-lg hover:-translate-y-0.5 transition-all',
-	link: 'hover:text-emerald-400 transition-colors',
-	panel: 'hover:border-emerald-500/20 transition-colors',
-} as const;
-
-export const FOCUS_STATES = {
-	default: 'focus:outline-none focus:ring-2 focus:ring-emerald-500/50',
-	input: 'focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500',
-	button: 'focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2',
-} as const;
-
-export const ACTIVE_STATES = {
-	button: 'active:scale-95',
-	card: 'active:scale-[0.98]',
-	tab: 'border-b-2 border-emerald-500',
-} as const;
-
-// Legacy export for backwards compatibility
 export const ANIMATION_DURATIONS = {
 	fast: TIMINGS.fast / 1000,
 	normal: TIMINGS.normal / 1000,
