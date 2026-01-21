@@ -1,17 +1,13 @@
 'use client';
 
-import { Suspense, useCallback, type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { Loader } from '@/components/common/Loader';
 import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
-import { PANEL_CONFIG } from '@/lib/constants';
 import { PANEL_STYLES, LAYOUT_SPACING } from '../constants';
 import dynamic from 'next/dynamic';
 import { usePanelControls } from '@/contexts/panel-context';
-import { useAtomValue } from 'jotai';
-import { mainHorizontalSizesAtom, mainVerticalSizesAtom } from '@/store';
-import type { PanelSize } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -26,77 +22,32 @@ interface DesktopLayoutProps {
 	children: ReactNode;
 }
 
+// Panel size configuration
+const SIDEBAR = { min: 10, max: 40, default: 20, collapsed: 3 };
+const TERMINAL = { min: 10, max: 80, default: 40, collapsed: 3 };
+const CONTENT = { min: 20 };
+
 export function DesktopLayout({ children }: DesktopLayoutProps) {
-	const {
-		sidebar,
-		terminal,
-		setSidebarPanelRef,
-		setTerminalPanelRef,
-		setSidebarCollapsedState,
-		setTerminalCollapsedState,
-		persistHorizontalSizes,
-		persistVerticalSizes,
-	} = usePanelControls();
-
-	// Read persisted sizes for initial render (read-only)
-	const hSizes = useAtomValue(mainHorizontalSizesAtom);
-	const vSizes = useAtomValue(mainVerticalSizesAtom);
-
-	// Persist sizes when layout changes (fires on resize end)
-	// Library's onLayout provides the final sizes after any resize operation
-	const handleHorizontalLayout = useCallback(
-		(sizes: number[]) => {
-			persistHorizontalSizes(sizes);
-		},
-		[persistHorizontalSizes],
-	);
-
-	const handleVerticalLayout = useCallback(
-		(sizes: number[]) => {
-			persistVerticalSizes(sizes);
-		},
-		[persistVerticalSizes],
-	);
-
-	const sidebarCollapsedSize = parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize);
-	const terminalCollapsedSize = parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize);
-
-	const handleSidebarResize = useCallback(
-		(size: PanelSize) => {
-			const isCollapsed = size.asPercentage <= sidebarCollapsedSize + 0.5;
-			setSidebarCollapsedState(isCollapsed);
-		},
-		[setSidebarCollapsedState, sidebarCollapsedSize],
-	);
-
-	const handleTerminalResize = useCallback(
-		(size: PanelSize) => {
-			const isCollapsed = size.asPercentage <= terminalCollapsedSize + 0.5;
-			setTerminalCollapsedState(isCollapsed);
-		},
-		[setTerminalCollapsedState, terminalCollapsedSize],
-	);
+	const { sidebar, terminal, setSidebarPanelRef, setTerminalPanelRef } = usePanelControls();
 
 	return (
 		<Group
 			id="portfolio-main-h"
 			orientation="horizontal"
 			className={cn('h-full w-full', LAYOUT_SPACING.gap)}
-			onLayout={handleHorizontalLayout}
+			autoSave="portfolio-horizontal"
 		>
 			<Panel
 				id="sidebar"
 				panelRef={setSidebarPanelRef}
-				defaultSize={hSizes?.[0] ?? 20}
-				minSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.minSize)}
-				maxSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.maxSize)}
+				defaultSize={SIDEBAR.default}
+				minSize={SIDEBAR.min}
+				maxSize={SIDEBAR.max}
 				collapsible
-				collapsedSize={parseFloat(PANEL_CONFIG.HORIZONTAL.SIDEBAR.collapsedSize)}
-				onResize={handleSidebarResize}
+				collapsedSize={SIDEBAR.collapsed}
 				className={cn(
 					PANEL_STYLES.base,
 					PANEL_STYLES.sidebar,
-					'shadow-none focus-within:ring-1 focus-within:ring-primary/10',
 					sidebar.isCollapsed && PANEL_STYLES.collapsed,
 				)}
 			>
@@ -109,22 +60,18 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 
 			<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
-			<Panel id="main" defaultSize={hSizes?.[1] ?? 80} minSize={50} className="min-w-0">
+			<Panel id="main" defaultSize={80} minSize={50} className="min-w-0">
 				<Group
 					id="portfolio-main-v"
 					orientation="vertical"
 					className={cn('h-full', LAYOUT_SPACING.gap)}
-					onLayout={handleVerticalLayout}
+					autoSave="portfolio-vertical"
 				>
 					<Panel
 						id="content"
-						defaultSize={vSizes?.[0] ?? 60}
-						minSize={parseFloat(PANEL_CONFIG.VERTICAL.CONTENT.minSize)}
-						className={cn(
-							PANEL_STYLES.base,
-							PANEL_STYLES.content,
-							'min-h-0 ring-1 ring-primary/10',
-						)}
+						defaultSize={60}
+						minSize={CONTENT.min}
+						className={cn(PANEL_STYLES.base, PANEL_STYLES.content, 'min-h-0')}
 					>
 						<ErrorBoundary>
 							<Suspense fallback={<Loader />}>{children}</Suspense>
@@ -136,16 +83,15 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 					<Panel
 						id="terminal"
 						panelRef={setTerminalPanelRef}
-						defaultSize={vSizes?.[1] ?? 40}
-						minSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.minSize)}
-						maxSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.maxSize)}
+						defaultSize={TERMINAL.default}
+						minSize={TERMINAL.min}
+						maxSize={TERMINAL.max}
 						collapsible
-						collapsedSize={parseFloat(PANEL_CONFIG.VERTICAL.TERMINAL.collapsedSize)}
-						onResize={handleTerminalResize}
+						collapsedSize={TERMINAL.collapsed}
 						className={cn(
 							PANEL_STYLES.base,
 							PANEL_STYLES.terminal,
-							'min-h-0 shadow-none focus-within:ring-1 focus-within:ring-primary/10',
+							'min-h-0',
 							terminal.isCollapsed && PANEL_STYLES.collapsed,
 						)}
 					>
