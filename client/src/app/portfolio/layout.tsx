@@ -12,13 +12,11 @@ import { ContextMenuProvider } from '@/components/providers/context-menu-provide
 import dynamic from 'next/dynamic';
 import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
 import { EmptyState } from '@/components/editor/EmptyState';
-import { PanelProvider, usePanelControls } from '@/contexts/panel-context';
 
 // Feature imports
 import { WindowHeader } from '@/features/shell/components/WindowHeader';
 import { PANEL_STYLES, MOTION_PRESETS, LAYOUT_SPACING } from '@/features/shell/constants';
 import { useModuleNavigation } from '@/features/shell/hooks/useModuleNavigation';
-import { useLayoutShortcuts } from '@/features/shell/hooks/useLayoutShortcuts';
 import { DesktopLayout } from '@/features/shell/components/DesktopLayout';
 import { MobileLayout } from '@/features/shell/components/MobileLayout';
 
@@ -39,13 +37,9 @@ const TaskbarDynamic = dynamic(
 	},
 );
 
-// Inner Layout Component
-function PortfolioLayoutInner({ children }: { children: ReactNode }) {
+// Main Layout
+export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
-
-	// Panel controls for TopBar (DesktopLayout uses context internally)
-	const { sidebar, terminal } = usePanelControls();
-
 	const modulePanel = useCollapsiblePanel({ type: 'module' });
 
 	// Safe access to optional properties
@@ -57,13 +51,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 		restore: modulePanel.restore,
 		collapse: modulePanel.collapse,
 		expand: modulePanel.expand,
-	});
-
-	useLayoutShortcuts({
-		toggleSidebar: sidebar.toggle,
-		toggleTerminal: terminal.toggle,
-		isMaximized,
-		restore: modulePanel.restore,
 	});
 
 	// Render module content with header
@@ -91,7 +78,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 	};
 
 	return (
-		<>
+		<ErrorBoundary>
 			{/* Maximized Overlay */}
 			<AnimatePresence mode="wait">
 				{isMaximized && (
@@ -109,14 +96,7 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 			<ContextMenuProvider>
 				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background font-sans selection:bg-primary/30">
 					<Suspense fallback={<Loader height="h-8" />}>
-						<TopBarDynamic
-							isMobile={isMobile}
-							sidebarCollapsed={sidebar.isCollapsed}
-							terminalCollapsed={terminal.isCollapsed}
-							onToggleSidebar={sidebar.toggle}
-							onToggleTerminal={terminal.toggle}
-							onFileSelect={handleFileSelect}
-						/>
+						<TopBarDynamic isMobile={isMobile} onFileSelect={handleFileSelect} />
 					</Suspense>
 
 					<div
@@ -146,17 +126,6 @@ function PortfolioLayoutInner({ children }: { children: ReactNode }) {
 					/>
 				</div>
 			</ContextMenuProvider>
-		</>
-	);
-}
-
-// Main Layout
-export default function PortfolioLayout({ children }: { children: ReactNode }) {
-	return (
-		<ErrorBoundary>
-			<PanelProvider>
-				<PortfolioLayoutInner>{children}</PortfolioLayoutInner>
-			</PanelProvider>
 		</ErrorBoundary>
 	);
 }
