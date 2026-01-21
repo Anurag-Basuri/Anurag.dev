@@ -20,9 +20,16 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 
+	const [mounted, setMounted] = useState(false);
+
 	// Static values for UI consistency
 	const batteryLevel = 100;
 	const isOnline = true;
+
+	// Handle hydration
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
 	// Update time
 	useEffect(() => {
@@ -102,58 +109,62 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 				{/* Center Section: Clock (Desktop only) */}
 				{!isMobile && (
 					<div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div
-									className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/50 shadow-sm hover:bg-muted hover:shadow-md hover:border-primary/20 transition-all duration-200 h-6 cursor-default group"
-									role="timer"
-									aria-live="polite"
-									aria-atomic="true"
-								>
-									<Clock
-										className="w-3 h-3 text-primary/70 group-hover:text-primary transition-colors"
-										aria-hidden="true"
-									/>
-									<span
-										className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums group-hover:text-foreground transition-colors"
-										suppressHydrationWarning
+						{!mounted ? (
+							<div className="h-6 w-16 rounded-full bg-muted/50 animate-pulse" />
+						) : (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div
+										className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/50 shadow-sm hover:bg-muted hover:shadow-md hover:border-primary/20 transition-all duration-200 h-6 cursor-default group"
+										role="timer"
+										aria-live="polite"
+										aria-atomic="true"
 									>
-										{currentTime}
-									</span>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p>System Time</p>
-							</TooltipContent>
-						</Tooltip>
+										<Clock
+											className="w-3 h-3 text-primary/70 group-hover:text-primary transition-colors"
+											aria-hidden="true"
+										/>
+										<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums group-hover:text-foreground transition-colors">
+											{currentTime}
+										</span>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									<p>System Time</p>
+								</TooltipContent>
+							</Tooltip>
+						)}
 					</div>
 				)}
 
 				{/* Right Section */}
 				<div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
 					{/* Mobile Clock */}
-					{isMobile && (
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div
-									className="flex md:hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted/50 border border-border/50 h-6 cursor-default"
-									role="timer"
-									aria-live="polite"
-								>
-									<Clock className="w-3 h-3 text-primary/70" aria-hidden="true" />
-									<span
-										className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums"
-										suppressHydrationWarning
+					{isMobile &&
+						(!mounted ? (
+							<div className="h-6 w-16 rounded-full bg-muted/50 animate-pulse md:hidden" />
+						) : (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<div
+										className="flex md:hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted/50 border border-border/50 h-6 cursor-default"
+										role="timer"
+										aria-live="polite"
 									>
-										{currentTime}
-									</span>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent side="bottom">
-								<p>System Time</p>
-							</TooltipContent>
-						</Tooltip>
-					)}
+										<Clock
+											className="w-3 h-3 text-primary/70"
+											aria-hidden="true"
+										/>
+										<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums">
+											{currentTime}
+										</span>
+									</div>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									<p>System Time</p>
+								</TooltipContent>
+							</Tooltip>
+						))}
 
 					{/* System Status Indicators - Desktop */}
 					<StatusBar isOnline={isOnline} batteryLevel={batteryLevel} />
