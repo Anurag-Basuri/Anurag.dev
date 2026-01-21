@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, type ReactNode } from 'react';
+import { Suspense, useCallback, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { Loader } from '@/components/common/Loader';
@@ -24,33 +24,51 @@ interface DesktopLayoutProps {
 }
 
 // Panel size configuration (percentages)
-const SIDEBAR = { min: 12, max: 35, default: 22, collapsed: 3 };
-const TERMINAL = { min: 12, max: 55, default: 35, collapsed: 3 };
-const CONTENT = { min: 30 };
-const MAIN = { min: 50, default: 78 };
+// Note: For collapsible panels, minSize should not be set (library handles it)
+const SIDEBAR = { max: 35, default: 20, collapsed: 0 };
+const TERMINAL = { max: 60, default: 35, collapsed: 0 };
+const CONTENT = { min: 25 };
+const MAIN = { min: 50, default: 80 };
 
-const isCollapsedSize = (size: PanelSize, collapsedSize: number) =>
-	size.asPercentage <= collapsedSize + 0.5;
+// Threshold for detecting collapsed state (accounts for floating point)
+const COLLAPSED_THRESHOLD = 1;
 
 export function DesktopLayout({ children }: DesktopLayoutProps) {
 	const { sidebar, terminal, setSidebarPanelRef, setTerminalPanelRef } = usePanelControls();
+
+	// Handle sidebar resize - sync collapsed state
+	const handleSidebarResize = useCallback(
+		(size: PanelSize) => {
+			const isCollapsed = size.asPercentage <= COLLAPSED_THRESHOLD;
+			sidebar.setCollapsed(isCollapsed);
+		},
+		[sidebar],
+	);
+
+	// Handle terminal resize - sync collapsed state
+	const handleTerminalResize = useCallback(
+		(size: PanelSize) => {
+			const isCollapsed = size.asPercentage <= COLLAPSED_THRESHOLD;
+			terminal.setCollapsed(isCollapsed);
+		},
+		[terminal],
+	);
 
 	return (
 		<Group
 			id="portfolio-main-h"
 			orientation="horizontal"
 			className={cn('h-full w-full', LAYOUT_SPACING.gap)}
-			autoSave="portfolio-horizontal"
+			autoSave="portfolio-h"
 		>
 			<Panel
 				id="sidebar"
 				panelRef={setSidebarPanelRef}
 				defaultSize={SIDEBAR.default}
-				minSize={SIDEBAR.min}
 				maxSize={SIDEBAR.max}
 				collapsible
 				collapsedSize={SIDEBAR.collapsed}
-				onResize={size => sidebar.setCollapsed(isCollapsedSize(size, SIDEBAR.collapsed))}
+				onResize={handleSidebarResize}
 				className={cn(
 					PANEL_STYLES.base,
 					PANEL_STYLES.sidebar,
@@ -71,11 +89,11 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 					id="portfolio-main-v"
 					orientation="vertical"
 					className={cn('h-full', LAYOUT_SPACING.gap)}
-					autoSave="portfolio-vertical"
+					autoSave="portfolio-v"
 				>
 					<Panel
 						id="content"
-						defaultSize={60}
+						defaultSize={65}
 						minSize={CONTENT.min}
 						className={cn(PANEL_STYLES.base, PANEL_STYLES.content, 'min-h-0')}
 					>
@@ -90,13 +108,10 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 						id="terminal"
 						panelRef={setTerminalPanelRef}
 						defaultSize={TERMINAL.default}
-						minSize={TERMINAL.min}
 						maxSize={TERMINAL.max}
 						collapsible
 						collapsedSize={TERMINAL.collapsed}
-						onResize={size =>
-							terminal.setCollapsed(isCollapsedSize(size, TERMINAL.collapsed))
-						}
+						onResize={handleTerminalResize}
 						className={cn(
 							PANEL_STYLES.base,
 							PANEL_STYLES.terminal,
