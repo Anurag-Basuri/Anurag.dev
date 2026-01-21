@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { SidebarProfile } from './SidebarProfile';
 import { FolderTree } from './FolderTree';
@@ -12,50 +12,11 @@ import { PanelHeader } from '@/components/layout/PanelHeader';
 import { SidebarControls } from '@/components/common/WindowControls';
 import { useSetAtom } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
-import { usePanelControls } from '@/contexts/panel-context';
-
-// ============================================================================
-// Collapsed Sidebar View
-// ============================================================================
-interface CollapsedSidebarProps {
-	onExpand: () => void;
-}
-
-const CollapsedSidebar = memo(function CollapsedSidebar({ onExpand }: CollapsedSidebarProps) {
-	return (
-		<button
-			onClick={onExpand}
-			className="collapsed-panel-btn h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
-			aria-label="Expand sidebar"
-		>
-			{/* Vertical content container */}
-			<div className="flex flex-col items-center gap-3">
-				{/* Top line with shimmer */}
-				<div className="collapsed-line-shimmer w-px h-8 rounded-full" />
-
-				{/* Icon with pulse */}
-				<FolderOpen className="collapsed-icon-pulse w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors duration-300" />
-
-				{/* Vertical text */}
-				<span
-					className="text-xs font-mono tracking-widest text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors duration-300 uppercase"
-					style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-				>
-					Explorer
-				</span>
-
-				{/* Bottom line with shimmer */}
-				<div className="collapsed-line-shimmer w-px h-8 rounded-full" />
-			</div>
-		</button>
-	);
-});
 
 // ============================================================================
 // Main Sidebar Component
 // ============================================================================
 export const Sidebar: React.FC = () => {
-	const { sidebar } = usePanelControls();
 	const router = useRouter();
 	const pathname = usePathname();
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
@@ -77,12 +38,6 @@ export const Sidebar: React.FC = () => {
 		[router],
 	);
 
-	// Collapsed state - matches terminal's collapsed design
-	if (sidebar.isCollapsed) {
-		return <CollapsedSidebar onExpand={sidebar.expand} />;
-	}
-
-	// Expanded state
 	return (
 		<div className="h-full w-full flex flex-col">
 			<PanelHeader
@@ -90,10 +45,7 @@ export const Sidebar: React.FC = () => {
 				icon={FolderOpen}
 				title="EXPLORER"
 				controls={
-					<SidebarControls
-						onClose={sidebar.collapse}
-						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
-					/>
+					<SidebarControls onToggleFolders={() => setFolderSignal(prev => prev + 1)} />
 				}
 			/>
 

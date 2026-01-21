@@ -6,7 +6,6 @@ import { useCLI } from './hooks/useCLI';
 import { Terminal } from 'lucide-react';
 import { PanelHeader } from '@/components/layout/PanelHeader';
 import { TerminalControls } from '@/components/common/WindowControls';
-import { usePanelControls } from '@/contexts/panel-context';
 import { TerminalInput, Suggestions, HistoryEntry, Welcome } from './components';
 
 // ============================================================================
@@ -14,7 +13,6 @@ import { TerminalInput, Suggestions, HistoryEntry, Welcome } from './components'
 // ============================================================================
 
 export function CLI() {
-	const { terminal } = usePanelControls();
 	const state = useTerminalState();
 	const { handleKeyDown } = useCLI(state);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -32,13 +30,11 @@ export function CLI() {
 		historyLengthRef.current = state.history.length;
 	}, [state.history.length]);
 
-	// Auto-focus input on mount and when expanding
+	// Auto-focus input on mount
 	useEffect(() => {
-		if (!terminal.isCollapsed) {
-			const timer = setTimeout(() => inputRef.current?.focus(), 100);
-			return () => clearTimeout(timer);
-		}
-	}, [terminal.isCollapsed]);
+		const timer = setTimeout(() => inputRef.current?.focus(), 100);
+		return () => clearTimeout(timer);
+	}, []);
 
 	// Handle container click to focus input
 	const handleContainerClick = useCallback((e: React.MouseEvent) => {
@@ -62,26 +58,6 @@ export function CLI() {
 	const handleFocus = useCallback(() => state.setIsFocused(true), [state]);
 	const handleBlur = useCallback(() => state.setIsFocused(false), [state]);
 
-	// Collapsed state
-	if (terminal.isCollapsed) {
-		return (
-			<button
-				onClick={terminal.expand}
-				className="collapsed-panel-btn h-full w-full flex items-center justify-center bg-transparent cursor-pointer group"
-				aria-label="Expand terminal"
-			>
-				<div className="flex items-center gap-4">
-					<div className="collapsed-line-shimmer h-px w-8 rounded-full" />
-					<Terminal className="collapsed-icon-pulse w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors duration-300" />
-					<span className="text-xs font-mono tracking-widest text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors duration-300 uppercase">
-						Terminal
-					</span>
-					<div className="collapsed-line-shimmer h-px w-8 rounded-full" />
-				</div>
-			</button>
-		);
-	}
-
 	return (
 		<div
 			className="h-full flex flex-col bg-transparent overflow-hidden"
@@ -93,12 +69,7 @@ export function CLI() {
 				title="TERMINAL"
 				subtitle={state.currentPath}
 				isFocused={state.isFocused}
-				controls={
-					<TerminalControls
-						onClose={terminal.collapse}
-						onClearHistory={state.clearHistory}
-					/>
-				}
+				controls={<TerminalControls onClearHistory={state.clearHistory} />}
 			/>
 
 			<div

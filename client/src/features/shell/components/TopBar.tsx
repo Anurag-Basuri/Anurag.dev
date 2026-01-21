@@ -10,25 +10,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import Image from 'next/image';
 import { StatusBar } from './StatusBar';
 import { MobileExplorerSheet } from './MobileExplorerSheet';
-import { ControlPanel } from './ControlPanel';
 
 interface TopBarProps {
 	isMobile: boolean;
-	sidebarCollapsed: boolean;
-	terminalCollapsed: boolean;
-	onToggleSidebar: () => void;
-	onToggleTerminal: () => void;
 	onFileSelect: (item: FileSystemItem) => void;
 }
 
-export const TopBar = memo(function TopBar({
-	isMobile,
-	sidebarCollapsed,
-	terminalCollapsed,
-	onToggleSidebar,
-	onToggleTerminal,
-	onFileSelect,
-}: TopBarProps) {
+export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarProps) {
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 
@@ -175,15 +163,14 @@ export const TopBar = memo(function TopBar({
 						<ThemeToggle />
 					</div>
 
-					{/* Control Panel - Desktop */}
+					{/* Contact Button - Desktop */}
 					{!isMobile && (
-						<ControlPanel
-							sidebarCollapsed={sidebarCollapsed}
-							terminalCollapsed={terminalCollapsed}
-							onToggleSidebar={onToggleSidebar}
-							onToggleTerminal={onToggleTerminal}
-							onContactClick={handleContactClick}
-						/>
+						<button
+							onClick={handleContactClick}
+							className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium text-foreground/70 hover:text-foreground hover:bg-muted/50 transition-colors"
+						>
+							Contact
+						</button>
 					)}
 				</div>
 			</header>
