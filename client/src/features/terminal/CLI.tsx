@@ -97,8 +97,6 @@ export function CLI() {
 					<TerminalControls
 						onClose={terminal.collapse}
 						onClearHistory={state.clearHistory}
-						onMaximize={terminal.toggleMaximize}
-						isMaximized={terminal.isMaximized}
 					/>
 				}
 			/>

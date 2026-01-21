@@ -92,9 +92,7 @@ export const Sidebar: React.FC = () => {
 				controls={
 					<SidebarControls
 						onClose={sidebar.collapse}
-						onMaximize={sidebar.toggleMaximize}
 						onToggleFolders={() => setFolderSignal(prev => prev + 1)}
-						isMaximized={sidebar.isMaximized}
 					/>
 				}
 			/>
