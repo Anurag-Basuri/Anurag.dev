@@ -19,6 +19,7 @@ interface PanelControls {
 	collapse: () => void;
 	expand: () => void;
 	toggle: () => void;
+	setCollapsed: (collapsed: boolean) => void;
 	isCollapsed: boolean;
 }
 
@@ -81,6 +82,10 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		}
 	}, [sidebarPanel]);
 
+	const setSidebarCollapsedState = useCallback((collapsed: boolean) => {
+		setSidebarCollapsed(prev => (prev === collapsed ? prev : collapsed));
+	}, []);
+
 	// ========================================================================
 	// Terminal Controls
 	// ========================================================================
@@ -105,6 +110,10 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 		}
 	}, [terminalPanel]);
 
+	const setTerminalCollapsedState = useCallback((collapsed: boolean) => {
+		setTerminalCollapsed(prev => (prev === collapsed ? prev : collapsed));
+	}, []);
+
 	// ========================================================================
 	// Context Value
 	// ========================================================================
@@ -116,12 +125,14 @@ export function PanelProvider({ children }: { children: ReactNode }) {
 					collapse: collapseSidebar,
 					expand: expandSidebar,
 					toggle: toggleSidebar,
+					setCollapsed: setSidebarCollapsedState,
 					isCollapsed: sidebarCollapsed,
 				},
 				terminal: {
 					collapse: collapseTerminal,
 					expand: expandTerminal,
 					toggle: toggleTerminal,
+					setCollapsed: setTerminalCollapsedState,
 					isCollapsed: terminalCollapsed,
 				},
 				setSidebarPanelRef,

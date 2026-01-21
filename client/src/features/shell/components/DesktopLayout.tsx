@@ -8,6 +8,7 @@ import { Panel, Group, ResizeHandle } from '@/components/common/ResizeHandle';
 import { PANEL_STYLES, LAYOUT_SPACING } from '../constants';
 import dynamic from 'next/dynamic';
 import { usePanelControls } from '@/contexts/panel-context';
+import type { PanelSize } from 'react-resizable-panels';
 
 const CLI = dynamic(() => import('@/features/terminal/CLI').then(mod => mod.CLI), {
 	ssr: false,
@@ -22,10 +23,14 @@ interface DesktopLayoutProps {
 	children: ReactNode;
 }
 
-// Panel size configuration
-const SIDEBAR = { min: 10, max: 40, default: 20, collapsed: 3 };
-const TERMINAL = { min: 10, max: 80, default: 40, collapsed: 3 };
-const CONTENT = { min: 20 };
+// Panel size configuration (percentages)
+const SIDEBAR = { min: 12, max: 35, default: 22, collapsed: 3 };
+const TERMINAL = { min: 12, max: 55, default: 35, collapsed: 3 };
+const CONTENT = { min: 30 };
+const MAIN = { min: 50, default: 78 };
+
+const isCollapsedSize = (size: PanelSize, collapsedSize: number) =>
+	size.asPercentage <= collapsedSize + 0.5;
 
 export function DesktopLayout({ children }: DesktopLayoutProps) {
 	const { sidebar, terminal, setSidebarPanelRef, setTerminalPanelRef } = usePanelControls();
@@ -45,6 +50,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 				maxSize={SIDEBAR.max}
 				collapsible
 				collapsedSize={SIDEBAR.collapsed}
+				onResize={size => sidebar.setCollapsed(isCollapsedSize(size, SIDEBAR.collapsed))}
 				className={cn(
 					PANEL_STYLES.base,
 					PANEL_STYLES.sidebar,
@@ -60,7 +66,7 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 
 			<ResizeHandle isCollapsed={sidebar.isCollapsed} orientation="vertical" />
 
-			<Panel id="main" defaultSize={80} minSize={50} className="min-w-0">
+			<Panel id="main" defaultSize={MAIN.default} minSize={MAIN.min} className="min-w-0">
 				<Group
 					id="portfolio-main-v"
 					orientation="vertical"
@@ -88,6 +94,9 @@ export function DesktopLayout({ children }: DesktopLayoutProps) {
 						maxSize={TERMINAL.max}
 						collapsible
 						collapsedSize={TERMINAL.collapsed}
+						onResize={size =>
+							terminal.setCollapsed(isCollapsedSize(size, TERMINAL.collapsed))
+						}
 						className={cn(
 							PANEL_STYLES.base,
 							PANEL_STYLES.terminal,
