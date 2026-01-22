@@ -1,116 +1,60 @@
 'use client';
 
 import { Suspense, type ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { Loader } from '@/components/common/Loader';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { useCollapsiblePanel } from '@/hooks/use-collapsible-panel';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import dynamic from 'next/dynamic';
-import { getModuleIcon, getModuleTitle } from '@/lib/moduleRegistry';
-import { EmptyState } from '@/components/editor/EmptyState';
-
-// Feature imports
-import { WindowHeader } from '@/features/shell/components/WindowHeader';
-import { PANEL_STYLES, MOTION_PRESETS, LAYOUT_SPACING } from '@/features/shell/constants';
-import { useModuleNavigation } from '@/features/shell/hooks/useModuleNavigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { AnimatedBackground } from '@/features/shell/components/AnimatedBackground';
 import { DesktopLayout } from '@/features/shell/components/DesktopLayout';
 import { MobileLayout } from '@/features/shell/components/MobileLayout';
 
-// Dynamic imports for heavy components
-const TopBarDynamic = dynamic(
-	() => import('@/features/shell/components/TopBar').then(mod => mod.TopBar),
-	{
-		ssr: false,
-		loading: () => <Loader height="h-8" />,
-	},
-);
+const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m => m.TopBar), {
+	ssr: false,
+	loading: () => <div className="h-8 bg-background" />,
+});
 
-const TaskbarDynamic = dynamic(
-	() => import('@/features/shell/components/Taskbar').then(mod => mod.Taskbar),
-	{
-		ssr: false,
-		loading: () => <Loader height="h-8" />,
-	},
-);
+const Taskbar = dynamic(() => import('@/features/shell/components/Taskbar').then(m => m.Taskbar), {
+	ssr: false,
+	loading: () => <div className="h-10 bg-background" />,
+});
 
-// Main Layout
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
-	const modulePanel = useCollapsiblePanel({ type: 'module' });
+	const router = useRouter();
+	const pathname = usePathname();
 
-	// Safe access to optional properties
-	const isMaximized = modulePanel.isMaximized ?? false;
-
-	// Custom hooks
-	const { currentModuleId, handleFileSelect, dismissCurrentModule } = useModuleNavigation({
-		isMaximized,
-		restore: modulePanel.restore,
-		collapse: modulePanel.collapse,
-		expand: modulePanel.expand,
-	});
-
-	// Render module content with header
-	const renderModuleContent = (className?: string) => {
-		if (!currentModuleId) return children;
-
-		const Icon = getModuleIcon(currentModuleId);
-		const title = getModuleTitle(currentModuleId);
-
-		return (
-			<div className={cn('h-full flex flex-col min-w-0', className)}>
-				<WindowHeader
-					icon={Icon}
-					title={title}
-					isMaximized={isMaximized}
-					onMaximize={isMaximized ? modulePanel.restore : modulePanel.maximize}
-					onMinimize={dismissCurrentModule}
-					onClose={dismissCurrentModule}
-				/>
-				<div className="flex-1 min-h-0 relative">
-					{modulePanel.isCollapsed ? <EmptyState /> : children}
-				</div>
-			</div>
-		);
+	const handleFileSelect = (item: { moduleId?: string }) => {
+		if (item.moduleId) {
+			router.push(`/portfolio/${item.moduleId}`);
+		}
 	};
 
 	return (
 		<ErrorBoundary>
-			{/* Maximized Overlay */}
-			<AnimatePresence mode="wait">
-				{isMaximized && (
-					<motion.div
-						key="maximized-overlay"
-						{...MOTION_PRESETS.fadeScale}
-						className={cn('fixed inset-0 z-100', PANEL_STYLES.maximized)}
-					>
-						{renderModuleContent('maximized-content p-4')}
-					</motion.div>
-				)}
-			</AnimatePresence>
+			{/* Single background for all screen sizes */}
+			<AnimatedBackground />
 
-			{/* Main Layout */}
 			<ContextMenuProvider>
-				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background font-sans selection:bg-primary/30">
-					<Suspense fallback={<Loader height="h-8" />}>
-						<TopBarDynamic isMobile={isMobile} onFileSelect={handleFileSelect} />
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background/80 font-sans">
+					<Suspense fallback={<div className="h-8" />}>
+						<TopBar isMobile={isMobile} onFileSelect={handleFileSelect} />
 					</Suspense>
 
-					<div
-						className={cn(
-							'flex-1 min-h-0 w-full overflow-hidden relative z-10',
-							LAYOUT_SPACING.padding,
+					<div className="flex-1 min-h-0 w-full overflow-hidden p-2 md:p-3">
+						{isMobile ? (
+							<MobileLayout>{children}</MobileLayout>
+						) : (
+							<DesktopLayout>{children}</DesktopLayout>
 						)}
-					>
-						{!isMobile && <DesktopLayout>{renderModuleContent()}</DesktopLayout>}
-						{isMobile && <MobileLayout>{renderModuleContent()}</MobileLayout>}
 					</div>
 
-					<Suspense fallback={<Loader height="h-8" />}>
-						<TaskbarDynamic isMobile={isMobile} />
+					<Suspense fallback={<div className="h-10" />}>
+						<Taskbar isMobile={isMobile} />
 					</Suspense>
 
 					<Toaster
