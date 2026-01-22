@@ -1,21 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
-import { PANEL_STYLES } from '../constants';
 
-interface MobileLayoutProps {
-	children: ReactNode;
-}
+const panel = 'rounded-xl bg-card/50 backdrop-blur-md border border-border/30 shadow-md';
 
-export function MobileLayout({ children }: MobileLayoutProps) {
+export function MobileLayout({ children }: { children: ReactNode }) {
 	return (
-		<div className="h-full w-full flex flex-col px-3 py-2 sm:px-4 sm:py-3 pb-[env(safe-area-inset-bottom)]">
-			<div
-				className={cn(PANEL_STYLES.base, PANEL_STYLES.mobile, 'h-full w-full rounded-2xl')}
-			>
-				{children}
-			</div>
+		<div className="h-full w-full pb-[env(safe-area-inset-bottom)]">
+			<div className={`${panel} h-full w-full overflow-auto`}>{children}</div>
 		</div>
 	);
 }
