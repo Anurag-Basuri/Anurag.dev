@@ -15,8 +15,8 @@ const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(m => m.S
 	loading: () => <Loader />,
 });
 
-// Simple panel styling
-const panel = 'rounded-xl bg-card/50 backdrop-blur-md border border-border/30 shadow-md';
+// Simple panel styling (transparent surface)
+const panel = 'rounded-xl bg-transparent border border-border/20';
 
 export function DesktopLayout({ children }: { children: ReactNode }) {
 	return (

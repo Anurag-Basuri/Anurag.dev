@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-const panel = 'rounded-xl bg-card/50 backdrop-blur-md border border-border/30 shadow-md';
+const panel = 'rounded-xl bg-transparent border border-border/20';
 
 export function MobileLayout({ children }: { children: ReactNode }) {
 	return (

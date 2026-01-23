@@ -51,7 +51,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			<AnimatedBackground />
 
 			<ContextMenuProvider>
-				<div className="fixed inset-0 flex flex-col overflow-hidden bg-background/80 font-sans">
+				<div className="fixed inset-0 flex flex-col overflow-hidden bg-transparent font-sans">
 					<Suspense fallback={<div className="h-8" />}>
 						<TopBar isMobile={isMobile} onFileSelect={handleFileSelect} />
 					</Suspense>
