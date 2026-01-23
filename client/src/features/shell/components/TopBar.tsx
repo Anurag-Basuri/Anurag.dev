@@ -4,12 +4,20 @@ import { useState, useEffect, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
 import { Clock } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import dynamic from 'next/dynamic';
 import { type FileSystemItem } from '@/data/filesystem';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import { StatusBar } from './StatusBar';
 import { MobileExplorerSheet } from './MobileExplorerSheet';
+
+const ThemeToggleDynamic = dynamic(
+	() => import('@/components/ui/theme-toggle').then(mod => mod.ThemeToggle),
+	{
+		ssr: false,
+		loading: () => <div className="h-8 w-8 rounded-lg bg-muted/60 animate-pulse" />,
+	},
+);
 
 interface TopBarProps {
 	isMobile: boolean;
@@ -171,7 +179,7 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 
 					{/* Theme Toggle */}
 					<div className="flex items-center">
-						<ThemeToggle />
+						<ThemeToggleDynamic />
 					</div>
 
 					{/* Contact Button - Desktop */}
