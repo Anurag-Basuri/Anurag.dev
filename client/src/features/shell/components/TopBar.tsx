@@ -3,21 +3,19 @@
 import { useState, useEffect, useCallback, memo } from 'react';
 import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
-import { Clock } from 'lucide-react';
+import { Clock, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { type FileSystemItem } from '@/data/filesystem';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import { StatusBar } from './StatusBar';
 import { MobileExplorerSheet } from './MobileExplorerSheet';
+import { cn } from '@/lib/utils';
 
-const ThemeToggleDynamic = dynamic(
-	() => import('@/components/ui/theme-toggle').then(mod => mod.ThemeToggle),
-	{
-		ssr: false,
-		loading: () => <div className="h-8 w-8 rounded-lg bg-muted/60 animate-pulse" />,
-	},
-);
+const ThemeToggle = dynamic(() => import('@/components/ui/theme-toggle').then(m => m.ThemeToggle), {
+	ssr: false,
+	loading: () => <div className="h-7 w-7 rounded-md bg-muted/50 animate-pulse" />,
+});
 
 interface TopBarProps {
 	isMobile: boolean;
@@ -27,24 +25,13 @@ interface TopBarProps {
 export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarProps) {
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
-
 	const [mounted, setMounted] = useState(false);
 
-	// Static values for UI consistency
-	const batteryLevel = 100;
-	const isOnline = true;
-
-	// Handle hydration
 	useEffect(() => {
 		setMounted(true);
-	}, []);
-
-	// Update time
-	useEffect(() => {
 		const updateTime = () => {
-			const now = new Date();
 			setCurrentTime(
-				now.toLocaleTimeString('en-US', {
+				new Date().toLocaleTimeString('en-US', {
 					hour: '2-digit',
 					minute: '2-digit',
 					hour12: false,
@@ -57,16 +44,9 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 	}, []);
 
 	const handleContactClick = useCallback(() => {
-		const contactItem: FileSystemItem = {
-			id: 'contact',
-			name: 'contact',
-			type: 'file',
-			moduleId: 'contact',
-		};
-		onFileSelect(contactItem);
+		onFileSelect({ id: 'contact', name: 'contact', type: 'file', moduleId: 'contact' });
 	}, [onFileSelect]);
 
-	// Close sheet with Escape key
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
 			if (e.key === 'Escape' && isExplorerOpen) setIsExplorerOpen(false);
@@ -77,15 +57,9 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 
 	return (
 		<TooltipProvider delayDuration={300}>
-			<header
-				className="h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50 shadow-sm flex items-center justify-between z-50 select-none relative"
-				role="banner"
-			>
-				{/* Bottom gradient border */}
-				<div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
-
-				{/* Left Section */}
-				<div className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 min-w-0">
+			<header className="h-8 px-2 sm:px-3 md:px-4 bg-background/90 backdrop-blur-xl border-b border-border/40 flex items-center justify-between z-50 select-none">
+				{/* Left: Menu + Logo */}
+				<div className="flex items-center gap-2 min-w-0">
 					{isMobile && (
 						<MobileExplorerSheet
 							isOpen={isExplorerOpen}
@@ -94,102 +68,74 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 						/>
 					)}
 
-					{/* Branding */}
 					{!isMobile && (
-						<div className="flex items-center gap-2 group cursor-default min-w-0">
-							<div className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative shrink-0">
+						<div className="flex items-center gap-2 group cursor-default">
+							<div className="w-5 h-5 relative shrink-0">
 								<Image
 									src="/logo.png"
-									alt="AnuragOS"
+									alt="Logo"
 									fill
-									sizes="18px"
+									sizes="20px"
 									className="object-contain"
 									priority
 								/>
 							</div>
-							<span className="font-bold tracking-[0.2em] text-[9px] sm:text-[10px] text-foreground/90 group-hover:text-foreground transition-colors truncate">
+							<span className="text-[10px] font-bold tracking-wider text-foreground/80 group-hover:text-foreground transition-colors hidden sm:block">
 								ANURAG&apos;S <span className="text-primary">PORTFOLIO</span>
 							</span>
 						</div>
 					)}
 				</div>
 
-				{/* Center Section: Clock (Desktop only) */}
+				{/* Center: Clock */}
 				{!isMobile && (
-					<div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center">
+					<div className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center">
 						{!mounted ? (
-							<div className="h-6 w-16 rounded-full bg-muted/50 animate-pulse" />
+							<div className="h-6 w-14 rounded-full bg-muted/40 animate-pulse" />
 						) : (
 							<Tooltip>
 								<TooltipTrigger asChild>
-									<div
-										className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 border border-border/50 shadow-sm hover:bg-muted hover:shadow-md hover:border-primary/20 transition-all duration-200 h-6 cursor-default group"
-										role="timer"
-										aria-live="polite"
-										aria-atomic="true"
-									>
-										<Clock
-											className="w-3 h-3 text-primary/70 group-hover:text-primary transition-colors"
-											aria-hidden="true"
-										/>
-										<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums group-hover:text-foreground transition-colors">
-											{currentTime}
-										</span>
+									<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/40 border border-border/30 text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-default">
+										<Clock className="w-3 h-3 text-primary/60" />
+										<span className="tabular-nums">{currentTime}</span>
 									</div>
 								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>System Time</p>
-								</TooltipContent>
+								<TooltipContent side="bottom">System Time</TooltipContent>
 							</Tooltip>
 						)}
 					</div>
 				)}
 
-				{/* Right Section */}
-				<div className="flex items-center gap-1 sm:gap-1.5 md:gap-2">
+				{/* Right: Status + Theme + Contact */}
+				<div className="flex items-center gap-1.5">
 					{/* Mobile Clock */}
-					{isMobile &&
-						(!mounted ? (
-							<div className="h-6 w-16 rounded-full bg-muted/50 animate-pulse md:hidden" />
-						) : (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<div
-										className="flex md:hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted/50 border border-border/50 h-6 cursor-default"
-										role="timer"
-										aria-live="polite"
-									>
-										<Clock
-											className="w-3 h-3 text-primary/70"
-											aria-hidden="true"
-										/>
-										<span className="text-[10px] font-medium text-foreground/90 font-mono tracking-wider tabular-nums">
-											{currentTime}
-										</span>
-									</div>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>System Time</p>
-								</TooltipContent>
-							</Tooltip>
-						))}
+					{isMobile && mounted && (
+						<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted/40 border border-border/30 text-[10px] font-mono text-muted-foreground">
+							<Clock className="w-2.5 h-2.5 text-primary/60" />
+							<span className="tabular-nums">{currentTime}</span>
+						</div>
+					)}
 
-					{/* System Status Indicators - Desktop */}
-					<StatusBar isOnline={isOnline} batteryLevel={batteryLevel} />
+					<StatusBar isOnline={true} batteryLevel={100} />
+					<ThemeToggle />
 
-					{/* Theme Toggle */}
-					<div className="flex items-center">
-						<ThemeToggleDynamic />
-					</div>
-
-					{/* Contact Button - Desktop */}
 					{!isMobile && (
-						<button
-							onClick={handleContactClick}
-							className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium text-foreground/70 hover:text-foreground hover:bg-muted/50 transition-colors"
-						>
-							Contact
-						</button>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<button
+									onClick={handleContactClick}
+									className={cn(
+										'h-7 px-2.5 rounded-md flex items-center gap-1.5',
+										'text-xs font-medium text-muted-foreground',
+										'hover:text-foreground hover:bg-muted/50 transition-colors',
+									)}
+								>
+									<Mail className="w-3.5 h-3.5" />
+									<span className="hidden lg:block">Contact</span>
+								</button>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">Get in Touch</TooltipContent>
+						</Tooltip>
 					)}
 				</div>
 			</header>

@@ -98,11 +98,11 @@ const normalizeModuleId = (id: string): ModuleId | null =>
 
 const btnStyles = (active: boolean) =>
 	cn(
-		'h-6 px-2 rounded-md flex items-center justify-center gap-1.5 transition-colors duration-150',
-		'focus:outline-none focus:ring-2 focus:ring-emerald-400/40',
+		'h-7 px-2.5 rounded-md flex items-center justify-center gap-1.5 transition-all duration-200',
+		'focus:outline-none focus:ring-2 focus:ring-primary/40',
 		active
-			? 'bg-emerald-500/15 text-white border border-emerald-500/30'
-			: 'bg-transparent text-white/70 border border-transparent hover:bg-white/5 hover:text-white',
+			? 'bg-primary/15 text-foreground border border-primary/30'
+			: 'bg-transparent text-muted-foreground border border-transparent hover:bg-muted/50 hover:text-foreground',
 	);
 
 // ============================================================================
@@ -212,16 +212,16 @@ const NavItem = memo(
 					<button
 						onClick={onClick}
 						className={cn(
-							'relative flex items-center gap-1.5 h-6 px-2 rounded-md group transition-colors',
+							'relative flex items-center gap-1.5 h-7 px-2.5 rounded-md group transition-all duration-200',
 							isActive
-								? 'bg-white/10 text-white'
-								: 'text-white/50 hover:bg-white/5 hover:text-white/80',
+								? 'bg-primary/15 text-foreground border border-primary/30'
+								: 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border border-transparent',
 						)}
 					>
 						{isActive && (
-							<div className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-emerald-400" />
+							<div className="absolute inset-x-1 -bottom-px h-0.5 rounded-full bg-primary" />
 						)}
-						<Icon className={cn('w-3.5 h-3.5', isActive && 'text-emerald-400')} />
+						<Icon className={cn('w-3.5 h-3.5 shrink-0', isActive && 'text-primary')} />
 						<span className="text-[11px] font-medium truncate max-w-[72px] hidden sm:block">
 							{title}
 						</span>
@@ -231,7 +231,7 @@ const NavItem = memo(
 									e.stopPropagation();
 									onClose(moduleId);
 								}}
-								className="ml-0.5 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-white/15"
+								className="ml-1 p-0.5 rounded-sm opacity-0 group-hover:opacity-100 hover:bg-destructive/20 hover:text-destructive transition-all"
 								aria-label={`Close ${title}`}
 							>
 								<X className="w-2.5 h-2.5" />
@@ -548,8 +548,8 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 			{isMobile && <HelpButton onClick={helpMenu.toggle} />}
 
 			{/* Main Bar */}
-			<footer className="h-8 px-2 sm:px-3 md:px-4 lg:px-6 bg-[#050505]/80 backdrop-blur-xl border-t border-white/5 flex items-center justify-between z-40 relative select-none">
-				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/30 to-transparent" />
+			<footer className="h-8 px-2 sm:px-3 md:px-4 bg-background/90 backdrop-blur-xl border-t border-border/40 flex items-center justify-between z-40 relative select-none">
+				<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
 				<div className="flex items-center gap-1.5 sm:gap-2 h-full flex-1 min-w-0">
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -571,7 +571,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 							<p>System Menu</p>
 						</TooltipContent>
 					</Tooltip>
-					<div className="w-px h-3.5 bg-white/10 mx-0.5" />
+					<div className="w-px h-4 bg-border/50 mx-1" />
 					<div className="flex items-center gap-1 h-full min-w-0 flex-1 overflow-x-auto scrollbar-hide">
 						{validFiles.map(id => (
 							<NavItem
@@ -585,7 +585,7 @@ export const Taskbar = memo(function Taskbar({ isMobile = false }: { isMobile?: 
 					</div>
 				</div>
 				{!isMobile && (
-					<div className="flex items-center gap-1 pl-2 border-l border-white/10">
+					<div className="flex items-center gap-1.5 pl-2 border-l border-border/50">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<button
