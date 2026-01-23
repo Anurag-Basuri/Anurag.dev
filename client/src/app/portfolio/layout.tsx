@@ -9,9 +9,13 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useSetAtom } from 'jotai';
 import { openFilesAtom, createFileEntry } from '@/store/atoms/files';
-import { AnimatedBackground } from '@/features/shell/components/AnimatedBackground';
 import { DesktopLayout } from '@/features/shell/components/DesktopLayout';
 import { MobileLayout } from '@/features/shell/components/MobileLayout';
+
+const AnimatedBackground = dynamic(
+	() => import('@/features/shell/components/AnimatedBackground').then(m => m.AnimatedBackground),
+	{ ssr: false },
+);
 
 const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m => m.TopBar), {
 	ssr: false,
