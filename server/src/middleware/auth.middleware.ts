@@ -1,52 +1,40 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { verifyAccessToken } from '../modules/auth/auth.service';
-import { TokenPayload } from '../types';
+import { verifyAccessToken, TokenPayload } from '../modules/auth/auth.service';
+import { unauthorized, AppError } from '../lib/errors';
 
+// Extend FastifyRequest to include admin user data
 declare module 'fastify' {
-  interface FastifyRequest {
-    user?: TokenPayload;
-  }
+	interface FastifyRequest {
+		user?: TokenPayload;
+	}
 }
 
-export async function authMiddleware(
-  request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
-  try {
-    const authHeader = request.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return reply.status(401).send({
-        error: {
-          code: 'MISSING_TOKEN',
-          message: 'Authorization token required',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
+/**
+ * Authentication middleware — verifies Bearer token and attaches admin info to request.
+ */
+export async function authMiddleware(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+	try {
+		const authHeader = request.headers.authorization;
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    const payload = verifyAccessToken(token);
+		if (!authHeader || !authHeader.startsWith('Bearer ')) {
+			const error = unauthorized('Authorization token required');
+			return reply.status(error.statusCode).send(error.toJSON());
+		}
 
-    if (!payload) {
-      return reply.status(401).send({
-        error: {
-          code: 'INVALID_TOKEN',
-          message: 'Invalid or expired token',
-          timestamp: new Date().toISOString(),
-        },
-      });
-    }
+		const token = authHeader.substring(7);
+		const payload = verifyAccessToken(token);
 
-    // Attach user info to request
-    request.user = payload;
-  } catch (error) {
-    return reply.status(401).send({
-      error: {
-        code: 'AUTH_ERROR',
-        message: 'Authentication failed',
-        timestamp: new Date().toISOString(),
-      },
-    });
-  }
+		if (!payload) {
+			const error = unauthorized('Invalid or expired token');
+			return reply.status(error.statusCode).send(error.toJSON());
+		}
+
+		request.user = payload;
+	} catch (err) {
+		if (err instanceof AppError) {
+			return reply.status(err.statusCode).send(err.toJSON());
+		}
+		const error = unauthorized('Authentication failed');
+		return reply.status(error.statusCode).send(error.toJSON());
+	}
 }
