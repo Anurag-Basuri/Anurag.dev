@@ -1,4 +1,5 @@
 // Prisma schema for AnuragOS Backend
+// Database: NeonDB (Serverless PostgreSQL)
 
 generator client {
   provider = "prisma-client-js"
@@ -9,18 +10,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String         @id @default(uuid())
-  username      String         @unique
-  passwordHash  String
-  email         String         @unique
-  isLocked      Boolean        @default(false)
-  lockedUntil   DateTime?
-  failedAttempts Int           @default(0)
-  lastFailedAt  DateTime?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  
+// ─── Admin (single portfolio owner) ───────────────────────────────
+
+model Admin {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   refreshTokens RefreshToken[]
   auditLogs     AuditLog[]
 }
@@ -28,17 +26,18 @@ model User {
 model RefreshToken {
   id        String   @id @default(uuid())
   token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
   isRevoked Boolean  @default(false)
-  
-  @@index([userId])
+
+  @@index([adminId])
   @@index([token])
 }
 
-// Singleton model for user profile/about
+// ─── Profile (singleton — portfolio owner's about info) ───────────
+
 model Profile {
   id              String   @id @default(uuid())
   name            String
@@ -52,107 +51,115 @@ model Profile {
   experienceYears Int      @default(0)
   projectsCount   Int      @default(0)
   coverUrl        String?
-  
-  currentStatus   Json?            // { label, description }
+
+  currentStatus   Json?    // { label, description }
   focusAreas      String[]
-  highlights      Json?            // [{ label, value, icon }]
-  
+  highlights      Json?    // [{ label, value, icon }]
+
   languages       String[]
   hobbies         String[]
-  
-  workPreferences Json?            // { remote, hybrid, onsite, timezone }
-  
-  // Stored as JSON for flexibility
+
+  workPreferences Json?    // { remote, hybrid, onsite, timezone }
+
   skills          Json     // { frontend: [], backend: [], ml: [] }
-  socials         Json?    // [{ platform: 'github', url: '...' }]
-  
+  socials         Json?    // [{ platform, url, icon? }]
+
+  createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+// ─── Coding Profiles ──────────────────────────────────────────────
 
 model CodingProfile {
-  id              String   @id @default(uuid())
-  leetcode        Json     // { username, url }
-  codeforces      Json     // { username, url }
-  codechef        Json     // { username, url }
-  github          Json     // { username, url }
-  
-  updatedAt       DateTime @updatedAt
+  id         String   @id @default(uuid())
+  leetcode   Json     // { username, url, stats? }
+  codeforces Json     // { username, url, stats? }
+  codechef   Json     // { username, url, stats? }
+  github     Json     // { username, url, stats? }
+
+  updatedAt  DateTime @updatedAt
 }
 
+// ─── Projects ─────────────────────────────────────────────────────
+
 model Project {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  slug        String    @unique
-  description String    @db.Text
-  content     String?   @db.Text
-  
+  slug        String   @unique
+  description String   @db.Text
+  content     String?  @db.Text
+
   techStack   String[]
   tags        String[]
-  
+
   thumbnail   String?
-  images      String[]  // Allow multiple images
-  
+  images      String[]
+
   githubUrl   String?
   liveUrl     String?
-  
-  status      String    @default("draft") // draft, published, archived, completed
-  featured    Boolean   @default(false)
-  priority    Int       @default(0)
-  
+
+  status      String   @default("draft") // draft, published, archived, completed
+  featured    Boolean  @default(false)
+  priority    Int      @default(0)
+
   stars       Int?
   forks       Int?
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
-  versions    Version[] @relation("ProjectVersions")
-  
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@index([status])
   @@index([featured])
   @@index([slug])
 }
 
+// ─── Journey Timeline ─────────────────────────────────────────────
+
 model JourneyEntry {
-  id          String   @id @default(uuid())
-  type        String   // work, education, project, etc.
-  title       String   // Role/Degree
-  company     String?  // Company/University
+  id          String    @id @default(uuid())
+  type        String    // work, education, project, achievement, other
+  title       String
+  company     String?
   location    String?
-  
-  date        String   // Display string e.g. "2023 - Present"
+
+  date        String    // Display string e.g. "2023 - Present"
   startDate   DateTime?
   endDate     DateTime?
-  
-  description String   @db.Text
+
+  description String    @db.Text
   skills      String[]
   url         String?
-  
-  order       Int      @default(0)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+
+  order       Int       @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   @@index([type])
   @@index([order])
 }
 
+// ─── Certifications ───────────────────────────────────────────────
+
 model Certification {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   title          String
   issuer         String
   date           DateTime
   expirationDate DateTime?
   credentialId   String?
   credentialUrl  String?
-  
+
   skills         String[]
   image          String?
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
   @@index([date])
 }
+
+// ─── Blog ─────────────────────────────────────────────────────────
 
 model BlogPost {
   id          String    @id @default(uuid())
@@ -161,22 +168,22 @@ model BlogPost {
   summary     String    @db.Text
   content     String    @db.Text
   coverImage  String?
-  
+
   tags        String[]
-  
-  status      String    @default("draft")
+
+  status      String    @default("draft") // draft, published, archived
   featured    Boolean   @default(false)
   publishedAt DateTime?
-  readingTime Int?      // Estimated minutes
-  
+  readingTime Int?
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  
-  versions    Version[] @relation("BlogPostVersions")
-  
+
   @@index([status])
   @@index([slug])
 }
+
+// ─── Contact Messages ─────────────────────────────────────────────
 
 model ContactMessage {
   id        String   @id @default(uuid())
@@ -184,47 +191,29 @@ model ContactMessage {
   email     String
   subject   String
   message   String   @db.Text
-  
+
   ipAddress String?
   isRead    Boolean  @default(false)
-  
+
   createdAt DateTime @default(now())
-  
+
   @@index([createdAt])
   @@index([isRead])
 }
 
+// ─── Audit Log ────────────────────────────────────────────────────
+
 model AuditLog {
   id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  action       String
+  adminId      String
+  admin        Admin    @relation(fields: [adminId], references: [id])
+  action       String   // create, update, delete
   resourceType String
   resourceId   String
   changes      Json
   timestamp    DateTime @default(now())
-  
-  @@index([userId])
+
+  @@index([adminId])
   @@index([resourceType, resourceId])
   @@index([timestamp])
 }
-
-model Version {
-  id            String   @id @default(uuid())
-  resourceType  String
-  resourceId    String
-  versionNumber Int
-  data          Json
-  changeSummary String?
-  createdBy     String?
-  createdAt     DateTime @default(now())
-  
-  project       Project?  @relation("ProjectVersions", fields: [projectId], references: [id])
-  projectId     String?
-  blogPost      BlogPost? @relation("BlogPostVersions", fields: [blogPostId], references: [id])
-  blogPostId    String?
-  
-  @@index([resourceType, resourceId])
-  @@index([createdAt])
-}
-
