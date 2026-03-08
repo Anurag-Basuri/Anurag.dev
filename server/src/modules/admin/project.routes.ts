@@ -1,12 +1,12 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
 import { notFound, conflict } from '../../lib/errors';
 import { ProjectSchema } from '../../schemas/zod-schemas';
 
-// Partial schema for updates
 const ProjectUpdateSchema = ProjectSchema.partial().omit({
 	id: true,
 	createdAt: true,
@@ -36,9 +36,8 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as z.infer<typeof ProjectSchema>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
-			// Check slug uniqueness
 			const existing = await prisma.project.findUnique({
 				where: { slug: data.slug },
 			});
@@ -54,7 +53,7 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 				action: 'create',
 				resourceType: 'Project',
 				resourceId: project.id,
-				changes: data as Record<string, unknown>,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.status(201).send(project);
@@ -62,13 +61,13 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 	);
 
 	// PUT /api/admin/projects/:id — update
-	fastify.put(
+	fastify.put<{ Params: { id: string } }>(
 		'/api/admin/projects/:id',
 		{ preHandler: [validate(ProjectUpdateSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.project.findUnique({ where: { id } });
 			if (!existing) {
@@ -76,7 +75,6 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 				return reply.status(error.statusCode).send(error.toJSON());
 			}
 
-			// If slug is being changed, check uniqueness
 			if (data.slug && data.slug !== existing.slug) {
 				const slugExists = await prisma.project.findUnique({
 					where: { slug: data.slug as string },
@@ -97,7 +95,7 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 				action: 'update',
 				resourceType: 'Project',
 				resourceId: id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.send(project);
@@ -105,13 +103,13 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 	);
 
 	// PATCH /api/admin/projects/:id/status — change status
-	fastify.patch(
+	fastify.patch<{ Params: { id: string } }>(
 		'/api/admin/projects/:id/status',
 		{ preHandler: [validate(StatusSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const { status } = request.body as z.infer<typeof StatusSchema>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.project.findUnique({ where: { id } });
 			if (!existing) {
@@ -137,11 +135,11 @@ export default async function projectRoutes(fastify: FastifyInstance) {
 	);
 
 	// DELETE /api/admin/projects/:id
-	fastify.delete(
+	fastify.delete<{ Params: { id: string } }>(
 		'/api/admin/projects/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.project.findUnique({ where: { id } });
 			if (!existing) {

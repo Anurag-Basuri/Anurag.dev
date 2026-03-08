@@ -9,7 +9,7 @@ import {
 } from './auth.service';
 import { validate } from '../../middleware/validate';
 import { rateLimit } from '../../middleware/rate-limit';
-import { unauthorized } from '../../lib/errors';
+import { unauthorized, AppError } from '../../lib/errors';
 import { authMiddleware } from '../../middleware/auth.middleware';
 
 // ─── Schemas ──────────────────────────────────────────────────────
@@ -65,9 +65,8 @@ export default async function authRoutes(fastify: FastifyInstance) {
 				const tokens = await rotateRefreshToken(refreshToken);
 				return reply.send(tokens);
 			} catch (err) {
-				if (err instanceof Error && 'statusCode' in err) {
-					const appErr = err as { statusCode: number; toJSON: () => unknown };
-					return reply.status(appErr.statusCode).send(appErr.toJSON());
+				if (err instanceof AppError) {
+					return reply.status(err.statusCode).send(err.toJSON());
 				}
 				throw err;
 			}
@@ -95,7 +94,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 		{ preHandler: [authMiddleware] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const admin = await prisma.admin.findUnique({
-				where: { id: request.user!.adminId },
+				where: { id: request.admin!.adminId },
 				select: { id: true, username: true, createdAt: true },
 			});
 

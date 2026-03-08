@@ -32,30 +32,32 @@ export async function verifyPassword(plain: string, hash: string): Promise<boole
 // ─── JWT Tokens ───────────────────────────────────────────────────
 
 export function generateAccessToken(payload: TokenPayload): string {
-	return jwt.sign(payload, env.JWT_SECRET, {
-		expiresIn: env.JWT_ACCESS_EXPIRY,
-	});
+	const tokenPayload = { adminId: payload.adminId, username: payload.username };
+	return jwt.sign(tokenPayload, env.JWT_SECRET, {
+		expiresIn: env.JWT_ACCESS_EXPIRY as string,
+	} as jwt.SignOptions);
 }
 
 export function verifyAccessToken(token: string): TokenPayload | null {
 	try {
-		const decoded = jwt.verify(token, env.JWT_SECRET) as TokenPayload;
-		return decoded;
+		const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload & TokenPayload;
+		return { adminId: decoded.adminId, username: decoded.username };
 	} catch {
 		return null;
 	}
 }
 
 function generateRefreshTokenString(payload: TokenPayload): string {
-	return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-		expiresIn: env.JWT_REFRESH_EXPIRY,
-	});
+	const tokenPayload = { adminId: payload.adminId, username: payload.username };
+	return jwt.sign(tokenPayload, env.JWT_REFRESH_SECRET, {
+		expiresIn: env.JWT_REFRESH_EXPIRY as string,
+	} as jwt.SignOptions);
 }
 
 function verifyRefreshTokenString(token: string): TokenPayload | null {
 	try {
-		const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET) as TokenPayload;
-		return decoded;
+		const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET) as jwt.JwtPayload & TokenPayload;
+		return { adminId: decoded.adminId, username: decoded.username };
 	} catch {
 		return null;
 	}
@@ -68,7 +70,7 @@ function verifyRefreshTokenString(token: string): TokenPayload | null {
  */
 function parseDuration(duration: string): number {
 	const match = duration.match(/^(\d+)([smhd])$/);
-	if (!match) return 7 * 24 * 60 * 60 * 1000; // fallback: 7 days
+	if (!match) return 7 * 24 * 60 * 60 * 1000;
 
 	const value = parseInt(match[1], 10);
 	const unit = match[2];
@@ -117,19 +119,16 @@ export async function generateTokenPair(payload: TokenPayload): Promise<AuthToke
  * Throws if the token is invalid, expired, or already revoked.
  */
 export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> {
-	// Verify JWT signature
 	const payload = verifyRefreshTokenString(oldToken);
 	if (!payload) {
 		throw unauthorized('Invalid refresh token');
 	}
 
-	// Check DB record
 	const stored = await prisma.refreshToken.findUnique({
 		where: { token: oldToken },
 	});
 
 	if (!stored || stored.isRevoked || stored.expiresAt < new Date()) {
-		// If already revoked, possible token reuse attack — revoke ALL tokens for this admin
 		if (stored?.isRevoked) {
 			await prisma.refreshToken.updateMany({
 				where: { adminId: stored.adminId },
@@ -139,13 +138,11 @@ export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> 
 		throw unauthorized('Refresh token expired or revoked');
 	}
 
-	// Revoke the old token
 	await prisma.refreshToken.update({
 		where: { id: stored.id },
 		data: { isRevoked: true },
 	});
 
-	// Issue new pair
 	return generateTokenPair({
 		adminId: payload.adminId,
 		username: payload.username,
@@ -158,16 +155,6 @@ export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> 
 export async function revokeRefreshToken(token: string): Promise<void> {
 	await prisma.refreshToken.updateMany({
 		where: { token, isRevoked: false },
-		data: { isRevoked: true },
-	});
-}
-
-/**
- * Revokes all refresh tokens for an admin.
- */
-export async function revokeAllTokens(adminId: string): Promise<void> {
-	await prisma.refreshToken.updateMany({
-		where: { adminId, isRevoked: false },
 		data: { isRevoked: true },
 	});
 }

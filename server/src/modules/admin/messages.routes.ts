@@ -39,35 +39,31 @@ export default async function messagesRoutes(fastify: FastifyInstance) {
 	);
 
 	// GET /api/admin/messages/:id — get single + mark as read
-	fastify.get(
-		'/api/admin/messages/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-			const { id } = request.params;
+	fastify.get<{ Params: { id: string } }>('/api/admin/messages/:id', async (request, reply) => {
+		const { id } = request.params;
 
-			const message = await prisma.contactMessage.findUnique({ where: { id } });
-			if (!message) {
-				const error = notFound('Message');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const message = await prisma.contactMessage.findUnique({ where: { id } });
+		if (!message) {
+			const error = notFound('Message');
+			return reply.status(error.statusCode).send(error.toJSON());
+		}
 
-			// Mark as read if not already
-			if (!message.isRead) {
-				await prisma.contactMessage.update({
-					where: { id },
-					data: { isRead: true },
-				});
-			}
+		if (!message.isRead) {
+			await prisma.contactMessage.update({
+				where: { id },
+				data: { isRead: true },
+			});
+		}
 
-			return reply.send({ ...message, isRead: true });
-		},
-	);
+		return reply.send({ ...message, isRead: true });
+	});
 
 	// DELETE /api/admin/messages/:id
-	fastify.delete(
+	fastify.delete<{ Params: { id: string } }>(
 		'/api/admin/messages/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.contactMessage.findUnique({ where: { id } });
 			if (!existing) {

@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
@@ -35,9 +36,8 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 		},
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as z.infer<typeof BlogPostSchema>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
-			// Check slug uniqueness
 			const existing = await prisma.blogPost.findUnique({
 				where: { slug: data.slug },
 			});
@@ -46,7 +46,6 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 				return reply.status(error.statusCode).send(error.toJSON());
 			}
 
-			// Auto-set publishedAt if publishing
 			const createData: any = { ...data };
 			if (data.status === 'published' && !data.publishedAt) {
 				createData.publishedAt = new Date();
@@ -59,7 +58,7 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 				action: 'create',
 				resourceType: 'BlogPost',
 				resourceId: post.id,
-				changes: data as Record<string, unknown>,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.status(201).send(post);
@@ -67,13 +66,13 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 	);
 
 	// PUT /api/admin/blog/:id
-	fastify.put(
+	fastify.put<{ Params: { id: string } }>(
 		'/api/admin/blog/:id',
 		{ preHandler: [validate(BlogUpdateSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.blogPost.findUnique({ where: { id } });
 			if (!existing) {
@@ -81,7 +80,6 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 				return reply.status(error.statusCode).send(error.toJSON());
 			}
 
-			// If slug is being changed, check uniqueness
 			if (data.slug && data.slug !== existing.slug) {
 				const slugExists = await prisma.blogPost.findUnique({
 					where: { slug: data.slug as string },
@@ -102,7 +100,7 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 				action: 'update',
 				resourceType: 'BlogPost',
 				resourceId: id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.send(post);
@@ -110,13 +108,13 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 	);
 
 	// PATCH /api/admin/blog/:id/status
-	fastify.patch(
+	fastify.patch<{ Params: { id: string } }>(
 		'/api/admin/blog/:id/status',
 		{ preHandler: [validate(BlogStatusSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const { status } = request.body as z.infer<typeof BlogStatusSchema>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.blogPost.findUnique({ where: { id } });
 			if (!existing) {
@@ -125,8 +123,6 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 			}
 
 			const updateData: any = { status };
-
-			// Auto-set publishedAt when publishing for the first time
 			if (status === 'published' && !existing.publishedAt) {
 				updateData.publishedAt = new Date();
 			}
@@ -149,29 +145,26 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 	);
 
 	// DELETE /api/admin/blog/:id
-	fastify.delete(
-		'/api/admin/blog/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-			const { id } = request.params;
-			const adminId = request.user!.adminId;
+	fastify.delete<{ Params: { id: string } }>('/api/admin/blog/:id', async (request, reply) => {
+		const { id } = request.params;
+		const adminId = request.admin!.adminId;
 
-			const existing = await prisma.blogPost.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Blog post');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.blogPost.findUnique({ where: { id } });
+		if (!existing) {
+			const error = notFound('Blog post');
+			return reply.status(error.statusCode).send(error.toJSON());
+		}
 
-			await prisma.blogPost.delete({ where: { id } });
+		await prisma.blogPost.delete({ where: { id } });
 
-			await logAudit({
-				adminId,
-				action: 'delete',
-				resourceType: 'BlogPost',
-				resourceId: id,
-				changes: { title: existing.title, slug: existing.slug },
-			});
+		await logAudit({
+			adminId,
+			action: 'delete',
+			resourceType: 'BlogPost',
+			resourceId: id,
+			changes: { title: existing.title, slug: existing.slug },
+		});
 
-			return reply.send({ message: 'Blog post deleted' });
-		},
-	);
+		return reply.send({ message: 'Blog post deleted' });
+	});
 }

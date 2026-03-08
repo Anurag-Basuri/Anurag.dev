@@ -2,10 +2,10 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { verifyAccessToken, TokenPayload } from '../modules/auth/auth.service';
 import { unauthorized, AppError } from '../lib/errors';
 
-// Extend FastifyRequest to include admin user data
+// Extend FastifyRequest to include admin data
 declare module 'fastify' {
 	interface FastifyRequest {
-		user?: TokenPayload;
+		admin?: TokenPayload;
 	}
 }
 
@@ -29,7 +29,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
 			return reply.status(error.statusCode).send(error.toJSON());
 		}
 
-		request.user = payload;
+		request.admin = payload;
 	} catch (err) {
 		if (err instanceof AppError) {
 			return reply.status(err.statusCode).send(err.toJSON());

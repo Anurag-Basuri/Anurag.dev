@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
@@ -24,7 +25,7 @@ export default async function certificationRoutes(fastify: FastifyInstance) {
 		{ preHandler: [validate(CertificationSchema.omit({ id: true }))] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const cert = await prisma.certification.create({ data: data as any });
 
@@ -33,7 +34,7 @@ export default async function certificationRoutes(fastify: FastifyInstance) {
 				action: 'create',
 				resourceType: 'Certification',
 				resourceId: cert.id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.status(201).send(cert);
@@ -41,13 +42,13 @@ export default async function certificationRoutes(fastify: FastifyInstance) {
 	);
 
 	// PUT /api/admin/certifications/:id
-	fastify.put(
+	fastify.put<{ Params: { id: string } }>(
 		'/api/admin/certifications/:id',
 		{ preHandler: [validate(CertificationUpdateSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.certification.findUnique({ where: { id } });
 			if (!existing) {
@@ -65,7 +66,7 @@ export default async function certificationRoutes(fastify: FastifyInstance) {
 				action: 'update',
 				resourceType: 'Certification',
 				resourceId: id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.send(cert);
@@ -73,11 +74,11 @@ export default async function certificationRoutes(fastify: FastifyInstance) {
 	);
 
 	// DELETE /api/admin/certifications/:id
-	fastify.delete(
+	fastify.delete<{ Params: { id: string } }>(
 		'/api/admin/certifications/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.certification.findUnique({ where: { id } });
 			if (!existing) {

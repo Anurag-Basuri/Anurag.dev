@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from './db';
 
 interface AuditEntry {
@@ -5,7 +6,7 @@ interface AuditEntry {
 	action: 'create' | 'update' | 'delete';
 	resourceType: string;
 	resourceId: string;
-	changes: Record<string, unknown>;
+	changes: Prisma.InputJsonValue;
 }
 
 /**
@@ -23,7 +24,8 @@ export async function logAudit(entry: AuditEntry): Promise<void> {
 				changes: entry.changes,
 			},
 		});
-	} catch (err) {
-		console.error('Failed to write audit log:', err);
+	} catch (err: unknown) {
+		const message = err instanceof Error ? err.message : String(err);
+		console.error('Failed to write audit log:', message);
 	}
 }

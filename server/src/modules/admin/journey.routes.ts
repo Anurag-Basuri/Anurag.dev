@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
@@ -32,7 +33,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 		{ preHandler: [validate(JourneyItemSchema.omit({ id: true }))] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const entry = await prisma.journeyEntry.create({ data: data as any });
 
@@ -41,7 +42,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 				action: 'create',
 				resourceType: 'JourneyEntry',
 				resourceId: entry.id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.status(201).send(entry);
@@ -49,13 +50,13 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 	);
 
 	// PUT /api/admin/journey/:id
-	fastify.put(
+	fastify.put<{ Params: { id: string } }>(
 		'/api/admin/journey/:id',
 		{ preHandler: [validate(JourneyUpdateSchema)] },
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+		async (request, reply) => {
 			const { id } = request.params;
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.journeyEntry.findUnique({ where: { id } });
 			if (!existing) {
@@ -73,7 +74,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 				action: 'update',
 				resourceType: 'JourneyEntry',
 				resourceId: id,
-				changes: data,
+				changes: data as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.send(entry);
@@ -86,9 +87,8 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 		{ preHandler: [validate(ReorderSchema)] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const { items } = request.body as z.infer<typeof ReorderSchema>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
-			// Use a transaction to update all orders atomically
 			await prisma.$transaction(
 				items.map(item =>
 					prisma.journeyEntry.update({
@@ -103,7 +103,7 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 				action: 'update',
 				resourceType: 'JourneyEntry',
 				resourceId: 'batch-reorder',
-				changes: { items },
+				changes: { items } as unknown as Prisma.InputJsonValue,
 			});
 
 			return reply.send({ message: 'Order updated' });
@@ -111,29 +111,26 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 	);
 
 	// DELETE /api/admin/journey/:id
-	fastify.delete(
-		'/api/admin/journey/:id',
-		async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-			const { id } = request.params;
-			const adminId = request.user!.adminId;
+	fastify.delete<{ Params: { id: string } }>('/api/admin/journey/:id', async (request, reply) => {
+		const { id } = request.params;
+		const adminId = request.admin!.adminId;
 
-			const existing = await prisma.journeyEntry.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Journey entry');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.journeyEntry.findUnique({ where: { id } });
+		if (!existing) {
+			const error = notFound('Journey entry');
+			return reply.status(error.statusCode).send(error.toJSON());
+		}
 
-			await prisma.journeyEntry.delete({ where: { id } });
+		await prisma.journeyEntry.delete({ where: { id } });
 
-			await logAudit({
-				adminId,
-				action: 'delete',
-				resourceType: 'JourneyEntry',
-				resourceId: id,
-				changes: { title: existing.title },
-			});
+		await logAudit({
+			adminId,
+			action: 'delete',
+			resourceType: 'JourneyEntry',
+			resourceId: id,
+			changes: { title: existing.title },
+		});
 
-			return reply.send({ message: 'Journey entry deleted' });
-		},
-	);
+		return reply.send({ message: 'Journey entry deleted' });
+	});
 }

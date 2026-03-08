@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
@@ -11,7 +12,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 		{ preHandler: [validate(AboutSchema)] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.profile.findFirst();
 
@@ -26,7 +27,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 					action: 'update',
 					resourceType: 'Profile',
 					resourceId: profile.id,
-					changes: data,
+					changes: data as unknown as Prisma.InputJsonValue,
 				});
 			} else {
 				profile = await prisma.profile.create({ data: data as any });
@@ -35,7 +36,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 					action: 'create',
 					resourceType: 'Profile',
 					resourceId: profile.id,
-					changes: data,
+					changes: data as unknown as Prisma.InputJsonValue,
 				});
 			}
 
@@ -49,7 +50,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 		{ preHandler: [validate(CodingProfileSchema)] },
 		async (request: FastifyRequest, reply: FastifyReply) => {
 			const data = request.body as Record<string, unknown>;
-			const adminId = request.user!.adminId;
+			const adminId = request.admin!.adminId;
 
 			const existing = await prisma.codingProfile.findFirst();
 
@@ -64,7 +65,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 					action: 'update',
 					resourceType: 'CodingProfile',
 					resourceId: profiles.id,
-					changes: data,
+					changes: data as unknown as Prisma.InputJsonValue,
 				});
 			} else {
 				profiles = await prisma.codingProfile.create({ data: data as any });
@@ -73,7 +74,7 @@ export default async function profileRoutes(fastify: FastifyInstance) {
 					action: 'create',
 					resourceType: 'CodingProfile',
 					resourceId: profiles.id,
-					changes: data,
+					changes: data as unknown as Prisma.InputJsonValue,
 				});
 			}
 
