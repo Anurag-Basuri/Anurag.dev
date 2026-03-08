@@ -1,32 +1,33 @@
 import { z } from 'zod';
 
-// --- Common Schemas ---
+// ─── Common Schemas ─────────────────────────────────────────────
+
 export const SkillSchema = z.object({
 	category: z.string(),
 	name: z.string(),
 	level: z.number().min(0).max(100),
 });
 
-// --- Social Link Schema ---
 export const SocialLinkSchema = z.object({
 	platform: z.string(),
 	url: z.string().url(),
 	icon: z.string().optional(),
 });
 
-// --- About Schema ---
+// ─── About / Profile ────────────────────────────────────────────
+
 export const AboutSchema = z.object({
-	id: z.string().optional(),
-	name: z.string(),
-	role: z.string(),
-	tagline: z.string(),
-	summary: z.string(),
-	bio: z.string(),
+	name: z.string().min(1),
+	role: z.string().min(1),
+	tagline: z.string().optional(),
+	summary: z.string().min(1),
+	bio: z.string().min(1),
 	location: z.string().optional(),
-	avatarUrl: z.string().url(),
+	avatarUrl: z.string().optional(),
 	resumeUrl: z.string().url().optional(),
 	experienceYears: z.number().default(0),
 	projectsCount: z.number().default(0),
+	coverUrl: z.string().optional(),
 
 	currentStatus: z
 		.object({
@@ -47,7 +48,6 @@ export const AboutSchema = z.object({
 		)
 		.optional(),
 
-	coverUrl: z.string().url().optional(),
 	languages: z.array(z.string()).optional(),
 	hobbies: z.array(z.string()).optional(),
 
@@ -70,29 +70,27 @@ export const AboutSchema = z.object({
 	socials: z.array(SocialLinkSchema).optional(),
 });
 
-// --- Project Schema ---
+// ─── Project ────────────────────────────────────────────────────
+
 export const ProjectSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(2, 'Title is required'),
-	slug: z.string().min(2, 'Slug is required'), // For URL friendly routing
+	slug: z.string().min(2, 'Slug is required'),
 	description: z.string().min(10),
-	content: z.string().optional(), // Extended markdown content
+	content: z.string().optional(),
 
 	techStack: z.array(z.string()),
 	tags: z.array(z.string()).optional(),
 
-	// URLs & Media
 	githubUrl: z.string().url().nullable().optional(),
 	liveUrl: z.string().url().nullable().optional(),
-	thumbnail: z.string().url().optional(),
-	images: z.array(z.string().url()).optional(), // Gallery
+	thumbnail: z.string().optional(),
+	images: z.array(z.string()).optional(),
 
-	// Metadata
 	status: z.enum(['draft', 'published', 'archived', 'completed']).default('draft'),
 	featured: z.boolean().default(false),
-	priority: z.number().default(0), // For custom sorting
+	priority: z.number().default(0),
 
-	// Stats (derived or manual)
 	stars: z.number().nullable().optional(),
 	forks: z.number().nullable().optional(),
 
@@ -100,81 +98,87 @@ export const ProjectSchema = z.object({
 	updatedAt: z.string().datetime().optional(),
 });
 
-// --- Journey Item Schema ---
+// ─── Journey Entry ──────────────────────────────────────────────
+
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
-	type: z.enum(['work', 'education', 'project', 'achievement', 'other']), // Replaces generalized 'category' string for better type safety
-
-	title: z.string(), // Role or Degree
-	company: z.string().optional(), // Company or Institution name
+	type: z.enum(['work', 'education', 'project', 'achievement', 'other']),
+	title: z.string().min(1),
+	company: z.string().optional(),
 	location: z.string().optional(),
 
-	date: z.string(), // Display date like "2023 - Present" or ISO
+	date: z.string().min(1),
 	startDate: z.string().datetime().optional(),
 	endDate: z.string().datetime().nullable().optional(),
 
-	description: z.string(),
-	skills: z.array(z.string()).optional(), // Skills used in this role
+	description: z.string().min(1),
+	skills: z.array(z.string()).optional(),
 	url: z.string().url().optional(),
 
 	order: z.number().default(0),
 });
 
-// --- Certification Schema ---
+// ─── Certification ──────────────────────────────────────────────
+
 export const CertificationSchema = z.object({
 	id: z.string().optional(),
-	title: z.string(),
-	issuer: z.string(),
-	date: z.string().datetime(), // Issue date
+	title: z.string().min(1),
+	issuer: z.string().min(1),
+	date: z.string().datetime(),
 	expirationDate: z.string().datetime().nullable().optional(),
 	credentialId: z.string().optional(),
 	credentialUrl: z.string().url().optional(),
 
 	skills: z.array(z.string()).optional(),
-	image: z.string().url().optional(),
+	image: z.string().optional(),
 });
 
-// --- Blog Post Schema ---
+// ─── Blog Post ──────────────────────────────────────────────────
+
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(5),
-	slug: z.string().min(5),
-	summary: z.string(),
-	content: z.string(), // Markdown
-	coverImage: z.string().url().optional(),
+	slug: z.string().min(3),
+	summary: z.string().min(1),
+	content: z.string().min(1),
+	coverImage: z.string().optional(),
 
 	tags: z.array(z.string()),
 	status: z.enum(['draft', 'published', 'archived']).default('draft'),
 	featured: z.boolean().default(false),
 
 	publishedAt: z.string().datetime().nullable().optional(),
-	readingTime: z.number().optional(), // In minutes
+	readingTime: z.number().optional(),
+
+	createdAt: z.string().datetime().optional(),
+	updatedAt: z.string().datetime().optional(),
 });
 
-// --- Contact Schema ---
+// ─── Contact ────────────────────────────────────────────────────
+
 export const ContactSchema = z.object({
-	name: z.string().min(2),
-	email: z.string().email(),
-	subject: z.string().min(2),
-	message: z.string().min(10),
+	name: z.string().min(2, 'Name must be at least 2 characters'),
+	email: z.string().email('Invalid email address'),
+	subject: z.string().min(2, 'Subject must be at least 2 characters'),
+	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
-const profileSchema = z.object({
+// ─── Coding Profile ─────────────────────────────────────────────
+
+const PlatformProfileSchema = z.object({
 	username: z.string(),
 	url: z.string().url(),
 });
 
-// --- Coding Profile Schema ---
 export const CodingProfileSchema = z.object({
-	id: z.string().optional(),
-	leetcode: profileSchema,
-	codeforces: profileSchema,
-	codechef: profileSchema,
-	github: profileSchema,
-	updatedAt: z.string().datetime().optional(),
+	leetcode: PlatformProfileSchema,
+	codeforces: PlatformProfileSchema,
+	codechef: PlatformProfileSchema,
+	github: PlatformProfileSchema,
 });
 
-// Types inferred from Zod schemas
+// ─── Inferred Types ─────────────────────────────────────────────
+
 export type About = z.infer<typeof AboutSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type JourneyItem = z.infer<typeof JourneyItemSchema>;
