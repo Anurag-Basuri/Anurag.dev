@@ -63,19 +63,19 @@ export function buildApp() {
 
 	// ─── Global Error Handler ─────────────────────────────────────
 
-	app.setErrorHandler((err, request, reply) => {
+	app.setErrorHandler((err: Error, request, reply) => {
 		// Known application errors
 		if (err instanceof AppError) {
 			return reply.status(err.statusCode).send(err.toJSON());
 		}
 
 		// Fastify validation errors (from schema validation)
-		if (err.validation) {
+		if ('validation' in err && (err as any).validation) {
 			return reply.status(400).send({
 				error: {
 					code: 'VALIDATION_ERROR',
 					message: 'Request validation failed',
-					details: err.validation,
+					details: (err as any).validation,
 					timestamp: new Date().toISOString(),
 				},
 			});
@@ -85,10 +85,18 @@ export function buildApp() {
 		request.log.error(err);
 
 		// Never leak internal details in production
-		const statusCode = err.statusCode || 500;
+		const statusCode =
+			'statusCode' in err && typeof (err as any).statusCode === 'number'
+				? (err as any).statusCode
+				: 500;
 		return reply.status(statusCode).send({
 			error: {
-				code: statusCode === 500 ? 'INTERNAL_ERROR' : err.code || 'ERROR',
+				code:
+					statusCode === 500
+						? 'INTERNAL_ERROR'
+						: 'code' in err
+							? (err as any).code
+							: 'ERROR',
 				message: statusCode === 500 ? 'Internal server error' : err.message,
 				timestamp: new Date().toISOString(),
 			},
