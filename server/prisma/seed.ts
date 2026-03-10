@@ -179,10 +179,12 @@ async function main() {
 		{
 			type: 'work',
 			title: 'Full Stack Engineer',
-			company: 'Tech Innovators Inc.',
+			organization: 'Tech Innovators Inc.',
 			location: 'San Francisco, CA',
 			date: '2024 - Present',
 			startDate: new Date('2024-01-01'),
+			isCurrent: true,
+			employmentType: 'full-time',
 			description:
 				'Developing high-performance web applications and AI-integrated solutions. Leading the frontend migration to Next.js.',
 			skills: ['React', 'Node.js', 'AWS', 'System Design'],
@@ -191,11 +193,12 @@ async function main() {
 		{
 			type: 'work',
 			title: 'Frontend Developer Intern',
-			company: 'Creative Solutions',
+			organization: 'Creative Solutions',
 			location: 'Remote',
 			date: '2023 - 2024',
 			startDate: new Date('2023-05-01'),
 			endDate: new Date('2023-12-31'),
+			employmentType: 'internship',
 			description:
 				'Contributed to the core design system and improved UI performance by 40%. Implemented accessible components.',
 			skills: ['TypeScript', 'Tailwind CSS', 'Storybook'],
@@ -203,25 +206,122 @@ async function main() {
 		},
 		{
 			type: 'education',
-			title: 'Bachelor of Computer Science',
-			company: 'University of Technology',
+			title: 'Bachelor of Technology',
+			organization: 'University of Technology',
 			location: 'City, Country',
 			date: '2020 - 2024',
 			startDate: new Date('2020-09-01'),
 			endDate: new Date('2024-05-01'),
+			degree: 'B.Tech',
+			fieldOfStudy: 'Computer Science and Engineering',
+			grade: '9.2 CGPA',
 			description:
 				'Specialized in Artificial Intelligence and Software Engineering. Graduated with Honors.',
 			skills: ['Algorithms', 'Data Structures', 'CS Fundamentals'],
 			order: 3,
 		},
+		{
+			type: 'education',
+			title: 'Higher Secondary (Class XII)',
+			organization: 'Delhi Public School',
+			location: 'Jamshedpur, Jharkhand',
+			date: '2018 - 2020',
+			startDate: new Date('2018-04-01'),
+			endDate: new Date('2020-03-31'),
+			degree: 'Higher Secondary',
+			fieldOfStudy: 'Science (PCM + CS)',
+			grade: '95.4%',
+			board: 'CBSE',
+			description:
+				'Excelled in Mathematics and Computer Science. Active participant in science olympiads and coding competitions.',
+			skills: ['C++', 'Mathematics', 'Physics'],
+			order: 4,
+		},
+		{
+			type: 'volunteering',
+			title: 'Open Source Contributor',
+			organization: 'Various Projects',
+			location: 'Remote',
+			date: '2022 - Present',
+			startDate: new Date('2022-01-01'),
+			isCurrent: true,
+			description:
+				'Active contributor to multiple open-source projects. Mentored new contributors and reviewed pull requests.',
+			skills: ['Git', 'TypeScript', 'Community Building'],
+			order: 5,
+		},
 	];
 
 	// Delete existing and re-create to avoid duplicate issues
+	await prisma.achievement.deleteMany();
 	await prisma.journeyEntry.deleteMany();
+	const createdJourneyEntries: Record<string, string> = {};
 	for (const entry of journeyEntries) {
-		await prisma.journeyEntry.create({ data: entry });
+		const created = await prisma.journeyEntry.create({ data: entry });
+		createdJourneyEntries[entry.title] = created.id;
 	}
 	console.log(`✅ Journey: ${journeyEntries.length} entries seeded`);
+
+	// ─── Achievements ───────────────────────────────────────────
+
+	const achievements = [
+		{
+			title: 'Winner - National Hackathon',
+			category: 'hackathon',
+			issuer: 'TechFest India',
+			event: 'CodeStorm 2024',
+			description:
+				'Built an AI-powered accessibility tool that won first place among 500+ teams.',
+			rank: '1st Place',
+			date: new Date('2024-03-15'),
+			tags: ['AI', 'Accessibility', 'React'],
+			team: ['Anurag Basuri', 'Team Member 2', 'Team Member 3'],
+			featured: true,
+			order: 1,
+			journeyEntryId: createdJourneyEntries['Bachelor of Technology'],
+		},
+		{
+			title: "Dean's List - Academic Excellence",
+			category: 'award',
+			issuer: 'University of Technology',
+			description:
+				'Recognized for outstanding academic performance across 6 consecutive semesters.',
+			date: new Date('2024-05-01'),
+			tags: ['Academic', 'Excellence'],
+			featured: true,
+			order: 2,
+			journeyEntryId: createdJourneyEntries['Bachelor of Technology'],
+		},
+		{
+			title: 'LeetCode Guardian',
+			category: 'competition',
+			issuer: 'LeetCode',
+			event: 'Weekly Contest',
+			description: 'Achieved Guardian badge with 2000+ rating on LeetCode.',
+			rank: 'Top 0.5%',
+			date: new Date('2024-06-10'),
+			proofUrl: 'https://leetcode.com/u/Anurag_Basuri',
+			tags: ['Competitive Programming', 'DSA'],
+			featured: false,
+			order: 3,
+		},
+		{
+			title: 'Open Source Scholarship',
+			category: 'scholarship',
+			issuer: 'GitHub Education',
+			description: 'Awarded scholarship for significant open-source contributions.',
+			date: new Date('2023-09-01'),
+			tags: ['Open Source', 'Community'],
+			featured: false,
+			order: 4,
+			journeyEntryId: createdJourneyEntries['Open Source Contributor'],
+		},
+	];
+
+	for (const achievement of achievements) {
+		await prisma.achievement.create({ data: achievement });
+	}
+	console.log(`✅ Achievements: ${achievements.length} seeded`);
 
 	// ─── Certifications ─────────────────────────────────────────
 

@@ -106,29 +106,85 @@ model Project {
   @@index([slug])
 }
 
-// Journey Model - For storing career and life experience entries
+// Journey Model - Career, education, and life experience entries
 model JourneyEntry {
-  id          String    @id @default(uuid())
-  type        String    // work, education, project, achievement, other
-  title       String
-  company     String?
-  location    String?
+  id           String    @id @default(uuid())
+  type         String    // work, education, volunteering, research, other
+  title        String
+  organization String?   // School, company, lab, NGO — generic label
+  location     String?
 
-  date        String    // Display string e.g. "2023 - Present"
-  startDate   DateTime?
-  endDate     DateTime?
+  date         String    // Display string e.g. "2023 - Present"
+  startDate    DateTime?
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
 
-  description String    @db.Text
-  skills      String[]
-  url         String?
+  description  String    @db.Text
+  skills       String[]
+  url          String?
 
-  order       Int       @default(0)
+  // Education-specific
+  degree       String?   // e.g. "B.Tech", "High School", "M.Sc"
+  fieldOfStudy String?   // e.g. "Computer Science and Engineering"
+  grade        String?   // e.g. "9.2 CGPA", "85%", "3.8/4.0" — string for flexibility
+  board        String?   // e.g. "CBSE", "ICSE", "State Board" (school-level)
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  // Work-specific
+  employmentType String? // full-time, part-time, internship, contract, freelance
+
+  // Research-specific
+  publication  String?   // Journal / conference name
+  doi          String?   // DOI identifier
+
+  // Display
+  icon         String?   // Custom icon/logo URL for the organization
+  highlighted  Boolean   @default(false) // Pin important entries
+
+  order        Int       @default(0)
+
+  // Relations
+  achievements Achievement[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([type])
   @@index([order])
+}
+
+// Achievement Model - Hackathons, awards, competitions, scholarships, etc.
+model Achievement {
+  id             String    @id @default(uuid())
+
+  title          String                       // "Won XYZ Hackathon"
+  category       String                       // hackathon, competition, award, opensource, publication, scholarship
+  issuer         String?                      // Organization that gave the award
+  event          String?                      // Event / competition name
+
+  description    String?   @db.Text
+  rank           String?                      // "1st Place", "Top 10", "Gold Medal"
+
+  date           DateTime?
+  proofUrl       String?                      // Certificate / proof link
+  url            String?                      // Related external link
+
+  tags           String[]                     // Skills / topics
+  team           String[]                     // Team member names
+
+  featured       Boolean   @default(false)
+  order          Int       @default(0)
+
+  // Optional relation to a Journey entry
+  journeyEntryId String?
+  journeyEntry   JourneyEntry? @relation(fields: [journeyEntryId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([category])
+  @@index([featured])
+  @@index([order])
+  @@index([journeyEntryId])
 }
 
 // Certification Model - For storing certification information
