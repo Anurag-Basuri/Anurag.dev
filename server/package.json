@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"description": "A TypeScript-based REST API server built on Fastify for a developer portfolio system.",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev": "tsx watch src/server.ts",
 		"build": "tsc",
@@ -21,7 +22,7 @@
 	},
 	"dependencies": {
 		"@prisma/adapter-pg": "^7.4.2",
-		"@prisma/client": "^6.19.2",
+		"@prisma/client": "^7.4.2",
 		"bcrypt": "^6.0.0",
 		"cors": "^2.8.6",
 		"dotenv": "^17.3.1",
@@ -39,7 +40,7 @@
 		"@types/node": "^22.19.15",
 		"@types/pg": "^8.18.0",
 		"@types/sanitize-html": "^2.16.1",
-		"prisma": "^6.19.2",
+		"prisma": "^7.4.2",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"

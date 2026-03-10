@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -11,74 +12,74 @@ datasource db {
 
 // Profile Model - Singleton pattern enforced by fixed ID "main"
 model Profile {
-  id            String  @id @default("main") // Sentinel — enforces single row at DB level
+  id String @id @default("main") // Sentinel — enforces single row at DB level
 
   // Personal Info
-  name          String @default("Anurag Basuri")           // Full name
-  pronouns      String @default("he/him")            // e.g. "he/him"
-  email         String @default("basurianurag@gmail.com")           // Public contact email (shown on portfolio)
-  phone         String @default("+91 9876543210")           // Optional public phone number
+  name     String @default("Anurag Basuri") // Full name
+  pronouns String @default("he/him") // e.g. "he/him"
+  email    String @default("basurianurag@gmail.com") // Public contact email (shown on portfolio)
+  phone    String @default("+91 9876543210") // Optional public phone number
 
   // Career & Bio
-  header          String?           // Primary title e.g. "Full Stack Developer"
-  bio           String? @db.Text  // Casual personal bio for about section
+  header String? // Primary title e.g. "Full Stack Developer"
+  bio    String? @db.Text // Casual personal bio for about section
 
   // Location(Current)
-  Currentlocation      String?           // e.g. "Bangalore, Karnataka, India"
+  Currentlocation String? // e.g. "Bangalore, Karnataka, India"
 
   // Location(Original)
-  Originallocation     String?           // e.g. "Jamshedpur, Jharkhand, India"
+  Originallocation String? // e.g. "Jamshedpur, Jharkhand, India"
 
   // Job Seeking & Availability
   openToWork    Boolean @default(true) // Toggle "Open to Work" badge
-  availableFrom String?           // e.g. "Immediately" or "June 2025"
-  noticePeriod  String?           // e.g. "30 days" or "Immediate"
+  availableFrom String? // e.g. "Immediately" or "June 2025"
+  noticePeriod  String? // e.g. "30 days" or "Immediate"
 
   // Job Preferences
-  workPreferences Json?   // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
+  workPreferences Json? // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
   jobTypes        String[] // ["full-time", "part-time", "contract", "freelance", "internship"]
 
   // Media & Links
-  avatarUrl     String?           // Profile picture
-  coverUrl      String?           // Portfolio header / banner image
-  resumeUrl     String?           // Downloadable resume PDF URL
+  avatarUrl String? // Profile picture
+  coverUrl  String? // Portfolio header / banner image
+  resumeUrl String? // Downloadable resume PDF URL
 
   // Quick Stats
-  experienceYears Int     @default(0)
-  projectsCount   Int     @default(0)
+  experienceYears Int @default(0)
+  projectsCount   Int @default(0)
 
   // Skills
-  skills        Json?     // { AI&ML: ["TensorFlow", "PyTorch"], Backend: ["Node.js", "Django"]}
+  skills Json? // { AI&ML: ["TensorFlow", "PyTorch"], Backend: ["Node.js", "Django"]}
 
   // Personal
-  languages     String[]  // Spoken/written languages e.g. ["English", "Hindi"]
+  languages String[] // Spoken/written languages e.g. ["English", "Hindi"]
 
   // Social & Web
-  socials       Json?     // [{ platform, url, icon?, handle? }]
-  website       String?   // Personal site / portfolio URL
+  socials Json? // [{ platform, url, icon?, handle? }]
+  website String? // Personal site / portfolio URL
 
   // Coding Platforms
-  github        String?     // stats: { repos, stars, contributions, followers, following }
-  leetcode      String?     // stats: { solved, totalSolved, ranking, acceptance, streak }
-  codeforces    String?     // stats: { rating, rank, maxRating, maxRank }
-  codechef      String?     // stats: { rating, stars, globalRank, countryRank }
-  gfg           String?     // stats: { score, streak, rank, problemsSolved }
-  kaggle        String?     // stats: { tier, medals: { gold, silver, bronze } }
-  otherProfiles String[]    // [{ platform, username, url, stats? }] — catch-all for others
+  github        String? // stats: { repos, stars, contributions, followers, following }
+  leetcode      String? // stats: { solved, totalSolved, ranking, acceptance, streak }
+  codeforces    String? // stats: { rating, rank, maxRating, maxRank }
+  codechef      String? // stats: { rating, stars, globalRank, countryRank }
+  gfg           String? // stats: { score, streak, rank, problemsSolved }
+  kaggle        String? // stats: { tier, medals: { gold, silver, bronze } }
+  otherProfiles String[] // [{ platform, username, url, stats? }] — catch-all for others
 
   // SEO / Meta
-  seoTitle      String?
-  seoDesc       String?
-  seoKeywords   String[]
+  seoTitle    String?
+  seoDesc     String?
+  seoKeywords String[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Project Model - Represents individual projects in portfolio
 model Project {
-  id          String   @id @default(uuid())
-  slug        String   @unique
+  id   String @id @default(uuid())
+  slug String @unique
 
   // Core Info
   title       String
@@ -86,19 +87,19 @@ model Project {
   techStack   String[]
 
   // Media & Links
-  thumbnail   String?
-  images      String[]
-  githubUrl   String? // Link to GitHub repo
-  liveUrl     String? // Link to live demo or deployed site
+  thumbnail String?
+  images    String[]
+  githubUrl String? // Link to GitHub repo
+  liveUrl   String? // Link to live demo or deployed site
 
-  status      String   @default("draft") // draft, published, archived, completed
-  featured    Boolean  @default(false)
+  status   String  @default("draft") // draft, published, archived, completed
+  featured Boolean @default(false)
 
-  stars       Int?
-  forks       Int?
+  stars Int?
+  forks Int?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([featured])
@@ -107,45 +108,45 @@ model Project {
 
 // Journey Model - Career, education, and life experience entries
 model JourneyEntry {
-  id           String    @id @default(uuid())
-  type         String    // work, education, volunteering, research, other
+  id           String  @id @default(uuid())
+  type         String // work, education, volunteering, research, other
   title        String
-  organization String?   // School, company, lab, NGO — generic label
+  organization String? // School, company, lab, NGO — generic label
   location     String?
 
-  date         String    // Display string e.g. "2023 - Present"
-  startDate    DateTime?
-  endDate      DateTime?
-  isCurrent    Boolean   @default(false)
+  date      String // Display string e.g. "2023 - Present"
+  startDate DateTime?
+  endDate   DateTime?
+  isCurrent Boolean   @default(false)
 
-  description  String    @db.Text
-  skills       String[]
-  url          String?
+  description String   @db.Text
+  skills      String[]
+  url         String?
 
   // Education-specific
-  degree       String?   // e.g. "B.Tech", "High School", "M.Sc"
-  fieldOfStudy String?   // e.g. "Computer Science and Engineering"
-  grade        String?   // e.g. "9.2 CGPA", "85%", "3.8/4.0" — string for flexibility
-  board        String?   // e.g. "CBSE", "ICSE", "State Board" (school-level)
+  degree       String? // e.g. "B.Tech", "High School", "M.Sc"
+  fieldOfStudy String? // e.g. "Computer Science and Engineering"
+  grade        String? // e.g. "9.2 CGPA", "85%", "3.8/4.0" — string for flexibility
+  board        String? // e.g. "CBSE", "ICSE", "State Board" (school-level)
 
   // Work-specific
   employmentType String? // full-time, part-time, internship, contract, freelance
 
   // Research-specific
-  publication  String?   // Journal / conference name
-  doi          String?   // DOI identifier
+  publication String? // Journal / conference name
+  doi         String? // DOI identifier
 
   // Display
-  icon         String?   // Custom icon/logo URL for the organization
-  highlighted  Boolean   @default(false) // Pin important entries
+  icon        String? // Custom icon/logo URL for the organization
+  highlighted Boolean @default(false) // Pin important entries
 
-  order        Int       @default(0)
+  order Int @default(0)
 
   // Relations
   achievements Achievement[]
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([type])
   @@index([order])
@@ -153,32 +154,32 @@ model JourneyEntry {
 
 // Achievement Model - Hackathons, awards, competitions, scholarships, etc.
 model Achievement {
-  id             String    @id @default(uuid())
+  id String @id @default(uuid())
 
-  title          String                       // "Won XYZ Hackathon"
-  category       String                       // hackathon, competition, award, opensource, publication, scholarship
-  issuer         String?                      // Organization that gave the award
-  event          String?                      // Event / competition name
+  title    String // "Won XYZ Hackathon"
+  category String // hackathon, competition, award, opensource, publication, scholarship
+  issuer   String? // Organization that gave the award
+  event    String? // Event / competition name
 
-  description    String?   @db.Text
-  rank           String?                      // "1st Place", "Top 10", "Gold Medal"
+  description String? @db.Text
+  rank        String? // "1st Place", "Top 10", "Gold Medal"
 
-  date           DateTime?
-  proofUrl       String?                      // Certificate / proof link
-  url            String?                      // Related external link
+  date     DateTime?
+  proofUrl String? // Certificate / proof link
+  url      String? // Related external link
 
-  tags           String[]                     // Skills / topics
-  team           String[]                     // Team member names
+  tags String[] // Skills / topics
+  team String[] // Team member names
 
-  featured       Boolean   @default(false)
-  order          Int       @default(0)
+  featured Boolean @default(false)
+  order    Int     @default(0)
 
   // Optional relation to a Journey entry
   journeyEntryId String?
   journeyEntry   JourneyEntry? @relation(fields: [journeyEntryId], references: [id], onDelete: SetNull)
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category])
   @@index([featured])
@@ -188,47 +189,47 @@ model Achievement {
 
 // Certification Model - For storing certification information
 model Certification {
-  id            String    @id @default(uuid())
+  id String @id @default(uuid())
 
-  title         String
-  issuer        String
+  title  String
+  issuer String
 
-  description   String?   @db.Text
-  credentialId  String?   @unique
+  description   String? @db.Text
+  credentialId  String? @unique
   credentialUrl String?
 
-  certificateUrl String?   // Link to certificate image or PDF
+  certificateUrl String? // Link to certificate image or PDF
 
-  skills        String[]
-  
-  startDate     DateTime?
-  endDate     DateTime?
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  skills String[]
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([issuer])
 }
 
 // BlogPost Model - For blog posts or articles on portfolio
 model BlogPost {
-  id          String    @id @default(uuid())
-  slug        String    @unique
+  id   String @id @default(uuid())
+  slug String @unique
 
   // Core Info
-  title       String
-  content     String    @db.Text
-  tags        String[]
+  title   String
+  content String   @db.Text
+  tags    String[]
 
   coverImage  String?
   otherImages String[]
-  link        String?   // Link to original post if cross-posted
+  link        String? // Link to original post if cross-posted
 
   status      String    @default("draft") // draft, published, archived
   publishedAt DateTime?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([slug])
@@ -236,14 +237,14 @@ model BlogPost {
 
 // Contact Messages - For storing messages sent via contact form on portfolio
 model ContactMessage {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  subject   String
-  message   String   @db.Text
+  id      String @id @default(uuid())
+  name    String
+  email   String
+  subject String
+  message String @db.Text
 
   ipAddress String?
-  isRead    Boolean  @default(false)
+  isRead    Boolean @default(false)
 
   createdAt DateTime @default(now())
 
