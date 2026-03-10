@@ -224,20 +224,72 @@ export const ProjectSchema = z.object({
 
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
-	type: z.enum(['work', 'education', 'project', 'achievement', 'other']),
+	type: z.enum(['work', 'education', 'volunteering', 'research', 'other']),
 	title: z.string().min(1),
-	company: z.string().optional(),
+	organization: z.string().optional(),
 	location: z.string().optional(),
 
 	date: z.string().min(1),
 	startDate: z.string().datetime().optional(),
 	endDate: z.string().datetime().nullable().optional(),
+	isCurrent: z.boolean().default(false),
 
 	description: z.string().min(1),
 	skills: z.array(z.string()).optional(),
 	url: z.string().url().optional(),
 
+	// Education-specific
+	degree: z.string().optional(),
+	fieldOfStudy: z.string().optional(),
+	grade: z.string().optional(),
+	board: z.string().optional(),
+
+	// Work-specific
+	employmentType: z
+		.enum(['full-time', 'part-time', 'internship', 'contract', 'freelance'])
+		.optional(),
+
+	// Research-specific
+	publication: z.string().optional(),
+	doi: z.string().optional(),
+
+	// Display
+	icon: z.string().optional(),
+	highlighted: z.boolean().default(false),
+
 	order: z.number().default(0),
+});
+
+// ─── Achievement ────────────────────────────────────────────────
+
+export const AchievementSchema = z.object({
+	id: z.string().optional(),
+	title: z.string().min(1),
+	category: z.enum([
+		'hackathon',
+		'competition',
+		'award',
+		'opensource',
+		'publication',
+		'scholarship',
+	]),
+	issuer: z.string().optional(),
+	event: z.string().optional(),
+
+	description: z.string().optional(),
+	rank: z.string().optional(),
+
+	date: z.string().datetime().nullable().optional(),
+	proofUrl: z.string().url().optional(),
+	url: z.string().url().optional(),
+
+	tags: z.array(z.string()).optional(),
+	team: z.array(z.string()).optional(),
+
+	featured: z.boolean().default(false),
+	order: z.number().default(0),
+
+	journeyEntryId: z.string().nullable().optional(),
 });
 
 // ─── Certification ──────────────────────────────────────────────
@@ -290,6 +342,7 @@ export const ContactSchema = z.object({
 export type Profile = z.infer<typeof ProfileSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type JourneyItem = z.infer<typeof JourneyItemSchema>;
+export type Achievement = z.infer<typeof AchievementSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;

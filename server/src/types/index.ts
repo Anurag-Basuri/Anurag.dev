@@ -27,5 +27,12 @@ export interface PaginatedResult<T> {
 }
 
 export type ContentStatus = 'draft' | 'published' | 'archived' | 'completed';
-export type JourneyType = 'work' | 'education' | 'project' | 'achievement' | 'other';
+export type JourneyType = 'work' | 'education' | 'volunteering' | 'research' | 'other';
+export type AchievementCategory =
+	| 'hackathon'
+	| 'competition'
+	| 'award'
+	| 'opensource'
+	| 'publication'
+	| 'scholarship';
 export type AuditAction = 'create' | 'update' | 'delete';

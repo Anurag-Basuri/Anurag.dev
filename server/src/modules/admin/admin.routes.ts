@@ -3,6 +3,7 @@ import { authMiddleware } from '../../middleware/auth.middleware';
 import profileRoutes from './profile.routes';
 import projectRoutes from './project.routes';
 import journeyRoutes from './journey.routes';
+import achievementRoutes from './achievement.routes';
 import certificationRoutes from './certification.routes';
 import blogRoutes from './blog.routes';
 import messagesRoutes from './messages.routes';
@@ -18,6 +19,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
 	fastify.register(profileRoutes);
 	fastify.register(projectRoutes);
 	fastify.register(journeyRoutes);
+	fastify.register(achievementRoutes);
 	fastify.register(certificationRoutes);
 	fastify.register(blogRoutes);
 	fastify.register(messagesRoutes);

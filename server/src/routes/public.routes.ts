@@ -60,6 +60,17 @@ export default async function publicRoutes(fastify: FastifyInstance) {
 	fastify.get('/api/journey', async (_req, reply) => {
 		const items = await prisma.journeyEntry.findMany({
 			orderBy: { order: 'asc' },
+			include: { achievements: { orderBy: { order: 'asc' } } },
+		});
+		return reply.send({ items });
+	});
+
+	// ─── Achievements ──────────────────────────────────────────
+
+	fastify.get('/api/achievements', async (_req, reply) => {
+		const items = await prisma.achievement.findMany({
+			orderBy: { order: 'asc' },
+			include: { journeyEntry: { select: { id: true, title: true, type: true } } },
 		});
 		return reply.send({ items });
 	});
