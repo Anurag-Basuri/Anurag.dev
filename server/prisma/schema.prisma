@@ -10,73 +10,95 @@ datasource db {
   provider  = "postgresql"
 }
 
-// Admin model(for authentication and audit logging)
-model Admin {
-  id           String   @id @default(uuid())
-  username     String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  adminId   String
-  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  isRevoked Boolean  @default(false)
-
-  @@index([adminId])
-  @@index([token])
-}
-
-// ─── Profile (singleton — portfolio owner's about info) ───────────
+// ─── Profile (singleton — one row, id is always "main") ──────────
 
 model Profile {
-  id              String   @id @default(uuid())
-  name            String
-  role            String
-  tagline         String?
-  summary         String   @db.Text
-  bio             String   @db.Text
-  location        String?
-  avatarUrl       String?
-  resumeUrl       String?
-  experienceYears Int      @default(0)
-  projectsCount   Int      @default(0)
-  coverUrl        String?
+  id            String  @id @default("main") // Sentinel — enforces single row at DB level
 
-  currentStatus   Json?    // { label, description }
-  focusAreas      String[]
-  highlights      Json?    // [{ label, value, icon }]
+  // ─── Identity ────────────────────────────────────────────────
+  name          String @default("Anurag Basuri")           // Full name
+  pronouns      String?           // e.g. "he/him"
+  email         String?           // Public contact email (shown on portfolio)
+  phone         String?           // Optional public phone number
 
-  languages       String[]
-  hobbies         String[]
+  // ─── Headline ────────────────────────────────────────────────
+  role          String?           // Primary title e.g. "Full Stack Developer"
+  tagline       String?           // Short punchy line for hero section
+  summary       String? @db.Text  // 2-3 paragraph professional summary (rich text)
+  bio           String? @db.Text  // Casual personal bio for about section
 
-  workPreferences Json?    // { remote, hybrid, onsite, timezone }
+  // ─── Location & Availability ─────────────────────────────────
+  location      String?           // e.g. "Bangalore, India"
+  timezone      String?           // e.g. "Asia/Kolkata" — shown to recruiters
+  openToWork    Boolean @default(false) // Toggle "Open to Work" badge
+  availableFrom String?           // e.g. "Immediately" or "June 2025"
+  noticePeriod  String?           // e.g. "30 days" or "Immediate"
 
-  skills          Json     // { frontend: [], backend: [], ml: [] }
-  socials         Json?    // [{ platform, url, icon? }]
+  // ─── Media ───────────────────────────────────────────────────
+  avatarUrl     String?           // Profile picture
+  coverUrl      String?           // Portfolio header / banner image
+  resumeUrl     String?           // Downloadable resume PDF URL
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
+  // ─── Quick Stats ─────────────────────────────────────────────
+  experienceYears Int     @default(0)
+  projectsCount   Int     @default(0)
 
-// ─── Coding Profiles ──────────────────────────────────────────────
+  // ─── Work Preferences ────────────────────────────────────────
+  workPreferences Json?   // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
+  jobTypes        String[] // ["full-time", "part-time", "contract", "freelance", "internship"]
+  preferredRoles  String[] // ["Backend Engineer", "ML Engineer", "DevOps"]
+  industries      String[] // ["Fintech", "EdTech", "Open Source"]
+  salaryRange     Json?   // { min, max, currency, period: "annual"|"monthly"|"hourly" }
 
-model CodingProfile {
-  id         String   @id @default(uuid())
-  leetcode   Json     // { username, url, stats? }
-  codeforces Json     // { username, url, stats? }
-  codechef   Json     // { username, url, stats? }
-  github     Json     // { username, url, stats? }
+  // ─── Skills ──────────────────────────────────────────────────
+  skills        Json?     // { frontend: [{name,level?,icon?}], backend:[], ml:[], devops:[], databases:[], tools:[], other:[] }
+  techStack     String[]  // Fast flat list of top technologies shown in hero/cards
 
-  updatedAt  DateTime @updatedAt
+  // ─── Status, Highlights & Focus ──────────────────────────────
+  currentStatus Json?     // { label, description?, emoji?, show: bool }
+  highlights    Json?     // [{ label, value, icon? }] — e.g. "10+ Projects Built"
+  focusAreas    String[]  // ["System Design", "Backend", "AI/ML"]
+  achievements  Json?     // [{ title, description?, year?, url? }]
+
+  // ─── Personal ────────────────────────────────────────────────
+  languages     String[]  // Spoken/written languages e.g. ["English (C2)", "Hindi"]
+  hobbies       String[]  // Personal interests
+
+  // ─── Social & Web ────────────────────────────────────────────
+  socials       Json?     // [{ platform, url, icon?, handle? }]
+  website       String?   // Personal site / portfolio URL
+
+  // ─── Coding Platforms ────────────────────────────────────────
+  // Each: { username, url, stats?: { platform-specific stats } }
+  github        Json?     // stats: { repos, stars, contributions, followers, following }
+  leetcode      Json?     // stats: { solved, totalSolved, ranking, acceptance, streak }
+  codeforces    Json?     // stats: { rating, rank, maxRating, maxRank }
+  codechef      Json?     // stats: { rating, stars, globalRank, countryRank }
+  hackerrank    Json?     // stats: { badges, score, level }
+  gfg           Json?     // stats: { score, streak, rank, problemsSolved }
+  kaggle        Json?     // stats: { tier, medals: { gold, silver, bronze } }
+  otherProfiles Json?     // [{ platform, username, url, stats? }] — catch-all for others
+
+  // ─── Open Source ─────────────────────────────────────────────
+  openSource    Json?     // [{ repo, description?, url, stars?, language?, role? }]
+
+  // ─── Publications & Talks ────────────────────────────────────
+  publications  Json?     // [{ title, url?, venue?, date?, type: "article"|"talk"|"paper"|"video"|"podcast" }]
+
+  // ─── Education Quick-Reference ───────────────────────────────
+  // Mirrors JourneyEntry for fast access without a join
+  education     Json?     // [{ institution, degree?, field?, year?, gpa?, url? }]
+
+  // ─── Testimonials ────────────────────────────────────────────
+  testimonials  Json?     // [{ name, role?, company?, text, avatarUrl? }]
+
+  // ─── SEO / Meta ──────────────────────────────────────────────
+  seoTitle      String?
+  seoDesc       String?
+  seoKeywords   String[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 // ─── Projects ─────────────────────────────────────────────────────
@@ -198,21 +220,4 @@ model ContactMessage {
 
   @@index([createdAt])
   @@index([isRead])
-}
-
-// ─── Audit Log ────────────────────────────────────────────────────
-
-model AuditLog {
-  id           String   @id @default(uuid())
-  adminId      String
-  admin        Admin    @relation(fields: [adminId], references: [id])
-  action       String   // create, update, delete
-  resourceType String
-  resourceId   String
-  changes      Json
-  timestamp    DateTime @default(now())
-
-  @@index([adminId])
-  @@index([resourceType, resourceId])
-  @@index([timestamp])
 }

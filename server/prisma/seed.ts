@@ -22,205 +22,110 @@ async function main() {
 	});
 	console.log(`✅ Admin user: ${admin.username}`);
 
-	// ─── Profile ────────────────────────────────────────────────
+	// ─── Profile (singleton) ─────────────────────────────────────
 
-	const existingProfile = await prisma.profile.findFirst();
-	const profile = existingProfile
-		? await prisma.profile.update({
-				where: { id: existingProfile.id },
-				data: {
-					name: 'Anurag Basuri',
-					role: 'Full Stack Engineer',
-					tagline: 'Building the Future with Code & AI',
-					summary:
-						'I specialize in building scalable web applications and exploring the frontiers of artificial intelligence. With a passion for clean code and intuitive design, I create digital experiences that perform as beautiful as they look.',
-					bio: "I'm a Full Stack Engineer with a deep passion for building scalable, user-centric web applications. My journey began with a curiosity about how things work on the internet, which quickly evolved into a career in software development.\n\nI specialize in the React ecosystem (Next.js, TypeScript) and modern backend architectures. I strongly believe in writing clean, maintainable code and testing thoroughly. Beyond coding, I'm an advocate for developer experience and often contribute to open-source projects.\n\nWhen I'm not pushing commits, you can find me exploring new AI technologies, reading sci-fi novels, or capturing moments through my camera lens.",
-					location: 'India',
-					avatarUrl: '/logo.png',
-					coverUrl: '/about-cover.jpg',
-					experienceYears: 2,
-					projectsCount: 15,
-					currentStatus: {
-						label: 'Building the future of web',
-						description:
-							'Currently focused on scalable architectures and AI integration',
-					},
-					focusAreas: [
-						'Full-Stack Development',
-						'AI/ML Integration',
-						'System Architecture',
-						'Developer Experience',
-					],
-					highlights: [
-						{ label: 'Code Quality', value: '98%', icon: 'Code2' },
-						{ label: 'Projects Delivered', value: '15+', icon: 'CheckCircle' },
-						{ label: 'Client Satisfaction', value: '100%', icon: 'Star' },
-					],
-					languages: ['English (Native)', 'Hindi (Native)', 'Japanese (Elementary)'],
-					hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
-					workPreferences: {
-						remote: true,
-						hybrid: true,
-						onsite: false,
-						timezone: 'IST (UTC+5:30)',
-					},
-					skills: {
-						frontend: [
-							{ category: 'Frontend', name: 'React/Next.js', level: 95 },
-							{ category: 'Frontend', name: 'TypeScript', level: 90 },
-							{ category: 'Frontend', name: 'Tailwind CSS', level: 98 },
-							{ category: 'Frontend', name: 'Framer Motion', level: 85 },
-						],
-						backend: [
-							{ category: 'Backend', name: 'Node.js', level: 88 },
-							{ category: 'Backend', name: 'PostgreSQL', level: 85 },
-							{ category: 'Backend', name: 'Prisma', level: 90 },
-							{ category: 'Backend', name: 'Serverless', level: 80 },
-						],
-						ml: [
-							{ category: 'AI/ML', name: 'Python', level: 85 },
-							{ category: 'AI/ML', name: 'LangChain', level: 75 },
-							{ category: 'AI/ML', name: 'LLM Integration', level: 80 },
-							{ category: 'AI/ML', name: 'TensorFlow', level: 60 },
-						],
-					},
-					socials: [
-						{
-							platform: 'GitHub',
-							url: 'https://github.com/Anurag-Basuri',
-						},
-						{
-							platform: 'LinkedIn',
-							url: 'https://linkedin.com/in/anuragbasuri',
-						},
-						{
-							platform: 'Twitter',
-							url: 'https://twitter.com/AnuragBasuri',
-						},
-					],
+	const profile = await prisma.profile.upsert({
+		where: { id: 'main' },
+		update: {},
+		create: {
+			id: 'main',
+			name: 'Anurag Basuri',
+			role: 'Full Stack Engineer',
+			tagline: 'Building the Future with Code & AI',
+			summary:
+				'I specialize in building scalable web applications and exploring the frontiers of artificial intelligence. With a passion for clean code and intuitive design, I create digital experiences that perform as beautifully as they look.',
+			bio: "I'm a Full Stack Engineer with a deep passion for building scalable, user-centric web applications. My journey began with a curiosity about how things work on the internet, which quickly evolved into a career in software development.\n\nI specialize in the React ecosystem (Next.js, TypeScript) and modern backend architectures. I strongly believe in writing clean, maintainable code and testing thoroughly. Beyond coding, I'm an advocate for developer experience and often contribute to open-source projects.\n\nWhen I'm not pushing commits, you can find me exploring new AI technologies, reading sci-fi novels, or capturing moments through my camera lens.",
+			location: 'India',
+			timezone: 'Asia/Kolkata',
+			openToWork: true,
+			avatarUrl: '/logo.png',
+			coverUrl: '/about-cover.jpg',
+			experienceYears: 2,
+			projectsCount: 15,
+			currentStatus: {
+				label: 'Building the future of web',
+				description: 'Currently focused on scalable architectures and AI integration',
+				show: true,
+			},
+			focusAreas: [
+				'Full-Stack Development',
+				'AI/ML Integration',
+				'System Architecture',
+				'Developer Experience',
+			],
+			highlights: [
+				{ label: 'Code Quality', value: '98%', icon: 'Code2' },
+				{ label: 'Projects Delivered', value: '15+', icon: 'CheckCircle' },
+				{ label: 'Client Satisfaction', value: '100%', icon: 'Star' },
+			],
+			languages: ['English (Native)', 'Hindi (Native)', 'Japanese (Elementary)'],
+			hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
+			workPreferences: { remote: true, hybrid: true, onsite: false, relocation: false },
+			jobTypes: ['full-time', 'contract'],
+			preferredRoles: ['Full Stack Engineer', 'Backend Engineer', 'AI/ML Engineer'],
+			techStack: ['TypeScript', 'React', 'Next.js', 'Node.js', 'Python', 'PostgreSQL'],
+			skills: {
+				frontend: [
+					{ name: 'React / Next.js', level: 95 },
+					{ name: 'TypeScript', level: 90 },
+					{ name: 'Tailwind CSS', level: 98 },
+					{ name: 'Framer Motion', level: 85 },
+				],
+				backend: [
+					{ name: 'Node.js / Fastify', level: 88 },
+					{ name: 'PostgreSQL', level: 85 },
+					{ name: 'Prisma', level: 90 },
+					{ name: 'Serverless / NeonDB', level: 80 },
+				],
+				ml: [
+					{ name: 'Python', level: 85 },
+					{ name: 'LangChain', level: 75 },
+					{ name: 'LLM Integration', level: 80 },
+					{ name: 'TensorFlow', level: 60 },
+				],
+				devops: [
+					{ name: 'Docker', level: 70 },
+					{ name: 'GitHub Actions', level: 75 },
+					{ name: 'Vercel / Railway', level: 85 },
+				],
+			},
+			socials: [
+				{
+					platform: 'GitHub',
+					url: 'https://github.com/Anurag-Basuri',
+					handle: 'Anurag-Basuri',
 				},
-			})
-		: await prisma.profile.create({
-				data: {
-					name: 'Anurag Basuri',
-					role: 'Full Stack Engineer',
-					tagline: 'Building the Future with Code & AI',
-					summary:
-						'I specialize in building scalable web applications and exploring the frontiers of artificial intelligence. With a passion for clean code and intuitive design, I create digital experiences that perform as beautiful as they look.',
-					bio: "I'm a Full Stack Engineer with a deep passion for building scalable, user-centric web applications. My journey began with a curiosity about how things work on the internet, which quickly evolved into a career in software development.\n\nI specialize in the React ecosystem (Next.js, TypeScript) and modern backend architectures. I strongly believe in writing clean, maintainable code and testing thoroughly. Beyond coding, I'm an advocate for developer experience and often contribute to open-source projects.\n\nWhen I'm not pushing commits, you can find me exploring new AI technologies, reading sci-fi novels, or capturing moments through my camera lens.",
-					location: 'India',
-					avatarUrl: '/logo.png',
-					coverUrl: '/about-cover.jpg',
-					experienceYears: 2,
-					projectsCount: 15,
-					currentStatus: {
-						label: 'Building the future of web',
-						description:
-							'Currently focused on scalable architectures and AI integration',
-					},
-					focusAreas: [
-						'Full-Stack Development',
-						'AI/ML Integration',
-						'System Architecture',
-						'Developer Experience',
-					],
-					highlights: [
-						{ label: 'Code Quality', value: '98%', icon: 'Code2' },
-						{ label: 'Projects Delivered', value: '15+', icon: 'CheckCircle' },
-						{ label: 'Client Satisfaction', value: '100%', icon: 'Star' },
-					],
-					languages: ['English (Native)', 'Hindi (Native)', 'Japanese (Elementary)'],
-					hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
-					workPreferences: {
-						remote: true,
-						hybrid: true,
-						onsite: false,
-						timezone: 'IST (UTC+5:30)',
-					},
-					skills: {
-						frontend: [
-							{ category: 'Frontend', name: 'React/Next.js', level: 95 },
-							{ category: 'Frontend', name: 'TypeScript', level: 90 },
-							{ category: 'Frontend', name: 'Tailwind CSS', level: 98 },
-							{ category: 'Frontend', name: 'Framer Motion', level: 85 },
-						],
-						backend: [
-							{ category: 'Backend', name: 'Node.js', level: 88 },
-							{ category: 'Backend', name: 'PostgreSQL', level: 85 },
-							{ category: 'Backend', name: 'Prisma', level: 90 },
-							{ category: 'Backend', name: 'Serverless', level: 80 },
-						],
-						ml: [
-							{ category: 'AI/ML', name: 'Python', level: 85 },
-							{ category: 'AI/ML', name: 'LangChain', level: 75 },
-							{ category: 'AI/ML', name: 'LLM Integration', level: 80 },
-							{ category: 'AI/ML', name: 'TensorFlow', level: 60 },
-						],
-					},
-					socials: [
-						{
-							platform: 'GitHub',
-							url: 'https://github.com/Anurag-Basuri',
-						},
-						{
-							platform: 'LinkedIn',
-							url: 'https://linkedin.com/in/anuragbasuri',
-						},
-						{
-							platform: 'Twitter',
-							url: 'https://twitter.com/AnuragBasuri',
-						},
-					],
+				{
+					platform: 'LinkedIn',
+					url: 'https://linkedin.com/in/anuragbasuri',
+					handle: 'anuragbasuri',
 				},
-			});
+				{
+					platform: 'Twitter',
+					url: 'https://twitter.com/AnuragBasuri',
+					handle: 'AnuragBasuri',
+				},
+			],
+			// Coding platforms (merged from former CodingProfile table)
+			github: {
+				username: 'Anurag-Basuri',
+				url: 'https://github.com/Anurag-Basuri',
+			},
+			leetcode: {
+				username: 'Anurag_Basuri',
+				url: 'https://leetcode.com/u/Anurag_Basuri',
+			},
+			codeforces: {
+				username: 'Anurag_Basuri',
+				url: 'https://codeforces.com/profile/Anurag_Basuri',
+			},
+			codechef: {
+				username: 'anurag_basuri',
+				url: 'https://www.codechef.com/users/anurag_basuri',
+			},
+		},
+	});
 	console.log(`✅ Profile: ${profile.name}`);
-
-	// ─── Coding Profiles ────────────────────────────────────────
-
-	const existingCoding = await prisma.codingProfile.findFirst();
-	const codingProfile = existingCoding
-		? await prisma.codingProfile.update({
-				where: { id: existingCoding.id },
-				data: {
-					leetcode: {
-						username: 'Anurag_Basuri',
-						url: 'https://leetcode.com/u/Anurag_Basuri',
-					},
-					codeforces: {
-						username: 'Anurag_Basuri',
-						url: 'https://codeforces.com/profile/Anurag_Basuri',
-					},
-					codechef: {
-						username: 'Anurag_Basuri',
-						url: 'https://www.codechef.com/users/anurag_basuri',
-					},
-					github: {
-						username: 'Anurag-Basuri',
-						url: 'https://github.com/Anurag-Basuri',
-					},
-				},
-			})
-		: await prisma.codingProfile.create({
-				data: {
-					leetcode: {
-						username: 'Anurag_Basuri',
-						url: 'https://leetcode.com/u/Anurag_Basuri',
-					},
-					codeforces: {
-						username: 'Anurag_Basuri',
-						url: 'https://codeforces.com/profile/Anurag_Basuri',
-					},
-					codechef: {
-						username: 'Anurag_Basuri',
-						url: 'https://www.codechef.com/users/anurag_basuri',
-					},
-					github: {
-						username: 'Anurag-Basuri',
-						url: 'https://github.com/Anurag-Basuri',
-					},
-				},
-			});
-	console.log(`✅ Coding profiles seeded`);
 
 	// ─── Projects ───────────────────────────────────────────────
 
