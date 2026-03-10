@@ -1,92 +1,109 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { prisma } from '../lib/db';
 import { notFound } from '../lib/errors';
+import { asyncHandler } from '../utils/asyncHandler';
+
+const router = Router();
 
 /**
  * Public read-only endpoints.
  * No authentication required. Returns only published content.
  */
-export default async function publicRoutes(fastify: FastifyInstance) {
-	// ─── Health Check ─────────────────────────────────────────────
 
-	fastify.get('/api/health', async (_req, reply) => {
-		return reply.send({
+// ─── Health Check ─────────────────────────────────────────────
+
+router.get(
+	'/api/health',
+	asyncHandler(async (_req, res) => {
+		res.json({
 			ok: true,
 			env: process.env.NODE_ENV || 'development',
 			uptime: Math.floor(process.uptime()),
 		});
-	});
+	}),
+);
 
-	// ─── Profile (singleton) ─────────────────────────────────────
+// ─── Profile (singleton) ─────────────────────────────────────
 
-	fastify.get('/api/profile', async (_req, reply) => {
+router.get(
+	'/api/profile',
+	asyncHandler(async (_req, res) => {
 		const profile = await prisma.profile.findUnique({ where: { id: 'main' } });
-		if (!profile) {
-			const error = notFound('Profile');
-			return reply.status(error.statusCode).send(error.toJSON());
-		}
-		return reply.send(profile);
-	});
+		if (!profile) throw notFound('Profile');
+		res.json(profile);
+	}),
+);
 
-	// ─── Projects ─────────────────────────────────────────────────
+// ─── Projects ─────────────────────────────────────────────────
 
-	fastify.get('/api/projects', async (_req, reply) => {
+router.get(
+	'/api/projects',
+	asyncHandler(async (_req, res) => {
 		const projects = await prisma.project.findMany({
 			where: { status: { in: ['published', 'completed'] } },
 			orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
 		});
-		return reply.send({ items: projects });
-	});
+		res.json({ items: projects });
+	}),
+);
 
-	fastify.get(
-		'/api/projects/:slug',
-		async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) => {
-			const { slug } = request.params;
-			const project = await prisma.project.findUnique({
-				where: { slug },
-			});
+router.get(
+	'/api/projects/:slug',
+	asyncHandler(async (req: Request<{ slug: string }>, res) => {
+		const { slug } = req.params;
+		const project = await prisma.project.findUnique({ where: { slug } });
 
-			if (!project || !['published', 'completed'].includes(project.status)) {
-				const error = notFound('Project');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		if (!project || !['published', 'completed'].includes(project.status)) {
+			throw notFound('Project');
+		}
 
-			return reply.send(project);
-		},
-	);
+		res.json(project);
+	}),
+);
 
-	// ─── Journey ──────────────────────────────────────────────────
+// ─── Journey ──────────────────────────────────────────────────
 
-	fastify.get('/api/journey', async (_req, reply) => {
+router.get(
+	'/api/journey',
+	asyncHandler(async (_req, res) => {
 		const items = await prisma.journeyEntry.findMany({
 			orderBy: { order: 'asc' },
 			include: { achievements: { orderBy: { order: 'asc' } } },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// ─── Achievements ──────────────────────────────────────────
+// ─── Achievements ──────────────────────────────────────────
 
-	fastify.get('/api/achievements', async (_req, reply) => {
-		const items = await prisma.achievement.findMany({
+router.get(
+	'/api/achievements',
+	asyncHandler(async (_req, res) => {
+		const items = await (prisma as any).achievement.findMany({
 			orderBy: { order: 'asc' },
 			include: { journeyEntry: { select: { id: true, title: true, type: true } } },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// ─── Certifications ──────────────────────────────────────────
+// ─── Certifications ──────────────────────────────────────────
 
-	fastify.get('/api/certifications', async (_req, reply) => {
+router.get(
+	'/api/certifications',
+	asyncHandler(async (_req, res) => {
 		const items = await prisma.certification.findMany({
-			orderBy: { date: 'desc' },
+			orderBy: { createdAt: 'desc' },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// ─── Blog ─────────────────────────────────────────────────────
+// ─── Blog ─────────────────────────────────────────────────────
 
-	fastify.get('/api/blog', async (_req, reply) => {
+router.get(
+	'/api/blog',
+	asyncHandler(async (_req, res) => {
 		const posts = await prisma.blogPost.findMany({
 			where: { status: 'published' },
 			orderBy: { publishedAt: 'desc' },
@@ -104,23 +121,22 @@ export default async function publicRoutes(fastify: FastifyInstance) {
 				updatedAt: true,
 			},
 		});
-		return reply.send({ posts });
-	});
+		res.json({ posts });
+	}),
+);
 
-	fastify.get(
-		'/api/blog/:slug',
-		async (request: FastifyRequest<{ Params: { slug: string } }>, reply: FastifyReply) => {
-			const { slug } = request.params;
-			const post = await prisma.blogPost.findUnique({
-				where: { slug },
-			});
+router.get(
+	'/api/blog/:slug',
+	asyncHandler(async (req: Request<{ slug: string }>, res) => {
+		const { slug } = req.params;
+		const post = await prisma.blogPost.findUnique({ where: { slug } });
 
-			if (!post || post.status !== 'published') {
-				const error = notFound('Blog post');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		if (!post || post.status !== 'published') {
+			throw notFound('Blog post');
+		}
 
-			return reply.send(post);
-		},
-	);
-}
+		res.json(post);
+	}),
+);
+
+export default router;

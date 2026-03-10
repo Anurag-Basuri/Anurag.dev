@@ -1,52 +1,53 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../lib/db';
 import { notFound } from '../../lib/errors';
 import { logAudit } from '../../lib/audit';
 import { validateQuery } from '../../middleware/validate';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 const PaginationQuery = z.object({
 	page: z.coerce.number().int().min(1).default(1),
 	limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export default async function messagesRoutes(fastify: FastifyInstance) {
-	// GET /api/admin/messages — paginated list
-	fastify.get(
-		'/api/admin/messages',
-		{ preHandler: [validateQuery(PaginationQuery)] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const { page, limit } = request.query as z.infer<typeof PaginationQuery>;
-			const skip = (page - 1) * limit;
+const router = Router();
 
-			const [items, total] = await Promise.all([
-				prisma.contactMessage.findMany({
-					orderBy: { createdAt: 'desc' },
-					skip,
-					take: limit,
-				}),
-				prisma.contactMessage.count(),
-			]);
+// GET /api/admin/messages — paginated list
+router.get(
+	'/api/admin/messages',
+	validateQuery(PaginationQuery),
+	asyncHandler(async (req, res) => {
+		const { page, limit } = req.query as unknown as z.infer<typeof PaginationQuery>;
+		const skip = (page - 1) * limit;
 
-			return reply.send({
-				items,
-				total,
-				page,
-				limit,
-				totalPages: Math.ceil(total / limit),
-			});
-		},
-	);
+		const [items, total] = await Promise.all([
+			prisma.contactMessage.findMany({
+				orderBy: { createdAt: 'desc' },
+				skip,
+				take: limit,
+			}),
+			prisma.contactMessage.count(),
+		]);
 
-	// GET /api/admin/messages/:id — get single + mark as read
-	fastify.get<{ Params: { id: string } }>('/api/admin/messages/:id', async (request, reply) => {
-		const { id } = request.params;
+		res.json({
+			items,
+			total,
+			page,
+			limit,
+			totalPages: Math.ceil(total / limit),
+		});
+	}),
+);
+
+// GET /api/admin/messages/:id — get single + mark as read
+router.get(
+	'/api/admin/messages/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
 
 		const message = await prisma.contactMessage.findUnique({ where: { id } });
-		if (!message) {
-			const error = notFound('Message');
-			return reply.status(error.statusCode).send(error.toJSON());
-		}
+		if (!message) throw notFound('Message');
 
 		if (!message.isRead) {
 			await prisma.contactMessage.update({
@@ -55,33 +56,32 @@ export default async function messagesRoutes(fastify: FastifyInstance) {
 			});
 		}
 
-		return reply.send({ ...message, isRead: true });
-	});
+		res.json({ ...message, isRead: true });
+	}),
+);
 
-	// DELETE /api/admin/messages/:id
-	fastify.delete<{ Params: { id: string } }>(
-		'/api/admin/messages/:id',
-		async (request, reply) => {
-			const { id } = request.params;
-			const adminId = request.admin!.adminId;
+// DELETE /api/admin/messages/:id
+router.delete(
+	'/api/admin/messages/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.contactMessage.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Message');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.contactMessage.findUnique({ where: { id } });
+		if (!existing) throw notFound('Message');
 
-			await prisma.contactMessage.delete({ where: { id } });
+		await prisma.contactMessage.delete({ where: { id } });
 
-			await logAudit({
-				adminId,
-				action: 'delete',
-				resourceType: 'ContactMessage',
-				resourceId: id,
-				changes: { from: existing.name, subject: existing.subject },
-			});
+		await logAudit({
+			adminId,
+			action: 'delete',
+			resourceType: 'ContactMessage',
+			resourceId: id,
+			changes: { from: existing.name, subject: existing.subject },
+		});
 
-			return reply.send({ message: 'Message deleted' });
-		},
-	);
-}
+		res.json({ message: 'Message deleted' });
+	}),
+);
+
+export default router;
