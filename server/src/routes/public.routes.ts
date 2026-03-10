@@ -20,23 +20,12 @@ export default async function publicRoutes(fastify: FastifyInstance) {
 	// ─── Profile (singleton) ─────────────────────────────────────
 
 	fastify.get('/api/profile', async (_req, reply) => {
-		const profile = await prisma.profile.findFirst();
+		const profile = await prisma.profile.findUnique({ where: { id: 'main' } });
 		if (!profile) {
 			const error = notFound('Profile');
 			return reply.status(error.statusCode).send(error.toJSON());
 		}
 		return reply.send(profile);
-	});
-
-	// ─── Coding Profiles ─────────────────────────────────────────
-
-	fastify.get('/api/coding-profiles', async (_req, reply) => {
-		const profiles = await prisma.codingProfile.findFirst();
-		if (!profiles) {
-			const error = notFound('Coding profiles');
-			return reply.status(error.statusCode).send(error.toJSON());
-		}
-		return reply.send(profiles);
 	});
 
 	// ─── Projects ─────────────────────────────────────────────────

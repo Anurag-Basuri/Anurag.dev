@@ -2,72 +2,194 @@ import { z } from 'zod';
 
 // ─── Common Schemas ─────────────────────────────────────────────
 
-export const SkillSchema = z.object({
-	category: z.string(),
+export const SkillItemSchema = z.object({
 	name: z.string(),
-	level: z.number().min(0).max(100),
+	level: z.number().min(0).max(100).optional(), // 0–100 proficiency
+	icon: z.string().optional(), // icon identifier / URL
 });
 
 export const SocialLinkSchema = z.object({
 	platform: z.string(),
 	url: z.string().url(),
 	icon: z.string().optional(),
+	handle: z.string().optional(),
 });
 
-// ─── About / Profile ────────────────────────────────────────────
+const CodingPlatformSchema = z.object({
+	username: z.string(),
+	url: z.string().url(),
+	stats: z.record(z.unknown()).optional(), // Platform-specific — kept flexible
+});
 
-export const AboutSchema = z.object({
+// ─── Profile (singleton) ─────────────────────────────────────────
+
+export const ProfileSchema = z.object({
+	// Identity
 	name: z.string().min(1),
-	role: z.string().min(1),
+	displayName: z.string().optional(),
+	pronouns: z.string().optional(),
+	email: z.string().email().optional(),
+	phone: z.string().optional(),
+
+	// Headline
+	role: z.string().optional(),
 	tagline: z.string().optional(),
-	summary: z.string().min(1),
-	bio: z.string().min(1),
+	summary: z.string().optional(),
+	bio: z.string().optional(),
+
+	// Location & Availability
 	location: z.string().optional(),
-	avatarUrl: z.string().optional(),
-	resumeUrl: z.string().url().optional(),
-	experienceYears: z.number().default(0),
-	projectsCount: z.number().default(0),
-	coverUrl: z.string().optional(),
+	timezone: z.string().optional(),
+	openToWork: z.boolean().default(false),
+	availableFrom: z.string().optional(),
+	noticePeriod: z.string().optional(),
 
-	currentStatus: z
-		.object({
-			label: z.string(),
-			description: z.string().optional(),
-		})
-		.optional(),
+	// Media
+	avatarUrl: z.string().url().optional().or(z.literal('')),
+	coverUrl: z.string().url().optional().or(z.literal('')),
+	resumeUrl: z.string().url().optional().or(z.literal('')),
 
-	focusAreas: z.array(z.string()).optional(),
+	// Quick Stats
+	experienceYears: z.number().int().min(0).default(0),
+	projectsCount: z.number().int().min(0).default(0),
 
-	highlights: z
-		.array(
-			z.object({
-				label: z.string(),
-				value: z.string(),
-				icon: z.string().optional(),
-			}),
-		)
-		.optional(),
-
-	languages: z.array(z.string()).optional(),
-	hobbies: z.array(z.string()).optional(),
-
+	// Work Preferences
 	workPreferences: z
 		.object({
 			remote: z.boolean().optional(),
 			hybrid: z.boolean().optional(),
 			onsite: z.boolean().optional(),
-			timezone: z.string().optional(),
+			relocation: z.boolean().optional(),
+		})
+		.optional(),
+	jobTypes: z
+		.array(z.enum(['full-time', 'part-time', 'contract', 'freelance', 'internship']))
+		.optional(),
+	preferredRoles: z.array(z.string()).optional(),
+	industries: z.array(z.string()).optional(),
+	salaryRange: z
+		.object({
+			min: z.number().optional(),
+			max: z.number().optional(),
+			currency: z.string().default('USD'),
+			period: z.enum(['annual', 'monthly', 'hourly']).default('annual'),
 		})
 		.optional(),
 
-	skills: z.object({
-		frontend: z.array(SkillSchema),
-		backend: z.array(SkillSchema),
-		ml: z.array(SkillSchema),
-		other: z.array(SkillSchema).optional(),
-	}),
+	// Skills
+	skills: z
+		.object({
+			frontend: z.array(SkillItemSchema).optional(),
+			backend: z.array(SkillItemSchema).optional(),
+			ml: z.array(SkillItemSchema).optional(),
+			devops: z.array(SkillItemSchema).optional(),
+			databases: z.array(SkillItemSchema).optional(),
+			tools: z.array(SkillItemSchema).optional(),
+			other: z.array(SkillItemSchema).optional(),
+		})
+		.optional(),
+	techStack: z.array(z.string()).optional(),
 
+	// Status, Highlights & Focus
+	currentStatus: z
+		.object({
+			label: z.string(),
+			description: z.string().optional(),
+			emoji: z.string().optional(),
+			show: z.boolean().default(true),
+		})
+		.optional(),
+	highlights: z
+		.array(z.object({ label: z.string(), value: z.string(), icon: z.string().optional() }))
+		.optional(),
+	focusAreas: z.array(z.string()).optional(),
+	achievements: z
+		.array(
+			z.object({
+				title: z.string(),
+				description: z.string().optional(),
+				year: z.number().optional(),
+				url: z.string().url().optional(),
+			}),
+		)
+		.optional(),
+
+	// Personal
+	languages: z.array(z.string()).optional(),
+	hobbies: z.array(z.string()).optional(),
+
+	// Social & Web
 	socials: z.array(SocialLinkSchema).optional(),
+	website: z.string().url().optional().or(z.literal('')),
+
+	// Coding Platforms
+	github: CodingPlatformSchema.optional(),
+	leetcode: CodingPlatformSchema.optional(),
+	codeforces: CodingPlatformSchema.optional(),
+	codechef: CodingPlatformSchema.optional(),
+	hackerrank: CodingPlatformSchema.optional(),
+	gfg: CodingPlatformSchema.optional(),
+	kaggle: CodingPlatformSchema.optional(),
+	otherProfiles: z.array(CodingPlatformSchema.extend({ platform: z.string() })).optional(),
+
+	// Open Source
+	openSource: z
+		.array(
+			z.object({
+				repo: z.string(),
+				description: z.string().optional(),
+				url: z.string().url(),
+				stars: z.number().optional(),
+				language: z.string().optional(),
+				role: z.string().optional(),
+			}),
+		)
+		.optional(),
+
+	// Publications & Talks
+	publications: z
+		.array(
+			z.object({
+				title: z.string(),
+				url: z.string().url().optional(),
+				venue: z.string().optional(),
+				date: z.string().optional(),
+				type: z.enum(['article', 'talk', 'paper', 'video', 'podcast']).optional(),
+			}),
+		)
+		.optional(),
+
+	// Education Quick-Reference
+	education: z
+		.array(
+			z.object({
+				institution: z.string(),
+				degree: z.string().optional(),
+				field: z.string().optional(),
+				year: z.string().optional(),
+				gpa: z.string().optional(),
+				url: z.string().url().optional(),
+			}),
+		)
+		.optional(),
+
+	// Testimonials
+	testimonials: z
+		.array(
+			z.object({
+				name: z.string(),
+				role: z.string().optional(),
+				company: z.string().optional(),
+				text: z.string(),
+				avatarUrl: z.string().url().optional(),
+			}),
+		)
+		.optional(),
+
+	// SEO
+	seoTitle: z.string().optional(),
+	seoDesc: z.string().optional(),
+	seoKeywords: z.array(z.string()).optional(),
 });
 
 // ─── Project ────────────────────────────────────────────────────
@@ -163,26 +285,11 @@ export const ContactSchema = z.object({
 	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
-// ─── Coding Profile ─────────────────────────────────────────────
-
-const PlatformProfileSchema = z.object({
-	username: z.string(),
-	url: z.string().url(),
-});
-
-export const CodingProfileSchema = z.object({
-	leetcode: PlatformProfileSchema,
-	codeforces: PlatformProfileSchema,
-	codechef: PlatformProfileSchema,
-	github: PlatformProfileSchema,
-});
-
 // ─── Inferred Types ─────────────────────────────────────────────
 
-export type About = z.infer<typeof AboutSchema>;
+export type Profile = z.infer<typeof ProfileSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type JourneyItem = z.infer<typeof JourneyItemSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;
-export type CodingProfile = z.infer<typeof CodingProfileSchema>;
