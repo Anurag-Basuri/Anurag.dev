@@ -1,6 +1,7 @@
 {
 	"name": "anuragos-backend",
 	"version": "0.1.0",
+	"description": "A TypeScript-based REST API server built on Fastify for a developer portfolio system.",
 	"private": true,
 	"scripts": {
 		"dev": "tsx watch src/server.ts",
@@ -8,12 +9,12 @@
 		"start": "node dist/server.js",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"db:migrate": "prisma migrate dev",
 		"db:generate": "prisma generate",
-		"db:studio": "prisma studio",
-		"db:seed": "tsx prisma/seed.ts",
+		"db:migrate": "prisma migrate dev",
+		"db:push": "prisma db push",
 		"db:reset": "prisma migrate reset",
-		"db:push": "prisma db push"
+		"db:seed": "tsx prisma/seed.ts",
+		"db:studio": "prisma studio"
 	},
 	"prisma": {
 		"seed": "tsx prisma/seed.ts"
@@ -24,7 +25,7 @@
 		"@fastify/sensible": "^6.0.4",
 		"@fastify/swagger": "^9.7.0",
 		"@fastify/swagger-ui": "^5.2.5",
-		"@prisma/client": "^6.19.0",
+		"@prisma/client": "^6.19.2",
 		"bcrypt": "^6.0.0",
 		"dotenv": "^17.3.1",
 		"fastify": "^5.8.2",
@@ -35,9 +36,9 @@
 	"devDependencies": {
 		"@types/bcrypt": "^6.0.0",
 		"@types/jsonwebtoken": "^9.0.6",
-		"@types/node": "^22.16.1",
+		"@types/node": "^22.19.15",
 		"@types/sanitize-html": "^2.16.1",
-		"prisma": "^6.19.0",
+		"prisma": "^6.19.2",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.18"
