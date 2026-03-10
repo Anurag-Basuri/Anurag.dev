@@ -10,89 +10,64 @@ datasource db {
   provider  = "postgresql"
 }
 
-// ─── Profile (singleton — one row, id is always "main") ──────────
-
+// Profile Model - Singleton pattern enforced by fixed ID "main"
 model Profile {
   id            String  @id @default("main") // Sentinel — enforces single row at DB level
 
-  // ─── Identity ────────────────────────────────────────────────
+  // Personal Info
   name          String @default("Anurag Basuri")           // Full name
-  pronouns      String?           // e.g. "he/him"
-  email         String?           // Public contact email (shown on portfolio)
-  phone         String?           // Optional public phone number
+  pronouns      String @default("he/him")            // e.g. "he/him"
+  email         String @default("basurianurag@gmail.com")           // Public contact email (shown on portfolio)
+  phone         String @default("+91 9876543210")           // Optional public phone number
 
-  // ─── Headline ────────────────────────────────────────────────
-  role          String?           // Primary title e.g. "Full Stack Developer"
-  tagline       String?           // Short punchy line for hero section
-  summary       String? @db.Text  // 2-3 paragraph professional summary (rich text)
+  // Career & Bio
+  header          String?           // Primary title e.g. "Full Stack Developer"
   bio           String? @db.Text  // Casual personal bio for about section
 
-  // ─── Location & Availability ─────────────────────────────────
-  location      String?           // e.g. "Bangalore, India"
-  timezone      String?           // e.g. "Asia/Kolkata" — shown to recruiters
-  openToWork    Boolean @default(false) // Toggle "Open to Work" badge
+  // Location(Current)
+  Currentlocation      String?           // e.g. "Bangalore, Karnataka, India"
+
+  // Location(Original)
+  Originallocation     String?           // e.g. "Jamshedpur, Jharkhand, India"
+
+  // Job Seeking & Availability
+  openToWork    Boolean @default(true) // Toggle "Open to Work" badge
   availableFrom String?           // e.g. "Immediately" or "June 2025"
   noticePeriod  String?           // e.g. "30 days" or "Immediate"
 
-  // ─── Media ───────────────────────────────────────────────────
+  // Job Preferences
+  workPreferences Json?   // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
+  jobTypes        String[] // ["full-time", "part-time", "contract", "freelance", "internship"]
+
+  // Media & Links
   avatarUrl     String?           // Profile picture
   coverUrl      String?           // Portfolio header / banner image
   resumeUrl     String?           // Downloadable resume PDF URL
 
-  // ─── Quick Stats ─────────────────────────────────────────────
+  // Quick Stats
   experienceYears Int     @default(0)
   projectsCount   Int     @default(0)
 
-  // ─── Work Preferences ────────────────────────────────────────
-  workPreferences Json?   // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
-  jobTypes        String[] // ["full-time", "part-time", "contract", "freelance", "internship"]
-  preferredRoles  String[] // ["Backend Engineer", "ML Engineer", "DevOps"]
-  industries      String[] // ["Fintech", "EdTech", "Open Source"]
-  salaryRange     Json?   // { min, max, currency, period: "annual"|"monthly"|"hourly" }
+  // Skills
+  skills        Json?     // { AI&ML: ["TensorFlow", "PyTorch"], Backend: ["Node.js", "Django"]}
 
-  // ─── Skills ──────────────────────────────────────────────────
-  skills        Json?     // { frontend: [{name,level?,icon?}], backend:[], ml:[], devops:[], databases:[], tools:[], other:[] }
-  techStack     String[]  // Fast flat list of top technologies shown in hero/cards
+  // Personal
+  languages     String[]  // Spoken/written languages e.g. ["English", "Hindi"]
 
-  // ─── Status, Highlights & Focus ──────────────────────────────
-  currentStatus Json?     // { label, description?, emoji?, show: bool }
-  highlights    Json?     // [{ label, value, icon? }] — e.g. "10+ Projects Built"
-  focusAreas    String[]  // ["System Design", "Backend", "AI/ML"]
-  achievements  Json?     // [{ title, description?, year?, url? }]
-
-  // ─── Personal ────────────────────────────────────────────────
-  languages     String[]  // Spoken/written languages e.g. ["English (C2)", "Hindi"]
-  hobbies       String[]  // Personal interests
-
-  // ─── Social & Web ────────────────────────────────────────────
+  // Social & Web
   socials       Json?     // [{ platform, url, icon?, handle? }]
   website       String?   // Personal site / portfolio URL
 
-  // ─── Coding Platforms ────────────────────────────────────────
-  // Each: { username, url, stats?: { platform-specific stats } }
-  github        Json?     // stats: { repos, stars, contributions, followers, following }
-  leetcode      Json?     // stats: { solved, totalSolved, ranking, acceptance, streak }
-  codeforces    Json?     // stats: { rating, rank, maxRating, maxRank }
-  codechef      Json?     // stats: { rating, stars, globalRank, countryRank }
-  hackerrank    Json?     // stats: { badges, score, level }
-  gfg           Json?     // stats: { score, streak, rank, problemsSolved }
-  kaggle        Json?     // stats: { tier, medals: { gold, silver, bronze } }
-  otherProfiles Json?     // [{ platform, username, url, stats? }] — catch-all for others
+  // Coding Platforms
+  github        String?     // stats: { repos, stars, contributions, followers, following }
+  leetcode      String?     // stats: { solved, totalSolved, ranking, acceptance, streak }
+  codeforces    String?     // stats: { rating, rank, maxRating, maxRank }
+  codechef      String?     // stats: { rating, stars, globalRank, countryRank }
+  gfg           String?     // stats: { score, streak, rank, problemsSolved }
+  kaggle        String?     // stats: { tier, medals: { gold, silver, bronze } }
+  otherProfiles String[]    // [{ platform, username, url, stats? }] — catch-all for others
 
-  // ─── Open Source ─────────────────────────────────────────────
-  openSource    Json?     // [{ repo, description?, url, stars?, language?, role? }]
-
-  // ─── Publications & Talks ────────────────────────────────────
-  publications  Json?     // [{ title, url?, venue?, date?, type: "article"|"talk"|"paper"|"video"|"podcast" }]
-
-  // ─── Education Quick-Reference ───────────────────────────────
-  // Mirrors JourneyEntry for fast access without a join
-  education     Json?     // [{ institution, degree?, field?, year?, gpa?, url? }]
-
-  // ─── Testimonials ────────────────────────────────────────────
-  testimonials  Json?     // [{ name, role?, company?, text, avatarUrl? }]
-
-  // ─── SEO / Meta ──────────────────────────────────────────────
+  // SEO / Meta
   seoTitle      String?
   seoDesc       String?
   seoKeywords   String[]
@@ -101,27 +76,24 @@ model Profile {
   updatedAt     DateTime @updatedAt
 }
 
-// ─── Projects ─────────────────────────────────────────────────────
-
+// Project Model - Represents individual projects in portfolio
 model Project {
   id          String   @id @default(uuid())
-  title       String
   slug        String   @unique
+
+  // Core Info
+  title       String
   description String   @db.Text
-  content     String?  @db.Text
-
   techStack   String[]
-  tags        String[]
 
+  // Media & Links
   thumbnail   String?
   images      String[]
-
-  githubUrl   String?
-  liveUrl     String?
+  githubUrl   String? // Link to GitHub repo
+  liveUrl     String? // Link to live demo or deployed site
 
   status      String   @default("draft") // draft, published, archived, completed
   featured    Boolean  @default(false)
-  priority    Int      @default(0)
 
   stars       Int?
   forks       Int?
@@ -134,8 +106,7 @@ model Project {
   @@index([slug])
 }
 
-// ─── Journey Timeline ─────────────────────────────────────────────
-
+// Journey Model - For storing career and life experience entries
 model JourneyEntry {
   id          String    @id @default(uuid())
   type        String    // work, education, project, achievement, other
@@ -160,42 +131,46 @@ model JourneyEntry {
   @@index([order])
 }
 
-// ─── Certifications ───────────────────────────────────────────────
-
+// Certification Model - For storing certification information
 model Certification {
-  id             String    @id @default(uuid())
-  title          String
-  issuer         String
-  date           DateTime
-  expirationDate DateTime?
-  credentialId   String?
-  credentialUrl  String?
+  id            String    @id @default(uuid())
 
-  skills         String[]
-  image          String?
+  title         String
+  issuer        String
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  description   String?   @db.Text
+  credentialId  String?   @unique
+  credentialUrl String?
 
-  @@index([date])
+  certificateUrl String?   // Link to certificate image or PDF
+
+  skills        String[]
+  
+  startDate     DateTime?
+  endDate     DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([issuer])
 }
 
-// ─── Blog ─────────────────────────────────────────────────────────
-
+// BlogPost Model - For blog posts or articles on portfolio
 model BlogPost {
   id          String    @id @default(uuid())
-  title       String
   slug        String    @unique
-  summary     String    @db.Text
-  content     String    @db.Text
-  coverImage  String?
 
+  // Core Info
+  title       String
+  content     String    @db.Text
   tags        String[]
 
+  coverImage  String?
+  otherImages String[]
+  link        String?   // Link to original post if cross-posted
+
   status      String    @default("draft") // draft, published, archived
-  featured    Boolean   @default(false)
   publishedAt DateTime?
-  readingTime Int?
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -204,8 +179,7 @@ model BlogPost {
   @@index([slug])
 }
 
-// ─── Contact Messages ─────────────────────────────────────────────
-
+// Contact Messages - For storing messages sent via contact form on portfolio
 model ContactMessage {
   id        String   @id @default(uuid())
   name      String
