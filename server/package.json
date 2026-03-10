@@ -20,21 +20,19 @@
 		"seed": "tsx prisma/seed.ts"
 	},
 	"dependencies": {
-		"@fastify/cors": "^11.2.0",
-		"@fastify/jwt": "^10.0.0",
-		"@fastify/sensible": "^6.0.4",
-		"@fastify/swagger": "^9.7.0",
-		"@fastify/swagger-ui": "^5.2.5",
 		"@prisma/client": "^6.19.2",
 		"bcrypt": "^6.0.0",
+		"cors": "^2.8.6",
 		"dotenv": "^17.3.1",
-		"fastify": "^5.8.2",
+		"express": "^5.2.1",
 		"jsonwebtoken": "^9.0.2",
 		"sanitize-html": "^2.17.1",
 		"zod": "^3.25.76"
 	},
 	"devDependencies": {
 		"@types/bcrypt": "^6.0.0",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/node": "^22.19.15",
 		"@types/sanitize-html": "^2.16.1",
