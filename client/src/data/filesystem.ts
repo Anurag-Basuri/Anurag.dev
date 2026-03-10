@@ -34,6 +34,7 @@ Next.js 15 • React 18 • TypeScript • Tailwind CSS • Framer Motion • Th
 		fs.app('about', { name: 'about.md' }),
 		fs.app('journey', { name: 'journey.md' }),
 		fs.app('certifications', { name: 'certifications.md' }),
+		fs.app('achievements', { name: 'achievements.md' }),
 	]),
 
 	// Work folder - Projects and experiments (.app files)

@@ -33,8 +33,9 @@ const moduleMetadata: Record<ModuleId, ModuleMetadata> = {
 	},
 	journey: {
 		title: 'My Journey',
-		description: 'My career timeline, educational background, and professional milestones.',
-		keywords: ['journey', 'career', 'timeline', 'education', 'experience'],
+		description:
+			'My career timeline, educational background, achievements, and professional milestones.',
+		keywords: ['journey', 'career', 'timeline', 'education', 'experience', 'achievements'],
 	},
 	certifications: {
 		title: 'Certifications',
@@ -75,6 +76,7 @@ const routeToModuleMap: Record<string, ModuleId> = {
 	about: 'about',
 	projects: 'projects',
 	journey: 'journey',
+	achievements: 'journey', // Achievements rendered within journey module
 	certifications: 'certifications',
 	blog: 'blog',
 	contact: 'contact',

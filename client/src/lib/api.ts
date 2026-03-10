@@ -1,6 +1,7 @@
 import {
 	Project,
 	JourneyEntry,
+	Achievement,
 	BlogPost,
 	ContactMessage,
 	AboutData,
@@ -9,6 +10,7 @@ import {
 } from '@/types/schema';
 import { PROJECTS } from '@/data/projects';
 import { JOURNEY } from '@/data/journey';
+import { ACHIEVEMENTS } from '@/data/achievements';
 import { BLOG_POSTS } from '@/data/blog';
 import { PROFILE } from '@/data/profile';
 import { CERTIFICATIONS } from '@/data/certifications';
@@ -17,6 +19,7 @@ import { CODING_PROFILES } from '@/data/coding-profiles';
 export type {
 	Project,
 	JourneyEntry,
+	Achievement,
 	BlogPost,
 	ContactMessage,
 	AboutData,
@@ -131,6 +134,10 @@ class ApiService {
 
 	async getJourney(): Promise<JourneyEntry[]> {
 		return this.fetchWithFallback<JourneyEntry[]>('/journey', JOURNEY);
+	}
+
+	async getAchievements(): Promise<Achievement[]> {
+		return this.fetchWithFallback<Achievement[]>('/achievements', ACHIEVEMENTS);
 	}
 
 	async getBlogPosts(): Promise<BlogPost[]> {

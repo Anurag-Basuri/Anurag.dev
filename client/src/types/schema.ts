@@ -26,20 +26,65 @@ export interface Project {
 
 export interface JourneyEntry {
 	id: string;
-	type: 'work' | 'education' | 'project' | 'achievement' | 'other';
+	type: 'work' | 'education' | 'volunteering' | 'research' | 'other';
 	title: string;
-	company?: string;
+	organization?: string;
 	location?: string;
 
 	date: string; // "2023 - Present"
 	startDate?: string;
 	endDate?: string | null;
+	isCurrent?: boolean;
 
 	description: string;
 	skills: string[];
 	url?: string;
 
+	// Education-specific
+	degree?: string;
+	fieldOfStudy?: string;
+	grade?: string;
+	board?: string;
+
+	// Work-specific
+	employmentType?: string;
+
+	// Research-specific
+	publication?: string;
+	doi?: string;
+
+	// Display
+	icon?: string;
+	highlighted?: boolean;
+
 	order: number;
+
+	// Related achievements
+	achievements?: Achievement[];
+}
+
+export interface Achievement {
+	id: string;
+	title: string;
+	category: 'hackathon' | 'competition' | 'award' | 'opensource' | 'publication' | 'scholarship';
+	issuer?: string;
+	event?: string;
+
+	description?: string;
+	rank?: string;
+
+	date?: string;
+	proofUrl?: string;
+	url?: string;
+
+	tags: string[];
+	team: string[];
+
+	featured?: boolean;
+	order: number;
+
+	journeyEntryId?: string | null;
+	journeyEntry?: { id: string; title: string; type: string };
 }
 
 export interface Certification {
