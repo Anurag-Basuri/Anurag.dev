@@ -25,7 +25,7 @@ router.get(
 	'/api/admin/projects',
 	asyncHandler(async (_req, res) => {
 		const projects = await prisma.project.findMany({
-			orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+			orderBy: { createdAt: 'desc' },
 		});
 		res.json({ items: projects });
 	}),

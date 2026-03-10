@@ -41,7 +41,7 @@ router.get(
 	asyncHandler(async (_req, res) => {
 		const projects = await prisma.project.findMany({
 			where: { status: { in: ['published', 'completed'] } },
-			orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+			orderBy: { createdAt: 'desc' },
 		});
 		res.json({ items: projects });
 	}),
@@ -111,12 +111,9 @@ router.get(
 				id: true,
 				title: true,
 				slug: true,
-				summary: true,
 				coverImage: true,
 				tags: true,
-				featured: true,
 				publishedAt: true,
-				readingTime: true,
 				createdAt: true,
 				updatedAt: true,
 			},

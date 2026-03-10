@@ -1,31 +1,17 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from './prisma';
-
 interface AuditEntry {
 	adminId: string;
 	action: 'create' | 'update' | 'delete';
 	resourceType: string;
 	resourceId: string;
-	changes: Prisma.InputJsonValue;
+	changes: unknown;
 }
 
 /**
- * Creates an audit log entry for admin actions.
- * Fire-and-forget — errors are logged but don't break the request.
+ * Logs admin actions to the console.
+ * TODO: Persist to database once admin auth is implemented.
  */
 export async function logAudit(entry: AuditEntry): Promise<void> {
-	try {
-		await prisma.auditLog.create({
-			data: {
-				adminId: entry.adminId,
-				action: entry.action,
-				resourceType: entry.resourceType,
-				resourceId: entry.resourceId,
-				changes: entry.changes,
-			},
-		});
-	} catch (err: unknown) {
-		const message = err instanceof Error ? err.message : String(err);
-		console.error('Failed to write audit log:', message);
-	}
+	console.log(
+		`[AUDIT] ${entry.action.toUpperCase()} ${entry.resourceType}#${entry.resourceId} by ${entry.adminId}`,
+	);
 }

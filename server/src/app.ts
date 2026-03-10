@@ -5,9 +5,10 @@ import { errorHandler } from './middleware/error.middleware';
 import { notFound } from './lib/errors';
 
 import publicRoutes from './routes/public.routes';
-import authRoutes from './modules/auth/auth.routes';
+// TODO: Re-enable once .env-based admin auth is implemented
+// import authRoutes from './modules/auth/auth.routes';
 import contactRoutes from './modules/contact/contact.routes';
-import adminRoutes from './modules/admin/admin.routes';
+// import adminRoutes from './modules/admin/admin.routes';
 
 export function buildApp() {
 	const app = express();
@@ -26,9 +27,9 @@ export function buildApp() {
 	// ─── Routes ───────────────────────────────────────────────────
 
 	app.use(publicRoutes);
-	app.use(authRoutes);
+	// app.use(authRoutes);
 	app.use(contactRoutes);
-	app.use(adminRoutes);
+	// app.use(adminRoutes);
 
 	// ─── 404 Handler ──────────────────────────────────────────────
 
