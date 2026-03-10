@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import sanitizeHtml from 'sanitize-html';
-import { prisma } from '../../lib/db';
+import { prisma } from '../../lib/prisma';
 import { validate } from '../../middleware/validate';
 import { rateLimit } from '../../middleware/rate-limit';
 import { ContactSchema } from '../../schemas/zod-schemas';

@@ -15,13 +15,13 @@ model Profile {
   id String @id @default("main") // Sentinel — enforces single row at DB level
 
   // Personal Info
-  name     String @default("Anurag Basuri") // Full name
-  pronouns String @default("he/him") // e.g. "he/him"
-  email    String @default("basurianurag@gmail.com") // Public contact email (shown on portfolio)
-  phone    String @default("+91 9876543210") // Optional public phone number
+  name     String @default("Anurag Basuri")
+  pronouns String @default("he/him")
+  email    String @default("basurianurag@gmail.com")
+  phone    String @default("+91 9876543210")
 
   // Career & Bio
-  header String? // Primary title e.g. "Full Stack Developer"
+  header String? // One-liner headline for portfolio header
   bio    String? @db.Text // Casual personal bio for about section
 
   // Location(Current)
@@ -59,13 +59,13 @@ model Profile {
   website String? // Personal site / portfolio URL
 
   // Coding Platforms
-  github        String? // stats: { repos, stars, contributions, followers, following }
-  leetcode      String? // stats: { solved, totalSolved, ranking, acceptance, streak }
-  codeforces    String? // stats: { rating, rank, maxRating, maxRank }
-  codechef      String? // stats: { rating, stars, globalRank, countryRank }
-  gfg           String? // stats: { score, streak, rank, problemsSolved }
-  kaggle        String? // stats: { tier, medals: { gold, silver, bronze } }
-  otherProfiles String[] // [{ platform, username, url, stats? }] — catch-all for others
+  github        String?
+  leetcode      String?
+  codeforces    String? 
+  codechef      String?
+  gfg           String? 
+  kaggle        String?
+  otherProfiles String[]
 
   // SEO / Meta
   seoTitle    String?

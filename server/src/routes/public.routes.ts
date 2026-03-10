@@ -1,5 +1,5 @@
 import { Router, Request } from 'express';
-import { prisma } from '../lib/db';
+import { prisma } from '../lib/prisma';
 import { notFound } from '../lib/errors';
 import { asyncHandler } from '../utils/asyncHandler';
 

@@ -1,6 +1,6 @@
 import { Router, Request } from 'express';
 import { z } from 'zod';
-import { prisma } from '../../lib/db';
+import { prisma } from '../../lib/prisma';
 import { notFound } from '../../lib/errors';
 import { logAudit } from '../../lib/audit';
 import { validateQuery } from '../../middleware/validate';

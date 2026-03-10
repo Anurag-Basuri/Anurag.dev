@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../../lib/db';
+import { prisma } from '../../lib/prisma';
 import { env } from '../../config/env';
 import { unauthorized } from '../../lib/errors';
 
