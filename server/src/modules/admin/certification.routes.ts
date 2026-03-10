@@ -16,7 +16,7 @@ router.get(
 	'/api/admin/certifications',
 	asyncHandler(async (_req, res) => {
 		const items = await prisma.certification.findMany({
-			orderBy: { createdAt: 'desc' },
+			orderBy: { startDate: 'desc' },
 		});
 		res.json({ items });
 	}),

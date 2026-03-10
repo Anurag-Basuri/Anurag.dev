@@ -128,11 +128,11 @@ export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> 
 		where: { token: oldToken },
 	});
 
-	if (!stored || stored.isRevoked || stored.expiresAt < new Date()) {
-		if (stored?.isRevoked) {
+	if (!stored || stored.revokedAt !== null || stored.expiresAt < new Date()) {
+		if (stored && stored.revokedAt !== null) {
 			await prisma.refreshToken.updateMany({
 				where: { adminId: stored.adminId },
-				data: { isRevoked: true },
+				data: { revokedAt: new Date() },
 			});
 		}
 		throw unauthorized('Refresh token expired or revoked');
@@ -140,7 +140,7 @@ export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> 
 
 	await prisma.refreshToken.update({
 		where: { id: stored.id },
-		data: { isRevoked: true },
+		data: { revokedAt: new Date() },
 	});
 
 	return generateTokenPair({
@@ -154,7 +154,7 @@ export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> 
  */
 export async function revokeRefreshToken(token: string): Promise<void> {
 	await prisma.refreshToken.updateMany({
-		where: { token, isRevoked: false },
-		data: { isRevoked: true },
+		where: { token, revokedAt: null },
+		data: { revokedAt: new Date() },
 	});
 }
