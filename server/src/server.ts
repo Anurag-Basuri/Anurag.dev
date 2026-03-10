@@ -1,16 +1,32 @@
-import { buildApp } from "./app";
-import { env } from "./config/env";
+import { buildApp } from './app';
+import { env } from './config/env';
+import { prisma } from './lib/db';
 
 const app = buildApp();
 
-const start = async () => {
-  try {
-    await app.listen({ port: env.PORT, host: "0.0.0.0" });
-    app.log.info(`Server listening on port ${env.PORT}`);
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
-};
+// ─── Process-level error handlers (keep the server alive) ─────────
 
-start();
+process.on('uncaughtException', err => {
+	console.error('[UNCAUGHT EXCEPTION]', err);
+});
+
+process.on('unhandledRejection', reason => {
+	console.error('[UNHANDLED REJECTION]', reason);
+});
+
+// ─── Graceful shutdown ────────────────────────────────────────────
+
+async function shutdown() {
+	console.log('\nShutting down gracefully...');
+	await prisma.$disconnect();
+	process.exit(0);
+}
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+
+// ─── Start server ─────────────────────────────────────────────────
+
+app.listen(env.PORT, '0.0.0.0', () => {
+	console.log(`Server listening on port ${env.PORT} [${env.NODE_ENV}]`);
+});

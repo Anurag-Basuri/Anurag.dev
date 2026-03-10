@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { Request, Response, NextFunction } from 'express';
 import { tooManyRequests } from '../lib/errors';
 
 interface RateLimitEntry {
@@ -32,14 +32,14 @@ interface RateLimitOptions {
 }
 
 /**
- * Creates an in-memory rate limiter preHandler.
+ * Creates an in-memory rate limiter middleware.
  * Keys by client IP + optional prefix.
  */
 export function rateLimit(options: RateLimitOptions) {
 	const { max, windowSeconds, prefix = 'rl' } = options;
 
-	return async (request: FastifyRequest, reply: FastifyReply) => {
-		const ip = request.ip;
+	return (req: Request, _res: Response, next: NextFunction) => {
+		const ip = req.ip || req.socket.remoteAddress || 'unknown';
 		const key = `${prefix}:${ip}`;
 		const now = Date.now();
 
@@ -48,16 +48,17 @@ export function rateLimit(options: RateLimitOptions) {
 		if (!entry || entry.resetAt <= now) {
 			// First request or window expired
 			store.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+			next();
 			return;
 		}
 
 		if (entry.count >= max) {
 			const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
-			reply.header('Retry-After', String(retryAfter));
-			const error = tooManyRequests(`Rate limit exceeded. Try again in ${retryAfter}s`);
-			return reply.status(error.statusCode).send(error.toJSON());
+			next(tooManyRequests(`Rate limit exceeded. Try again in ${retryAfter}s`));
+			return;
 		}
 
 		entry.count++;
+		next();
 	};
 }

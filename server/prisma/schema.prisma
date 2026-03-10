@@ -2,12 +2,12 @@
 // Database: NeonDB (Serverless PostgreSQL)
 
 generator client {
-  provider        = "prisma-client-js"
-  output          = "../src/generated/prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // Profile Model - Singleton pattern enforced by fixed ID "main"
