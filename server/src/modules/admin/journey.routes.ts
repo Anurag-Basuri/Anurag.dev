@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
@@ -6,6 +6,7 @@ import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
 import { notFound } from '../../lib/errors';
 import { JourneyItemSchema } from '../../schemas/zod-schemas';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 const JourneyUpdateSchema = JourneyItemSchema.partial().omit({ id: true });
 
@@ -18,108 +19,108 @@ const ReorderSchema = z.object({
 	),
 });
 
-export default async function journeyRoutes(fastify: FastifyInstance) {
-	// GET /api/admin/journey
-	fastify.get('/api/admin/journey', async (_req, reply) => {
+const router = Router();
+
+// GET /api/admin/journey
+router.get(
+	'/api/admin/journey',
+	asyncHandler(async (_req, res) => {
 		const items = await prisma.journeyEntry.findMany({
 			orderBy: { order: 'asc' },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// POST /api/admin/journey
-	fastify.post(
-		'/api/admin/journey',
-		{ preHandler: [validate(JourneyItemSchema.omit({ id: true }))] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
+// POST /api/admin/journey
+router.post(
+	'/api/admin/journey',
+	validate(JourneyItemSchema.omit({ id: true })),
+	asyncHandler(async (req, res) => {
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
-			const entry = await prisma.journeyEntry.create({ data: data as any });
+		const entry = await prisma.journeyEntry.create({ data: data as any });
 
-			await logAudit({
-				adminId,
-				action: 'create',
-				resourceType: 'JourneyEntry',
-				resourceId: entry.id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'create',
+			resourceType: 'JourneyEntry',
+			resourceId: entry.id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.status(201).send(entry);
-		},
-	);
+		res.status(201).json(entry);
+	}),
+);
 
-	// PUT /api/admin/journey/:id
-	fastify.put<{ Params: { id: string } }>(
-		'/api/admin/journey/:id',
-		{ preHandler: [validate(JourneyUpdateSchema)] },
-		async (request, reply) => {
-			const { id } = request.params;
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
-
-			const existing = await prisma.journeyEntry.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Journey entry');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
-
-			const entry = await prisma.journeyEntry.update({
-				where: { id },
-				data: data as any,
-			});
-
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'JourneyEntry',
-				resourceId: id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
-
-			return reply.send(entry);
-		},
-	);
-
-	// PATCH /api/admin/journey/reorder
-	fastify.patch(
-		'/api/admin/journey/reorder',
-		{ preHandler: [validate(ReorderSchema)] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const { items } = request.body as z.infer<typeof ReorderSchema>;
-			const adminId = request.admin!.adminId;
-
-			await prisma.$transaction(
-				items.map(item =>
-					prisma.journeyEntry.update({
-						where: { id: item.id },
-						data: { order: item.order },
-					}),
-				),
-			);
-
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'JourneyEntry',
-				resourceId: 'batch-reorder',
-				changes: { items } as unknown as Prisma.InputJsonValue,
-			});
-
-			return reply.send({ message: 'Order updated' });
-		},
-	);
-
-	// DELETE /api/admin/journey/:id
-	fastify.delete<{ Params: { id: string } }>('/api/admin/journey/:id', async (request, reply) => {
-		const { id } = request.params;
-		const adminId = request.admin!.adminId;
+// PUT /api/admin/journey/:id
+router.put(
+	'/api/admin/journey/:id',
+	validate(JourneyUpdateSchema),
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
 		const existing = await prisma.journeyEntry.findUnique({ where: { id } });
-		if (!existing) {
-			const error = notFound('Journey entry');
-			return reply.status(error.statusCode).send(error.toJSON());
-		}
+		if (!existing) throw notFound('Journey entry');
+
+		const entry = await prisma.journeyEntry.update({
+			where: { id },
+			data: data as any,
+		});
+
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'JourneyEntry',
+			resourceId: id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
+
+		res.json(entry);
+	}),
+);
+
+// PATCH /api/admin/journey/reorder
+router.patch(
+	'/api/admin/journey/reorder',
+	validate(ReorderSchema),
+	asyncHandler(async (req, res) => {
+		const { items } = req.body as z.infer<typeof ReorderSchema>;
+		const adminId = req.admin!.adminId;
+
+		await prisma.$transaction(
+			items.map(item =>
+				prisma.journeyEntry.update({
+					where: { id: item.id },
+					data: { order: item.order },
+				}),
+			),
+		);
+
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'JourneyEntry',
+			resourceId: 'batch-reorder',
+			changes: { items } as unknown as Prisma.InputJsonValue,
+		});
+
+		res.json({ message: 'Order updated' });
+	}),
+);
+
+// DELETE /api/admin/journey/:id
+router.delete(
+	'/api/admin/journey/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const adminId = req.admin!.adminId;
+
+		const existing = await prisma.journeyEntry.findUnique({ where: { id } });
+		if (!existing) throw notFound('Journey entry');
 
 		await prisma.journeyEntry.delete({ where: { id } });
 
@@ -131,6 +132,8 @@ export default async function journeyRoutes(fastify: FastifyInstance) {
 			changes: { title: existing.title },
 		});
 
-		return reply.send({ message: 'Journey entry deleted' });
-	});
-}
+		res.json({ message: 'Journey entry deleted' });
+	}),
+);
+
+export default router;

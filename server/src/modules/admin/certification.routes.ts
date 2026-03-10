@@ -1,102 +1,100 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
 import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
 import { notFound } from '../../lib/errors';
 import { CertificationSchema } from '../../schemas/zod-schemas';
+import { asyncHandler } from '../../utils/asyncHandler';
 
-const CertificationUpdateSchema = CertificationSchema.partial().omit({
-	id: true,
-});
+const CertificationUpdateSchema = CertificationSchema.partial().omit({ id: true });
 
-export default async function certificationRoutes(fastify: FastifyInstance) {
-	// GET /api/admin/certifications
-	fastify.get('/api/admin/certifications', async (_req, reply) => {
+const router = Router();
+
+// GET /api/admin/certifications
+router.get(
+	'/api/admin/certifications',
+	asyncHandler(async (_req, res) => {
 		const items = await prisma.certification.findMany({
-			orderBy: { date: 'desc' },
+			orderBy: { createdAt: 'desc' },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// POST /api/admin/certifications
-	fastify.post(
-		'/api/admin/certifications',
-		{ preHandler: [validate(CertificationSchema.omit({ id: true }))] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
+// POST /api/admin/certifications
+router.post(
+	'/api/admin/certifications',
+	validate(CertificationSchema.omit({ id: true })),
+	asyncHandler(async (req, res) => {
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
-			const cert = await prisma.certification.create({ data: data as any });
+		const cert = await prisma.certification.create({ data: data as any });
 
-			await logAudit({
-				adminId,
-				action: 'create',
-				resourceType: 'Certification',
-				resourceId: cert.id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'create',
+			resourceType: 'Certification',
+			resourceId: cert.id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.status(201).send(cert);
-		},
-	);
+		res.status(201).json(cert);
+	}),
+);
 
-	// PUT /api/admin/certifications/:id
-	fastify.put<{ Params: { id: string } }>(
-		'/api/admin/certifications/:id',
-		{ preHandler: [validate(CertificationUpdateSchema)] },
-		async (request, reply) => {
-			const { id } = request.params;
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
+// PUT /api/admin/certifications/:id
+router.put(
+	'/api/admin/certifications/:id',
+	validate(CertificationUpdateSchema),
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.certification.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Certification');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.certification.findUnique({ where: { id } });
+		if (!existing) throw notFound('Certification');
 
-			const cert = await prisma.certification.update({
-				where: { id },
-				data: data as any,
-			});
+		const cert = await prisma.certification.update({
+			where: { id },
+			data: data as any,
+		});
 
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'Certification',
-				resourceId: id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'Certification',
+			resourceId: id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.send(cert);
-		},
-	);
+		res.json(cert);
+	}),
+);
 
-	// DELETE /api/admin/certifications/:id
-	fastify.delete<{ Params: { id: string } }>(
-		'/api/admin/certifications/:id',
-		async (request, reply) => {
-			const { id } = request.params;
-			const adminId = request.admin!.adminId;
+// DELETE /api/admin/certifications/:id
+router.delete(
+	'/api/admin/certifications/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.certification.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Certification');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.certification.findUnique({ where: { id } });
+		if (!existing) throw notFound('Certification');
 
-			await prisma.certification.delete({ where: { id } });
+		await prisma.certification.delete({ where: { id } });
 
-			await logAudit({
-				adminId,
-				action: 'delete',
-				resourceType: 'Certification',
-				resourceId: id,
-				changes: { title: existing.title },
-			});
+		await logAudit({
+			adminId,
+			action: 'delete',
+			resourceType: 'Certification',
+			resourceId: id,
+			changes: { title: existing.title },
+		});
 
-			return reply.send({ message: 'Certification deleted' });
-		},
-	);
-}
+		res.json({ message: 'Certification deleted' });
+	}),
+);
+
+export default router;

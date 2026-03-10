@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify';
+import { Router } from 'express';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import profileRoutes from './profile.routes';
 import projectRoutes from './project.routes';
@@ -8,19 +8,20 @@ import certificationRoutes from './certification.routes';
 import blogRoutes from './blog.routes';
 import messagesRoutes from './messages.routes';
 
+const router = Router();
+
 /**
- * Admin route registrar.
+ * Admin route aggregator.
  * All sub-routes require authentication.
  */
-export default async function adminRoutes(fastify: FastifyInstance) {
-	// Apply auth middleware to all routes in this scope
-	fastify.addHook('preHandler', authMiddleware);
+router.use(authMiddleware);
 
-	fastify.register(profileRoutes);
-	fastify.register(projectRoutes);
-	fastify.register(journeyRoutes);
-	fastify.register(achievementRoutes);
-	fastify.register(certificationRoutes);
-	fastify.register(blogRoutes);
-	fastify.register(messagesRoutes);
-}
+router.use(profileRoutes);
+router.use(projectRoutes);
+router.use(journeyRoutes);
+router.use(achievementRoutes);
+router.use(certificationRoutes);
+router.use(blogRoutes);
+router.use(messagesRoutes);
+
+export default router;

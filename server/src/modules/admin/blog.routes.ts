@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
@@ -6,6 +6,7 @@ import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
 import { notFound, conflict } from '../../lib/errors';
 import { BlogPostSchema } from '../../schemas/zod-schemas';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 const BlogUpdateSchema = BlogPostSchema.partial().omit({
 	id: true,
@@ -17,143 +18,128 @@ const BlogStatusSchema = z.object({
 	status: z.enum(['draft', 'published', 'archived']),
 });
 
-export default async function blogRoutes(fastify: FastifyInstance) {
-	// GET /api/admin/blog — list ALL (including drafts)
-	fastify.get('/api/admin/blog', async (_req, reply) => {
+const router = Router();
+
+// GET /api/admin/blog
+router.get(
+	'/api/admin/blog',
+	asyncHandler(async (_req, res) => {
 		const posts = await prisma.blogPost.findMany({
 			orderBy: { createdAt: 'desc' },
 		});
-		return reply.send({ posts });
-	});
+		res.json({ posts });
+	}),
+);
 
-	// POST /api/admin/blog
-	fastify.post(
-		'/api/admin/blog',
-		{
-			preHandler: [
-				validate(BlogPostSchema.omit({ id: true, createdAt: true, updatedAt: true })),
-			],
-		},
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const data = request.body as z.infer<typeof BlogPostSchema>;
-			const adminId = request.admin!.adminId;
+// POST /api/admin/blog
+router.post(
+	'/api/admin/blog',
+	validate(BlogPostSchema.omit({ id: true, createdAt: true, updatedAt: true })),
+	asyncHandler(async (req, res) => {
+		const data = req.body as z.infer<typeof BlogPostSchema>;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.blogPost.findUnique({
-				where: { slug: data.slug },
-			});
-			if (existing) {
-				const error = conflict(`Blog post with slug "${data.slug}" already exists`);
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await prisma.blogPost.findUnique({ where: { slug: data.slug } });
+		if (existing) throw conflict(`Blog post with slug "${data.slug}" already exists`);
 
-			const createData: any = { ...data };
-			if (data.status === 'published' && !data.publishedAt) {
-				createData.publishedAt = new Date();
-			}
+		const createData: any = { ...data };
+		if (data.status === 'published' && !data.publishedAt) {
+			createData.publishedAt = new Date();
+		}
 
-			const post = await prisma.blogPost.create({ data: createData });
+		const post = await prisma.blogPost.create({ data: createData });
 
-			await logAudit({
-				adminId,
-				action: 'create',
-				resourceType: 'BlogPost',
-				resourceId: post.id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'create',
+			resourceType: 'BlogPost',
+			resourceId: post.id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.status(201).send(post);
-		},
-	);
+		res.status(201).json(post);
+	}),
+);
 
-	// PUT /api/admin/blog/:id
-	fastify.put<{ Params: { id: string } }>(
-		'/api/admin/blog/:id',
-		{ preHandler: [validate(BlogUpdateSchema)] },
-		async (request, reply) => {
-			const { id } = request.params;
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
-
-			const existing = await prisma.blogPost.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Blog post');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
-
-			if (data.slug && data.slug !== existing.slug) {
-				const slugExists = await prisma.blogPost.findUnique({
-					where: { slug: data.slug as string },
-				});
-				if (slugExists) {
-					const error = conflict(`Blog post with slug "${data.slug}" already exists`);
-					return reply.status(error.statusCode).send(error.toJSON());
-				}
-			}
-
-			const post = await prisma.blogPost.update({
-				where: { id },
-				data: data as any,
-			});
-
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'BlogPost',
-				resourceId: id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
-
-			return reply.send(post);
-		},
-	);
-
-	// PATCH /api/admin/blog/:id/status
-	fastify.patch<{ Params: { id: string } }>(
-		'/api/admin/blog/:id/status',
-		{ preHandler: [validate(BlogStatusSchema)] },
-		async (request, reply) => {
-			const { id } = request.params;
-			const { status } = request.body as z.infer<typeof BlogStatusSchema>;
-			const adminId = request.admin!.adminId;
-
-			const existing = await prisma.blogPost.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Blog post');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
-
-			const updateData: any = { status };
-			if (status === 'published' && !existing.publishedAt) {
-				updateData.publishedAt = new Date();
-			}
-
-			const post = await prisma.blogPost.update({
-				where: { id },
-				data: updateData,
-			});
-
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'BlogPost',
-				resourceId: id,
-				changes: { status, previousStatus: existing.status },
-			});
-
-			return reply.send(post);
-		},
-	);
-
-	// DELETE /api/admin/blog/:id
-	fastify.delete<{ Params: { id: string } }>('/api/admin/blog/:id', async (request, reply) => {
-		const { id } = request.params;
-		const adminId = request.admin!.adminId;
+// PUT /api/admin/blog/:id
+router.put(
+	'/api/admin/blog/:id',
+	validate(BlogUpdateSchema),
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
 		const existing = await prisma.blogPost.findUnique({ where: { id } });
-		if (!existing) {
-			const error = notFound('Blog post');
-			return reply.status(error.statusCode).send(error.toJSON());
+		if (!existing) throw notFound('Blog post');
+
+		if (data.slug && data.slug !== existing.slug) {
+			const slugExists = await prisma.blogPost.findUnique({
+				where: { slug: data.slug as string },
+			});
+			if (slugExists) throw conflict(`Blog post with slug "${data.slug}" already exists`);
 		}
+
+		const post = await prisma.blogPost.update({
+			where: { id },
+			data: data as any,
+		});
+
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'BlogPost',
+			resourceId: id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
+
+		res.json(post);
+	}),
+);
+
+// PATCH /api/admin/blog/:id/status
+router.patch(
+	'/api/admin/blog/:id/status',
+	validate(BlogStatusSchema),
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const { status } = req.body as z.infer<typeof BlogStatusSchema>;
+		const adminId = req.admin!.adminId;
+
+		const existing = await prisma.blogPost.findUnique({ where: { id } });
+		if (!existing) throw notFound('Blog post');
+
+		const updateData: any = { status };
+		if (status === 'published' && !existing.publishedAt) {
+			updateData.publishedAt = new Date();
+		}
+
+		const post = await prisma.blogPost.update({
+			where: { id },
+			data: updateData,
+		});
+
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'BlogPost',
+			resourceId: id,
+			changes: { status, previousStatus: existing.status },
+		});
+
+		res.json(post);
+	}),
+);
+
+// DELETE /api/admin/blog/:id
+router.delete(
+	'/api/admin/blog/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const adminId = req.admin!.adminId;
+
+		const existing = await prisma.blogPost.findUnique({ where: { id } });
+		if (!existing) throw notFound('Blog post');
 
 		await prisma.blogPost.delete({ where: { id } });
 
@@ -165,6 +151,8 @@ export default async function blogRoutes(fastify: FastifyInstance) {
 			changes: { title: existing.title, slug: existing.slug },
 		});
 
-		return reply.send({ message: 'Blog post deleted' });
-	});
-}
+		res.json({ message: 'Blog post deleted' });
+	}),
+);
+
+export default router;

@@ -1,61 +1,5 @@
 ﻿src/lib/audit.ts(18,16): error TS2339: Property 'auditLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
-src/modules/admin/achievement.routes.ts(62,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/achievement.routes.ts(119,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/blog.routes.ts(68,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/blog.routes.ts(104,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/blog.routes.ts(137,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/certification.routes.ts(51,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/certification.routes.ts(79,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/journey.routes.ts(61,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/journey.routes.ts(118,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/messages.routes.ts(46,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/messages.routes.ts(66,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
 src/modules/admin/project.routes.ts(28,16): error TS2353: Object literal may only specify known properties, and 'priority' does not exist in type 'ProjectOrderByWithRelationInput'.
-src/modules/admin/project.routes.ts(63,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/project.routes.ts(99,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
-src/modules/admin/project.routes.ts(127,15): error TS2345: Argument of type '(req: Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ id: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'id' is missing in type 'ParamsDictionary' but required in type '{ id: string; }'.
 src/modules/auth/auth.routes.ts(39,30): error TS2339: Property 'admin' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
 src/modules/auth/auth.routes.ts(85,30): error TS2339: Property 'admin' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
 src/modules/auth/auth.service.ts(102,15): error TS2339: Property 'refreshToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
@@ -64,12 +8,4 @@ src/modules/auth/auth.service.ts(133,17): error TS2339: Property 'refreshToken' 
 src/modules/auth/auth.service.ts(141,15): error TS2339: Property 'refreshToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
 src/modules/auth/auth.service.ts(156,15): error TS2339: Property 'refreshToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
 src/routes/public.routes.ts(44,16): error TS2353: Object literal may only specify known properties, and 'priority' does not exist in type 'ProjectOrderByWithRelationInput'.
-src/routes/public.routes.ts(52,15): error TS2345: Argument of type '(req: Request<{ slug: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ slug: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'slug' is missing in type 'ParamsDictionary' but required in type '{ slug: string; }'.
 src/routes/public.routes.ts(114,5): error TS2353: Object literal may only specify known properties, and 'summary' does not exist in type 'BlogPostSelect<DefaultArgs>'.
-src/routes/public.routes.ts(130,15): error TS2345: Argument of type '(req: Request<{ slug: string; }, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>) => Promise<void>' is not assignable to parameter of type '(req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: Response<any, Record<string, any>>, next: NextFunction) => Promise<...>'.
-  Types of parameters 'req' and 'req' are incompatible.
-    Type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>' is not assignable to type 'Request<{ slug: string; }, any, any, ParsedQs, Record<string, any>>'.
-      Property 'slug' is missing in type 'ParamsDictionary' but required in type '{ slug: string; }'.

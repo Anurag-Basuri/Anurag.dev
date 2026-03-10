@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Router, Request } from 'express';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/db';
@@ -6,6 +6,7 @@ import { validate } from '../../middleware/validate';
 import { logAudit } from '../../lib/audit';
 import { notFound } from '../../lib/errors';
 import { AchievementSchema } from '../../schemas/zod-schemas';
+import { asyncHandler } from '../../utils/asyncHandler';
 
 const AchievementUpdateSchema = AchievementSchema.partial().omit({ id: true });
 
@@ -18,123 +19,122 @@ const ReorderSchema = z.object({
 	),
 });
 
-export default async function achievementRoutes(fastify: FastifyInstance) {
-	// GET /api/admin/achievements
-	fastify.get('/api/admin/achievements', async (_req, reply) => {
-		const items = await prisma.achievement.findMany({
+const router = Router();
+
+// GET /api/admin/achievements
+router.get(
+	'/api/admin/achievements',
+	asyncHandler(async (_req, res) => {
+		const items = await (prisma as any).achievement.findMany({
 			orderBy: { order: 'asc' },
 			include: { journeyEntry: { select: { id: true, title: true, type: true } } },
 		});
-		return reply.send({ items });
-	});
+		res.json({ items });
+	}),
+);
 
-	// POST /api/admin/achievements
-	fastify.post(
-		'/api/admin/achievements',
-		{ preHandler: [validate(AchievementSchema.omit({ id: true }))] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
+// POST /api/admin/achievements
+router.post(
+	'/api/admin/achievements',
+	validate(AchievementSchema.omit({ id: true })),
+	asyncHandler(async (req, res) => {
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
-			const entry = await prisma.achievement.create({ data: data as any });
+		const entry = await (prisma as any).achievement.create({ data: data as any });
 
-			await logAudit({
-				adminId,
-				action: 'create',
-				resourceType: 'Achievement',
-				resourceId: entry.id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'create',
+			resourceType: 'Achievement',
+			resourceId: entry.id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.status(201).send(entry);
-		},
-	);
+		res.status(201).json(entry);
+	}),
+);
 
-	// PUT /api/admin/achievements/:id
-	fastify.put<{ Params: { id: string } }>(
-		'/api/admin/achievements/:id',
-		{ preHandler: [validate(AchievementUpdateSchema)] },
-		async (request, reply) => {
-			const { id } = request.params;
-			const data = request.body as Record<string, unknown>;
-			const adminId = request.admin!.adminId;
+// PUT /api/admin/achievements/:id
+router.put(
+	'/api/admin/achievements/:id',
+	validate(AchievementUpdateSchema),
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const data = req.body as Record<string, unknown>;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.achievement.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Achievement');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await (prisma as any).achievement.findUnique({ where: { id } });
+		if (!existing) throw notFound('Achievement');
 
-			const entry = await prisma.achievement.update({
-				where: { id },
-				data: data as any,
-			});
+		const entry = await (prisma as any).achievement.update({
+			where: { id },
+			data: data as any,
+		});
 
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'Achievement',
-				resourceId: id,
-				changes: data as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'Achievement',
+			resourceId: id,
+			changes: data as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.send(entry);
-		},
-	);
+		res.json(entry);
+	}),
+);
 
-	// PATCH /api/admin/achievements/reorder
-	fastify.patch(
-		'/api/admin/achievements/reorder',
-		{ preHandler: [validate(ReorderSchema)] },
-		async (request: FastifyRequest, reply: FastifyReply) => {
-			const { items } = request.body as z.infer<typeof ReorderSchema>;
-			const adminId = request.admin!.adminId;
+// PATCH /api/admin/achievements/reorder
+router.patch(
+	'/api/admin/achievements/reorder',
+	validate(ReorderSchema),
+	asyncHandler(async (req, res) => {
+		const { items } = req.body as z.infer<typeof ReorderSchema>;
+		const adminId = req.admin!.adminId;
 
-			await prisma.$transaction(
-				items.map(item =>
-					prisma.achievement.update({
-						where: { id: item.id },
-						data: { order: item.order },
-					}),
-				),
-			);
+		await prisma.$transaction(
+			items.map(item =>
+				(prisma as any).achievement.update({
+					where: { id: item.id },
+					data: { order: item.order },
+				}),
+			),
+		);
 
-			await logAudit({
-				adminId,
-				action: 'update',
-				resourceType: 'Achievement',
-				resourceId: 'batch-reorder',
-				changes: { items } as unknown as Prisma.InputJsonValue,
-			});
+		await logAudit({
+			adminId,
+			action: 'update',
+			resourceType: 'Achievement',
+			resourceId: 'batch-reorder',
+			changes: { items } as unknown as Prisma.InputJsonValue,
+		});
 
-			return reply.send({ message: 'Order updated' });
-		},
-	);
+		res.json({ message: 'Order updated' });
+	}),
+);
 
-	// DELETE /api/admin/achievements/:id
-	fastify.delete<{ Params: { id: string } }>(
-		'/api/admin/achievements/:id',
-		async (request, reply) => {
-			const { id } = request.params;
-			const adminId = request.admin!.adminId;
+// DELETE /api/admin/achievements/:id
+router.delete(
+	'/api/admin/achievements/:id',
+	asyncHandler(async (req: Request<{ id: string }>, res) => {
+		const { id } = req.params;
+		const adminId = req.admin!.adminId;
 
-			const existing = await prisma.achievement.findUnique({ where: { id } });
-			if (!existing) {
-				const error = notFound('Achievement');
-				return reply.status(error.statusCode).send(error.toJSON());
-			}
+		const existing = await (prisma as any).achievement.findUnique({ where: { id } });
+		if (!existing) throw notFound('Achievement');
 
-			await prisma.achievement.delete({ where: { id } });
+		await (prisma as any).achievement.delete({ where: { id } });
 
-			await logAudit({
-				adminId,
-				action: 'delete',
-				resourceType: 'Achievement',
-				resourceId: id,
-				changes: { title: existing.title },
-			});
+		await logAudit({
+			adminId,
+			action: 'delete',
+			resourceType: 'Achievement',
+			resourceId: id,
+			changes: { title: existing.title },
+		});
 
-			return reply.send({ message: 'Achievement deleted' });
-		},
-	);
-}
+		res.json({ message: 'Achievement deleted' });
+	}),
+);
+
+export default router;
