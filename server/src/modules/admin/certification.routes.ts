@@ -1,7 +1,7 @@
 import { Router, Request } from 'express';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
-import { validate } from '../../middleware/validate';
+import { validate } from '../../middleware/validate.middleware';
 import { logAudit } from '../../lib/audit';
 import { notFound } from '../../lib/errors';
 import { CertificationSchema } from '../../schemas/zod-schemas';

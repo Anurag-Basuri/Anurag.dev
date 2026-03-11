@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
-import { errorHandler } from './middleware/error.middleware';
 import { ApiError } from './utils/ApiError';
 
 import publicRoutes from './routes/public.routes';
@@ -36,10 +35,6 @@ export function buildApp() {
 	app.use((_req, _res, next) => {
 		next(ApiError.NotFound('Route'));
 	});
-
-	// ─── Centralized Error Handler (must be last) ─────────────────
-
-	app.use(errorHandler);
 
 	return app;
 }

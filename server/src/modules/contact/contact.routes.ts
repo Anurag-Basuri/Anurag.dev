@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import sanitizeHtml from 'sanitize-html';
 import { prisma } from '../../lib/prisma';
-import { validate } from '../../middleware/validate';
-import { rateLimit } from '../../middleware/rate-limit';
+import { validate } from '../../middleware/validate.middleware';
+import { rateLimit } from '../../middleware/rate-limit.middleware';
 import { ContactSchema } from '../../schemas/zod-schemas';
 import { asyncHandler } from '../../utils/asyncHandler';
 

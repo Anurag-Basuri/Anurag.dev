@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { prisma } from '../../lib/prisma';
 import { notFound } from '../../lib/errors';
 import { logAudit } from '../../lib/audit';
-import { validateQuery } from '../../middleware/validate';
+import { validateQuery } from '../../middleware/validate.middleware';
 import { asyncHandler } from '../../utils/asyncHandler';
 
 const PaginationQuery = z.object({

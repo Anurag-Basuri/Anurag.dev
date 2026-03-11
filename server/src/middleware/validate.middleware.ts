@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import { badRequest } from '../lib/errors';
+import { ApiError } from '../utils/ApiError';
 
-/**
- * Creates middleware that validates request.body against a Zod schema.
- * On failure, forwards a structured error to the error handler.
- */
+// Middleware to validate request bodies against a Zod schema
 export function validate(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -17,7 +14,7 @@ export function validate(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(badRequest('Validation failed', details));
+				next(new ApiError(400, 'Validation failed', details));
 				return;
 			}
 			next(err);
@@ -25,9 +22,7 @@ export function validate(schema: ZodSchema) {
 	};
 }
 
-/**
- * Creates middleware that validates request.params against a Zod schema.
- */
+// Optional: validate route parameters as well
 export function validateParams(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -39,7 +34,7 @@ export function validateParams(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(badRequest('Invalid parameters', details));
+				next(new ApiError(400, 'Invalid parameters', details));
 				return;
 			}
 			next(err);
@@ -47,9 +42,7 @@ export function validateParams(schema: ZodSchema) {
 	};
 }
 
-/**
- * Creates middleware that validates request.query against a Zod schema.
- */
+// Optional: validate query parameters as well
 export function validateQuery(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -61,7 +54,7 @@ export function validateQuery(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(badRequest('Invalid query parameters', details));
+				next(new ApiError(400, 'Invalid query parameters', details));
 				return;
 			}
 			next(err);

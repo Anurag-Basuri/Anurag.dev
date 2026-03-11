@@ -7,8 +7,8 @@ import {
 	rotateRefreshToken,
 	revokeRefreshToken,
 } from './auth.service';
-import { validate } from '../../middleware/validate';
-import { rateLimit } from '../../middleware/rate-limit';
+import { validate } from '../../middleware/validate.middleware';
+import { rateLimit } from '../../middleware/rate-limit.middleware';
 import { unauthorized } from '../../lib/errors';
 import { authMiddleware } from '../../middleware/auth.middleware';
 import { asyncHandler } from '../../utils/asyncHandler';
