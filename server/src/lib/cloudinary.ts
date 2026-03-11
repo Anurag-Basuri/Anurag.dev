@@ -4,8 +4,7 @@ import path from 'path';
 import { env } from '../config/env';
 import { badRequest, internal } from './errors';
 
-// ─── Types ────────────────────────────────────────────────────────
-
+// Types for uploads and deletions, plus config constants and helpers.
 interface UploadedFile {
 	path: string;
 	mimetype: string;
@@ -28,8 +27,7 @@ interface UploadOptions {
 	folder?: string;
 }
 
-// ─── Config ───────────────────────────────────────────────────────
-
+// Allowed MIME types and max file size for uploads
 const ALLOWED_MIME_TYPES: Record<string, string> = {
 	'image/jpeg': 'jpg',
 	'image/jpg': 'jpg',
@@ -41,12 +39,13 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
 	'video/webm': 'webm',
 	'video/quicktime': 'mov',
 	'application/pdf': 'pdf',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-// ─── Initialization ───────────────────────────────────────────────
-
+// Initialization flag to ensure Cloudinary is configured once
 let initialized = false;
 
 function ensureInitialized(): void {
@@ -62,10 +61,7 @@ function ensureInitialized(): void {
 	initialized = true;
 }
 
-/**
- * Verify Cloudinary credentials are valid by pinging the API.
- * Call once at server startup.
- */
+// Ping Cloudinary to verify credentials and connectivity. Throws if ping fails.
 async function verifyConnection(): Promise<void> {
 	ensureInitialized();
 
@@ -75,8 +71,7 @@ async function verifyConnection(): Promise<void> {
 	}
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────
-
+// Validates the uploaded file's type and size against allowed criteria. Throws if invalid.
 function validateFile(file: UploadedFile): void {
 	if (!file?.mimetype || !(file.mimetype in ALLOWED_MIME_TYPES)) {
 		throw badRequest(
@@ -108,12 +103,9 @@ function toUploadResult(response: UploadApiResponse): UploadResult {
 	};
 }
 
-// ─── Upload Operations ───────────────────────────────────────────
+// Upload Operations
 
-/**
- * Upload a file (image/video) to Cloudinary.
- * Validates type + size, uploads, cleans up local temp file.
- */
+// Upload File (image/video/raw based on mimetype)
 async function uploadFile(file: UploadedFile, options: UploadOptions = {}): Promise<UploadResult> {
 	validateFile(file);
 	ensureInitialized();
@@ -134,10 +126,7 @@ async function uploadFile(file: UploadedFile, options: UploadOptions = {}): Prom
 	}
 }
 
-/**
- * Upload a resume (PDF) to Cloudinary under the "resumes" folder.
- * Uses raw resource type to preserve file format.
- */
+// Upload Resume
 async function uploadResume(file: UploadedFile): Promise<UploadResult> {
 	validateFile(file);
 	ensureInitialized();
@@ -160,11 +149,9 @@ async function uploadResume(file: UploadedFile): Promise<UploadResult> {
 	}
 }
 
-// ─── Delete Operations ───────────────────────────────────────────
+// Delete Operations
 
-/**
- * Delete a single file from Cloudinary by public ID.
- */
+// Delete a single file
 async function deleteFile(target: DeleteTarget): Promise<void> {
 	if (!target.publicId || !target.resourceType) {
 		throw badRequest('publicId and resourceType are required to delete a file');
@@ -187,10 +174,7 @@ async function deleteFile(target: DeleteTarget): Promise<void> {
 	}
 }
 
-/**
- * Bulk delete files from Cloudinary. Groups by resource type for efficiency.
- * Non-throwing — logs errors but doesn't interrupt the caller.
- */
+// Delete multiple files in bulk. Groups by resource type for efficiency.
 async function deleteFiles(targets: DeleteTarget[]): Promise<void> {
 	if (!targets.length) return;
 
@@ -214,7 +198,6 @@ async function deleteFiles(targets: DeleteTarget[]): Promise<void> {
 	}
 }
 
-// ─── Exports ──────────────────────────────────────────────────────
-
+// Exports
 export { verifyConnection, uploadFile, uploadResume, deleteFile, deleteFiles };
 export type { UploadedFile, UploadResult, DeleteTarget, UploadOptions };
