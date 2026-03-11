@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { tooManyRequests } from '../lib/errors';
-
+import { ApiError } from '../utils/ApiError';
 interface RateLimitEntry {
 	count: number;
 	resetAt: number;
@@ -19,22 +18,16 @@ setInterval(
 			}
 		}
 	},
-	5 * 60 * 1000,
+	5 * 60 * 1000, // 5 minutes
 ).unref();
 
 interface RateLimitOptions {
-	/** Max requests allowed in the window */
 	max: number;
-	/** Window duration in seconds */
 	windowSeconds: number;
-	/** Optional prefix for the key (to separate different limiters) */
 	prefix?: string;
 }
 
-/**
- * Creates an in-memory rate limiter middleware.
- * Keys by client IP + optional prefix.
- */
+// Rate limiting middleware factory
 export function rateLimit(options: RateLimitOptions) {
 	const { max, windowSeconds, prefix = 'rl' } = options;
 
@@ -54,7 +47,7 @@ export function rateLimit(options: RateLimitOptions) {
 
 		if (entry.count >= max) {
 			const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
-			next(tooManyRequests(`Rate limit exceeded. Try again in ${retryAfter}s`));
+			next(ApiError.TooManyRequests(`Rate limit exceeded. Try again in ${retryAfter}s`));
 			return;
 		}
 
