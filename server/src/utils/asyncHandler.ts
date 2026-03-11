@@ -1,13 +1,24 @@
 import { Request, Response, NextFunction } from 'express';
 
-type AsyncRouteHandler = (req: Request<any>, res: Response, next: NextFunction) => Promise<void>;
+type AsyncRouteHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
-/**
- * Wraps an async route handler to catch errors and forward them to Express error middleware.
- * Eliminates the need for try/catch blocks in every route.
- */
-export const asyncHandler = (fn: AsyncRouteHandler) => {
+const asyncHandler = (fn: AsyncRouteHandler) => {
+	// Early validation during middleware setup
+	if (typeof fn !== 'function') {
+		throw new TypeError('asyncHandler requires a function argument');
+	}
+
 	return (req: Request, res: Response, next: NextFunction) => {
-		Promise.resolve(fn(req, res, next)).catch(next);
+		// Handle both async functions and synchronous errors
+		Promise.resolve(fn(req, res, next)).catch((error: Record<string, unknown>) => {
+			// Ensure error has a statusCode and message
+			if (!error.statusCode) error.statusCode = 500;
+			if (!error.message) error.message = 'Internal Server Error';
+			// Optionally log the error for debugging
+			console.error('Async error:', error);
+			next(error);
+		});
 	};
 };
+
+export { asyncHandler };
