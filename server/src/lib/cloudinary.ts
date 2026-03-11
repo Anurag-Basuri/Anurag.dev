@@ -2,7 +2,7 @@ import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
 import fs from 'fs';
 import path from 'path';
 import { env } from '../config/env';
-import { badRequest, internal } from './errors';
+import { ApiError } from '../utils/ApiError';
 
 // Types for uploads and deletions, plus config constants and helpers.
 interface UploadedFile {
@@ -74,14 +74,14 @@ async function verifyConnection(): Promise<void> {
 // Validates the uploaded file's type and size against allowed criteria. Throws if invalid.
 function validateFile(file: UploadedFile): void {
 	if (!file?.mimetype || !(file.mimetype in ALLOWED_MIME_TYPES)) {
-		throw badRequest(
+		throw ApiError.BadRequest(
 			`Invalid file type "${file?.mimetype ?? 'unknown'}". Allowed: ${Object.keys(ALLOWED_MIME_TYPES).join(', ')}`,
 		);
 	}
 
 	if (file.size > MAX_FILE_SIZE) {
 		const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-		throw badRequest(
+		throw ApiError.BadRequest(
 			`File size (${sizeMB} MB) exceeds the ${MAX_FILE_SIZE / (1024 * 1024)} MB limit`,
 		);
 	}
@@ -122,7 +122,7 @@ async function uploadFile(file: UploadedFile, options: UploadOptions = {}): Prom
 	} catch (err) {
 		cleanupLocalFile(file.path);
 		const message = err instanceof Error ? err.message : String(err);
-		throw internal(`Failed to upload "${file.originalname ?? file.path}": ${message}`);
+		throw ApiError.InternalServerError(`Failed to upload "${file.originalname ?? file.path}": ${message}`);
 	}
 }
 
@@ -145,7 +145,7 @@ async function uploadResume(file: UploadedFile): Promise<UploadResult> {
 	} catch (err) {
 		cleanupLocalFile(file.path);
 		const message = err instanceof Error ? err.message : String(err);
-		throw internal(`Failed to upload resume: ${message}`);
+		throw ApiError.InternalServerError(`Failed to upload resume: ${message}`);
 	}
 }
 
@@ -154,7 +154,7 @@ async function uploadResume(file: UploadedFile): Promise<UploadResult> {
 // Delete a single file
 async function deleteFile(target: DeleteTarget): Promise<void> {
 	if (!target.publicId || !target.resourceType) {
-		throw badRequest('publicId and resourceType are required to delete a file');
+		throw ApiError.BadRequest('publicId and resourceType are required to delete a file');
 	}
 
 	ensureInitialized();
@@ -165,12 +165,12 @@ async function deleteFile(target: DeleteTarget): Promise<void> {
 		});
 
 		if (result.result !== 'ok' && result.result !== 'not found') {
-			throw internal(`Cloudinary deletion failed for "${target.publicId}": ${result.result}`);
+			throw ApiError.InternalServerError(`Cloudinary deletion failed for "${target.publicId}": ${result.result}`);
 		}
 	} catch (err) {
 		if (err instanceof Error && 'statusCode' in err) throw err; // Re-throw AppError
 		const message = err instanceof Error ? err.message : String(err);
-		throw internal(`Failed to delete "${target.publicId}": ${message}`);
+		throw ApiError.InternalServerError(`Failed to delete "${target.publicId}": ${message}`);
 	}
 }
 
@@ -195,6 +195,7 @@ async function deleteFiles(targets: DeleteTarget[]): Promise<void> {
 	} catch (err) {
 		const message = err instanceof Error ? err.message : String(err);
 		console.error(`[cloudinary] Bulk delete failed: ${message}`);
+		throw ApiError.InternalServerError(`Failed to delete files in bulk: ${message}`);
 	}
 }
 

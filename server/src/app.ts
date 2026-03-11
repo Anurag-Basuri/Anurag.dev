@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { env } from './config/env';
 import { errorHandler } from './middleware/error.middleware';
-import { notFound } from './lib/errors';
+import { ApiError } from './utils/ApiError';
 
 import publicRoutes from './routes/public.routes';
 // TODO: Re-enable once .env-based admin auth is implemented
@@ -34,7 +34,7 @@ export function buildApp() {
 	// ─── 404 Handler ──────────────────────────────────────────────
 
 	app.use((_req, _res, next) => {
-		next(notFound('Route'));
+		next(ApiError.NotFound('Route'));
 	});
 
 	// ─── Centralized Error Handler (must be last) ─────────────────
