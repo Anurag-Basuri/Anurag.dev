@@ -6,7 +6,7 @@ import { ApiError } from './utils/ApiError';
 import publicRoutes from './routes/public.routes';
 // TODO: Re-enable once .env-based admin auth is implemented
 // import authRoutes from './modules/auth/auth.routes';
-import contactRoutes from './modules/contact/contact.routes';
+import contactRoutes from './routes/contact/contact.routes';
 // import adminRoutes from './modules/admin/admin.routes';
 
 export function buildApp() {

@@ -1,6 +1,6 @@
 import { Router, Request } from 'express';
 import { prisma } from '../lib/prisma';
-import { notFound } from '../lib/errors';
+import { ApiError } from '../utils/ApiError';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
@@ -29,7 +29,7 @@ router.get(
 	'/api/profile',
 	asyncHandler(async (_req, res) => {
 		const profile = await prisma.profile.findUnique({ where: { id: 'main' } });
-		if (!profile) throw notFound('Profile');
+		if (!profile) throw new ApiError(404, 'Profile not found');
 		res.json(profile);
 	}),
 );
@@ -54,7 +54,7 @@ router.get(
 		const project = await prisma.project.findUnique({ where: { slug } });
 
 		if (!project || !['published', 'completed'].includes(project.status)) {
-			throw notFound('Project');
+			throw new ApiError(404, 'Project not found');
 		}
 
 		res.json(project);
@@ -129,7 +129,7 @@ router.get(
 		const post = await prisma.blogPost.findUnique({ where: { slug } });
 
 		if (!post || post.status !== 'published') {
-			throw notFound('Blog post');
+			throw new ApiError(404, 'Blog post not found');
 		}
 
 		res.json(post);

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken, TokenPayload } from '../modules/auth/auth.service';
+import { verifyAccessToken, TokenPayload } from '../routes/auth/auth.service';
 import { unauthorized } from '../lib/errors';
 
 // Augment Express Request to include admin data
