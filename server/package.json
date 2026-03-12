@@ -1,11 +1,11 @@
 {
-	"name": "anuragos-backend",
+	"name": "anurag-portfolio-server",
 	"version": "0.1.0",
 	"description": "A TypeScript-based REST API server built on Fastify for a developer portfolio system.",
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/server.ts",
+		"dev": "nodemon --exec tsx src/server.ts --watch src -e ts,json",
 		"build": "tsc",
 		"start": "node dist/server.js",
 		"test": "vitest run",
@@ -43,6 +43,7 @@
 		"@types/node": "^22.19.15",
 		"@types/pg": "^8.18.0",
 		"@types/sanitize-html": "^2.16.1",
+		"nodemon": "^3.1.14",
 		"prisma": "^7.4.2",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",

@@ -14,7 +14,7 @@ const router = Router();
 // ─── Health Check ─────────────────────────────────────────────
 
 router.get(
-	'/api/health',
+	'/health',
 	asyncHandler(async (_req, res) => {
 		ApiResponse.ok(res, {
 			env: process.env.NODE_ENV || 'development',

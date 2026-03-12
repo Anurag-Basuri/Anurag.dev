@@ -1,12 +1,10 @@
-import { buildApp } from './app';
+import http from 'node:http';
+import app from './app';
 import { env } from './config/env';
 import { verifyDatabaseConnection, disconnectDatabase } from './lib/prisma';
 import { verifyConnection as verifyCloudinary } from './lib/cloudinary';
 
-const app = buildApp();
-
-// ─── Process-level error handlers ────────────────────────────────
-
+// ─── Process-Level Error Handlers ────────────────────────────
 process.on('uncaughtException', err => {
 	console.error('[UNCAUGHT EXCEPTION]', err);
 	process.exit(1);
@@ -16,15 +14,20 @@ process.on('unhandledRejection', reason => {
 	console.error('[UNHANDLED REJECTION]', reason);
 });
 
-// ─── Graceful shutdown ───────────────────────────────────────────
-
+// ─── Graceful Shutdown ───────────────────────────────────────
+let server: http.Server;
 let isShuttingDown = false;
 
 async function shutdown(signal: string) {
 	if (isShuttingDown) return;
 	isShuttingDown = true;
 
-	console.log(`\n[server] ${signal} received — shutting down...`);
+	console.log(`\n[server] ${signal} received — shutting down gracefully...`);
+
+	// Stop accepting new connections, then wait for in-flight requests to finish
+	server?.close(() => {
+		console.log('[server] http server closed');
+	});
 
 	try {
 		await disconnectDatabase();
@@ -39,10 +42,9 @@ async function shutdown(signal: string) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// ─── Startup ─────────────────────────────────────────────────────
-
-async function start() {
-	// 1. Verify database connection
+// ─── Bootstrap ───────────────────────────────────────────────
+async function bootstrap() {
+	// 1. Verify external dependencies before accepting traffic
 	try {
 		await verifyDatabaseConnection();
 		console.log('[server] database connected');
@@ -54,7 +56,6 @@ async function start() {
 		process.exit(1);
 	}
 
-	// 2. Verify Cloudinary connection
 	try {
 		await verifyCloudinary();
 		console.log('[server] cloudinary connected');
@@ -66,10 +67,12 @@ async function start() {
 		process.exit(1);
 	}
 
-	// 3. Start HTTP server
-	app.listen(env.PORT, '0.0.0.0', () => {
-		console.log(`[server] listening on port ${env.PORT} [${env.NODE_ENV}]`);
+	// 2. Start HTTP server
+	server = http.createServer(app);
+
+	server.listen(env.PORT, '0.0.0.0', () => {
+		console.log(`[server] listening on http://0.0.0.0:${env.PORT} [${env.NODE_ENV}]`);
 	});
 }
 
-start();
+bootstrap();
