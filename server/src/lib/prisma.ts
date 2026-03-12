@@ -7,9 +7,10 @@ import { env } from '../config/env';
 // In production, module-level const handles it since the process is long-lived.
 const globalForPrisma = globalThis as unknown as {
 	__prisma: PrismaClient | undefined;
+	__pool: Pool | undefined;
 };
 
-function createPrismaClient(): PrismaClient {
+function createPrismaClient(): { client: PrismaClient; pool: Pool } {
 	const pool = new Pool({
 		connectionString: env.DATABASE_URL,
 		max: env.NODE_ENV === 'production' ? 20 : 5,
@@ -17,16 +18,49 @@ function createPrismaClient(): PrismaClient {
 		connectionTimeoutMillis: 5_000,
 	});
 
+	// Log pool-level errors so they don't crash the process silently
+	pool.on('error', err => {
+		console.error('[prisma] pg pool background error:', err.message);
+	});
+
 	const adapter = new PrismaPg(pool);
 
-	return new PrismaClient({
+	const client = new PrismaClient({
 		adapter,
 		log: env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
 	});
+
+	return { client, pool };
 }
 
-export const prisma = globalForPrisma.__prisma ?? createPrismaClient();
+const { client, pool } = globalForPrisma.__prisma
+	? { client: globalForPrisma.__prisma, pool: globalForPrisma.__pool! }
+	: createPrismaClient();
 
 if (env.NODE_ENV !== 'production') {
-	globalForPrisma.__prisma = prisma;
+	globalForPrisma.__prisma = client;
+	globalForPrisma.__pool = pool;
 }
+
+/**
+ * Verify the database connection by running a simple query.
+ * Call this once at startup to fail fast if the DB is unreachable.
+ */
+async function verifyDatabaseConnection(): Promise<void> {
+	const pgClient = await pool.connect();
+	try {
+		await pgClient.query('SELECT 1');
+	} finally {
+		pgClient.release();
+	}
+}
+
+/**
+ * Disconnect both Prisma and the underlying pg pool.
+ */
+async function disconnectDatabase(): Promise<void> {
+	await client.$disconnect();
+	await pool.end();
+}
+
+export { client as prisma, verifyDatabaseConnection, disconnectDatabase };

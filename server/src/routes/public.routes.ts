@@ -1,6 +1,7 @@
 import { Router, Request } from 'express';
 import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
+import { ApiResponse } from '../utils/ApiResponse';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
@@ -15,8 +16,7 @@ const router = Router();
 router.get(
 	'/api/health',
 	asyncHandler(async (_req, res) => {
-		res.json({
-			ok: true,
+		ApiResponse.ok(res, {
 			env: process.env.NODE_ENV || 'development',
 			uptime: Math.floor(process.uptime()),
 		});
@@ -29,8 +29,8 @@ router.get(
 	'/api/profile',
 	asyncHandler(async (_req, res) => {
 		const profile = await prisma.profile.findUnique({ where: { id: 'main' } });
-		if (!profile) throw new ApiError(404, 'Profile not found');
-		res.json(profile);
+		if (!profile) throw ApiError.NotFound('Profile not found');
+		ApiResponse.ok(res, profile);
 	}),
 );
 
@@ -43,7 +43,7 @@ router.get(
 			where: { status: { in: ['published', 'completed'] } },
 			orderBy: { createdAt: 'desc' },
 		});
-		res.json({ items: projects });
+		ApiResponse.ok(res, projects);
 	}),
 );
 
@@ -54,10 +54,10 @@ router.get(
 		const project = await prisma.project.findUnique({ where: { slug } });
 
 		if (!project || !['published', 'completed'].includes(project.status)) {
-			throw new ApiError(404, 'Project not found');
+			throw ApiError.NotFound('Project not found');
 		}
 
-		res.json(project);
+		ApiResponse.ok(res, project);
 	}),
 );
 
@@ -70,7 +70,7 @@ router.get(
 			orderBy: { order: 'asc' },
 			include: { achievements: { orderBy: { order: 'asc' } } },
 		});
-		res.json({ items });
+		ApiResponse.ok(res, items);
 	}),
 );
 
@@ -83,7 +83,7 @@ router.get(
 			orderBy: { order: 'asc' },
 			include: { journeyEntry: { select: { id: true, title: true, type: true } } },
 		});
-		res.json({ items });
+		ApiResponse.ok(res, items);
 	}),
 );
 
@@ -95,7 +95,7 @@ router.get(
 		const items = await prisma.certification.findMany({
 			orderBy: { startDate: 'desc' },
 		});
-		res.json({ items });
+		ApiResponse.ok(res, items);
 	}),
 );
 
@@ -118,7 +118,7 @@ router.get(
 				updatedAt: true,
 			},
 		});
-		res.json({ posts });
+		ApiResponse.ok(res, posts);
 	}),
 );
 
@@ -129,10 +129,10 @@ router.get(
 		const post = await prisma.blogPost.findUnique({ where: { slug } });
 
 		if (!post || post.status !== 'published') {
-			throw new ApiError(404, 'Blog post not found');
+			throw ApiError.NotFound('Blog post not found');
 		}
 
-		res.json(post);
+		ApiResponse.ok(res, post);
 	}),
 );
 
