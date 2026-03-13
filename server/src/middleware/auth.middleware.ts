@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken, TokenPayload } from '../routes/auth/auth.service';
-import { unauthorized } from '../lib/errors';
+import { verifyAccessToken, TokenPayload } from '../services/auth.service';
+import { ApiError } from '../utils/ApiError';
 
 // Augment Express Request to include admin data
 declare global {
@@ -18,7 +18,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
 	const authHeader = req.headers.authorization;
 
 	if (!authHeader || !authHeader.startsWith('Bearer ')) {
-		next(unauthorized('Authorization token required'));
+		next(ApiError.Unauthorized('Authorization token required'));
 		return;
 	}
 
@@ -26,7 +26,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
 	const payload = verifyAccessToken(token);
 
 	if (!payload) {
-		next(unauthorized('Invalid or expired token'));
+		next(ApiError.Unauthorized('Invalid or expired token'));
 		return;
 	}
 

@@ -14,7 +14,7 @@ export function validate(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(new ApiError(400, 'Validation failed', details));
+				next(new ApiError(400, 'Validation failed', { details }));
 				return;
 			}
 			next(err);
@@ -34,7 +34,7 @@ export function validateParams(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(new ApiError(400, 'Invalid parameters', details));
+				next(new ApiError(400, 'Invalid parameters', { details }));
 				return;
 			}
 			next(err);
@@ -54,7 +54,7 @@ export function validateQuery(schema: ZodSchema) {
 					field: e.path.join('.'),
 					message: e.message,
 				}));
-				next(new ApiError(400, 'Invalid query parameters', details));
+				next(new ApiError(400, 'Invalid query parameters', { details }));
 				return;
 			}
 			next(err);

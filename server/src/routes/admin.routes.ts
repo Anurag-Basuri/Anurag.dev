@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware } from '../../middleware/auth.middleware';
+import { authMiddleware } from '../middleware/auth.middleware';
 import profileRoutes from './profile.routes';
 import projectRoutes from './project.routes';
 import journeyRoutes from './journey.routes';

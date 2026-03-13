@@ -4,9 +4,9 @@ import { env } from './config/env';
 import { ApiError, isApiError } from './utils/ApiError';
 
 import publicRoutes from './routes/public.routes';
-import authRoutes from './routes/auth/auth.routes';
-import contactRoutes from './routes/contact/contact.routes';
-import adminRoutes from './routes/admin/admin.routes';
+import authRoutes from './routes/auth.routes';
+import contactRoutes from './routes/contact.routes';
+import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
@@ -29,15 +29,38 @@ app.use((_req, _res, next) => {
 });
 
 // ─── Global Error Handler ────────────────────────────────────
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
+	// Already sent response — nothing else we can do
+	if (res.headersSent) return;
+
+	const isDevMode = env.NODE_ENV === 'development';
+
 	if (isApiError(err)) {
+		// Operational errors — log only non-4xx or if in dev mode
+		if (!err.isOperational || isDevMode) {
+			console.error('[error-handler]', {
+				status: err.statusCode,
+				message: err.message,
+				source: err.source ?? 'unknown',
+				method: req.method,
+				url: req.originalUrl,
+				ip: req.ip,
+				...(isDevMode && { stack: err.stack }),
+			});
+		}
+
 		res.status(err.statusCode).json(err.toJSON());
 		return;
 	}
 
-	const isDevMode = env.NODE_ENV === 'development';
-
-	console.error('[error-handler] unhandled error:', err);
+	// Unexpected / programming errors — always log with full detail
+	console.error('[error-handler] UNEXPECTED ERROR', {
+		message: err instanceof Error ? err.message : String(err),
+		method: req.method,
+		url: req.originalUrl,
+		ip: req.ip,
+		stack: err instanceof Error ? err.stack : undefined,
+	});
 
 	res.status(500).json({
 		error: {
