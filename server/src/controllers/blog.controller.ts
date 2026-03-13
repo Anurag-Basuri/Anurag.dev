@@ -46,7 +46,7 @@ export async function createPost(req: Request, res: Response): Promise<void> {
  * PUT /api/admin/blog/:id
  */
 export async function updatePost(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -75,7 +75,7 @@ export async function updatePost(req: Request, res: Response): Promise<void> {
  * PATCH /api/admin/blog/:id/status
  */
 export async function updatePostStatus(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -104,7 +104,7 @@ export async function updatePostStatus(req: Request, res: Response): Promise<voi
  * DELETE /api/admin/blog/:id
  */
 export async function deletePost(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.blogPost.findUnique({ where: { id } });

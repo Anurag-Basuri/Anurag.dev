@@ -38,7 +38,7 @@ export async function createCertification(req: Request, res: Response): Promise<
  * PUT /api/admin/certifications/:id
  */
 export async function updateCertification(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -62,7 +62,7 @@ export async function updateCertification(req: Request, res: Response): Promise<
  * DELETE /api/admin/certifications/:id
  */
 export async function deleteCertification(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.certification.findUnique({ where: { id } });

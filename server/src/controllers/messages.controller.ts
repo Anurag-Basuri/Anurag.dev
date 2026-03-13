@@ -38,7 +38,7 @@ export async function listMessages(req: Request, res: Response): Promise<void> {
  * GET /api/admin/messages/:id — get single + mark as read
  */
 export async function getMessage(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 
 	const message = await prisma.contactMessage.findUnique({ where: { id } });
 	if (!message) throw notFound('Message');
@@ -57,7 +57,7 @@ export async function getMessage(req: Request, res: Response): Promise<void> {
  * DELETE /api/admin/messages/:id
  */
 export async function deleteMessage(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.contactMessage.findUnique({ where: { id } });

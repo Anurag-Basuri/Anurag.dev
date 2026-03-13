@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { validate } from '../../middleware/validate.middleware';
 import { rateLimit } from '../../middleware/rate-limit.middleware';
 import { authMiddleware } from '../../middleware/auth.middleware';

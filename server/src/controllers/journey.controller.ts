@@ -38,7 +38,7 @@ export async function createJourney(req: Request, res: Response): Promise<void> 
  * PUT /api/admin/journey/:id
  */
 export async function updateJourney(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -89,7 +89,7 @@ export async function reorderJourney(req: Request, res: Response): Promise<void>
  * DELETE /api/admin/journey/:id
  */
 export async function deleteJourney(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.journeyEntry.findUnique({ where: { id } });

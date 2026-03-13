@@ -41,7 +41,7 @@ export async function createProject(req: Request, res: Response): Promise<void> 
  * PUT /api/admin/projects/:id
  */
 export async function updateProject(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -70,7 +70,7 @@ export async function updateProject(req: Request, res: Response): Promise<void> 
  * PATCH /api/admin/projects/:id/status
  */
 export async function updateProjectStatus(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -94,7 +94,7 @@ export async function updateProjectStatus(req: Request, res: Response): Promise<
  * DELETE /api/admin/projects/:id
  */
 export async function deleteProject(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { id } });

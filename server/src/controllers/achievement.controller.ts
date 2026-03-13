@@ -39,7 +39,7 @@ export async function createAchievement(req: Request, res: Response): Promise<vo
  * PUT /api/admin/achievements/:id
  */
 export async function updateAchievement(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -90,7 +90,7 @@ export async function reorderAchievements(req: Request, res: Response): Promise<
  * DELETE /api/admin/achievements/:id
  */
 export async function deleteAchievement(req: Request, res: Response): Promise<void> {
-	const { id } = req.params;
+	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.achievement.findUnique({ where: { id } });
