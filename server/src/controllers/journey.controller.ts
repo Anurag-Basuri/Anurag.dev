@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
+import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
-import { notFound } from '../lib/errors';
 
-/**
- * GET /api/admin/journey
- */
 export async function listJourney(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.journeyEntry.findMany({
 		orderBy: { order: 'asc' },
@@ -14,9 +11,6 @@ export async function listJourney(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, items);
 }
 
-/**
- * POST /api/admin/journey
- */
 export async function createJourney(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -34,16 +28,13 @@ export async function createJourney(req: Request, res: Response): Promise<void> 
 	ApiResponse.created(res, entry);
 }
 
-/**
- * PUT /api/admin/journey/:id
- */
 export async function updateJourney(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.journeyEntry.findUnique({ where: { id } });
-	if (!existing) throw notFound('Journey entry');
+	if (!existing) throw ApiError.NotFound('Journey entry');
 
 	const entry = await prisma.journeyEntry.update({ where: { id }, data });
 
@@ -58,9 +49,6 @@ export async function updateJourney(req: Request, res: Response): Promise<void> 
 	ApiResponse.ok(res, entry, 'Journey entry updated');
 }
 
-/**
- * PATCH /api/admin/journey/reorder
- */
 export async function reorderJourney(req: Request, res: Response): Promise<void> {
 	const { items } = req.body;
 	const adminId = req.admin!.adminId;
@@ -85,15 +73,12 @@ export async function reorderJourney(req: Request, res: Response): Promise<void>
 	ApiResponse.ok(res, null, 'Order updated');
 }
 
-/**
- * DELETE /api/admin/journey/:id
- */
 export async function deleteJourney(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.journeyEntry.findUnique({ where: { id } });
-	if (!existing) throw notFound('Journey entry');
+	if (!existing) throw ApiError.NotFound('Journey entry');
 
 	await prisma.journeyEntry.delete({ where: { id } });
 

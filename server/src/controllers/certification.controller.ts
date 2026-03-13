@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
+import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
-import { notFound } from '../lib/errors';
 
-/**
- * GET /api/admin/certifications
- */
 export async function listCertifications(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.certification.findMany({
 		orderBy: { startDate: 'desc' },
@@ -14,9 +11,6 @@ export async function listCertifications(_req: Request, res: Response): Promise<
 	ApiResponse.ok(res, items);
 }
 
-/**
- * POST /api/admin/certifications
- */
 export async function createCertification(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -34,16 +28,13 @@ export async function createCertification(req: Request, res: Response): Promise<
 	ApiResponse.created(res, cert);
 }
 
-/**
- * PUT /api/admin/certifications/:id
- */
 export async function updateCertification(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.certification.findUnique({ where: { id } });
-	if (!existing) throw notFound('Certification');
+	if (!existing) throw ApiError.NotFound('Certification');
 
 	const cert = await prisma.certification.update({ where: { id }, data });
 
@@ -58,15 +49,12 @@ export async function updateCertification(req: Request, res: Response): Promise<
 	ApiResponse.ok(res, cert, 'Certification updated');
 }
 
-/**
- * DELETE /api/admin/certifications/:id
- */
 export async function deleteCertification(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.certification.findUnique({ where: { id } });
-	if (!existing) throw notFound('Certification');
+	if (!existing) throw ApiError.NotFound('Certification');
 
 	await prisma.certification.delete({ where: { id } });
 
