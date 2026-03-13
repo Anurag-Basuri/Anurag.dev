@@ -15,26 +15,26 @@ import {
 const router = Router();
 
 router.post(
-	'/api/auth/login',
+	'/auth/login',
 	rateLimit({ max: 10, windowSeconds: 15 * 60, prefix: 'login' }),
 	validate(LoginSchema),
 	asyncHandler(loginHandler),
 );
 
 router.post(
-	'/api/auth/refresh',
+	'/auth/refresh',
 	validate(RefreshSchema),
 	asyncHandler(refreshHandler),
 );
 
 router.post(
-	'/api/auth/logout',
+	'/auth/logout',
 	authMiddleware,
 	asyncHandler(logoutHandler),
 );
 
 router.get(
-	'/api/auth/me',
+	'/auth/me',
 	authMiddleware,
 	asyncHandler(meHandler),
 );

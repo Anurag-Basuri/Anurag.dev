@@ -1,10 +1,8 @@
-import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { ApiError } from '../utils/ApiError';
 
-// ─── Types ────────────────────────────────────────────────────────
-
+// Types
 export interface TokenPayload {
 	adminId: string;
 	username: string;
@@ -16,27 +14,17 @@ export interface AuthTokens {
 	expiresIn: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────
+// Constants
+const ADMIN_ID = 'itsme';
 
-const ADMIN_ID = 'admin';
-
-// ─── Password Verification ───────────────────────────────────────
-
-export async function verifyPassword(plain: string): Promise<boolean> {
-	return bcrypt.compare(plain, env.ADMIN_PASSWORD_HASH);
+// JWT Tokens
+function generateAccessToken(payload: TokenPayload): string {
+	return jwt.sign({ adminId: payload.adminId, username: payload.username }, env.JWT_SECRET, {
+		expiresIn: env.JWT_ACCESS_EXPIRY as string,
+	} as jwt.SignOptions);
 }
 
-// ─── JWT Tokens ───────────────────────────────────────────────────
-
-export function generateAccessToken(payload: TokenPayload): string {
-	return jwt.sign(
-		{ adminId: payload.adminId, username: payload.username },
-		env.JWT_SECRET,
-		{ expiresIn: env.JWT_ACCESS_EXPIRY as string } as jwt.SignOptions,
-	);
-}
-
-export function verifyAccessToken(token: string): TokenPayload | null {
+function verifyAccessToken(token: string): TokenPayload | null {
 	try {
 		const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload & TokenPayload;
 		return { adminId: decoded.adminId, username: decoded.username };
@@ -62,9 +50,8 @@ function verifyRefreshTokenString(token: string): TokenPayload | null {
 	}
 }
 
-// ─── Token Management ─────────────────────────────────────────────
-
-export function generateTokenPair(payload: TokenPayload): AuthTokens {
+// Token Management
+function generateTokenPair(payload: TokenPayload): AuthTokens {
 	return {
 		accessToken: generateAccessToken(payload),
 		refreshToken: generateRefreshTokenString(payload),
@@ -72,12 +59,12 @@ export function generateTokenPair(payload: TokenPayload): AuthTokens {
 	};
 }
 
-export async function login(username: string, password: string): Promise<AuthTokens> {
+async function login(username: string, password: string): Promise<AuthTokens> {
 	if (username !== env.ADMIN_USERNAME) {
 		throw ApiError.Unauthorized('Invalid username or password');
 	}
 
-	const valid = await verifyPassword(password);
+	const valid = password === env.ADMIN_PASSWORD;
 	if (!valid) {
 		throw ApiError.Unauthorized('Invalid username or password');
 	}
@@ -85,7 +72,7 @@ export async function login(username: string, password: string): Promise<AuthTok
 	return generateTokenPair({ adminId: ADMIN_ID, username });
 }
 
-export function rotateRefreshToken(oldToken: string): AuthTokens {
+function rotateRefreshToken(oldToken: string): AuthTokens {
 	const payload = verifyRefreshTokenString(oldToken);
 	if (!payload) {
 		throw ApiError.Unauthorized('Invalid or expired refresh token');
@@ -94,9 +81,11 @@ export function rotateRefreshToken(oldToken: string): AuthTokens {
 	return generateTokenPair(payload);
 }
 
-export function getAdminInfo(payload: TokenPayload) {
+function getAdminInfo(payload: TokenPayload) {
 	return {
 		adminId: payload.adminId,
 		username: payload.username,
 	};
 }
+
+export { login, rotateRefreshToken, getAdminInfo, verifyAccessToken };

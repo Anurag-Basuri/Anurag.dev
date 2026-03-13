@@ -18,7 +18,7 @@ const envSchema = z.object({
 
 	// Admin Credentials (single admin, no DB model)
 	ADMIN_USERNAME: z.string().min(1),
-	ADMIN_PASSWORD_HASH: z.string().min(1),
+	ADMIN_PASSWORD: z.string().min(1),
 
 	// CORS
 	CORS_ORIGIN: z.string().default('http://localhost:3000'),
