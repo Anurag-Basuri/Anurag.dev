@@ -4,14 +4,16 @@ import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
 
-export async function listJourney(_req: Request, res: Response): Promise<void> {
+// Controller for managing the user journey entries in the admin panel
+async function listJourney(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.journeyEntry.findMany({
 		orderBy: { order: 'asc' },
 	});
 	ApiResponse.ok(res, items);
 }
 
-export async function createJourney(req: Request, res: Response): Promise<void> {
+// Admin creates a new journey entry
+async function createJourney(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -28,7 +30,8 @@ export async function createJourney(req: Request, res: Response): Promise<void> 
 	ApiResponse.created(res, entry);
 }
 
-export async function updateJourney(req: Request, res: Response): Promise<void> {
+// Admin updates an existing journey entry
+async function updateJourney(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -49,7 +52,8 @@ export async function updateJourney(req: Request, res: Response): Promise<void> 
 	ApiResponse.ok(res, entry, 'Journey entry updated');
 }
 
-export async function reorderJourney(req: Request, res: Response): Promise<void> {
+// Admin reorders journey entries by providing an array of { id, order }
+async function reorderJourney(req: Request, res: Response): Promise<void> {
 	const { items } = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -73,7 +77,8 @@ export async function reorderJourney(req: Request, res: Response): Promise<void>
 	ApiResponse.ok(res, null, 'Order updated');
 }
 
-export async function deleteJourney(req: Request, res: Response): Promise<void> {
+// Admin deletes a journey entry
+async function deleteJourney(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
@@ -92,3 +97,5 @@ export async function deleteJourney(req: Request, res: Response): Promise<void> 
 
 	ApiResponse.noContent(res);
 }
+
+export { listJourney, createJourney, updateJourney, reorderJourney, deleteJourney };

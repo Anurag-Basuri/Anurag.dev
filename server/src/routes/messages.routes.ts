@@ -1,15 +1,13 @@
 import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler';
-import {
-	listMessages,
-	getMessage,
-	deleteMessage,
-} from '../controllers/messages.controller';
+import { listMessages, getMessage, deleteMessage } from '../controllers/messages.controller';
 
 const router = Router();
 
-router.get('/api/admin/messages', asyncHandler(listMessages));
-router.get('/api/admin/messages/:id', asyncHandler(getMessage));
-router.delete('/api/admin/messages/:id', asyncHandler(deleteMessage));
+router.get('/admin/messages', asyncHandler(listMessages));
+
+router.get('/admin/messages/:id', asyncHandler(getMessage));
+
+router.delete('/admin/messages/:id', asyncHandler(deleteMessage));
 
 export default router;

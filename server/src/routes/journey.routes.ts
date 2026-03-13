@@ -19,10 +19,14 @@ const ReorderSchema = z.object({
 
 const router = Router();
 
-router.get('/api/admin/journey', asyncHandler(listJourney));
-router.post('/api/admin/journey', validate(JourneyCreateSchema), asyncHandler(createJourney));
-router.put('/api/admin/journey/:id', validate(JourneyUpdateSchema), asyncHandler(updateJourney));
-router.patch('/api/admin/journey/reorder', validate(ReorderSchema), asyncHandler(reorderJourney));
-router.delete('/api/admin/journey/:id', asyncHandler(deleteJourney));
+router.get('/admin/journey', asyncHandler(listJourney));
+
+router.post('/admin/journey', validate(JourneyCreateSchema), asyncHandler(createJourney));
+
+router.put('/admin/journey/:id', validate(JourneyUpdateSchema), asyncHandler(updateJourney));
+
+router.patch('/admin/journey/reorder', validate(ReorderSchema), asyncHandler(reorderJourney));
+
+router.delete('/admin/journey/:id', asyncHandler(deleteJourney));
 
 export default router;

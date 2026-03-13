@@ -10,7 +10,8 @@ const PaginationQuery = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-export async function listMessages(req: Request, res: Response): Promise<void> {
+// Controller functions for managing contact messages
+async function listMessages(req: Request, res: Response): Promise<void> {
 	const { page, limit } = PaginationQuery.parse(req.query);
 	const skip = (page - 1) * limit;
 
@@ -31,7 +32,8 @@ export async function listMessages(req: Request, res: Response): Promise<void> {
 	});
 }
 
-export async function getMessage(req: Request, res: Response): Promise<void> {
+// Get a specific message by ID and mark it as read if it hasn't been read yet
+async function getMessage(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 
 	const message = await prisma.contactMessage.findUnique({ where: { id } });
@@ -47,7 +49,8 @@ export async function getMessage(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, { ...message, isRead: true });
 }
 
-export async function deleteMessage(req: Request, res: Response): Promise<void> {
+// Delete a specific message by ID and log the action in the audit log
+async function deleteMessage(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
@@ -66,3 +69,5 @@ export async function deleteMessage(req: Request, res: Response): Promise<void> 
 
 	ApiResponse.noContent(res);
 }
+
+export { listMessages, getMessage, deleteMessage };

@@ -4,14 +4,16 @@ import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
 
-export async function listProjects(_req: Request, res: Response): Promise<void> {
+// Controller functions for project management
+async function listProjects(_req: Request, res: Response): Promise<void> {
 	const projects = await prisma.project.findMany({
 		orderBy: { createdAt: 'desc' },
 	});
 	ApiResponse.ok(res, projects);
 }
 
-export async function createProject(req: Request, res: Response): Promise<void> {
+// Create a new project
+async function createProject(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -31,7 +33,8 @@ export async function createProject(req: Request, res: Response): Promise<void> 
 	ApiResponse.created(res, project);
 }
 
-export async function updateProject(req: Request, res: Response): Promise<void> {
+// Update an existing project
+async function updateProject(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -57,7 +60,8 @@ export async function updateProject(req: Request, res: Response): Promise<void> 
 	ApiResponse.ok(res, project, 'Project updated');
 }
 
-export async function updateProjectStatus(req: Request, res: Response): Promise<void> {
+// Update only the status of a project
+async function updateProjectStatus(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
@@ -78,7 +82,8 @@ export async function updateProjectStatus(req: Request, res: Response): Promise<
 	ApiResponse.ok(res, project, 'Status updated');
 }
 
-export async function deleteProject(req: Request, res: Response): Promise<void> {
+// Delete a project
+async function deleteProject(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
@@ -97,3 +102,5 @@ export async function deleteProject(req: Request, res: Response): Promise<void> 
 
 	ApiResponse.noContent(res);
 }
+
+export { listProjects, createProject, updateProject, updateProjectStatus, deleteProject };

@@ -14,9 +14,20 @@ const CertificationUpdateSchema = CertificationSchema.partial().omit({ id: true 
 
 const router = Router();
 
-router.get('/api/admin/certifications', asyncHandler(listCertifications));
-router.post('/api/admin/certifications', validate(CertificationCreateSchema), asyncHandler(createCertification));
-router.put('/api/admin/certifications/:id', validate(CertificationUpdateSchema), asyncHandler(updateCertification));
-router.delete('/api/admin/certifications/:id', asyncHandler(deleteCertification));
+router.get('/admin/certifications', asyncHandler(listCertifications));
+
+router.post(
+	'/admin/certifications',
+	validate(CertificationCreateSchema),
+	asyncHandler(createCertification),
+);
+
+router.put(
+	'/admin/certifications/:id',
+	validate(CertificationUpdateSchema),
+	asyncHandler(updateCertification),
+);
+
+router.delete('/admin/certifications/:id', asyncHandler(deleteCertification));
 
 export default router;

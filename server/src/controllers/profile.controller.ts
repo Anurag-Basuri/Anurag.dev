@@ -5,12 +5,14 @@ import { logAudit } from '../lib/audit';
 
 const SINGLETON_ID = 'main';
 
-export async function getProfile(_req: Request, res: Response): Promise<void> {
+// Since there's only one profile, we use a fixed ID to ensure there's always a single record.
+async function getProfile(_req: Request, res: Response): Promise<void> {
 	const profile = await prisma.profile.findUnique({ where: { id: SINGLETON_ID } });
 	ApiResponse.ok(res, profile ?? null);
 }
 
-export async function updateProfile(req: Request, res: Response): Promise<void> {
+// Since there's only one profile, we use a fixed ID to ensure there's always a single record.
+async function updateProfile(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -30,3 +32,5 @@ export async function updateProfile(req: Request, res: Response): Promise<void> 
 
 	ApiResponse.ok(res, profile, 'Profile updated');
 }
+
+export { getProfile, updateProfile };

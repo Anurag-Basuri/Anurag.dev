@@ -6,7 +6,8 @@ import { getProfile, updateProfile } from '../controllers/profile.controller';
 
 const router = Router();
 
-router.get('/api/admin/profile', asyncHandler(getProfile));
-router.put('/api/admin/profile', validate(ProfileSchema), asyncHandler(updateProfile));
+router.get('/admin/profile', asyncHandler(getProfile));
+
+router.put('/admin/profile', validate(ProfileSchema), asyncHandler(updateProfile));
 
 export default router;
