@@ -42,10 +42,7 @@ if (env.NODE_ENV !== 'production') {
 	globalForPrisma.__pool = pool;
 }
 
-/**
- * Verify the database connection by running a simple query.
- * Call this once at startup to fail fast if the DB is unreachable.
- */
+// Helper function to verify database connectivity at startup
 async function verifyDatabaseConnection(): Promise<void> {
 	const pgClient = await pool.connect();
 	try {
@@ -55,9 +52,7 @@ async function verifyDatabaseConnection(): Promise<void> {
 	}
 }
 
-/**
- * Disconnect both Prisma and the underlying pg pool.
- */
+// Helper function to gracefully disconnect the database when shutting down
 async function disconnectDatabase(): Promise<void> {
 	await client.$disconnect();
 	await pool.end();
