@@ -4,10 +4,9 @@ import { env } from './config/env';
 import { ApiError, isApiError } from './utils/ApiError';
 
 import publicRoutes from './routes/public.routes';
-// TODO: Re-enable once .env-based admin auth is implemented
-// import authRoutes from './routes/auth/auth.routes';
+import authRoutes from './routes/auth/auth.routes';
 import contactRoutes from './routes/contact/contact.routes';
-// import adminRoutes from './routes/admin/admin.routes';
+import adminRoutes from './routes/admin/admin.routes';
 
 const app = express();
 
@@ -20,9 +19,9 @@ app.use(express.static('public'));
 
 // ─── Routes ──────────────────────────────────────────────────
 app.use(publicRoutes);
-// app.use(authRoutes);
+app.use(authRoutes);
 app.use(contactRoutes);
-// app.use(adminRoutes);
+app.use(adminRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────
 app.use((_req, _res, next) => {

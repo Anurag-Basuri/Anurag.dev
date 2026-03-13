@@ -6,11 +6,7 @@ interface AuditEntry {
 	changes?: unknown;
 }
 
-/**
- * Log an admin action for audit purposes.
- * Currently writes to stdout in structured JSON.
- * Replace with a database insert when an AuditLog model is added.
- */
+// In a real implementation, this would likely write to a database or external logging service
 export async function logAudit(entry: AuditEntry): Promise<void> {
 	console.log(
 		JSON.stringify({

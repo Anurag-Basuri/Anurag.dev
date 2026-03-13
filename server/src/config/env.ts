@@ -16,6 +16,10 @@ const envSchema = z.object({
 	JWT_ACCESS_EXPIRY: z.string().default('15m'),
 	JWT_REFRESH_EXPIRY: z.string().default('7d'),
 
+	// Admin Credentials (single admin, no DB model)
+	ADMIN_USERNAME: z.string().min(1),
+	ADMIN_PASSWORD_HASH: z.string().min(1),
+
 	// CORS
 	CORS_ORIGIN: z.string().default('http://localhost:3000'),
 
