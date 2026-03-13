@@ -21,18 +21,18 @@ const StatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived'
 
 const router = Router();
 
-router.get('/api/admin/projects', asyncHandler(listProjects));
+router.get('/admin/projects', asyncHandler(listProjects));
 
-router.post('/api/admin/projects', validate(ProjectCreateSchema), asyncHandler(createProject));
+router.post('/admin/projects', validate(ProjectCreateSchema), asyncHandler(createProject));
 
-router.put('/api/admin/projects/:id', validate(ProjectUpdateSchema), asyncHandler(updateProject));
+router.put('/admin/projects/:id', validate(ProjectUpdateSchema), asyncHandler(updateProject));
 
 router.patch(
-	'/api/admin/projects/:id/status',
+	'/admin/projects/:id/status',
 	validate(StatusSchema),
 	asyncHandler(updateProjectStatus),
 );
 
-router.delete('/api/admin/projects/:id', asyncHandler(deleteProject));
+router.delete('/admin/projects/:id', asyncHandler(deleteProject));
 
 export default router;

@@ -5,38 +5,34 @@ import { ApiError, isApiError } from './utils/ApiError';
 
 import publicRoutes from './routes/public.routes';
 import authRoutes from './routes/auth.routes';
-import contactRoutes from './routes/contact.routes';
 import adminRoutes from './routes/admin.routes';
 
 const app = express();
 
-// ─── Security & Parsing ─────────────────────────────────────
+// Security & Parsing
 app.disable('x-powered-by');
 app.use(applyCors);
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static('public'));
 
-// ─── Routes ──────────────────────────────────────────────────
+// Routes
 app.use(publicRoutes);
 app.use(authRoutes);
-app.use(contactRoutes);
 app.use(adminRoutes);
 
-// ─── 404 Handler ─────────────────────────────────────────────
+// 404 Handler
 app.use((_req, _res, next) => {
 	next(new ApiError(404, 'Route not found'));
 });
 
-// ─── Global Error Handler ────────────────────────────────────
+// Global Error Handler
 app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
-	// Already sent response — nothing else we can do
 	if (res.headersSent) return;
 
 	const isDevMode = env.NODE_ENV === 'development';
 
 	if (isApiError(err)) {
-		// Operational errors — log only non-4xx or if in dev mode
 		if (!err.isOperational || isDevMode) {
 			console.error('[error-handler]', {
 				status: err.statusCode,
@@ -53,7 +49,6 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 		return;
 	}
 
-	// Unexpected / programming errors — always log with full detail
 	console.error('[error-handler] UNEXPECTED ERROR', {
 		message: err instanceof Error ? err.message : String(err),
 		method: req.method,
