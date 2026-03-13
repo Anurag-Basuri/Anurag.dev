@@ -1,8 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../../lib/prisma';
 import { env } from '../../config/env';
-import { unauthorized } from '../../lib/errors';
+import { ApiError } from '../../utils/ApiError';
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -17,25 +16,27 @@ export interface AuthTokens {
 	expiresIn: string;
 }
 
-// ─── Password Hashing ─────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────
 
-const SALT_ROUNDS = 12;
+const ADMIN_ID = 'admin'; // Fixed ID since there's only one admin
 
-export async function hashPassword(plain: string): Promise<string> {
-	return bcrypt.hash(plain, SALT_ROUNDS);
-}
+// ─── Password Verification ───────────────────────────────────────
 
-export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
-	return bcrypt.compare(plain, hash);
+/**
+ * Verify a plain-text password against the stored bcrypt hash from .env.
+ */
+export async function verifyPassword(plain: string): Promise<boolean> {
+	return bcrypt.compare(plain, env.ADMIN_PASSWORD_HASH);
 }
 
 // ─── JWT Tokens ───────────────────────────────────────────────────
 
 export function generateAccessToken(payload: TokenPayload): string {
-	const tokenPayload = { adminId: payload.adminId, username: payload.username };
-	return jwt.sign(tokenPayload, env.JWT_SECRET, {
-		expiresIn: env.JWT_ACCESS_EXPIRY as string,
-	} as jwt.SignOptions);
+	return jwt.sign(
+		{ adminId: payload.adminId, username: payload.username },
+		env.JWT_SECRET,
+		{ expiresIn: env.JWT_ACCESS_EXPIRY as string } as jwt.SignOptions,
+	);
 }
 
 export function verifyAccessToken(token: string): TokenPayload | null {
@@ -48,10 +49,11 @@ export function verifyAccessToken(token: string): TokenPayload | null {
 }
 
 function generateRefreshTokenString(payload: TokenPayload): string {
-	const tokenPayload = { adminId: payload.adminId, username: payload.username };
-	return jwt.sign(tokenPayload, env.JWT_REFRESH_SECRET, {
-		expiresIn: env.JWT_REFRESH_EXPIRY as string,
-	} as jwt.SignOptions);
+	return jwt.sign(
+		{ adminId: payload.adminId, username: payload.username },
+		env.JWT_REFRESH_SECRET,
+		{ expiresIn: env.JWT_REFRESH_EXPIRY as string } as jwt.SignOptions,
+	);
 }
 
 function verifyRefreshTokenString(token: string): TokenPayload | null {
@@ -63,98 +65,55 @@ function verifyRefreshTokenString(token: string): TokenPayload | null {
 	}
 }
 
-// ─── Token Management ─────────────────────────────────────────────
+// ─── Token Management (stateless — no DB) ─────────────────────────
 
 /**
- * Parse a duration string like "7d", "15m", "1h" into milliseconds.
+ * Generates an access + refresh token pair. Purely JWT-based, no DB writes.
  */
-function parseDuration(duration: string): number {
-	const match = duration.match(/^(\d+)([smhd])$/);
-	if (!match) return 7 * 24 * 60 * 60 * 1000;
-
-	const value = parseInt(match[1], 10);
-	const unit = match[2];
-
-	switch (unit) {
-		case 's':
-			return value * 1000;
-		case 'm':
-			return value * 60 * 1000;
-		case 'h':
-			return value * 60 * 60 * 1000;
-		case 'd':
-			return value * 24 * 60 * 60 * 1000;
-		default:
-			return 7 * 24 * 60 * 60 * 1000;
-	}
-}
-
-/**
- * Generates an access + refresh token pair.
- * Stores the refresh token in the database.
- */
-export async function generateTokenPair(payload: TokenPayload): Promise<AuthTokens> {
-	const accessToken = generateAccessToken(payload);
-	const refreshTokenStr = generateRefreshTokenString(payload);
-
-	const expiresAt = new Date(Date.now() + parseDuration(env.JWT_REFRESH_EXPIRY));
-
-	await prisma.refreshToken.create({
-		data: {
-			token: refreshTokenStr,
-			adminId: payload.adminId,
-			expiresAt,
-		},
-	});
-
+export function generateTokenPair(payload: TokenPayload): AuthTokens {
 	return {
-		accessToken,
-		refreshToken: refreshTokenStr,
+		accessToken: generateAccessToken(payload),
+		refreshToken: generateRefreshTokenString(payload),
 		expiresIn: env.JWT_ACCESS_EXPIRY,
 	};
 }
 
 /**
- * Rotates a refresh token: revokes the old one, issues a new pair.
- * Throws if the token is invalid, expired, or already revoked.
+ * Validates credentials against .env and returns a token pair.
+ * Throws if credentials are invalid.
  */
-export async function rotateRefreshToken(oldToken: string): Promise<AuthTokens> {
-	const payload = verifyRefreshTokenString(oldToken);
-	if (!payload) {
-		throw unauthorized('Invalid refresh token');
+export async function login(username: string, password: string): Promise<AuthTokens> {
+	if (username !== env.ADMIN_USERNAME) {
+		throw ApiError.Unauthorized('Invalid username or password');
 	}
 
-	const stored = await prisma.refreshToken.findUnique({
-		where: { token: oldToken },
-	});
-
-	if (!stored || stored.revokedAt !== null || stored.expiresAt < new Date()) {
-		if (stored && stored.revokedAt !== null) {
-			await prisma.refreshToken.updateMany({
-				where: { adminId: stored.adminId },
-				data: { revokedAt: new Date() },
-			});
-		}
-		throw unauthorized('Refresh token expired or revoked');
+	const valid = await verifyPassword(password);
+	if (!valid) {
+		throw ApiError.Unauthorized('Invalid username or password');
 	}
 
-	await prisma.refreshToken.update({
-		where: { id: stored.id },
-		data: { revokedAt: new Date() },
-	});
-
-	return generateTokenPair({
-		adminId: payload.adminId,
-		username: payload.username,
-	});
+	return generateTokenPair({ adminId: ADMIN_ID, username });
 }
 
 /**
- * Revokes a specific refresh token (logout).
+ * Rotates a refresh token: verifies old JWT, issues new pair.
+ * Stateless — no DB revocation tracking.
  */
-export async function revokeRefreshToken(token: string): Promise<void> {
-	await prisma.refreshToken.updateMany({
-		where: { token, revokedAt: null },
-		data: { revokedAt: new Date() },
-	});
+export function rotateRefreshToken(oldToken: string): AuthTokens {
+	const payload = verifyRefreshTokenString(oldToken);
+	if (!payload) {
+		throw ApiError.Unauthorized('Invalid or expired refresh token');
+	}
+
+	return generateTokenPair(payload);
+}
+
+/**
+ * Returns admin info from the token payload.
+ */
+export function getAdminInfo(payload: TokenPayload) {
+	return {
+		adminId: payload.adminId,
+		username: payload.username,
+	};
 }
