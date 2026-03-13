@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
+import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
-import { notFound, conflict } from '../lib/errors';
 
-/**
- * GET /api/admin/projects
- */
 export async function listProjects(_req: Request, res: Response): Promise<void> {
 	const projects = await prisma.project.findMany({
 		orderBy: { createdAt: 'desc' },
@@ -14,15 +11,12 @@ export async function listProjects(_req: Request, res: Response): Promise<void> 
 	ApiResponse.ok(res, projects);
 }
 
-/**
- * POST /api/admin/projects
- */
 export async function createProject(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { slug: data.slug } });
-	if (existing) throw conflict(`Project with slug "${data.slug}" already exists`);
+	if (existing) throw ApiError.Conflict(`Project with slug "${data.slug}" already exists`);
 
 	const project = await prisma.project.create({ data });
 
@@ -37,20 +31,17 @@ export async function createProject(req: Request, res: Response): Promise<void> 
 	ApiResponse.created(res, project);
 }
 
-/**
- * PUT /api/admin/projects/:id
- */
 export async function updateProject(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { id } });
-	if (!existing) throw notFound('Project');
+	if (!existing) throw ApiError.NotFound('Project');
 
 	if (data.slug && data.slug !== existing.slug) {
 		const slugExists = await prisma.project.findUnique({ where: { slug: data.slug } });
-		if (slugExists) throw conflict(`Project with slug "${data.slug}" already exists`);
+		if (slugExists) throw ApiError.Conflict(`Project with slug "${data.slug}" already exists`);
 	}
 
 	const project = await prisma.project.update({ where: { id }, data });
@@ -66,16 +57,13 @@ export async function updateProject(req: Request, res: Response): Promise<void> 
 	ApiResponse.ok(res, project, 'Project updated');
 }
 
-/**
- * PATCH /api/admin/projects/:id/status
- */
 export async function updateProjectStatus(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { id } });
-	if (!existing) throw notFound('Project');
+	if (!existing) throw ApiError.NotFound('Project');
 
 	const project = await prisma.project.update({ where: { id }, data: { status } });
 
@@ -90,15 +78,12 @@ export async function updateProjectStatus(req: Request, res: Response): Promise<
 	ApiResponse.ok(res, project, 'Status updated');
 }
 
-/**
- * DELETE /api/admin/projects/:id
- */
 export async function deleteProject(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { id } });
-	if (!existing) throw notFound('Project');
+	if (!existing) throw ApiError.NotFound('Project');
 
 	await prisma.project.delete({ where: { id } });
 

@@ -1,18 +1,15 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
+import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
-import { notFound } from '../lib/errors';
 
 const PaginationQuery = z.object({
 	page: z.coerce.number().int().min(1).default(1),
 	limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-/**
- * GET /api/admin/messages
- */
 export async function listMessages(req: Request, res: Response): Promise<void> {
 	const { page, limit } = PaginationQuery.parse(req.query);
 	const skip = (page - 1) * limit;
@@ -34,14 +31,11 @@ export async function listMessages(req: Request, res: Response): Promise<void> {
 	});
 }
 
-/**
- * GET /api/admin/messages/:id — get single + mark as read
- */
 export async function getMessage(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 
 	const message = await prisma.contactMessage.findUnique({ where: { id } });
-	if (!message) throw notFound('Message');
+	if (!message) throw ApiError.NotFound('Message');
 
 	if (!message.isRead) {
 		await prisma.contactMessage.update({
@@ -53,15 +47,12 @@ export async function getMessage(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, { ...message, isRead: true });
 }
 
-/**
- * DELETE /api/admin/messages/:id
- */
 export async function deleteMessage(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.contactMessage.findUnique({ where: { id } });
-	if (!existing) throw notFound('Message');
+	if (!existing) throw ApiError.NotFound('Message');
 
 	await prisma.contactMessage.delete({ where: { id } });
 

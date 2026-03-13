@@ -1,14 +1,31 @@
-// Custom error class for API errors.
+/**
+ * Centralized API error class.
+ *
+ * Every thrown ApiError carries:
+ *  - statusCode  — HTTP status
+ *  - message     — human-readable description
+ *  - source      — origin context, e.g. "ProjectController.update" (optional)
+ *  - details     — structured payload (validation errors, IDs, etc.)
+ *  - isOperational — true = expected business error, false = programming bug
+ *  - stack        — full stack trace (auto-captured)
+ */
 class ApiError extends Error {
 	public readonly statusCode: number;
+	public readonly source?: string;
 	public readonly details?: unknown;
-	public readonly name: string;
+	public readonly isOperational: boolean;
 
-	constructor(statusCode: number, message: string, details?: unknown) {
+	constructor(
+		statusCode: number,
+		message: string,
+		options: { source?: string; details?: unknown; isOperational?: boolean } = {},
+	) {
 		super(message);
 		this.name = 'ApiError';
 		this.statusCode = statusCode;
-		this.details = details;
+		this.source = options.source;
+		this.details = options.details;
+		this.isOperational = options.isOperational ?? true;
 		Error.captureStackTrace(this, this.constructor);
 	}
 
@@ -17,54 +34,52 @@ class ApiError extends Error {
 			error: {
 				code: this.statusCode,
 				message: this.message,
+				...(this.source && { source: this.source }),
 				...(this.details ? { details: this.details } : {}),
 				timestamp: new Date().toISOString(),
 			},
 		};
 	}
 
+	// ─── Factory Methods ──────────────────────────────────────────
+
 	static BadRequest(message = 'Bad Request', details?: unknown) {
-		return new ApiError(400, message, details);
+		return new ApiError(400, message, { details });
 	}
 
-	static Unauthorized(message = 'Unauthorized', details?: unknown) {
-		return new ApiError(401, message, details);
+	static Unauthorized(message = 'Unauthorized') {
+		return new ApiError(401, message);
 	}
 
-	static Forbidden(message = 'Forbidden', details?: unknown) {
-		return new ApiError(403, message, details);
+	static Forbidden(message = 'Forbidden') {
+		return new ApiError(403, message);
 	}
 
-	static NotFound(message = 'Not Found', details?: unknown) {
-		return new ApiError(404, message, details);
+	static NotFound(resource = 'Resource') {
+		return new ApiError(404, `${resource} not found`);
 	}
 
-	static Conflict(message = 'Conflict', details?: unknown) {
-		return new ApiError(409, message, details);
+	static Conflict(message = 'Conflict') {
+		return new ApiError(409, message);
 	}
 
 	static UnprocessableEntity(message = 'Unprocessable Entity', details?: unknown) {
-		return new ApiError(422, message, details);
+		return new ApiError(422, message, { details });
 	}
 
-	static TooManyRequests(message = 'Too Many Requests', details?: unknown) {
-		return new ApiError(429, message, details);
+	static TooManyRequests(message = 'Too Many Requests') {
+		return new ApiError(429, message);
 	}
 
 	static InternalServerError(message = 'Internal Server Error', details?: unknown) {
-		return new ApiError(500, message, details);
+		return new ApiError(500, message, { details, isOperational: false });
 	}
 
-	static ServiceUnavailable(message = 'Service Unavailable', details?: unknown) {
-		return new ApiError(503, message, details);
-	}
-
-	static GatewayTimeout(message = 'Gateway Timeout', details?: unknown) {
-		return new ApiError(504, message, details);
+	static ServiceUnavailable(message = 'Service Unavailable') {
+		return new ApiError(503, message, { isOperational: false });
 	}
 }
 
-// Type guard to check if an error is an ApiError.
 function isApiError(err: unknown): err is ApiError {
 	return err instanceof ApiError || (err instanceof Error && err.name === 'ApiError');
 }
