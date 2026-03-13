@@ -4,14 +4,16 @@ import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
 
-export async function listPosts(_req: Request, res: Response): Promise<void> {
+// Controller for listing all blog posts (admin view, includes drafts and archived)
+async function listPosts(_req: Request, res: Response): Promise<void> {
 	const posts = await prisma.blogPost.findMany({
 		orderBy: { createdAt: 'desc' },
 	});
 	ApiResponse.ok(res, posts);
 }
 
-export async function createPost(req: Request, res: Response): Promise<void> {
+// Controller for creating a new blog post
+async function createPost(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -36,7 +38,8 @@ export async function createPost(req: Request, res: Response): Promise<void> {
 	ApiResponse.created(res, post);
 }
 
-export async function updatePost(req: Request, res: Response): Promise<void> {
+// Controller for updating an existing blog post
+async function updatePost(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -46,7 +49,8 @@ export async function updatePost(req: Request, res: Response): Promise<void> {
 
 	if (data.slug && data.slug !== existing.slug) {
 		const slugExists = await prisma.blogPost.findUnique({ where: { slug: data.slug } });
-		if (slugExists) throw ApiError.Conflict(`Blog post with slug "${data.slug}" already exists`);
+		if (slugExists)
+			throw ApiError.Conflict(`Blog post with slug "${data.slug}" already exists`);
 	}
 
 	const post = await prisma.blogPost.update({ where: { id }, data });
@@ -62,7 +66,8 @@ export async function updatePost(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, post, 'Blog post updated');
 }
 
-export async function updatePostStatus(req: Request, res: Response): Promise<void> {
+// Controller for updating only the status of a blog post (e.g. publish/unpublish/archive)
+async function updatePostStatus(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
@@ -88,7 +93,8 @@ export async function updatePostStatus(req: Request, res: Response): Promise<voi
 	ApiResponse.ok(res, post, 'Status updated');
 }
 
-export async function deletePost(req: Request, res: Response): Promise<void> {
+// Controller for deleting a blog post
+async function deletePost(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
@@ -107,3 +113,5 @@ export async function deletePost(req: Request, res: Response): Promise<void> {
 
 	ApiResponse.noContent(res);
 }
+
+export { listPosts, createPost, updatePost, updatePostStatus, deletePost };

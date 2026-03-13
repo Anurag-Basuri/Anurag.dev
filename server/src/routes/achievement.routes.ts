@@ -19,10 +19,26 @@ const ReorderSchema = z.object({
 
 const router = Router();
 
-router.get('/api/admin/achievements', asyncHandler(listAchievements));
-router.post('/api/admin/achievements', validate(AchievementCreateSchema), asyncHandler(createAchievement));
-router.put('/api/admin/achievements/:id', validate(AchievementUpdateSchema), asyncHandler(updateAchievement));
-router.patch('/api/admin/achievements/reorder', validate(ReorderSchema), asyncHandler(reorderAchievements));
-router.delete('/api/admin/achievements/:id', asyncHandler(deleteAchievement));
+router.get('/admin/achievements', asyncHandler(listAchievements));
+
+router.post(
+	'/admin/achievements',
+	validate(AchievementCreateSchema),
+	asyncHandler(createAchievement),
+);
+
+router.put(
+	'/admin/achievements/:id',
+	validate(AchievementUpdateSchema),
+	asyncHandler(updateAchievement),
+);
+
+router.patch(
+	'/admin/achievements/reorder',
+	validate(ReorderSchema),
+	asyncHandler(reorderAchievements),
+);
+
+router.delete('/admin/achievements/:id', asyncHandler(deleteAchievement));
 
 export default router;

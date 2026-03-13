@@ -4,7 +4,8 @@ import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
 
-export async function listAchievements(_req: Request, res: Response): Promise<void> {
+// Controllers to get all the achivements
+async function listAchievements(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.achievement.findMany({
 		orderBy: { order: 'asc' },
 		include: { journeyEntry: { select: { id: true, title: true, type: true } } },
@@ -12,7 +13,8 @@ export async function listAchievements(_req: Request, res: Response): Promise<vo
 	ApiResponse.ok(res, items);
 }
 
-export async function createAchievement(req: Request, res: Response): Promise<void> {
+// Controller to create a new achievement
+async function createAchievement(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -29,7 +31,8 @@ export async function createAchievement(req: Request, res: Response): Promise<vo
 	ApiResponse.created(res, entry);
 }
 
-export async function updateAchievement(req: Request, res: Response): Promise<void> {
+// Controller to update an existing achievement
+async function updateAchievement(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -50,7 +53,8 @@ export async function updateAchievement(req: Request, res: Response): Promise<vo
 	ApiResponse.ok(res, entry, 'Achievement updated');
 }
 
-export async function reorderAchievements(req: Request, res: Response): Promise<void> {
+// Controller to reorder achievements
+async function reorderAchievements(req: Request, res: Response): Promise<void> {
 	const { items } = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -74,7 +78,8 @@ export async function reorderAchievements(req: Request, res: Response): Promise<
 	ApiResponse.ok(res, null, 'Order updated');
 }
 
-export async function deleteAchievement(req: Request, res: Response): Promise<void> {
+// Controller to delete an achievement
+async function deleteAchievement(req: Request, res: Response): Promise<void> {
 	const id = req.params.id as string;
 	const adminId = req.admin!.adminId;
 
@@ -93,3 +98,11 @@ export async function deleteAchievement(req: Request, res: Response): Promise<vo
 
 	ApiResponse.noContent(res);
 }
+
+export {
+	listAchievements,
+	createAchievement,
+	updateAchievement,
+	reorderAchievements,
+	deleteAchievement,
+};
