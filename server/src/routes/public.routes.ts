@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.middleware';
 import { rateLimit } from '../middleware/rate-limit.middleware';
+import { cacheControl } from '../middleware/cache.middleware';
 import { ContactSchema } from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
@@ -17,31 +18,32 @@ import {
 } from '../controllers/public.controller';
 
 const router = Router();
+const cache5min = cacheControl(300);
 
 // Health
 router.get('/health', asyncHandler(healthCheck));
 
 // Profile
-router.get('/profile', asyncHandler(getPublicProfile));
+router.get('/profile', cache5min, asyncHandler(getPublicProfile));
 
 // Projects
-router.get('/projects', asyncHandler(getPublicProjects));
-router.get('/projects/:slug', asyncHandler(getPublicProjectBySlug));
+router.get('/projects', cache5min, asyncHandler(getPublicProjects));
+router.get('/projects/:slug', cache5min, asyncHandler(getPublicProjectBySlug));
 
 // Journey
-router.get('/journey', asyncHandler(getPublicJourney));
+router.get('/journey', cache5min, asyncHandler(getPublicJourney));
 
 // Achievements
-router.get('/achievements', asyncHandler(getPublicAchievements));
+router.get('/achievements', cache5min, asyncHandler(getPublicAchievements));
 
 // Certifications
-router.get('/certifications', asyncHandler(getPublicCertifications));
+router.get('/certifications', cache5min, asyncHandler(getPublicCertifications));
 
 // Blog
-router.get('/blog', asyncHandler(getPublicBlogPosts));
-router.get('/blog/:slug', asyncHandler(getPublicBlogPostBySlug));
+router.get('/blog', cache5min, asyncHandler(getPublicBlogPosts));
+router.get('/blog/:slug', cache5min, asyncHandler(getPublicBlogPostBySlug));
 
-// Contact
+// Contact (no cache — write operation)
 router.post(
 	'/contact',
 	rateLimit({ max: 5, windowSeconds: 60 * 60, prefix: 'contact' }),

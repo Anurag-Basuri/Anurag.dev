@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { validate } from '../middleware/validate.middleware';
-import { ProjectSchema } from '../schemas/zod-schemas';
+import {
+	ProjectCreateSchema,
+	ProjectUpdateSchema,
+	ProjectStatusSchema,
+} from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listProjects,
@@ -10,14 +13,6 @@ import {
 	updateProjectStatus,
 	deleteProject,
 } from '../controllers/project.controller';
-
-const ProjectCreateSchema = ProjectSchema.omit({ id: true, createdAt: true, updatedAt: true });
-const ProjectUpdateSchema = ProjectSchema.partial().omit({
-	id: true,
-	createdAt: true,
-	updatedAt: true,
-});
-const StatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived', 'completed']) });
 
 const router = Router();
 
@@ -29,7 +24,7 @@ router.put('/admin/projects/:id', validate(ProjectUpdateSchema), asyncHandler(up
 
 router.patch(
 	'/admin/projects/:id/status',
-	validate(StatusSchema),
+	validate(ProjectStatusSchema),
 	asyncHandler(updateProjectStatus),
 );
 

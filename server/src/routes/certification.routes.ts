@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.middleware';
-import { CertificationSchema } from '../schemas/zod-schemas';
+import {
+	CertificationCreateSchema,
+	CertificationUpdateSchema,
+} from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listCertifications,
@@ -8,9 +11,6 @@ import {
 	updateCertification,
 	deleteCertification,
 } from '../controllers/certification.controller';
-
-const CertificationCreateSchema = CertificationSchema.omit({ id: true });
-const CertificationUpdateSchema = CertificationSchema.partial().omit({ id: true });
 
 const router = Router();
 

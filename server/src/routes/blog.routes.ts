@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { validate } from '../middleware/validate.middleware';
-import { BlogPostSchema } from '../schemas/zod-schemas';
+import {
+	BlogCreateSchema,
+	BlogUpdateSchema,
+	BlogStatusSchema,
+} from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listPosts,
@@ -10,14 +13,6 @@ import {
 	updatePostStatus,
 	deletePost,
 } from '../controllers/blog.controller';
-
-const BlogCreateSchema = BlogPostSchema.omit({ id: true, createdAt: true, updatedAt: true });
-const BlogUpdateSchema = BlogPostSchema.partial().omit({
-	id: true,
-	createdAt: true,
-	updatedAt: true,
-});
-const BlogStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived']) });
 
 const router = Router();
 

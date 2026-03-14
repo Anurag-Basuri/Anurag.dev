@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { validate } from '../middleware/validate.middleware';
-import { JourneyItemSchema } from '../schemas/zod-schemas';
+import {
+	JourneyCreateSchema,
+	JourneyUpdateSchema,
+	ReorderSchema,
+} from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listJourney,
@@ -10,12 +13,6 @@ import {
 	reorderJourney,
 	deleteJourney,
 } from '../controllers/journey.controller';
-
-const JourneyCreateSchema = JourneyItemSchema.omit({ id: true });
-const JourneyUpdateSchema = JourneyItemSchema.partial().omit({ id: true });
-const ReorderSchema = z.object({
-	items: z.array(z.object({ id: z.string(), order: z.number().int().min(0) })),
-});
 
 const router = Router();
 
