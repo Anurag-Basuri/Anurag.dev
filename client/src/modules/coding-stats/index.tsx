@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
-import { publicService } from '@/api';
+import { apiClient } from '@/api/client';
 import type { CodingStats } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -402,7 +402,7 @@ export function CodingStatsModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await api.getCodingStats();
+			const data = await apiClient.get<CodingStats>('/coding-stats');
 			setStats(data);
 		} catch (err: unknown) {
 			if (err instanceof Error) {

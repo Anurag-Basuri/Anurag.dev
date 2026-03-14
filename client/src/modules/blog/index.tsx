@@ -35,7 +35,7 @@ export function BlogModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const { data } = await publicService.getBlog();
+			const { data } = await publicService.getBlogPosts();
 			setPosts(data);
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Failed to load blog posts';
