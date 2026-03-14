@@ -1,7 +1,7 @@
 {
 	"name": "anurag-portfolio-server",
 	"version": "0.1.0",
-	"description": "A TypeScript-based REST API server built on Fastify for a developer portfolio system.",
+	"description": "A TypeScript REST API server built with Express for a developer portfolio system.",
 	"private": true,
 	"type": "module",
 	"scripts": {
