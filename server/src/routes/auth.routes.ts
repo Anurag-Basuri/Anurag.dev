@@ -2,14 +2,13 @@ import { Router } from 'express';
 import { validate } from '../middleware/validate.middleware';
 import { rateLimit } from '../middleware/rate-limit.middleware';
 import { authMiddleware } from '../middleware/auth.middleware';
+import { LoginSchema, RefreshSchema } from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	loginHandler,
 	refreshHandler,
 	logoutHandler,
 	meHandler,
-	LoginSchema,
-	RefreshSchema,
 } from '../controllers/auth.controller';
 
 const router = Router();

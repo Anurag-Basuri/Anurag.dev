@@ -3,8 +3,9 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import type { IdRequest } from '../utils/types';
 
-// Controller for managing the user journey entries in the admin panel
+// Controller for managing the user journey entries
 async function listJourney(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.journeyEntry.findMany({
 		orderBy: { order: 'asc' },
@@ -31,8 +32,8 @@ async function createJourney(req: Request, res: Response): Promise<void> {
 }
 
 // Admin updates an existing journey entry
-async function updateJourney(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+async function updateJourney(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -52,7 +53,7 @@ async function updateJourney(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, entry, 'Journey entry updated');
 }
 
-// Admin reorders journey entries by providing an array of { id, order }
+// Admin reorders journey entries
 async function reorderJourney(req: Request, res: Response): Promise<void> {
 	const { items } = req.body;
 	const adminId = req.admin!.adminId;
@@ -78,8 +79,8 @@ async function reorderJourney(req: Request, res: Response): Promise<void> {
 }
 
 // Admin deletes a journey entry
-async function deleteJourney(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+async function deleteJourney(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.journeyEntry.findUnique({ where: { id } });

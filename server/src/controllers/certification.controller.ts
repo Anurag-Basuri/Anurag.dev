@@ -3,8 +3,9 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import type { IdRequest } from '../utils/types';
 
-// Controllers to get all the certifications
+// List all certifications
 async function listCertifications(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.certification.findMany({
 		orderBy: { startDate: 'desc' },
@@ -12,7 +13,7 @@ async function listCertifications(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, items);
 }
 
-// Controller to create a new certification
+// Create a new certification
 async function createCertification(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -30,9 +31,9 @@ async function createCertification(req: Request, res: Response): Promise<void> {
 	ApiResponse.created(res, cert);
 }
 
-// Controller to update an existing certification
-async function updateCertification(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Update an existing certification
+async function updateCertification(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -52,9 +53,9 @@ async function updateCertification(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, cert, 'Certification updated');
 }
 
-// Controller to delete a certification
-async function deleteCertification(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Delete a certification
+async function deleteCertification(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.certification.findUnique({ where: { id } });

@@ -4,13 +4,14 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import type { IdRequest } from '../utils/types';
 
 const PaginationQuery = z.object({
 	page: z.coerce.number().int().min(1).default(1),
 	limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
-// Controller functions for managing contact messages
+// List contact messages with pagination
 async function listMessages(req: Request, res: Response): Promise<void> {
 	const { page, limit } = PaginationQuery.parse(req.query);
 	const skip = (page - 1) * limit;
@@ -32,9 +33,9 @@ async function listMessages(req: Request, res: Response): Promise<void> {
 	});
 }
 
-// Get a specific message by ID and mark it as read if it hasn't been read yet
-async function getMessage(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Get a single message (marks as read)
+async function getMessage(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 
 	const message = await prisma.contactMessage.findUnique({ where: { id } });
 	if (!message) throw ApiError.NotFound('Message');
@@ -49,9 +50,9 @@ async function getMessage(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, { ...message, isRead: true });
 }
 
-// Delete a specific message by ID and log the action in the audit log
-async function deleteMessage(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Delete a message
+async function deleteMessage(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.contactMessage.findUnique({ where: { id } });

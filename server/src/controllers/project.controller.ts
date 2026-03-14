@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import type { IdRequest } from '../utils/types';
 
 // Controller functions for project management
 async function listProjects(_req: Request, res: Response): Promise<void> {
@@ -34,8 +35,8 @@ async function createProject(req: Request, res: Response): Promise<void> {
 }
 
 // Update an existing project
-async function updateProject(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+async function updateProject(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -61,8 +62,8 @@ async function updateProject(req: Request, res: Response): Promise<void> {
 }
 
 // Update only the status of a project
-async function updateProjectStatus(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+async function updateProjectStatus(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const { status } = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -83,8 +84,8 @@ async function updateProjectStatus(req: Request, res: Response): Promise<void> {
 }
 
 // Delete a project
-async function deleteProject(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+async function deleteProject(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.project.findUnique({ where: { id } });

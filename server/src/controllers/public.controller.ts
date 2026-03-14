@@ -3,6 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
+import type { SlugRequest } from '../utils/types';
 
 // Health check
 async function healthCheck(_req: Request, res: Response): Promise<void> {
@@ -30,9 +31,9 @@ async function getPublicProjects(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, projects);
 }
 
-// Get a single project by slug (only if published/completed)
-async function getPublicProjectBySlug(req: Request, res: Response): Promise<void> {
-	const slug = req.params.slug as string;
+// Get a single project by slug
+async function getPublicProjectBySlug(req: SlugRequest, res: Response): Promise<void> {
+	const { slug } = req.params;
 	const project = await prisma.project.findUnique({ where: { slug } });
 
 	if (!project || !['published', 'completed'].includes(project.status)) {
@@ -42,7 +43,7 @@ async function getPublicProjectBySlug(req: Request, res: Response): Promise<void
 	ApiResponse.ok(res, project);
 }
 
-// List all journey entries with their achievements
+// List all journey entries with achievements
 async function getPublicJourney(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.journeyEntry.findMany({
 		orderBy: { order: 'asc' },
@@ -91,9 +92,9 @@ async function getPublicBlogPosts(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, posts);
 }
 
-// Get a single blog post by slug (only if published)
-async function getPublicBlogPostBySlug(req: Request, res: Response): Promise<void> {
-	const slug = req.params.slug as string;
+// Get a single blog post by slug (published only)
+async function getPublicBlogPostBySlug(req: SlugRequest, res: Response): Promise<void> {
+	const { slug } = req.params;
 	const post = await prisma.blogPost.findUnique({ where: { slug } });
 
 	if (!post || post.status !== 'published') {
