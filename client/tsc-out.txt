@@ -1,0 +1,12 @@
+﻿src/features/shell/components/MobileExplorerSheet.tsx(9,58): error TS2307: Cannot find module '@/data/filesystem' or its corresponding type declarations.
+src/features/shell/components/TopBar.tsx(8,37): error TS2307: Cannot find module '@/data/filesystem' or its corresponding type declarations.
+src/features/shell/hooks/useModuleNavigation.ts(7,37): error TS2307: Cannot find module '@/data/filesystem' or its corresponding type declarations.
+src/features/sidebar/Sidebar.tsx(7,72): error TS2307: Cannot find module '@/data/filesystem' or its corresponding type declarations.
+src/lib/coreCommands.ts(2,53): error TS2307: Cannot find module '@/data/filesystem' or its corresponding type declarations.
+src/modules/about/index.tsx(7,45): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/blog/index.tsx(4,31): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/certifications/index.tsx(4,36): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/coding-stats/index.tsx(5,34): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/contact/index.tsx(5,32): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/journey/index.tsx(5,48): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.
+src/modules/projects/index.tsx(5,30): error TS2307: Cannot find module '@/lib/api' or its corresponding type declarations.

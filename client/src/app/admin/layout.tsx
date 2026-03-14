@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/api';
+import { AdminNav } from './components/AdminNav';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
@@ -13,22 +14,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 	const isLoginPage = pathname === '/admin/login';
 
 	useEffect(() => {
-		// Allow login page without auth
 		if (isLoginPage) {
 			setChecked(true);
 			return;
 		}
-
-		// Redirect to login if not authenticated
 		if (!isAuthenticated) {
 			router.replace('/admin/login');
 			return;
 		}
-
 		setChecked(true);
 	}, [isAuthenticated, isLoginPage, router]);
 
-	// Show nothing until auth check completes (prevents flash)
 	if (!checked) {
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-[#020202]">
@@ -37,5 +33,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 		);
 	}
 
-	return <>{children}</>;
+	// Login page — no sidebar
+	if (isLoginPage) return <>{children}</>;
+
+	return (
+		<div className="min-h-screen flex bg-[#020202] text-white">
+			<AdminNav />
+			<main className="flex-1 overflow-y-auto p-8">{children}</main>
+		</div>
+	);
 }
