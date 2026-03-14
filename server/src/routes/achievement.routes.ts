@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { z } from 'zod';
 import { validate } from '../middleware/validate.middleware';
-import { AchievementSchema } from '../schemas/zod-schemas';
+import {
+	AchievementCreateSchema,
+	AchievementUpdateSchema,
+	ReorderSchema,
+} from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listAchievements,
@@ -10,12 +13,6 @@ import {
 	reorderAchievements,
 	deleteAchievement,
 } from '../controllers/achievement.controller';
-
-const AchievementCreateSchema = AchievementSchema.omit({ id: true });
-const AchievementUpdateSchema = AchievementSchema.partial().omit({ id: true });
-const ReorderSchema = z.object({
-	items: z.array(z.object({ id: z.string(), order: z.number().int().min(0) })),
-});
 
 const router = Router();
 

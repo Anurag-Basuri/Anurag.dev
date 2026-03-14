@@ -1,16 +1,8 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { LoginSchema, RefreshSchema } from '../schemas/zod-schemas';
 import { login, rotateRefreshToken, getAdminInfo } from '../services/auth.service';
 import { ApiResponse } from '../utils/ApiResponse';
-
-const LoginSchema = z.object({
-	username: z.string().min(1, 'Username is required'),
-	password: z.string().min(1, 'Password is required'),
-});
-
-const RefreshSchema = z.object({
-	refreshToken: z.string().min(1, 'Refresh token is required'),
-});
 
 async function loginHandler(req: Request, res: Response): Promise<void> {
 	const { username, password } = req.body as z.infer<typeof LoginSchema>;
@@ -33,4 +25,4 @@ async function meHandler(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, admin);
 }
 
-export { LoginSchema, RefreshSchema, loginHandler, refreshHandler, logoutHandler, meHandler };
+export { loginHandler, refreshHandler, logoutHandler, meHandler };

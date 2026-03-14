@@ -4,7 +4,7 @@ import { env } from './config/env';
 import { verifyDatabaseConnection, disconnectDatabase } from './lib/prisma';
 import { verifyConnection as verifyCloudinary } from './lib/cloudinary';
 
-// ─── Process-Level Error Handlers ────────────────────────────
+// Process-Level Error Handlers
 process.on('uncaughtException', err => {
 	console.error('[UNCAUGHT EXCEPTION]', err);
 	process.exit(1);
@@ -14,7 +14,7 @@ process.on('unhandledRejection', reason => {
 	console.error('[UNHANDLED REJECTION]', reason);
 });
 
-// ─── Graceful Shutdown ───────────────────────────────────────
+// Graceful Shutdown
 let server: http.Server;
 let isShuttingDown = false;
 
@@ -24,7 +24,6 @@ async function shutdown(signal: string) {
 
 	console.log(`\n[server] ${signal} received — shutting down gracefully...`);
 
-	// Stop accepting new connections, then wait for in-flight requests to finish
 	server?.close(() => {
 		console.log('[server] http server closed');
 	});
@@ -42,28 +41,28 @@ async function shutdown(signal: string) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// ─── Bootstrap ───────────────────────────────────────────────
+// Bootstrap
 async function bootstrap() {
-	// 1. Verify external dependencies before accepting traffic
+	const startTime = Date.now();
+
+	console.log('\n┌──────────────────────────────────────┐');
+	console.log('│       Portfolio API — Starting       │');
+	console.log('└──────────────────────────────────────┘\n');
+
+	// 1. Verify external dependencies
 	try {
 		await verifyDatabaseConnection();
-		console.log('[server] database connected');
+		console.log('  ✓ Database connected');
 	} catch (err) {
-		console.error(
-			'[server] database connection failed:',
-			err instanceof Error ? err.message : err,
-		);
+		console.error('  ✗ Database connection failed:', err instanceof Error ? err.message : err);
 		process.exit(1);
 	}
 
 	try {
 		await verifyCloudinary();
-		console.log('[server] cloudinary connected');
+		console.log('  ✓ Cloudinary connected');
 	} catch (err) {
-		console.error(
-			'[server] cloudinary connection failed:',
-			err instanceof Error ? err.message : err,
-		);
+		console.error('  ✗ Cloudinary connection failed:', err instanceof Error ? err.message : err);
 		process.exit(1);
 	}
 
@@ -71,7 +70,14 @@ async function bootstrap() {
 	server = http.createServer(app);
 
 	server.listen(env.PORT, '0.0.0.0', () => {
-		console.log(`[server] listening on http://0.0.0.0:${env.PORT} [${env.NODE_ENV}]`);
+		const elapsed = Date.now() - startTime;
+
+		console.log('\n┌──────────────────────────────────────┐');
+		console.log(`│  Environment : ${env.NODE_ENV.padEnd(21)} │`);
+		console.log(`│  Port        : ${String(env.PORT).padEnd(21)} │`);
+		console.log(`│  API Base    : /api/v1${' '.repeat(15)}│`);
+		console.log(`│  Started in  : ${String(elapsed + 'ms').padEnd(21)} │`);
+		console.log('└──────────────────────────────────────┘\n');
 	});
 }
 

@@ -3,8 +3,9 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import type { IdRequest } from '../utils/types';
 
-// Controllers to get all the achivements
+// List all achievements
 async function listAchievements(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.achievement.findMany({
 		orderBy: { order: 'asc' },
@@ -13,7 +14,7 @@ async function listAchievements(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, items);
 }
 
-// Controller to create a new achievement
+// Create a new achievement
 async function createAchievement(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -31,9 +32,9 @@ async function createAchievement(req: Request, res: Response): Promise<void> {
 	ApiResponse.created(res, entry);
 }
 
-// Controller to update an existing achievement
-async function updateAchievement(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Update an existing achievement
+async function updateAchievement(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const data = req.body;
 	const adminId = req.admin!.adminId;
 
@@ -53,7 +54,7 @@ async function updateAchievement(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, entry, 'Achievement updated');
 }
 
-// Controller to reorder achievements
+// Reorder achievements
 async function reorderAchievements(req: Request, res: Response): Promise<void> {
 	const { items } = req.body;
 	const adminId = req.admin!.adminId;
@@ -78,9 +79,9 @@ async function reorderAchievements(req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, null, 'Order updated');
 }
 
-// Controller to delete an achievement
-async function deleteAchievement(req: Request, res: Response): Promise<void> {
-	const id = req.params.id as string;
+// Delete an achievement
+async function deleteAchievement(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
 	const adminId = req.admin!.adminId;
 
 	const existing = await prisma.achievement.findUnique({ where: { id } });
@@ -99,10 +100,4 @@ async function deleteAchievement(req: Request, res: Response): Promise<void> {
 	ApiResponse.noContent(res);
 }
 
-export {
-	listAchievements,
-	createAchievement,
-	updateAchievement,
-	reorderAchievements,
-	deleteAchievement,
-};
+export { listAchievements, createAchievement, updateAchievement, reorderAchievements, deleteAchievement };

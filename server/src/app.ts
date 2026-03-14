@@ -6,6 +6,7 @@ import { ApiError, isApiError } from './utils/ApiError';
 import publicRoutes from './routes/public.routes';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
+import docsRoutes from './routes/docs.routes';
 
 const app = express();
 
@@ -16,10 +17,11 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static('public'));
 
-// Routes
-app.use(publicRoutes);
-app.use(authRoutes);
-app.use(adminRoutes);
+// API v1 Routes
+app.use('/api/v1', publicRoutes);
+app.use('/api/v1', authRoutes);
+app.use('/api/v1', adminRoutes);
+app.use('/api/v1', docsRoutes);
 
 // 404 Handler
 app.use((_req, _res, next) => {
@@ -58,12 +60,13 @@ app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
 	});
 
 	res.status(500).json({
+		success: false,
 		error: {
 			code: 500,
 			message: isDevMode && err instanceof Error ? err.message : 'Internal Server Error',
 			...(isDevMode && err instanceof Error && { stack: err.stack }),
-			timestamp: new Date().toISOString(),
 		},
+		timestamp: new Date().toISOString(),
 	});
 });
 
