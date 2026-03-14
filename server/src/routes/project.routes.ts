@@ -16,18 +16,18 @@ import {
 
 const router = Router();
 
-router.get('/admin/projects', asyncHandler(listProjects));
+router.get('/projects', asyncHandler(listProjects));
 
-router.post('/admin/projects', validate(ProjectCreateSchema), asyncHandler(createProject));
+router.post('/projects', validate(ProjectCreateSchema), asyncHandler(createProject));
 
-router.put('/admin/projects/:id', validate(ProjectUpdateSchema), asyncHandler(updateProject));
+router.put('/projects/:id', validate(ProjectUpdateSchema), asyncHandler(updateProject));
 
 router.patch(
-	'/admin/projects/:id/status',
+	'/projects/:id/status',
 	validate(ProjectStatusSchema),
 	asyncHandler(updateProjectStatus),
 );
 
-router.delete('/admin/projects/:id', asyncHandler(deleteProject));
+router.delete('/projects/:id', asyncHandler(deleteProject));
 
 export default router;

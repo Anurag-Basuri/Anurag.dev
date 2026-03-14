@@ -16,26 +16,14 @@ import {
 
 const router = Router();
 
-router.get('/admin/achievements', asyncHandler(listAchievements));
+router.get('/achievements', asyncHandler(listAchievements));
 
-router.post(
-	'/admin/achievements',
-	validate(AchievementCreateSchema),
-	asyncHandler(createAchievement),
-);
+router.post('/achievements', validate(AchievementCreateSchema), asyncHandler(createAchievement));
 
-router.put(
-	'/admin/achievements/:id',
-	validate(AchievementUpdateSchema),
-	asyncHandler(updateAchievement),
-);
+router.put('/achievements/:id', validate(AchievementUpdateSchema), asyncHandler(updateAchievement));
 
-router.patch(
-	'/admin/achievements/reorder',
-	validate(ReorderSchema),
-	asyncHandler(reorderAchievements),
-);
+router.patch('/achievements/reorder', validate(ReorderSchema), asyncHandler(reorderAchievements));
 
-router.delete('/admin/achievements/:id', asyncHandler(deleteAchievement));
+router.delete('/achievements/:id', asyncHandler(deleteAchievement));
 
 export default router;

@@ -4,10 +4,10 @@ import { listMessages, getMessage, deleteMessage } from '../controllers/messages
 
 const router = Router();
 
-router.get('/admin/messages', asyncHandler(listMessages));
+router.get('/messages', asyncHandler(listMessages));
 
-router.get('/admin/messages/:id', asyncHandler(getMessage));
+router.get('/messages/:id', asyncHandler(getMessage));
 
-router.delete('/admin/messages/:id', asyncHandler(deleteMessage));
+router.delete('/messages/:id', asyncHandler(deleteMessage));
 
 export default router;

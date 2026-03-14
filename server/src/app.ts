@@ -19,13 +19,21 @@ app.use(express.static('public'));
 
 // API v1 Routes
 app.use('/api/v1', publicRoutes);
-app.use('/api/v1', authRoutes);
-app.use('/api/v1', adminRoutes);
 app.use('/api/v1', docsRoutes);
+app.use('/api/v1', authRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
-// 404 Handler
-app.use((_req, _res, next) => {
-	next(new ApiError(404, 'Route not found'));
+// Invalid Route Handler
+app.use((req, _res, next) => {
+	next(
+		new ApiError(404, `Cannot ${req.method} ${req.originalUrl}`, {
+			details: {
+				method: req.method,
+				url: req.originalUrl,
+				hint: 'Check the API docs at /api/v1/docs for available endpoints',
+			},
+		}),
+	);
 });
 
 // Global Error Handler

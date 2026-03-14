@@ -1,10 +1,6 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.middleware';
-import {
-	BlogCreateSchema,
-	BlogUpdateSchema,
-	BlogStatusSchema,
-} from '../schemas/zod-schemas';
+import { BlogCreateSchema, BlogUpdateSchema, BlogStatusSchema } from '../schemas/zod-schemas';
 import { asyncHandler } from '../utils/asyncHandler';
 import {
 	listPosts,
@@ -16,18 +12,14 @@ import {
 
 const router = Router();
 
-router.get('/admin/blog', asyncHandler(listPosts));
+router.get('/blog', asyncHandler(listPosts));
 
-router.post('/admin/blog', validate(BlogCreateSchema), asyncHandler(createPost));
+router.post('/blog', validate(BlogCreateSchema), asyncHandler(createPost));
 
-router.put('/admin/blog/:id', validate(BlogUpdateSchema), asyncHandler(updatePost));
+router.put('/blog/:id', validate(BlogUpdateSchema), asyncHandler(updatePost));
 
-router.patch(
-	'/admin/blog/:id/status',
-	validate(BlogStatusSchema),
-	asyncHandler(updatePostStatus),
-);
+router.patch('/blog/:id/status', validate(BlogStatusSchema), asyncHandler(updatePostStatus));
 
-router.delete('/admin/blog/:id', asyncHandler(deletePost));
+router.delete('/blog/:id', asyncHandler(deletePost));
 
 export default router;

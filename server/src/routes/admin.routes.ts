@@ -10,10 +10,7 @@ import messagesRoutes from './messages.routes';
 
 const router = Router();
 
-/**
- * Admin route aggregator.
- * All sub-routes require authentication.
- */
+// All routes require authentication
 router.use(authMiddleware);
 
 router.use(profileRoutes);

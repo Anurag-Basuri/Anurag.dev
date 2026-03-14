@@ -14,20 +14,12 @@ import {
 
 const router = Router();
 
-router.get('/admin/certifications', asyncHandler(listCertifications));
+router.get('/certifications', asyncHandler(listCertifications));
 
-router.post(
-	'/admin/certifications',
-	validate(CertificationCreateSchema),
-	asyncHandler(createCertification),
-);
+router.post('/certifications', validate(CertificationCreateSchema), asyncHandler(createCertification));
 
-router.put(
-	'/admin/certifications/:id',
-	validate(CertificationUpdateSchema),
-	asyncHandler(updateCertification),
-);
+router.put('/certifications/:id', validate(CertificationUpdateSchema), asyncHandler(updateCertification));
 
-router.delete('/admin/certifications/:id', asyncHandler(deleteCertification));
+router.delete('/certifications/:id', asyncHandler(deleteCertification));
 
 export default router;
