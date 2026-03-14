@@ -18,7 +18,7 @@ export function AdminNav() {
 	const pathname = usePathname();
 
 	return (
-		<nav className="w-56 shrink-0 border-r border-zinc-800 bg-zinc-950 p-4 flex flex-col gap-1">
+		<nav className="w-56 shrink-0 h-full border-r border-zinc-800 bg-zinc-950 p-4 flex flex-col gap-1 overflow-y-auto">
 			<h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">
 				Admin Panel
 			</h2>

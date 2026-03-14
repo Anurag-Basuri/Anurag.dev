@@ -37,9 +37,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 	if (isLoginPage) return <>{children}</>;
 
 	return (
-		<div className="min-h-screen flex bg-[#020202] text-white">
+		<div className="h-screen flex bg-[#020202] text-white overflow-hidden">
 			<AdminNav />
-			<main className="flex-1 overflow-y-auto p-8">{children}</main>
+			<main className="flex-1 overflow-y-auto p-8 pb-16">{children}</main>
 		</div>
 	);
 }

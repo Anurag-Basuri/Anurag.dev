@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/api';
 import { loginSchema } from '@/api';
@@ -16,11 +16,14 @@ export default function AdminLoginPage() {
 	const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
 	const [loading, setLoading] = useState(false);
 
-	// Redirect if already authenticated
-	if (isAuthenticated) {
-		router.replace('/admin');
-		return null;
-	}
+	// Redirect if already authenticated (in useEffect to avoid setState-in-render)
+	useEffect(() => {
+		if (isAuthenticated) {
+			router.replace('/admin');
+		}
+	}, [isAuthenticated, router]);
+
+	if (isAuthenticated) return null;
 
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
 		const { name, value } = e.target;

@@ -1,14 +1,11 @@
-/**
- * Fallback pipeline utility.
- *
- * Wraps any async fetcher with automatic fallback:
- * 1. Tries the API call
- * 2. On failure → returns the hardcoded fallback data
- * 3. Logs the failure for debugging
- *
- * Usage:
- *   const data = await withFallback(() => apiClient.get('/projects'), FALLBACK_PROJECTS);
- */
+// Fallback pipeline utility.
+// This function attempts to fetch data using the provided fetcher function.
+// If the fetcher fails (e.g., due to network issues), it logs a warning and returns the provided fallback data instead.
+// How to use:
+// 1. Define a fetcher function that retrieves data from the API.
+// 2. Prepare fallback data that matches the expected structure of the API response.
+// 3. Call withFallback(fetcher, fallbackData, 'optional-label') to get the data, which will be from the API if successful, or from the fallback if the API call fails.
+
 export async function withFallback<T>(
 	fetcher: () => Promise<T>,
 	fallbackData: T,
