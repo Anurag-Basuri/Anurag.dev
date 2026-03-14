@@ -20,6 +20,8 @@ const EMPTY_PROJECT = {
 	liveUrl: '',
 	status: 'draft',
 	featured: false,
+	stars: 0,
+	forks: 0,
 };
 
 export default function ProjectsPage() {
@@ -52,16 +54,14 @@ export default function ProjectsPage() {
 			liveUrl: project.liveUrl || '',
 			status: project.status,
 			featured: project.featured,
+			stars: project.stars ?? 0,
+			forks: project.forks ?? 0,
 		});
 		setModal({ open: true, editing: project });
 		setError(null);
 	}
 
-	function updateField(name: string, value: string | number | boolean) {
-		setForm((prev) => ({ ...prev, [name]: value }));
-	}
-
-	function updateTags(name: string, value: string[]) {
+	function updateField(name: string, value: unknown) {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	}
 
@@ -120,10 +120,15 @@ export default function ProjectsPage() {
 				<FormField label="Title" name="title" value={form.title} onChange={updateField} required />
 				<FormField label="Slug" name="slug" value={form.slug} onChange={updateField} required />
 				<FormField label="Description" name="description" type="textarea" value={form.description} onChange={updateField} required rows={4} />
-				<TagField label="Tech Stack" name="techStack" value={form.techStack} onChange={updateTags} />
+				<TagField label="Tech Stack" name="techStack" value={form.techStack} onChange={updateField} />
 				<FormField label="Thumbnail URL" name="thumbnail" type="url" value={form.thumbnail} onChange={updateField} />
+				<TagField label="Image URLs" name="images" value={form.images} onChange={updateField} placeholder="Paste image URLs" />
 				<FormField label="GitHub URL" name="githubUrl" type="url" value={form.githubUrl} onChange={updateField} />
 				<FormField label="Live URL" name="liveUrl" type="url" value={form.liveUrl} onChange={updateField} />
+				<div className="grid grid-cols-2 gap-4">
+					<FormField label="Stars" name="stars" type="number" value={form.stars} onChange={updateField} />
+					<FormField label="Forks" name="forks" type="number" value={form.forks} onChange={updateField} />
+				</div>
 				<FormField label="Status" name="status" type="select" value={form.status} onChange={updateField} options={[{ label: 'Draft', value: 'draft' }, { label: 'Published', value: 'published' }, { label: 'Completed', value: 'completed' }, { label: 'Archived', value: 'archived' }]} />
 				<FormField label="Featured" name="featured" type="checkbox" value={form.featured} onChange={updateField} />
 			</FormModal>
