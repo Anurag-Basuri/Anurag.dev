@@ -1,4 +1,13 @@
 import { apiClient } from '../client';
+import { withFallback } from '../fallback/with-fallback';
+import {
+	FALLBACK_PROFILE,
+	FALLBACK_PROJECTS,
+	FALLBACK_JOURNEY,
+	FALLBACK_ACHIEVEMENTS,
+	FALLBACK_CERTIFICATIONS,
+	FALLBACK_BLOG_POSTS,
+} from '../fallback';
 import type {
 	Project,
 	JourneyEntry,
@@ -8,38 +17,72 @@ import type {
 	AboutData,
 } from '@/types/schema';
 
-// Public-facing API service — no auth required
+// Public-facing API service — falls back to hardcoded data if backend is unreachable
 
-async function getProfile(): Promise<AboutData> {
-	return apiClient.get<AboutData>('/profile');
+async function getProfile() {
+	return withFallback(
+		() => apiClient.get<AboutData>('/profile'),
+		FALLBACK_PROFILE,
+		'profile',
+	);
 }
 
-async function getProjects(): Promise<Project[]> {
-	return apiClient.get<Project[]>('/projects');
+async function getProjects() {
+	return withFallback(
+		() => apiClient.get<Project[]>('/projects'),
+		FALLBACK_PROJECTS,
+		'projects',
+	);
 }
 
-async function getProjectBySlug(slug: string): Promise<Project> {
-	return apiClient.get<Project>(`/projects/${slug}`);
+async function getProjectBySlug(slug: string) {
+	const fallbackProject = FALLBACK_PROJECTS.find((p) => p.slug === slug) || FALLBACK_PROJECTS[0];
+	return withFallback(
+		() => apiClient.get<Project>(`/projects/${slug}`),
+		fallbackProject,
+		`project:${slug}`,
+	);
 }
 
-async function getJourney(): Promise<JourneyEntry[]> {
-	return apiClient.get<JourneyEntry[]>('/journey');
+async function getJourney() {
+	return withFallback(
+		() => apiClient.get<JourneyEntry[]>('/journey'),
+		FALLBACK_JOURNEY,
+		'journey',
+	);
 }
 
-async function getAchievements(): Promise<Achievement[]> {
-	return apiClient.get<Achievement[]>('/achievements');
+async function getAchievements() {
+	return withFallback(
+		() => apiClient.get<Achievement[]>('/achievements'),
+		FALLBACK_ACHIEVEMENTS,
+		'achievements',
+	);
 }
 
-async function getCertifications(): Promise<Certification[]> {
-	return apiClient.get<Certification[]>('/certifications');
+async function getCertifications() {
+	return withFallback(
+		() => apiClient.get<Certification[]>('/certifications'),
+		FALLBACK_CERTIFICATIONS,
+		'certifications',
+	);
 }
 
-async function getBlogPosts(): Promise<BlogPost[]> {
-	return apiClient.get<BlogPost[]>('/blog');
+async function getBlogPosts() {
+	return withFallback(
+		() => apiClient.get<BlogPost[]>('/blog'),
+		FALLBACK_BLOG_POSTS,
+		'blog',
+	);
 }
 
-async function getBlogPostBySlug(slug: string): Promise<BlogPost> {
-	return apiClient.get<BlogPost>(`/blog/${slug}`);
+async function getBlogPostBySlug(slug: string) {
+	const fallbackPost = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug) || FALLBACK_BLOG_POSTS[0];
+	return withFallback(
+		() => apiClient.get<BlogPost>(`/blog/${slug}`),
+		fallbackPost,
+		`blog:${slug}`,
+	);
 }
 
 async function submitContact(data: {
@@ -47,8 +90,12 @@ async function submitContact(data: {
 	email: string;
 	subject: string;
 	message: string;
-}): Promise<null> {
-	return apiClient.post<null>('/contact', data);
+}): Promise<{ data: null; source: 'api' | 'fallback' }> {
+	return withFallback(
+		() => apiClient.post<null>('/contact', data),
+		null,
+		'contact',
+	);
 }
 
 export const publicService = {

@@ -29,3 +29,15 @@ export type { LoginFormData } from './validations/auth';
 
 // Store
 export { accessTokenAtom, refreshTokenAtom, isAuthenticatedAtom } from './store/auth';
+
+// Fallback
+export { withFallback } from './fallback/with-fallback';
+export {
+	FALLBACK_PROFILE,
+	FALLBACK_PROJECTS,
+	FALLBACK_JOURNEY,
+	FALLBACK_ACHIEVEMENTS,
+	FALLBACK_CERTIFICATIONS,
+	FALLBACK_BLOG_POSTS,
+} from './fallback';
+
