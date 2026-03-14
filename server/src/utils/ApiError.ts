@@ -2,10 +2,10 @@
  * Centralized API error class.
  *
  * Every thrown ApiError carries:
- *  - statusCode  — HTTP status
- *  - message     — human-readable description
- *  - source      — origin context, e.g. "ProjectController.update" (optional)
- *  - details     — structured payload (validation errors, IDs, etc.)
+ *  - statusCode   — HTTP status
+ *  - message      — human-readable description
+ *  - source       — origin context, e.g. "ProjectController.update"
+ *  - details      — structured payload (validation errors, IDs, etc.)
  *  - isOperational — true = expected business error, false = programming bug
  *  - stack        — full stack trace (auto-captured)
  */
@@ -31,18 +31,18 @@ class ApiError extends Error {
 
 	toJSON() {
 		return {
+			success: false,
 			error: {
 				code: this.statusCode,
 				message: this.message,
 				...(this.source && { source: this.source }),
 				...(this.details ? { details: this.details } : {}),
-				timestamp: new Date().toISOString(),
 			},
+			timestamp: new Date().toISOString(),
 		};
 	}
 
-	// ─── Factory Methods ──────────────────────────────────────────
-
+	// Factory Methods
 	static BadRequest(message = 'Bad Request', details?: unknown) {
 		return new ApiError(400, message, { details });
 	}

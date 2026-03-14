@@ -337,6 +337,44 @@ export const ContactSchema = z.object({
 	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
+// ─── Auth Schemas ────────────────────────────────────────────────
+
+export const LoginSchema = z.object({
+	username: z.string().min(1, 'Username is required'),
+	password: z.string().min(1, 'Password is required'),
+});
+
+export const RefreshSchema = z.object({
+	refreshToken: z.string().min(1, 'Refresh token is required'),
+});
+
+// ─── Derived Schemas (Create / Update / Status) ──────────────────
+
+// Project
+export const ProjectCreateSchema = ProjectSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const ProjectUpdateSchema = ProjectSchema.partial().omit({ id: true, createdAt: true, updatedAt: true });
+export const ProjectStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived', 'completed']) });
+
+// Journey
+export const JourneyCreateSchema = JourneyItemSchema.omit({ id: true });
+export const JourneyUpdateSchema = JourneyItemSchema.partial().omit({ id: true });
+export const ReorderSchema = z.object({
+	items: z.array(z.object({ id: z.string(), order: z.number().int().min(0) })),
+});
+
+// Achievement
+export const AchievementCreateSchema = AchievementSchema.omit({ id: true });
+export const AchievementUpdateSchema = AchievementSchema.partial().omit({ id: true });
+
+// Certification
+export const CertificationCreateSchema = CertificationSchema.omit({ id: true });
+export const CertificationUpdateSchema = CertificationSchema.partial().omit({ id: true });
+
+// Blog
+export const BlogCreateSchema = BlogPostSchema.omit({ id: true, createdAt: true, updatedAt: true });
+export const BlogUpdateSchema = BlogPostSchema.partial().omit({ id: true, createdAt: true, updatedAt: true });
+export const BlogStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived']) });
+
 // ─── Inferred Types ─────────────────────────────────────────────
 
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -346,3 +384,4 @@ export type Achievement = z.infer<typeof AchievementSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;
+
