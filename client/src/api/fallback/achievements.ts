@@ -7,7 +7,8 @@ export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 		category: 'hackathon',
 		issuer: 'Government of India',
 		event: 'Smart India Hackathon 2024',
-		description: 'Reached finals of the national-level hackathon with an AI-powered civic engagement solution.',
+		description:
+			'Reached finals of the national-level hackathon with an AI-powered civic engagement solution.',
 		rank: 'Finalist',
 		date: '2024-03-15T00:00:00.000Z',
 		proofUrl: 'https://sih.gov.in',
@@ -16,7 +17,8 @@ export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 		featured: true,
 		order: 0,
 		journeyEntryId: 'fb-j-1',
-		journeyEntry: { id: 'fb-j-1', title: 'B.Tech in CSE', type: 'education' },
+		createdAt: '2024-03-15T00:00:00.000Z',
+		updatedAt: '2024-03-15T00:00:00.000Z',
 	},
 	{
 		id: 'fb-a-2',
@@ -28,6 +30,8 @@ export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 		team: [],
 		featured: true,
 		order: 1,
+		createdAt: '2024-01-01T00:00:00.000Z',
+		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 	{
 		id: 'fb-a-3',
@@ -40,5 +44,7 @@ export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 		team: [],
 		featured: false,
 		order: 2,
+		createdAt: '2024-01-01T00:00:00.000Z',
+		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 ];

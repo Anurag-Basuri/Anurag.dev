@@ -1,217 +1,290 @@
-export interface Project {
-	id: string;
-	title: string;
-	slug: string;
-	description: string;
-	content?: string;
-	techStack: string[];
-	tags?: string[];
+import { z } from 'zod';
 
-	thumbnail?: string;
-	images?: string[];
+// ─── JSON Sub-schemas (Profile JSON fields) ──────────────────
 
-	githubUrl?: string | null;
-	liveUrl?: string | null;
+export const workPreferencesSchema = z.object({
+	remote: z.boolean().optional(),
+	hybrid: z.boolean().optional(),
+	onsite: z.boolean().optional(),
+	relocation: z.boolean().optional(),
+});
 
-	status: 'draft' | 'published' | 'archived' | 'completed';
-	featured: boolean;
-	priority: number;
+export const socialLinkSchema = z.object({
+	platform: z.string(),
+	url: z.string(),
+	icon: z.string().optional(),
+	handle: z.string().optional(),
+});
 
-	stars?: number | null;
-	forks?: number | null;
+// ─── Profile (Prisma: Profile) ───────────────────────────────
 
-	createdAt: string;
-	updatedAt: string;
-}
+export const profileSchema = z.object({
+	id: z.string(),
 
-export interface JourneyEntry {
-	id: string;
-	type: 'work' | 'education' | 'volunteering' | 'research' | 'other';
-	title: string;
-	organization?: string;
-	location?: string;
+	// Personal Info
+	name: z.string(),
+	pronouns: z.string(),
+	email: z.string(),
+	phone: z.string(),
 
-	date: string; // "2023 - Present"
-	startDate?: string;
-	endDate?: string | null;
-	isCurrent?: boolean;
+	// Career & Bio
+	header: z.string().nullish(),
+	bio: z.string().nullish(),
 
-	description: string;
-	skills: string[];
-	url?: string;
+	// Location
+	Currentlocation: z.string().nullish(),
+	Originallocation: z.string().nullish(),
+
+	// Job Seeking & Availability
+	openToWork: z.boolean(),
+	availableFrom: z.string().nullish(),
+	noticePeriod: z.string().nullish(),
+
+	// Job Preferences
+	workPreferences: workPreferencesSchema.nullish(),
+	jobTypes: z.array(z.string()),
+
+	// Media & Links
+	avatarUrl: z.string().nullish(),
+	coverUrl: z.string().nullish(),
+	resumeUrl: z.string().nullish(),
+
+	// Quick Stats
+	experienceYears: z.number().int(),
+	projectsCount: z.number().int(),
+
+	// Skills — { category: skills[] }
+	skills: z.record(z.string(), z.array(z.string())).nullish(),
+
+	// Personal
+	languages: z.array(z.string()),
+
+	// Social & Web
+	socials: z.array(socialLinkSchema).nullish(),
+	website: z.string().nullish(),
+
+	// Coding Platforms
+	github: z.string().nullish(),
+	leetcode: z.string().nullish(),
+	codeforces: z.string().nullish(),
+	codechef: z.string().nullish(),
+	gfg: z.string().nullish(),
+	kaggle: z.string().nullish(),
+	otherProfiles: z.array(z.string()),
+
+	// SEO / Meta
+	seoTitle: z.string().nullish(),
+	seoDesc: z.string().nullish(),
+	seoKeywords: z.array(z.string()),
+
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
+
+// ─── Project (Prisma: Project) ───────────────────────────────
+
+export const projectSchema = z.object({
+	id: z.string(),
+	slug: z.string(),
+
+	title: z.string(),
+	description: z.string(),
+	techStack: z.array(z.string()),
+
+	thumbnail: z.string().nullish(),
+	images: z.array(z.string()),
+	githubUrl: z.string().nullish(),
+	liveUrl: z.string().nullish(),
+
+	status: z.string(),
+	featured: z.boolean(),
+
+	stars: z.number().nullish(),
+	forks: z.number().nullish(),
+
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
+
+// ─── Achievement (Prisma: Achievement) ───────────────────────
+
+export const achievementSchema = z.object({
+	id: z.string(),
+
+	title: z.string(),
+	category: z.string(),
+	issuer: z.string().nullish(),
+	event: z.string().nullish(),
+
+	description: z.string().nullish(),
+	rank: z.string().nullish(),
+
+	date: z.string().nullish(),
+	proofUrl: z.string().nullish(),
+	url: z.string().nullish(),
+
+	tags: z.array(z.string()),
+	team: z.array(z.string()),
+
+	featured: z.boolean(),
+	order: z.number().int(),
+
+	journeyEntryId: z.string().nullish(),
+
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
+
+// ─── Journey Entry (Prisma: JourneyEntry) ────────────────────
+
+export const journeyEntrySchema = z.object({
+	id: z.string(),
+	type: z.string(),
+	title: z.string(),
+	organization: z.string().nullish(),
+	location: z.string().nullish(),
+
+	date: z.string(),
+	startDate: z.string().nullish(),
+	endDate: z.string().nullish(),
+	isCurrent: z.boolean(),
+
+	description: z.string(),
+	skills: z.array(z.string()),
+	url: z.string().nullish(),
 
 	// Education-specific
-	degree?: string;
-	fieldOfStudy?: string;
-	grade?: string;
-	board?: string;
+	degree: z.string().nullish(),
+	fieldOfStudy: z.string().nullish(),
+	grade: z.string().nullish(),
+	board: z.string().nullish(),
 
 	// Work-specific
-	employmentType?: string;
+	employmentType: z.string().nullish(),
 
 	// Research-specific
-	publication?: string;
-	doi?: string;
+	publication: z.string().nullish(),
+	doi: z.string().nullish(),
 
 	// Display
-	icon?: string;
-	highlighted?: boolean;
+	icon: z.string().nullish(),
+	highlighted: z.boolean(),
 
-	order: number;
+	order: z.number().int(),
 
-	// Related achievements
-	achievements?: Achievement[];
-}
+	// Nested relation (populated by API)
+	achievements: z.array(achievementSchema).optional(),
 
-export interface Achievement {
-	id: string;
-	title: string;
-	category: 'hackathon' | 'competition' | 'award' | 'opensource' | 'publication' | 'scholarship';
-	issuer?: string;
-	event?: string;
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
 
-	description?: string;
-	rank?: string;
+// ─── Certification (Prisma: Certification) ───────────────────
 
-	date?: string;
-	proofUrl?: string;
-	url?: string;
+export const certificationSchema = z.object({
+	id: z.string(),
 
-	tags: string[];
-	team: string[];
+	title: z.string(),
+	issuer: z.string(),
 
-	featured?: boolean;
-	order: number;
+	description: z.string().nullish(),
+	credentialId: z.string().nullish(),
+	credentialUrl: z.string().nullish(),
 
-	journeyEntryId?: string | null;
-	journeyEntry?: { id: string; title: string; type: string };
-}
+	certificateUrl: z.string().nullish(),
 
-export interface Certification {
-	id: string;
-	title: string;
-	issuer: string;
-	date: string;
-	expirationDate?: string | null;
-	credentialId?: string;
-	credentialUrl?: string;
+	skills: z.array(z.string()),
 
-	skills: string[];
-	image?: string;
-}
+	startDate: z.string().nullish(),
+	endDate: z.string().nullish(),
 
-export interface BlogPost {
-	id: string;
-	title: string;
-	slug: string;
-	summary: string;
-	content: string;
-	coverImage?: string;
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
 
-	tags: string[];
-	status: 'draft' | 'published' | 'archived';
-	featured: boolean;
+// ─── Blog Post (Prisma: BlogPost) ────────────────────────────
 
-	publishedAt?: string | null;
-	readingTime?: number;
+export const blogPostSchema = z.object({
+	id: z.string(),
+	slug: z.string(),
 
-	createdAt: string;
-	updatedAt: string;
-}
+	title: z.string(),
+	content: z.string(),
+	tags: z.array(z.string()),
 
-export interface ContactMessage {
-	id?: string;
-	name: string;
-	email: string;
-	subject: string;
-	message: string;
-	ipAddress?: string;
-}
+	coverImage: z.string().nullish(),
+	otherImages: z.array(z.string()),
+	link: z.string().nullish(),
 
-export interface Skill {
-	category: string;
-	name: string;
-	level: number;
-}
+	status: z.string(),
+	publishedAt: z.string().nullish(),
 
-export interface SocialLink {
-	platform: string;
-	url: string;
-	icon?: string;
-}
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
 
-export interface AboutData {
-	name: string;
-	role: string;
-	tagline: string;
-	summary: string;
-	bio: string;
+// ─── Contact Message (Prisma: ContactMessage) ────────────────
 
-	location?: string;
-	avatarUrl: string;
-	coverUrl?: string;
-	resumeUrl?: string;
+export const contactMessageSchema = z.object({
+	id: z.string(),
 
-	experienceYears: number;
-	projectsCount: number;
+	name: z.string(),
+	email: z.string(),
+	subject: z.string(),
+	message: z.string(),
 
-	currentStatus?: {
-		label: string;
-		description?: string;
-	};
+	ipAddress: z.string().nullish(),
+	isRead: z.boolean(),
 
-	focusAreas?: string[];
+	createdAt: z.string(),
+});
 
-	highlights?: {
-		label: string;
-		value: string;
-		icon?: string;
-	}[];
+// ─── Inferred Types ──────────────────────────────────────────
 
-	skills: {
-		frontend: Skill[];
-		backend: Skill[];
-		ml: Skill[];
-		other?: Skill[];
-	};
+export type WorkPreferences = z.infer<typeof workPreferencesSchema>;
+export type SocialLink = z.infer<typeof socialLinkSchema>;
+export type Profile = z.infer<typeof profileSchema>;
+export type Project = z.infer<typeof projectSchema>;
+export type Achievement = z.infer<typeof achievementSchema>;
+export type JourneyEntry = z.infer<typeof journeyEntrySchema>;
+export type Certification = z.infer<typeof certificationSchema>;
+export type BlogPost = z.infer<typeof blogPostSchema>;
+export type ContactMessage = z.infer<typeof contactMessageSchema>;
 
-	languages?: string[];
-	hobbies?: string[];
+// Backward-compat alias — existing code references AboutData
+export type AboutData = Profile;
 
-	workPreferences?: {
-		remote?: boolean;
-		hybrid?: boolean;
-		onsite?: boolean;
-		timezone?: string;
-	};
+// ─── Client-only types (not backed by Prisma) ────────────────
 
-	socials?: SocialLink[];
-}
+export const platformStatsSchema = z.object({
+	username: z.string(),
+	url: z.string(),
+	stats: z
+		.object({
+			solved: z.number().optional(),
+			easy: z.number().optional(),
+			medium: z.number().optional(),
+			hard: z.number().optional(),
+			linesOfCode: z.number().optional(),
+			rating: z.number().optional(),
+			maxRating: z.number().optional(),
+			globalRank: z.union([z.string(), z.number()]).optional(),
+			stars: z.number().optional(),
+			followers: z.number().optional(),
+			prs: z.number().optional(),
+			issues: z.number().optional(),
+		})
+		.optional(),
+});
 
-export interface PlatformStats {
-	username: string;
-	url: string;
-	stats?: {
-		solved?: number;
-		easy?: number;
-		medium?: number;
-		hard?: number;
-		linesOfCode?: number;
-		rating?: number;
-		maxRating?: number;
-		globalRank?: string | number;
-		stars?: number;
-		followers?: number;
-		prs?: number;
-		issues?: number;
-	};
-}
+export const codingStatsSchema = z.object({
+	id: z.string().optional(),
+	leetcode: platformStatsSchema,
+	codeforces: platformStatsSchema,
+	codechef: platformStatsSchema.optional(),
+	github: platformStatsSchema,
+	updatedAt: z.string().optional(),
+});
 
-export interface CodingStats {
-	id?: string;
-	leetcode: PlatformStats;
-	codeforces: PlatformStats;
-	codechef?: PlatformStats;
-	github: PlatformStats;
-	updatedAt?: string;
-}
+export type PlatformStats = z.infer<typeof platformStatsSchema>;
+export type CodingStats = z.infer<typeof codingStatsSchema>;

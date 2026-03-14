@@ -1,66 +1,64 @@
-import type { AboutData } from '@/types/schema';
+import type { Profile } from '@/types/schema';
 
-export const FALLBACK_PROFILE: AboutData = {
+export const FALLBACK_PROFILE: Profile = {
+	id: 'main',
+
 	name: 'Anurag Basuri',
-	role: 'Full Stack Engineer',
-	tagline: 'Building the Future with Code & AI',
-	summary:
-		'I specialize in building scalable web applications and exploring the frontiers of artificial intelligence. With a passion for clean code and intuitive design, I create digital experiences that perform as beautiful as they look.',
+	pronouns: 'he/him',
+	email: 'basurianurag@gmail.com',
+	phone: '+91 9876543210',
+
+	header: 'Full Stack Engineer | Building the Future with Code & AI',
 	bio: `I'm a Full Stack Engineer with a deep passion for building scalable, user-centric web applications. My journey began with a curiosity about how things work on the internet, which quickly evolved into a career in software development.
 
 I specialize in the React ecosystem (Next.js, TypeScript) and modern backend architectures. I strongly believe in writing clean, maintainable code and testing thoroughly. Beyond coding, I'm an advocate for developer experience and often contribute to open-source projects.
 
 When I'm not pushing commits, you can find me exploring new AI technologies, reading sci-fi novels, or capturing moments through my camera lens.`,
-	location: 'Jamshedpur, Jharkhand, India',
+
+	Currentlocation: 'Jamshedpur, Jharkhand, India',
+	Originallocation: 'Jamshedpur, Jharkhand, India',
+
+	openToWork: true,
+	availableFrom: 'Immediately',
+	noticePeriod: 'Immediate',
+
+	workPreferences: { remote: true, hybrid: true, onsite: false, relocation: false },
+	jobTypes: ['full-time', 'internship'],
+
 	avatarUrl: '/logo.png',
 	coverUrl: '/about-cover.jpg',
+	resumeUrl: null,
+
 	experienceYears: 2,
 	projectsCount: 15,
-	currentStatus: {
-		label: 'Building the future of web',
-		description: 'Currently focused on scalable architectures and AI integration',
-	},
-	focusAreas: [
-		'Full-Stack Development',
-		'AI/ML Integration',
-		'System Architecture',
-		'Developer Experience',
-	],
-	highlights: [
-		{ label: 'Code Quality', value: '98%', icon: 'Code2' },
-		{ label: 'Projects Delivered', value: '15+', icon: 'CheckCircle' },
-		{ label: 'Client Satisfaction', value: '100%', icon: 'Star' },
-	],
-	languages: ['English (Native)', 'Hindi (Native)'],
-	hobbies: ['Photography', 'Sci-Fi Literature', 'Chess', 'Hiking'],
-	workPreferences: {
-		remote: true,
-		hybrid: true,
-		onsite: false,
-	},
+
 	skills: {
-		frontend: [
-			{ category: 'Frontend', name: 'React/Next.js', level: 95 },
-			{ category: 'Frontend', name: 'TypeScript', level: 90 },
-			{ category: 'Frontend', name: 'Tailwind CSS', level: 98 },
-			{ category: 'Frontend', name: 'Framer Motion', level: 85 },
-		],
-		backend: [
-			{ category: 'Backend', name: 'Node.js', level: 88 },
-			{ category: 'Backend', name: 'PostgreSQL', level: 85 },
-			{ category: 'Backend', name: 'Prisma', level: 90 },
-			{ category: 'Backend', name: 'Express', level: 85 },
-		],
-		ml: [
-			{ category: 'AI/ML', name: 'Python', level: 85 },
-			{ category: 'AI/ML', name: 'LangChain', level: 75 },
-			{ category: 'AI/ML', name: 'LLM Integration', level: 80 },
-			{ category: 'AI/ML', name: 'TensorFlow', level: 60 },
-		],
+		Frontend: ['React/Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
+		Backend: ['Node.js', 'PostgreSQL', 'Prisma', 'Express'],
+		'AI/ML': ['Python', 'LangChain', 'LLM Integration', 'TensorFlow'],
 	},
+
+	languages: ['English', 'Hindi'],
+
 	socials: [
 		{ platform: 'GitHub', url: 'https://github.com/Anurag-Basuri' },
 		{ platform: 'LinkedIn', url: 'https://linkedin.com/in/anuragbasuri' },
 		{ platform: 'Twitter', url: 'https://twitter.com/AnuragBasuri' },
 	],
+	website: null,
+
+	github: 'https://github.com/Anurag-Basuri',
+	leetcode: 'https://leetcode.com/u/Anurag_Basuri',
+	codeforces: 'https://codeforces.com/profile/Anurag_Basuri',
+	codechef: 'https://www.codechef.com/users/anurag_basuri',
+	gfg: null,
+	kaggle: null,
+	otherProfiles: [],
+
+	seoTitle: null,
+	seoDesc: null,
+	seoKeywords: [],
+
+	createdAt: '2024-01-01T00:00:00.000Z',
+	updatedAt: '2024-06-01T00:00:00.000Z',
 };

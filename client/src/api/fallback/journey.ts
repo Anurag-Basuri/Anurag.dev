@@ -26,7 +26,8 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 				category: 'hackathon',
 				issuer: 'Government of India',
 				event: 'Smart India Hackathon 2024',
-				description: 'Reached finals of the national-level hackathon with an AI-powered solution.',
+				description:
+					'Reached finals of the national-level hackathon with an AI-powered solution.',
 				rank: 'Finalist',
 				date: '2024-03-15T00:00:00.000Z',
 				tags: ['AI', 'Hackathon', 'National'],
@@ -34,8 +35,12 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 				featured: true,
 				order: 0,
 				journeyEntryId: 'fb-j-1',
+				createdAt: '2024-03-15T00:00:00.000Z',
+				updatedAt: '2024-03-15T00:00:00.000Z',
 			},
 		],
+		createdAt: '2022-08-01T00:00:00.000Z',
+		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 	{
 		id: 'fb-j-2',
@@ -47,7 +52,8 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		startDate: '2020-04-01T00:00:00.000Z',
 		endDate: '2022-03-31T00:00:00.000Z',
 		isCurrent: false,
-		description: 'Completed higher secondary education with focus on Science (PCM) and Computer Science.',
+		description:
+			'Completed higher secondary education with focus on Science (PCM) and Computer Science.',
 		skills: ['Physics', 'Chemistry', 'Mathematics', 'Computer Science'],
 		degree: 'Higher Secondary',
 		fieldOfStudy: 'Science (PCM)',
@@ -55,6 +61,8 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		board: 'CBSE',
 		highlighted: false,
 		order: 1,
+		createdAt: '2020-04-01T00:00:00.000Z',
+		updatedAt: '2022-03-31T00:00:00.000Z',
 	},
 	{
 		id: 'fb-j-3',
@@ -72,5 +80,7 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		employmentType: 'internship',
 		highlighted: true,
 		order: 2,
+		createdAt: '2024-01-01T00:00:00.000Z',
+		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 ];
