@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { api, Project } from '@/lib/api';
+import { publicService } from '@/api';
+import type { Project } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Folder,
@@ -51,7 +52,7 @@ export function ProjectsModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await api.getProjects();
+			const { data } = await publicService.getProjects();
 			setProjects(data);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
@@ -70,7 +71,7 @@ export function ProjectsModule() {
 
 	const filteredProjects = projects.filter(p => {
 		if (filter === 'All') return true;
-		return p.tags?.includes(filter) ?? false;
+		return p.techStack.some(t => t.toLowerCase().includes(filter.toLowerCase()));
 	});
 
 	if (loading) return <ProjectsSkeleton />;

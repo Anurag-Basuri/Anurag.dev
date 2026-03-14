@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import type { ComponentType } from 'react';
-import { api, JourneyEntry, Achievement } from '@/lib/api';
+import { publicService } from '@/api';
+import type { JourneyEntry, Achievement } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Briefcase,
@@ -100,12 +101,12 @@ export function JourneyModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const [journeyData, achievementData] = await Promise.all([
-				api.getJourney(),
-				api.getAchievements(),
+			const [journeyResult, achievementResult] = await Promise.all([
+				publicService.getJourney(),
+				publicService.getAchievements(),
 			]);
-			setJourney(journeyData.sort((a, b) => a.order - b.order));
-			setAchievements(achievementData.sort((a, b) => a.order - b.order));
+			setJourney(journeyResult.data.sort((a, b) => a.order - b.order));
+			setAchievements(achievementResult.data.sort((a, b) => a.order - b.order));
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Failed to load journey timeline';
 			setError(message);

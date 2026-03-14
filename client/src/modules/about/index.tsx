@@ -4,7 +4,8 @@ import { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import type { ComponentType, ElementType, SVGProps } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { api, AboutData, CodingStats } from '@/lib/api';
+import { publicService } from '@/api';
+import type { AboutData, CodingStats } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Code2,
@@ -245,7 +246,7 @@ const TechStackCard = memo(function TechStackCard({
 	delay = 0,
 }: {
 	category: string;
-	skills: Array<{ name: string; level?: string } | string>;
+	skills: string[];
 	config: (typeof TECH_STACK_CONFIG)[keyof typeof TECH_STACK_CONFIG];
 	delay?: number;
 }) {
@@ -275,7 +276,7 @@ const TechStackCard = memo(function TechStackCard({
 			<h3 className="text-xl font-bold text-white mb-6">{config.label}</h3>
 			<div className="flex flex-wrap gap-2">
 				{skills.map(skill => {
-					const skillName = typeof skill === 'string' ? skill : skill.name;
+					const skillName = skill;
 					return (
 						<motion.span
 							key={skillName}
@@ -301,7 +302,7 @@ const TechStackCard = memo(function TechStackCard({
 const CodingStatsCard = memo(function CodingStatsCard({
 	codingStats,
 }: {
-	codingStats: CodingStats | null;
+	codingStats: CodingStats | null | undefined;
 }) {
 	if (!codingStats) return null;
 
@@ -385,12 +386,8 @@ export function AboutModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const [aboutData, statsData] = await Promise.all([
-				api.getAbout(),
-				api.getCodingStats(),
-			]);
-			setAbout(aboutData);
-			setCodingStats(statsData);
+			const { data: profileData } = await publicService.getProfile();
+			setAbout(profileData);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message);
@@ -408,9 +405,7 @@ export function AboutModule() {
 
 	// Memoize computed values
 	const socialLinks = useMemo(() => about?.socials || [], [about?.socials]);
-	const focusAreas = useMemo(() => about?.focusAreas || [], [about?.focusAreas]);
 	const languages = useMemo(() => about?.languages || [], [about?.languages]);
-	const hobbies = useMemo(() => about?.hobbies || [], [about?.hobbies]);
 
 	// Handle social link clicks
 	const handleSocialClick = useCallback((url: string) => {
@@ -450,7 +445,7 @@ export function AboutModule() {
 						<div className="bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 shadow-2xl rounded-[2.5rem] p-8 max-w-5xl mx-auto">
 							<div className="flex flex-col md:flex-row items-center md:items-start gap-8">
 								{/* Avatar */}
-								<ProfileAvatar avatarUrl={about.avatarUrl} name={about.name} />
+								<ProfileAvatar avatarUrl={about.avatarUrl ?? undefined} name={about.name} />
 
 								{/* Info */}
 								<div className="flex-1 text-center md:text-left space-y-4 pt-2">
@@ -469,7 +464,7 @@ export function AboutModule() {
 											transition={{ delay: 0.2 }}
 											className="text-xl text-emerald-400 font-medium"
 										>
-											{about.role}
+											{about.header}
 										</motion.p>
 									</div>
 
@@ -479,7 +474,7 @@ export function AboutModule() {
 										transition={{ delay: 0.3 }}
 										className="text-muted-foreground leading-relaxed max-w-2xl"
 									>
-										{about.tagline}
+										{about.bio}
 									</motion.p>
 
 									{/* Quick Links & Status */}
@@ -489,16 +484,16 @@ export function AboutModule() {
 										transition={{ delay: 0.4 }}
 										className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-2"
 									>
-										{about.location && (
+										{about.Currentlocation && (
 											<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 text-xs font-medium text-white/70">
 												<MapPin className="w-3.5 h-3.5 text-emerald-500" />
-												{about.location}
+												{about.Currentlocation}
 											</div>
 										)}
-										{about.currentStatus && (
+										{about.openToWork && (
 											<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs font-medium text-emerald-400">
 												<Zap className="w-3.5 h-3.5" />
-												{about.currentStatus.label}
+												Open to Work
 											</div>
 										)}
 
@@ -539,8 +534,8 @@ export function AboutModule() {
                     CONTENT GRID
                     ============================================================ */}
 				<div className="px-4 sm:px-6 md:px-8 max-w-7xl mx-auto space-y-16">
-					{/* Highlights */}
-					{about.highlights && (
+					{/* Quick Stats */}
+					{(
 						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 							<QuickStat
 								value={`${about.experienceYears}+`}
@@ -584,47 +579,18 @@ export function AboutModule() {
 									About Me
 								</h2>
 								<div className="prose prose-invert prose-lg max-w-none text-muted-foreground leading-relaxed">
-									<p>{about.summary}</p>
 									{about.bio && (
-										<div className="whitespace-pre-line mt-4">{about.bio}</div>
+										<div className="whitespace-pre-line">{about.bio}</div>
 									)}
 								</div>
 							</motion.div>
 
-							{/* Focus Areas */}
-							{focusAreas.length > 0 && (
-								<motion.div
-									initial={{ opacity: 0, y: 20 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									viewport={{ once: true }}
-									transition={{ delay: 0.1 }}
-									className="pt-6"
-								>
-									<h3 className="text-sm font-bold text-white/50 uppercase tracking-widest mb-4">
-										Core Focus
-									</h3>
-									<div className="flex flex-wrap gap-3">
-										{focusAreas.map((area, index) => (
-											<motion.span
-												key={area}
-												initial={{ opacity: 0, scale: 0.8 }}
-												whileInView={{ opacity: 1, scale: 1 }}
-												viewport={{ once: true }}
-												transition={{ delay: index * 0.05 }}
-												whileHover={{ scale: 1.05 }}
-												className="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-sm font-medium text-white/80 hover:border-emerald-500/30 hover:text-emerald-400 transition-colors cursor-default"
-											>
-												{area}
-											</motion.span>
-										))}
-									</div>
-								</motion.div>
-							)}
+
 						</div>
 
 						{/* Sidebar Stats */}
 						<div className="lg:col-span-4 space-y-6">
-							<CodingStatsCard codingStats={codingStats} />
+							<CodingStatsCard codingStats={null} />
 						</div>
 					</div>
 
@@ -641,54 +607,20 @@ export function AboutModule() {
 						</motion.h2>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							<TechStackCard
-								category="frontend"
-								skills={about.skills.frontend.map(skill =>
-									typeof skill === 'string'
-										? skill
-										: {
-												...skill,
-												level:
-													skill.level !== undefined
-														? String(skill.level)
-														: undefined,
-										  },
-								)}
-								config={TECH_STACK_CONFIG.frontend}
-								delay={0}
-							/>
-							<TechStackCard
-								category="backend"
-								skills={about.skills.backend.map(skill =>
-									typeof skill === 'string'
-										? skill
-										: {
-												...skill,
-												level:
-													skill.level !== undefined
-														? String(skill.level)
-														: undefined,
-										  },
-								)}
-								config={TECH_STACK_CONFIG.backend}
-								delay={0.1}
-							/>
-							<TechStackCard
-								category="ml"
-								skills={about.skills.ml.map(skill =>
-									typeof skill === 'string'
-										? skill
-										: {
-												...skill,
-												level:
-													skill.level !== undefined
-														? String(skill.level)
-														: undefined,
-										  },
-								)}
-								config={TECH_STACK_CONFIG.ml}
-								delay={0.2}
-							/>
+							{about.skills && Object.entries(about.skills).map(([category, skillList], idx) => {
+								const configKey = category.toLowerCase().includes('front') ? 'frontend'
+									: category.toLowerCase().includes('back') ? 'backend'
+									: 'ml';
+								return (
+									<TechStackCard
+										key={category}
+										category={category}
+										skills={skillList as string[]}
+										config={TECH_STACK_CONFIG[configKey]}
+										delay={idx * 0.1}
+									/>
+								);
+							})}
 						</div>
 					</div>
 
@@ -724,36 +656,7 @@ export function AboutModule() {
 							</motion.div>
 						)}
 
-						{/* Interests */}
-						{hobbies.length > 0 && (
-							<motion.div
-								initial={{ opacity: 0, y: 20 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								viewport={{ once: true }}
-								transition={{ delay: 0.1 }}
-								className="p-8 rounded-4xl bg-card/20 border border-white/5 hover:border-yellow-500/20 transition-all"
-							>
-								<h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-									<Sparkles className="w-5 h-5 text-yellow-400" />
-									Interests
-								</h3>
-								<div className="flex flex-wrap gap-3">
-									{hobbies.map((hobby, index) => (
-										<motion.span
-											key={hobby}
-											initial={{ opacity: 0, scale: 0.8 }}
-											whileInView={{ opacity: 1, scale: 1 }}
-											viewport={{ once: true }}
-											transition={{ delay: index * 0.05 }}
-											whileHover={{ scale: 1.05 }}
-											className="px-4 py-2 rounded-xl bg-background/50 border border-white/5 text-sm font-medium text-white/80 hover:border-yellow-500/30 transition-colors"
-										>
-											{hobby}
-										</motion.span>
-									))}
-								</div>
-							</motion.div>
-						)}
+
 					</div>
 				</div>
 			</div>

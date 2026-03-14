@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, BlogPost } from '@/lib/api';
+import { publicService } from '@/api';
+import type { BlogPost } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,7 +35,7 @@ export function BlogModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await api.getBlogPosts();
+			const { data } = await publicService.getBlog();
 			setPosts(data);
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Failed to load blog posts';
@@ -138,7 +139,7 @@ export function BlogModule() {
 									<div className="flex flex-wrap items-center gap-4 pt-2">
 										<div className="flex items-center gap-1.5 text-xs font-mono text-emerald-500/80 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
 											<Clock className="w-3.5 h-3.5" />
-											<span>{post.readingTime || 5} min read</span>
+											<span>{Math.max(1, Math.ceil(post.content.split(/\s+/).length / 200))} min read</span>
 										</div>
 
 										{post.tags.length > 0 && (

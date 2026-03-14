@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
-import { api, CodingStats } from '@/lib/api';
+import { publicService } from '@/api';
+import type { CodingStats } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Code2,

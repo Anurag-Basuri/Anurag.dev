@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { api, AboutData } from '@/lib/api';
+import { publicService } from '@/api';
+import type { AboutData } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Send,
@@ -59,8 +60,8 @@ export function ContactModule() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const aboutData = await api.getAbout();
-				setAbout(aboutData);
+				const { data: profileData } = await publicService.getProfile();
+			setAbout(profileData);
 			} catch (err) {
 				console.error('Failed to fetch about data in contact module', err);
 			} finally {
@@ -77,7 +78,7 @@ export function ContactModule() {
 		setSuccess(false);
 
 		try {
-			const result = await api.submitContact(formData);
+			const result = await publicService.submitContact(formData);
 			if (result.success) {
 				setSuccess(true);
 				setFormData({ name: '', email: '', subject: '', message: '' });

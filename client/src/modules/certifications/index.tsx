@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, Certification } from '@/lib/api';
+import { publicService } from '@/api';
+import type { Certification } from '@/types/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Award, Calendar, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -45,7 +46,7 @@ export function CertificationModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await api.getCertifications();
+			const { data } = await publicService.getCertifications();
 			setCerts(data);
 		} catch (err: unknown) {
 			const message = err instanceof Error ? err.message : 'Failed to load certifications';
@@ -109,7 +110,7 @@ export function CertificationModule() {
 									<div className="flex items-center gap-2 text-sm text-muted-foreground/80 font-mono">
 										<Calendar className="w-4 h-4" />
 										<span>
-											Issued: {new Date(cert.date).toLocaleDateString()}
+											Issued: {new Date(cert.startDate ?? cert.createdAt).toLocaleDateString()}
 										</span>
 									</div>
 								</div>
