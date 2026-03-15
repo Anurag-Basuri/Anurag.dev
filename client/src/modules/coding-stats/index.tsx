@@ -477,24 +477,13 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 export function CodingStatsModule() {
 	const [stats, setStats] = useState<CodingStats | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
 
-	// Fetch data with error handling
+	// Fetch data
 	const fetchData = useCallback(async () => {
-		try {
-			setLoading(true);
-			setError(null);
-			const { data } = await publicService.getCodingStats();
-			setStats(data);
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-				setError(err.message);
-			} else {
-				setError('An unknown error occurred');
-			}
-		} finally {
-			setLoading(false);
-		}
+		setLoading(true);
+		const { data } = await publicService.getCodingStats();
+		setStats(data);
+		setLoading(false);
 	}, []);
 
 	useEffect(() => {
@@ -531,13 +520,9 @@ export function CodingStatsModule() {
 	// Loading state
 	if (loading) return <CodingStatsSkeleton />;
 
-	// No data state
+	// No data state — fallback data will always populate, so this only hits
+	// if the fallback itself is somehow null (shouldn't happen)
 	if (!stats || !leetcodeStats) return null;
-
-	// Error state
-	if (error) {
-		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
-	}
 
 	return (
 		<ScrollArea className="h-full w-full">
