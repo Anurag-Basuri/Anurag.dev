@@ -6,18 +6,12 @@ import { SidebarProfile } from './SidebarProfile';
 import { TableOfContents } from './TableOfContents';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/lib/filesystem';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderOpen } from 'lucide-react';
-import { PanelHeader } from '@/components/layout/PanelHeader';
-import { SidebarControls } from '@/components/common/WindowControls';
-import { useSetAtom } from 'jotai';
-import { folderExpansionSignalAtom } from '@/store';
 
 // ============================================================================
 // Main Sidebar Component
 // ============================================================================
 export const Sidebar: React.FC = () => {
 	const pathname = usePathname();
-	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
 
 	const currentModule = useMemo(() => {
 		const segments = pathname

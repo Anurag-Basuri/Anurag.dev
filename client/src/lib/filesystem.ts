@@ -1,7 +1,7 @@
 import type { AppModuleId } from '@/lib/moduleRegistry';
 import { SECTIONS } from '@/lib/sections';
 
-type FileSystemItem = {
+export type FileSystemItem = {
 	name: string;
 	type: 'folder' | 'file';
 	children?: FileSystemItem[];
