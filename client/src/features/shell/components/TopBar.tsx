@@ -67,7 +67,6 @@ export const TopBar = memo(function TopBar({ isMobile }: TopBarProps) {
 							isOpen={isExplorerOpen}
 							onOpenChange={setIsExplorerOpen}
 						/>
-						/>
 					)}
 
 					{!isMobile && (

@@ -1,12 +1,11 @@
 'use client';
 
-import { Suspense, type ReactNode, useCallback } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { Toaster } from 'react-hot-toast';
 import { ContextMenuProvider } from '@/components/providers/context-menu-provider';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
 import { DesktopLayout } from '@/features/shell/components/DesktopLayout';
 import { MobileLayout } from '@/features/shell/components/MobileLayout';
 
@@ -22,14 +21,6 @@ const TopBar = dynamic(() => import('@/features/shell/components/TopBar').then(m
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const isMobile = useMediaQuery('(max-width: 768px)');
-	const router = useRouter();
-
-	const handleNavigate = useCallback(
-		(moduleId: string) => {
-			router.push(`/portfolio/${moduleId}`);
-		},
-		[router],
-	);
 
 	return (
 		<ErrorBoundary>
@@ -38,7 +29,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			<ContextMenuProvider>
 				<div className="fixed inset-0 flex flex-col overflow-hidden bg-transparent font-sans">
 					<Suspense fallback={<div className="h-8" />}>
-						<TopBar isMobile={isMobile} onNavigate={handleNavigate} />
+						<TopBar isMobile={isMobile} />
 					</Suspense>
 
 					<div className="flex-1 min-h-0 w-full overflow-hidden p-2 md:p-3">
