@@ -3,12 +3,12 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { GraduationCap, MapPin, Calendar, Award, BookOpen } from 'lucide-react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { JourneyEntry } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { ScrollArea } from '@/ui/scroll-area';
+import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, fadeInUp } from '@/design-system/motion';
+import { staggerContainer, fadeInUp } from '@/animations/motion';
 
 // --- 3D Card Component ---
 const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
@@ -154,7 +154,7 @@ export function EducationModule() {
 	useEffect(() => {
 		async function fetchJourney() {
 			try {
-				const data = await apiClient.get<JourneyEntry[]>('/journey');
+				const { data } = await publicService.getJourney();
 				setEntries(data || []);
 			} catch (err) {
 				console.error('Failed to load education', err);
@@ -214,4 +214,3 @@ export function EducationModule() {
 		</ScrollArea>
 	);
 }
-

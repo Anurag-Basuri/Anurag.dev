@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { CodingStats } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 import {
 	Code2,
 	Trophy,
@@ -17,8 +17,8 @@ import {
 	ExternalLink,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { SectionHeader } from '@/components/layout/SectionHeader';
-import { staggerContainer, staggerItem, fadeInUp } from '@/design-system/motion';
+import { SectionHeader } from '@/ui/SectionHeader';
+import { staggerContainer, staggerItem, fadeInUp } from '@/animations/motion';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -484,7 +484,7 @@ export function CodingStatsModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await apiClient.get<CodingStats>('/coding-stats');
+			const { data } = await publicService.getCodingStats();
 			setStats(data);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
@@ -667,4 +667,3 @@ export function CodingStatsModule() {
 		</ScrollArea>
 	);
 }
-

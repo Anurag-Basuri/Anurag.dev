@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { Project } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 import { Folder, Github, ExternalLink, Layout, X, Layers, Globe, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/design-system/motion';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/animations/motion';
+import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 
 function ProjectsSkeleton() {
@@ -40,7 +40,7 @@ export function ProjectsModule() {
 		try {
 			setLoading(true);
 			setError(null);
-			const data = await apiClient.get<Project[]>('/projects');
+			const { data } = await publicService.getProjects();
 			setProjects(data || []);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
@@ -352,4 +352,3 @@ export function ProjectsModule() {
 		</ScrollArea>
 	);
 }
-

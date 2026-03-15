@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { BlogPost } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { staggerContainer, staggerItem } from '@/design-system/motion';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { staggerContainer, staggerItem } from '@/animations/motion';
+import { SectionHeader } from '@/ui/SectionHeader';
 
 export function BlogModule() {
 	const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -17,7 +17,7 @@ export function BlogModule() {
 	useEffect(() => {
 		async function fetchPosts() {
 			try {
-				const data = await apiClient.get<BlogPost[]>('/blog');
+				const { data } = await publicService.getBlogPosts();
 				setPosts(data || []);
 			} catch (err) {
 				console.error('Failed to load blog posts', err);
@@ -172,4 +172,3 @@ export function BlogModule() {
 		</ScrollArea>
 	);
 }
-

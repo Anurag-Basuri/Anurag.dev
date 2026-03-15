@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { Achievement } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { ScrollArea } from '@/ui/scroll-area';
+import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, scaleIn } from '@/design-system/motion';
+import { staggerContainer, scaleIn } from '@/animations/motion';
 
 const getCategoryIcon = (category: string) => {
 	switch (category.toLowerCase()) {
@@ -43,7 +43,7 @@ export function AchievementsModule() {
 	useEffect(() => {
 		async function fetchAchievements() {
 			try {
-				const data = await apiClient.get<Achievement[]>('/achievements');
+				const { data } = await publicService.getAchievements();
 				setAchievements(data || []);
 			} catch (err) {
 				console.error('Failed to load achievements', err);
@@ -176,4 +176,3 @@ export function AchievementsModule() {
 		</ScrollArea>
 	);
 }
-

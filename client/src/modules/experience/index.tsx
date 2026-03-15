@@ -3,12 +3,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Building2, MapPin, Calendar, Star, ChevronRight } from 'lucide-react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { JourneyEntry } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { ScrollArea } from '@/ui/scroll-area';
+import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem } from '@/design-system/motion';
+import { staggerContainer, staggerItem } from '@/animations/motion';
 
 export function ExperienceModule() {
 	const [entries, setEntries] = useState<JourneyEntry[]>([]);
@@ -17,7 +17,7 @@ export function ExperienceModule() {
 	useEffect(() => {
 		async function fetchJourney() {
 			try {
-				const data = await apiClient.get<JourneyEntry[]>('/journey');
+				const { data } = await publicService.getJourney();
 				setEntries(data || []);
 			} catch (err) {
 				console.error('Failed to load experience', err);
@@ -171,4 +171,3 @@ export function ExperienceModule() {
 		</ScrollArea>
 	);
 }
-

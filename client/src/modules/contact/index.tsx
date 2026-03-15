@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { AboutData } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 import {
 	Send,
 	CheckCircle,
@@ -20,7 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { SectionHeader } from '@/ui/SectionHeader';
 
 function ContactSkeleton() {
 	return (
@@ -60,7 +60,7 @@ export function ContactModule() {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const profileData = await apiClient.get<AboutData>('/profile');
+				const { data: profileData } = await publicService.getProfile();
 				setAbout(profileData);
 			} catch (err) {
 				console.error('Failed to fetch about data in contact module', err);
@@ -78,7 +78,7 @@ export function ContactModule() {
 		setSuccess(false);
 
 		try {
-			await apiClient.post('/contact', formData);
+			await publicService.submitContact(formData);
 			setSuccess(true);
 			setFormData({ name: '', email: '', subject: '', message: '' });
 			toast.success('Message sent successfully!');
@@ -343,4 +343,3 @@ export function ContactModule() {
 		</ScrollArea>
 	);
 }
-

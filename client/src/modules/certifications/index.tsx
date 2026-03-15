@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { Certification } from '@/api/schema';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 import { ShieldCheck, Award, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { staggerContainer, staggerItem } from '@/design-system/motion';
-import { SectionHeader } from '@/components/layout/SectionHeader';
+import { staggerContainer, staggerItem } from '@/animations/motion';
+import { SectionHeader } from '@/ui/SectionHeader';
 
 export function CertificationModule() {
 	const [certs, setCerts] = useState<Certification[]>([]);
@@ -16,7 +16,7 @@ export function CertificationModule() {
 	useEffect(() => {
 		async function fetchCerts() {
 			try {
-				const data = await apiClient.get<Certification[]>('/certifications');
+				const { data } = await publicService.getCertifications();
 				setCerts(data || []);
 			} catch (err) {
 				console.error('Failed to load certifications', err);
@@ -128,4 +128,3 @@ export function CertificationModule() {
 		</ScrollArea>
 	);
 }
-
