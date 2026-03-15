@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
 import { ModuleLoader } from '@/components/common/Loader';
-import { EmptyState } from '@/components/editor/EmptyState';
 
 interface PageProps {
 	params: Promise<{
@@ -17,12 +16,13 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { slug } = await params;
 
-	// Root portfolio page: show desktop/empty state metadata
+	// Root portfolio page: default to About Me
 	if (!slug || slug.length === 0) {
+		const aboutMeta = getModuleMetadata('about');
 		return {
-			title: 'Portfolio',
-			description:
-				'Explore projects, journey, certifications, blog posts, and ways to connect.',
+			title: aboutMeta.title,
+			description: aboutMeta.description,
+			keywords: aboutMeta.keywords,
 		};
 	}
 
@@ -60,12 +60,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 
-	// Root: EmptyState (transparent)
-	if (!slug || slug.length === 0) {
-		return <EmptyState />;
-	}
-
-	const moduleId = resolveModuleFromSlug(slug);
+	// Root: default to About Me
+	const moduleId = (!slug || slug.length === 0) ? 'about' : resolveModuleFromSlug(slug);
 
 	// Invalid route: 404 (not EmptyState)
 	if (!moduleId) {

@@ -1,7 +1,5 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useReducer } from 'react';
-import { useSetAtom } from 'jotai';
-import { openFilesAtom, createFileEntry } from '@/store/atoms/files';
 import { useRouter } from 'next/navigation';
 import { processCommand, getCommandSuggestions } from '@/lib/commands';
 import type { CommandResponse } from '@/lib/commands';
@@ -66,8 +64,6 @@ export function useTerminalState() {
 		currentPath: loadCurrentPath(),
 	}));
 
-	// Atoms and Hooks
-	const setOpenFiles = useSetAtom(openFilesAtom);
 	const { setTheme, resolvedTheme } = useTheme();
 	const router = useRouter();
 
@@ -180,14 +176,7 @@ export function useTerminalState() {
 					case 'open_module':
 						addToHistory(trimmedCommand, response);
 						if (response.moduleId) {
-							const moduleId = response.moduleId;
-							// Update open files atom
-							setOpenFiles(prev => {
-								if (prev.some(f => f.moduleId === moduleId)) return prev;
-								return [...prev, createFileEntry(moduleId)];
-							});
-							// Navigate to the module
-							router.push(`/portfolio/${moduleId}`);
+							router.push(`/portfolio/${response.moduleId}`);
 						}
 						break;
 
@@ -222,7 +211,6 @@ export function useTerminalState() {
 			state.currentPath,
 			state.isExecuting,
 			addToHistory,
-			setOpenFiles,
 			setTheme,
 			resolvedTheme,
 			setCurrentPath,
