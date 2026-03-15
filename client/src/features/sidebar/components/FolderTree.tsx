@@ -6,7 +6,7 @@ import { useAtomValue } from 'jotai';
 import { folderExpansionSignalAtom } from '@/store';
 import { FolderTreeContext } from './FolderTreeContext';
 import { FolderTreeItem } from './FolderTreeItem';
-import { useKeyboardNavigation } from './useKeyboardNavigation';
+import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
 
 interface FolderTreeProps {
 	items: FileSystemItem[];
