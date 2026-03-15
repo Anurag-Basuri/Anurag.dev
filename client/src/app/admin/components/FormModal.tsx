@@ -8,10 +8,19 @@ interface FormModalProps {
 	title: string;
 	onSubmit: () => void;
 	loading?: boolean;
+	wide?: boolean;
 	children: React.ReactNode;
 }
 
-export function FormModal({ open, onClose, title, onSubmit, loading, children }: FormModalProps) {
+export function FormModal({
+	open,
+	onClose,
+	title,
+	onSubmit,
+	loading,
+	wide,
+	children,
+}: FormModalProps) {
 	const backdropRef = useRef<HTMLDivElement>(null);
 
 	// Lock body scroll when modal is open
@@ -44,14 +53,14 @@ export function FormModal({ open, onClose, title, onSubmit, loading, children }:
 	return (
 		<div
 			ref={backdropRef}
-			onClick={(e) => {
+			onClick={e => {
 				if (e.target === backdropRef.current) onClose();
 			}}
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
 		>
 			<form
 				onSubmit={handleFormSubmit}
-				className="bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col"
+				className={`bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl w-full max-h-[85vh] flex flex-col ${wide ? 'max-w-2xl' : 'max-w-lg'}`}
 			>
 				{/* Header */}
 				<div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 shrink-0">
@@ -89,4 +98,3 @@ export function FormModal({ open, onClose, title, onSubmit, loading, children }:
 		</div>
 	);
 }
-

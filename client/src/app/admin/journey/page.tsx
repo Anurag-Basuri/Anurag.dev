@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useApi } from '@/api';
 import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
@@ -25,8 +25,32 @@ const EMPLOYMENT_TYPES = [
 	{ label: 'Freelance', value: 'freelance' },
 ];
 
-const EMPTY: Record<string, unknown> = {
-	type: 'education',
+interface JourneyForm {
+	type: string;
+	title: string;
+	organization: string;
+	location: string;
+	date: string;
+	startDate: string;
+	endDate: string;
+	description: string;
+	skills: string[];
+	url: string;
+	isCurrent: boolean;
+	highlighted: boolean;
+	order: number;
+	degree: string;
+	fieldOfStudy: string;
+	grade: string;
+	board: string;
+	employmentType: string;
+	publication: string;
+	doi: string;
+	icon: string;
+}
+
+const EMPTY: JourneyForm = {
+	type: 'work',
 	title: '',
 	organization: '',
 	location: '',
@@ -49,6 +73,55 @@ const EMPTY: Record<string, unknown> = {
 	icon: '',
 };
 
+/** Build a display date string from startDate / endDate / isCurrent */
+function buildDisplayDate(startDate: string, endDate: string, isCurrent: boolean): string {
+	if (!startDate) return '';
+	const start = new Date(startDate);
+	const startStr = start.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+	if (isCurrent) return `${startStr} - Present`;
+	if (!endDate) return startStr;
+	const end = new Date(endDate);
+	const endStr = end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+	return `${startStr} - ${endStr}`;
+}
+
+/** Strip type-specific fields that don't belong to the selected type */
+function cleanPayload(form: JourneyForm): Record<string, unknown> {
+	const payload: Record<string, unknown> = { ...form };
+
+	if (form.type !== 'education') {
+		payload.degree = '';
+		payload.fieldOfStudy = '';
+		payload.grade = '';
+		payload.board = '';
+	}
+	if (form.type !== 'work') {
+		payload.employmentType = '';
+	}
+	if (form.type !== 'research') {
+		payload.publication = '';
+		payload.doi = '';
+	}
+
+	return payload;
+}
+
+// ─── Section divider ────────────────────────────────────────────
+
+function SectionDivider({ label }: { label: string }) {
+	return (
+		<div className="flex items-center gap-3 pt-3 pb-1">
+			<div className="h-px flex-1 bg-zinc-800" />
+			<span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">
+				{label}
+			</span>
+			<div className="h-px flex-1 bg-zinc-800" />
+		</div>
+	);
+}
+
+// ─── Main Page ──────────────────────────────────────────────────
+
 export default function JourneyPage() {
 	const fetcher = useCallback(() => adminService.getJourney(), []);
 	const { data: entries, loading, refetch } = useApi<JourneyEntry[]>(fetcher);
@@ -57,7 +130,7 @@ export default function JourneyPage() {
 		open: false,
 		editing: null,
 	});
-	const [form, setForm] = useState(EMPTY);
+	const [form, setForm] = useState<JourneyForm>(EMPTY);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -96,17 +169,34 @@ export default function JourneyPage() {
 	}
 
 	function updateField(name: string, value: unknown) {
-		setForm(prev => ({ ...prev, [name]: value }));
+		setForm(prev => {
+			const next = { ...prev, [name]: value };
+
+			// Auto-generate display date when date fields or isCurrent change
+			if (name === 'startDate' || name === 'endDate' || name === 'isCurrent') {
+				const startDate = name === 'startDate' ? (value as string) : prev.startDate;
+				const endDate = name === 'endDate' ? (value as string) : prev.endDate;
+				const isCurrent = name === 'isCurrent' ? (value as boolean) : prev.isCurrent;
+				const auto = buildDisplayDate(startDate, endDate, isCurrent);
+				if (auto) next.date = auto;
+			}
+
+			return next;
+		});
 	}
 
 	async function handleSave() {
 		setSaving(true);
 		setError(null);
 		try {
+			const payload = cleanPayload(form);
 			if (modal.editing) {
-				await adminService.updateJourney(modal.editing.id, form as Partial<JourneyEntry>);
+				await adminService.updateJourney(
+					modal.editing.id,
+					payload as Partial<JourneyEntry>,
+				);
 			} else {
-				await adminService.createJourney(form as Omit<JourneyEntry, 'id'>);
+				await adminService.createJourney(payload as Omit<JourneyEntry, 'id'>);
 			}
 			setModal({ open: false, editing: null });
 			refetch();
@@ -127,21 +217,38 @@ export default function JourneyPage() {
 		}
 	}
 
-	const columns = [
-		{ key: 'title', label: 'Title' },
-		{
-			key: 'type',
-			label: 'Type',
-			render: (e: JourneyEntry) => <span className="capitalize">{e.type}</span>,
-		},
-		{
-			key: 'organization',
-			label: 'Organization',
-			render: (e: JourneyEntry) => e.organization || '—',
-		},
-		{ key: 'date', label: 'Date' },
-		{ key: 'order', label: 'Order' },
-	];
+	const columns = useMemo(
+		() => [
+			{ key: 'title', label: 'Title' },
+			{
+				key: 'type',
+				label: 'Type',
+				render: (e: JourneyEntry) => (
+					<span
+						className={`capitalize text-xs font-medium px-2 py-0.5 rounded ${
+							e.type === 'work'
+								? 'bg-blue-500/10 text-blue-400'
+								: e.type === 'education'
+									? 'bg-emerald-500/10 text-emerald-400'
+									: e.type === 'research'
+										? 'bg-purple-500/10 text-purple-400'
+										: 'bg-zinc-500/10 text-zinc-400'
+						}`}
+					>
+						{e.type}
+					</span>
+				),
+			},
+			{
+				key: 'organization',
+				label: 'Organization',
+				render: (e: JourneyEntry) => e.organization || '—',
+			},
+			{ key: 'date', label: 'Date' },
+			{ key: 'order', label: '#' },
+		],
+		[],
+	);
 
 	return (
 		<div className="max-w-5xl">
@@ -173,203 +280,245 @@ export default function JourneyPage() {
 				title={modal.editing ? 'Edit Entry' : 'New Entry'}
 				onSubmit={handleSave}
 				loading={saving}
+				wide
 			>
 				{error && (
 					<div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
 						{error}
 					</div>
 				)}
-				<FormField
-					label="Type"
-					name="type"
-					type="select"
-					value={form.type as string}
-					onChange={updateField}
-					options={TYPES}
-					required
-				/>
+
+				{/* ── Core Information ── */}
+				<SectionDivider label="Core Information" />
+
+				<div className="grid grid-cols-2 gap-4">
+					<FormField
+						label="Type"
+						name="type"
+						type="select"
+						value={form.type}
+						onChange={updateField}
+						options={TYPES}
+						required
+					/>
+					<FormField
+						label="Order"
+						name="order"
+						type="number"
+						value={form.order}
+						onChange={updateField}
+					/>
+				</div>
+
 				<FormField
 					label="Title"
 					name="title"
-					value={form.title as string}
+					value={form.title}
 					onChange={updateField}
 					required
-				/>
-				<FormField
-					label="Organization"
-					name="organization"
-					value={form.organization as string}
-					onChange={updateField}
-				/>
-				<FormField
-					label="Location"
-					name="location"
-					value={form.location as string}
-					onChange={updateField}
+					placeholder={
+						form.type === 'work'
+							? 'e.g. Software Engineer'
+							: form.type === 'education'
+								? 'e.g. B.Tech Computer Science'
+								: 'Title of the entry'
+					}
 				/>
 
-				<FormField
-					label="Date (display)"
-					name="date"
-					value={form.date as string}
-					onChange={updateField}
-					required
-					placeholder="e.g. 2022 - Present"
-				/>
+				<div className="grid grid-cols-2 gap-4">
+					<FormField
+						label="Organization"
+						name="organization"
+						value={form.organization}
+						onChange={updateField}
+						placeholder={
+							form.type === 'work'
+								? 'Company name'
+								: form.type === 'education'
+									? 'School / University'
+									: 'Organization'
+						}
+					/>
+					<FormField
+						label="Location"
+						name="location"
+						value={form.location}
+						onChange={updateField}
+						placeholder="City, Country"
+					/>
+				</div>
+
+				{/* ── Timeline ── */}
+				<SectionDivider label="Timeline" />
+
 				<div className="grid grid-cols-2 gap-4">
 					<FormField
 						label="Start Date"
 						name="startDate"
 						type="date"
-						value={form.startDate as string}
+						value={form.startDate}
 						onChange={updateField}
 					/>
 					<FormField
 						label="End Date"
 						name="endDate"
 						type="date"
-						value={form.endDate as string}
+						value={form.endDate}
 						onChange={updateField}
 					/>
 				</div>
+
+				<div className="grid grid-cols-2 gap-4 items-end">
+					<FormField
+						label="Display Date"
+						name="date"
+						value={form.date}
+						onChange={updateField}
+						required
+						placeholder="e.g. Jan 2023 - Present"
+					/>
+					<FormField
+						label="Currently Active"
+						name="isCurrent"
+						type="checkbox"
+						value={form.isCurrent}
+						onChange={updateField}
+					/>
+				</div>
+
+				{form.startDate && !form.date && (
+					<p className="text-xs text-zinc-500 -mt-2">
+						Tip: Display date auto-fills when you set start/end dates.
+					</p>
+				)}
+
+				{/* ── Details ── */}
+				<SectionDivider label="Details" />
 
 				<FormField
 					label="Description"
 					name="description"
 					type="textarea"
-					value={form.description as string}
+					value={form.description}
 					onChange={updateField}
 					required
 					rows={4}
+					placeholder="Describe the role, responsibilities, or coursework..."
 				/>
+
 				<TagField
-					label="Skills"
+					label="Skills / Technologies"
 					name="skills"
-					value={form.skills as string[]}
+					value={form.skills}
 					onChange={updateField}
-				/>
-				<FormField
-					label="URL"
-					name="url"
-					type="url"
-					value={form.url as string}
-					onChange={updateField}
-					placeholder="Related link"
-				/>
-				<FormField
-					label="Icon URL"
-					name="icon"
-					type="url"
-					value={form.icon as string}
-					onChange={updateField}
-					placeholder="Organization logo"
+					placeholder="Type a skill and press Enter"
 				/>
 
 				<div className="grid grid-cols-2 gap-4">
 					<FormField
-						label="Order"
-						name="order"
-						type="number"
-						value={form.order as number}
+						label="Related URL"
+						name="url"
+						type="url"
+						value={form.url}
 						onChange={updateField}
-					/>
-				</div>
-				<div className="flex gap-6">
-					<FormField
-						label="Currently Active"
-						name="isCurrent"
-						type="checkbox"
-						value={form.isCurrent as boolean}
-						onChange={updateField}
+						placeholder="https://..."
 					/>
 					<FormField
-						label="Highlighted"
-						name="highlighted"
-						type="checkbox"
-						value={form.highlighted as boolean}
+						label="Icon / Logo URL"
+						name="icon"
+						value={form.icon}
 						onChange={updateField}
+						placeholder="Organization logo URL"
 					/>
 				</div>
 
-				{/* Education-specific */}
+				{/* ── Education-specific ── */}
 				{form.type === 'education' && (
 					<>
-						<h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pt-2">
-							Education Details
-						</h3>
-						<FormField
-							label="Degree"
-							name="degree"
-							value={(form.degree as string) || ''}
-							onChange={updateField}
-							placeholder="e.g. B.Tech"
-						/>
-						<FormField
-							label="Field of Study"
-							name="fieldOfStudy"
-							value={(form.fieldOfStudy as string) || ''}
-							onChange={updateField}
-						/>
+						<SectionDivider label="Education Details" />
 						<div className="grid grid-cols-2 gap-4">
 							<FormField
-								label="Grade"
-								name="grade"
-								value={(form.grade as string) || ''}
+								label="Degree"
+								name="degree"
+								value={form.degree}
 								onChange={updateField}
-								placeholder="9.2 CGPA"
+								placeholder="e.g. B.Tech, M.Sc, High School"
+							/>
+							<FormField
+								label="Field of Study"
+								name="fieldOfStudy"
+								value={form.fieldOfStudy}
+								onChange={updateField}
+								placeholder="e.g. Computer Science"
+							/>
+						</div>
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								label="Grade / GPA"
+								name="grade"
+								value={form.grade}
+								onChange={updateField}
+								placeholder="e.g. 9.2 CGPA, 85%"
 							/>
 							<FormField
 								label="Board"
 								name="board"
-								value={(form.board as string) || ''}
+								value={form.board}
 								onChange={updateField}
-								placeholder="CBSE, ICSE, etc."
+								placeholder="e.g. CBSE, ICSE, State Board"
 							/>
 						</div>
 					</>
 				)}
 
-				{/* Work-specific */}
+				{/* ── Work-specific ── */}
 				{form.type === 'work' && (
 					<>
-						<h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pt-2">
-							Work Details
-						</h3>
+						<SectionDivider label="Work Details" />
 						<FormField
 							label="Employment Type"
 							name="employmentType"
 							type="select"
-							value={(form.employmentType as string) || ''}
+							value={form.employmentType}
 							onChange={updateField}
 							options={EMPLOYMENT_TYPES}
 						/>
 					</>
 				)}
 
-				{/* Research-specific */}
+				{/* ── Research-specific ── */}
 				{form.type === 'research' && (
 					<>
-						<h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider pt-2">
-							Research Details
-						</h3>
-						<FormField
-							label="Publication"
-							name="publication"
-							value={(form.publication as string) || ''}
-							onChange={updateField}
-							placeholder="Journal / conference"
-						/>
-						<FormField
-							label="DOI"
-							name="doi"
-							value={(form.doi as string) || ''}
-							onChange={updateField}
-							placeholder="DOI identifier"
-						/>
+						<SectionDivider label="Research Details" />
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								label="Publication"
+								name="publication"
+								value={form.publication}
+								onChange={updateField}
+								placeholder="Journal / Conference name"
+							/>
+							<FormField
+								label="DOI"
+								name="doi"
+								value={form.doi}
+								onChange={updateField}
+								placeholder="10.xxxx/xxxxx"
+							/>
+						</div>
 					</>
 				)}
+
+				{/* ── Display Options ── */}
+				<SectionDivider label="Display Options" />
+				<FormField
+					label="Highlighted (pinned entry)"
+					name="highlighted"
+					type="checkbox"
+					value={form.highlighted}
+					onChange={updateField}
+				/>
 			</FormModal>
 		</div>
 	);
 }
-

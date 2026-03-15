@@ -252,7 +252,9 @@ export const BlogPostSchema = z.object({
 export const ContactSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
 	email: z.string().email('Invalid email address'),
-	subject: z.string().min(2, 'Subject must be at least 2 characters'),
+	subject: z
+		.string()
+		.transform(v => (v === '' ? 'No Subject' : v)),
 	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
