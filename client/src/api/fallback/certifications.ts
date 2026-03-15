@@ -36,3 +36,4 @@ export const FALLBACK_CERTIFICATIONS: Certification[] = [
 		updatedAt: '2023-11-01T00:00:00.000Z',
 	},
 ];
+

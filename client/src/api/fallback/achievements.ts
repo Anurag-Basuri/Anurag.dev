@@ -48,3 +48,4 @@ export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 ];
+

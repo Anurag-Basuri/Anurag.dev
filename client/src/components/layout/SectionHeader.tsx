@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
-import { fadeInUp } from '@/lib/animations';
+import { fadeInUp } from '@/design-system/motion';
 
 interface SectionHeaderProps {
 	icon: LucideIcon;
@@ -67,3 +67,4 @@ export function SectionHeader({
 		</motion.div>
 	);
 }
+

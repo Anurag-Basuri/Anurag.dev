@@ -158,3 +158,4 @@ export const apiClient = {
 	del: <T = void>(endpoint: string, auth = true) =>
 		request<T>('DELETE', endpoint, { auth }),
 };
+

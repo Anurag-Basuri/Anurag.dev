@@ -7,3 +7,4 @@ export const refreshTokenAtom = atomWithStorage<string | null>('portfolio_refres
 
 // Derived atom — true if access token exists
 export const isAuthenticatedAtom = atom((get) => get(accessTokenAtom) !== null);
+

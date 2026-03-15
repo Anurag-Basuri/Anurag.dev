@@ -40,3 +40,4 @@ export function BootGuard({ children }: { children: React.ReactNode }) {
 
 	return <>{children}</>;
 }
+

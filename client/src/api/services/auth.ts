@@ -26,3 +26,4 @@ async function getMe(): Promise<AdminInfo> {
 
 export const authService = { login, refresh, logout, getMe };
 export type { AdminInfo };
+

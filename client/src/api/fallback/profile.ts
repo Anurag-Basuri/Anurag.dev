@@ -62,3 +62,4 @@ When I'm not pushing commits, you can find me exploring new AI technologies, rea
 	createdAt: '2024-01-01T00:00:00.000Z',
 	updatedAt: '2024-06-01T00:00:00.000Z',
 };
+

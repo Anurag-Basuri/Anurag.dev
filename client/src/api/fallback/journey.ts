@@ -84,3 +84,4 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		updatedAt: '2024-06-01T00:00:00.000Z',
 	},
 ];
+

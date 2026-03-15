@@ -75,3 +75,4 @@ export function useThemeName(): ThemeName {
   const [name] = useAtom(themeNameAtom);
   return name;
 }
+

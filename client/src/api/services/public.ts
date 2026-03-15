@@ -93,3 +93,4 @@ export const publicService = {
 	getBlogPostBySlug,
 	submitContact,
 };
+

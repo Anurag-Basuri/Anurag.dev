@@ -2,7 +2,7 @@
 
 import { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PANEL_TOKENS } from '@/lib/constants';
+import { PANEL_TOKENS } from '@/design-system/tokens';
 
 // ============================================================================
 // Types
@@ -105,3 +105,4 @@ export function PanelHeader({
 		</header>
 	);
 }
+

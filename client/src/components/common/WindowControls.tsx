@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { X, Minus, Maximize2, Minimize2, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { PANEL_TOKENS, SPRINGS } from '@/lib/constants';
+import { PANEL_TOKENS, SPRINGS } from '@/design-system/tokens';
 
 // ============================================================================
 // Constants
@@ -217,3 +217,4 @@ export const ModuleControls = memo(function ModuleControls({
 		/>
 	);
 });
+
