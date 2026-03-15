@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
-import gsap from 'gsap';
 import { BOOT_CONFIG, BOOT_PHASES } from '../constants';
 
 const { PHASE_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
@@ -13,37 +12,27 @@ const { PHASE_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
 // ============================================================================
 
 interface UseBootSequenceReturn {
-	// Current boot phase status message
 	status: string;
-	// Progress percentage (0-100)
 	progress: number;
-	// Whether the boot sequence is in the final completion phase
 	isCompleting: boolean;
-	// Function to skip the boot sequence immediately
 	skip: () => void;
 }
 
 // ============================================================================
-// Hook Implementation
+// Hook — animates boot phases via requestAnimationFrame (no gsap)
 // ============================================================================
 
-// Custom hook that manages the boot sequence animation. Handles GSAP timeline for phase transitions, progress state updates, and provides skip functionality via keyboard or button.
-// @returns Boot sequence state and controls
-// @example
-// ```tsx
-// const { status, progress, isCompleting, skip } = useBootSequence();
-// ```
 export function useBootSequence(): UseBootSequenceReturn {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
 	const [status, setStatus] = useState('INITIALIZING...');
 	const [progress, setProgress] = useState(0);
 	const [isCompleting, setIsCompleting] = useState(false);
 
-	const timelineRef = useRef<gsap.core.Timeline | null>(null);
+	const cancelledRef = useRef(false);
 	const completionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const completeBoot = useCallback(() => {
-		if (isCompleting) return;
+		if (isCompleting || cancelledRef.current) return;
 		setIsCompleting(true);
 		setProgress(100);
 
@@ -53,7 +42,7 @@ export function useBootSequence(): UseBootSequenceReturn {
 	}, [isCompleting, setBootComplete]);
 
 	const skip = useCallback(() => {
-		timelineRef.current?.kill();
+		cancelledRef.current = true;
 		completeBoot();
 	}, [completeBoot]);
 
@@ -65,41 +54,42 @@ export function useBootSequence(): UseBootSequenceReturn {
 				skip();
 			}
 		};
-
 		window.addEventListener('keydown', handleKeyPress);
 		return () => window.removeEventListener('keydown', handleKeyPress);
 	}, [skip]);
 
-	// GSAP Timeline
+	// Phase animation via requestAnimationFrame
 	useEffect(() => {
-		const timeline = gsap.timeline({ onComplete: completeBoot });
-		timelineRef.current = timeline;
+		const totalDuration = PHASE_DURATION * BOOT_PHASES.length * 1000; // convert s -> ms
+		let startTime: number | null = null;
+		let rafId: number;
 
-		BOOT_PHASES.forEach((phase, index) => {
-			const progressStart = (index / BOOT_PHASES.length) * 100;
-			const progressRange = 100 / BOOT_PHASES.length;
+		const animate = (timestamp: number) => {
+			if (cancelledRef.current) return;
+			if (!startTime) startTime = timestamp;
 
-			timeline.to(
-				{},
-				{
-					duration: PHASE_DURATION,
-					onStart: () => setStatus(phase.status),
-					onUpdate: function () {
-						const phaseProgress = this.progress();
-						setProgress(
-							Math.min(
-								100,
-								Math.floor(progressStart + phaseProgress * progressRange),
-							),
-						);
-					},
-					ease: 'power1.inOut',
-				},
+			const elapsed = timestamp - startTime;
+			const overallProgress = Math.min(1, elapsed / totalDuration);
+
+			// Determine current phase
+			const phaseIndex = Math.min(
+				BOOT_PHASES.length - 1,
+				Math.floor(overallProgress * BOOT_PHASES.length),
 			);
-		});
+			setStatus(BOOT_PHASES[phaseIndex]!.status);
+			setProgress(Math.floor(overallProgress * 100));
+
+			if (overallProgress < 1) {
+				rafId = requestAnimationFrame(animate);
+			} else {
+				completeBoot();
+			}
+		};
+
+		rafId = requestAnimationFrame(animate);
 
 		return () => {
-			timeline.kill();
+			cancelAnimationFrame(rafId);
 		};
 	}, [completeBoot]);
 
@@ -114,4 +104,3 @@ export function useBootSequence(): UseBootSequenceReturn {
 
 	return { status, progress, isCompleting, skip };
 }
-

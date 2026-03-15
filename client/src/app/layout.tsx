@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { AppProviders } from '@/components/providers/AppProviders';
-import { Scene3D } from '@/design-system/background/Scene3D';
+import ClientShell from './ClientShell';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,15 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <AppProviders>
-          {/* 3D Animated Background — rendered globally behind all pages */}
-          <Scene3D />
-
-          {children}
-        </AppProviders>
+      <body className={inter.className} style={{ background: '#020409' }}>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );
 }
-

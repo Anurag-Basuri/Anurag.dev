@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 
-// Server-side redirect - more efficient than client-side
+// Force dynamic — server redirect can't be statically prerendered
+export const dynamic = 'force-dynamic';
+
 export default function HomePage() {
 	redirect('/portfolio');
 }
-
