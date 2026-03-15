@@ -47,8 +47,8 @@ export default function CertificationsPage() {
 			credentialUrl: item.credentialUrl || '',
 			certificateUrl: item.certificateUrl || '',
 			skills: item.skills,
-			startDate: item.startDate || '',
-			endDate: item.endDate || '',
+			startDate: item.startDate ? item.startDate.slice(0, 10) : '',
+			endDate: item.endDate ? item.endDate.slice(0, 10) : '',
 		});
 		setModal({ open: true, editing: item });
 		setError(null);
@@ -197,4 +197,3 @@ export default function CertificationsPage() {
 		</div>
 	);
 }
-

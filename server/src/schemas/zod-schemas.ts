@@ -1,5 +1,35 @@
 import { z } from 'zod';
 
+// ─── Reusable field helpers ─────────────────────────────────────
+// Frontend forms send empty strings for blank optional fields.
+// These helpers coerce '' → null so nullable validators don't reject them.
+
+/** Nullable string field: '' → null */
+const nullableStr = z
+	.string()
+	.transform(v => (v === '' ? null : v))
+	.pipe(z.string().nullable())
+	.optional();
+
+/** Nullable URL field: '' → null, non-empty must be a valid URL */
+const nullableUrl = z
+	.string()
+	.transform(v => (v === '' ? null : v))
+	.pipe(z.string().url().nullable())
+	.optional();
+
+/** Nullable datetime field: '' → null, 'YYYY-MM-DD' → full ISO, passthrough ISO strings */
+const nullableDatetime = z
+	.string()
+	.transform(v => {
+		if (v === '') return null;
+		// If it's a date-only string like "2024-01-15", convert to ISO datetime
+		if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return `${v}T00:00:00.000Z`;
+		return v;
+	})
+	.pipe(z.string().datetime().nullable())
+	.optional();
+
 // ─── Common Schemas ─────────────────────────────────────────────
 
 export const SocialLinkSchema = z.object({
@@ -21,17 +51,17 @@ export const ProfileSchema = z.object({
 	phone: z.string().optional(),
 
 	// Career & Bio
-	header: z.string().nullable().optional(),
-	bio: z.string().nullable().optional(),
+	header: nullableStr,
+	bio: nullableStr,
 
 	// Location
-	Currentlocation: z.string().nullable().optional(),
-	Originallocation: z.string().nullable().optional(),
+	Currentlocation: nullableStr,
+	Originallocation: nullableStr,
 
 	// Job Seeking & Availability
 	openToWork: z.boolean().default(true),
-	availableFrom: z.string().nullable().optional(),
-	noticePeriod: z.string().nullable().optional(),
+	availableFrom: nullableStr,
+	noticePeriod: nullableStr,
 
 	// Job Preferences
 	workPreferences: z
@@ -46,9 +76,9 @@ export const ProfileSchema = z.object({
 	jobTypes: z.array(z.string()).optional(),
 
 	// Media — URLs are set by file upload endpoints, but can also be set directly
-	avatarUrl: z.string().nullable().optional(),
-	coverUrl: z.string().nullable().optional(),
-	resumeUrl: z.string().nullable().optional(),
+	avatarUrl: nullableStr,
+	coverUrl: nullableStr,
+	resumeUrl: nullableStr,
 
 	// Quick Stats
 	experienceYears: z.number().int().min(0).default(0),
@@ -62,20 +92,20 @@ export const ProfileSchema = z.object({
 
 	// Social & Web
 	socials: z.array(SocialLinkSchema).nullable().optional(),
-	website: z.string().nullable().optional(),
+	website: nullableStr,
 
 	// Coding Platforms — plain string URLs/usernames (matches Prisma String?)
-	github: z.string().nullable().optional(),
-	leetcode: z.string().nullable().optional(),
-	codeforces: z.string().nullable().optional(),
-	codechef: z.string().nullable().optional(),
-	gfg: z.string().nullable().optional(),
-	kaggle: z.string().nullable().optional(),
+	github: nullableStr,
+	leetcode: nullableStr,
+	codeforces: nullableStr,
+	codechef: nullableStr,
+	gfg: nullableStr,
+	kaggle: nullableStr,
 	otherProfiles: z.array(z.string()).optional(),
 
 	// SEO / Meta
-	seoTitle: z.string().nullable().optional(),
-	seoDesc: z.string().nullable().optional(),
+	seoTitle: nullableStr,
+	seoDesc: nullableStr,
 	seoKeywords: z.array(z.string()).optional(),
 });
 
@@ -89,10 +119,10 @@ export const ProjectSchema = z.object({
 	description: z.string().min(10),
 	techStack: z.array(z.string()),
 
-	thumbnail: z.string().nullable().optional(),
+	thumbnail: nullableStr,
 	images: z.array(z.string()).optional(),
-	githubUrl: z.string().url().nullable().optional(),
-	liveUrl: z.string().url().nullable().optional(),
+	githubUrl: nullableUrl,
+	liveUrl: nullableUrl,
 
 	status: z.enum(['draft', 'published', 'archived', 'completed']).default('draft'),
 	featured: z.boolean().default(false),
@@ -100,8 +130,8 @@ export const ProjectSchema = z.object({
 	stars: z.number().int().nullable().optional(),
 	forks: z.number().int().nullable().optional(),
 
-	createdAt: z.string().datetime().optional(),
-	updatedAt: z.string().datetime().optional(),
+	createdAt: nullableDatetime,
+	updatedAt: nullableDatetime,
 });
 
 // ─── Journey Entry ──────────────────────────────────────────────
@@ -111,33 +141,33 @@ export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
 	type: z.enum(['work', 'education', 'volunteering', 'research', 'other']),
 	title: z.string().min(1),
-	organization: z.string().nullable().optional(),
-	location: z.string().nullable().optional(),
+	organization: nullableStr,
+	location: nullableStr,
 
 	date: z.string().min(1),
-	startDate: z.string().datetime().nullable().optional(),
-	endDate: z.string().datetime().nullable().optional(),
+	startDate: nullableDatetime,
+	endDate: nullableDatetime,
 	isCurrent: z.boolean().default(false),
 
 	description: z.string().min(1),
 	skills: z.array(z.string()).optional(),
-	url: z.string().url().nullable().optional(),
+	url: nullableUrl,
 
 	// Education-specific
-	degree: z.string().nullable().optional(),
-	fieldOfStudy: z.string().nullable().optional(),
-	grade: z.string().nullable().optional(),
-	board: z.string().nullable().optional(),
+	degree: nullableStr,
+	fieldOfStudy: nullableStr,
+	grade: nullableStr,
+	board: nullableStr,
 
 	// Work-specific
-	employmentType: z.string().nullable().optional(),
+	employmentType: nullableStr,
 
 	// Research-specific
-	publication: z.string().nullable().optional(),
-	doi: z.string().nullable().optional(),
+	publication: nullableStr,
+	doi: nullableStr,
 
 	// Display
-	icon: z.string().nullable().optional(),
+	icon: nullableStr,
 	highlighted: z.boolean().default(false),
 
 	order: z.number().int().default(0),
@@ -157,15 +187,15 @@ export const AchievementSchema = z.object({
 		'publication',
 		'scholarship',
 	]),
-	issuer: z.string().nullable().optional(),
-	event: z.string().nullable().optional(),
+	issuer: nullableStr,
+	event: nullableStr,
 
-	description: z.string().nullable().optional(),
-	rank: z.string().nullable().optional(),
+	description: nullableStr,
+	rank: nullableStr,
 
-	date: z.string().datetime().nullable().optional(),
-	proofUrl: z.string().url().nullable().optional(),
-	url: z.string().url().nullable().optional(),
+	date: nullableDatetime,
+	proofUrl: nullableUrl,
+	url: nullableUrl,
 
 	tags: z.array(z.string()).optional(),
 	team: z.array(z.string()).optional(),
@@ -173,7 +203,7 @@ export const AchievementSchema = z.object({
 	featured: z.boolean().default(false),
 	order: z.number().int().default(0),
 
-	journeyEntryId: z.string().nullable().optional(),
+	journeyEntryId: nullableStr,
 });
 
 // ─── Certification ──────────────────────────────────────────────
@@ -184,16 +214,16 @@ export const CertificationSchema = z.object({
 	title: z.string().min(1),
 	issuer: z.string().min(1),
 
-	description: z.string().nullable().optional(),
-	credentialId: z.string().nullable().optional(),
-	credentialUrl: z.string().url().nullable().optional(),
+	description: nullableStr,
+	credentialId: nullableStr,
+	credentialUrl: nullableUrl,
 
-	certificateUrl: z.string().nullable().optional(),
+	certificateUrl: nullableStr,
 
 	skills: z.array(z.string()).optional(),
 
-	startDate: z.string().datetime().nullable().optional(),
-	endDate: z.string().datetime().nullable().optional(),
+	startDate: nullableDatetime,
+	endDate: nullableDatetime,
 });
 
 // ─── Blog Post ──────────────────────────────────────────────────
@@ -206,15 +236,15 @@ export const BlogPostSchema = z.object({
 	content: z.string().min(1),
 	tags: z.array(z.string()),
 
-	coverImage: z.string().nullable().optional(),
+	coverImage: nullableStr,
 	otherImages: z.array(z.string()).optional(),
-	link: z.string().nullable().optional(),
+	link: nullableStr,
 
 	status: z.enum(['draft', 'published', 'archived']).default('draft'),
-	publishedAt: z.string().datetime().nullable().optional(),
+	publishedAt: nullableDatetime,
 
-	createdAt: z.string().datetime().optional(),
-	updatedAt: z.string().datetime().optional(),
+	createdAt: nullableDatetime,
+	updatedAt: nullableDatetime,
 });
 
 // ─── Contact ────────────────────────────────────────────────────
