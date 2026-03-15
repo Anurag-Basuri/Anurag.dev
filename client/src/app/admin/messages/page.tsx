@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import { useApi } from '@/api';
 import { adminService } from '@/api';
-import type { ContactMessage } from '@/types/schema';
+import type { ContactMessage } from '@/api/schema';
 
 export default function MessagesPage() {
 	const fetcher = useCallback(() => adminService.getMessages(), []);
@@ -32,12 +32,14 @@ export default function MessagesPage() {
 			{loading ? (
 				<div className="text-zinc-500">Loading...</div>
 			) : !messages?.length ? (
-				<div className="border border-zinc-800 rounded-lg p-8 text-center text-zinc-500">No messages yet</div>
+				<div className="border border-zinc-800 rounded-lg p-8 text-center text-zinc-500">
+					No messages yet
+				</div>
 			) : (
 				<div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
 					{/* List */}
 					<div className="lg:col-span-2 border border-zinc-800 rounded-lg overflow-hidden max-h-[70vh] overflow-y-auto">
-						{messages.map((msg) => (
+						{messages.map(msg => (
 							<button
 								key={msg.id}
 								onClick={() => setSelected(msg)}
@@ -46,11 +48,19 @@ export default function MessagesPage() {
 								}`}
 							>
 								<div className="flex items-center justify-between">
-									<span className="font-medium text-sm text-white truncate">{msg.name}</span>
-									{!msg.isRead && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />}
+									<span className="font-medium text-sm text-white truncate">
+										{msg.name}
+									</span>
+									{!msg.isRead && (
+										<span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+									)}
 								</div>
-								<p className="text-xs text-zinc-500 truncate mt-0.5">{msg.subject}</p>
-								<p className="text-xs text-zinc-600 mt-0.5">{new Date(msg.createdAt).toLocaleDateString()}</p>
+								<p className="text-xs text-zinc-500 truncate mt-0.5">
+									{msg.subject}
+								</p>
+								<p className="text-xs text-zinc-600 mt-0.5">
+									{new Date(msg.createdAt).toLocaleDateString()}
+								</p>
 							</button>
 						))}
 					</div>
@@ -61,11 +71,16 @@ export default function MessagesPage() {
 							<>
 								<div className="flex items-start justify-between mb-4">
 									<div>
-										<h2 className="text-lg font-semibold">{selected.subject}</h2>
+										<h2 className="text-lg font-semibold">
+											{selected.subject}
+										</h2>
 										<p className="text-sm text-zinc-400 mt-1">
-											From <span className="text-white">{selected.name}</span> &lt;{selected.email}&gt;
+											From <span className="text-white">{selected.name}</span>{' '}
+											&lt;{selected.email}&gt;
 										</p>
-										<p className="text-xs text-zinc-600 mt-1">{new Date(selected.createdAt).toLocaleString()}</p>
+										<p className="text-xs text-zinc-600 mt-1">
+											{new Date(selected.createdAt).toLocaleString()}
+										</p>
 									</div>
 									<button
 										onClick={() => handleDelete(selected)}
@@ -75,7 +90,9 @@ export default function MessagesPage() {
 									</button>
 								</div>
 								<div className="border-t border-zinc-800 pt-4">
-									<p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{selected.message}</p>
+									<p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">
+										{selected.message}
+									</p>
 								</div>
 							</>
 						) : (

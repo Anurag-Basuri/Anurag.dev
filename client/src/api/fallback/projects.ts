@@ -1,4 +1,4 @@
-import type { Project } from '@/types/schema';
+import type { Project } from '@/api/schema';
 
 export const FALLBACK_PROJECTS: Project[] = [
 	{

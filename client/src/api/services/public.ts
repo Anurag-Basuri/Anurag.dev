@@ -15,28 +15,20 @@ import type {
 	Certification,
 	BlogPost,
 	AboutData,
-} from '@/types/schema';
+} from '@/api/schema';
 
 // Public-facing API service — falls back to hardcoded data if backend is unreachable
 
 async function getProfile() {
-	return withFallback(
-		() => apiClient.get<AboutData>('/profile'),
-		FALLBACK_PROFILE,
-		'profile',
-	);
+	return withFallback(() => apiClient.get<AboutData>('/profile'), FALLBACK_PROFILE, 'profile');
 }
 
 async function getProjects() {
-	return withFallback(
-		() => apiClient.get<Project[]>('/projects'),
-		FALLBACK_PROJECTS,
-		'projects',
-	);
+	return withFallback(() => apiClient.get<Project[]>('/projects'), FALLBACK_PROJECTS, 'projects');
 }
 
 async function getProjectBySlug(slug: string) {
-	const fallbackProject = FALLBACK_PROJECTS.find((p) => p.slug === slug) || FALLBACK_PROJECTS[0];
+	const fallbackProject = FALLBACK_PROJECTS.find(p => p.slug === slug) || FALLBACK_PROJECTS[0];
 	return withFallback(
 		() => apiClient.get<Project>(`/projects/${slug}`),
 		fallbackProject,
@@ -69,15 +61,11 @@ async function getCertifications() {
 }
 
 async function getBlogPosts() {
-	return withFallback(
-		() => apiClient.get<BlogPost[]>('/blog'),
-		FALLBACK_BLOG_POSTS,
-		'blog',
-	);
+	return withFallback(() => apiClient.get<BlogPost[]>('/blog'), FALLBACK_BLOG_POSTS, 'blog');
 }
 
 async function getBlogPostBySlug(slug: string) {
-	const fallbackPost = FALLBACK_BLOG_POSTS.find((p) => p.slug === slug) || FALLBACK_BLOG_POSTS[0];
+	const fallbackPost = FALLBACK_BLOG_POSTS.find(p => p.slug === slug) || FALLBACK_BLOG_POSTS[0];
 	return withFallback(
 		() => apiClient.get<BlogPost>(`/blog/${slug}`),
 		fallbackPost,
@@ -91,11 +79,7 @@ async function submitContact(data: {
 	subject: string;
 	message: string;
 }): Promise<{ data: null; source: 'api' | 'fallback' }> {
-	return withFallback(
-		() => apiClient.post<null>('/contact', data),
-		null,
-		'contact',
-	);
+	return withFallback(() => apiClient.post<null>('/contact', data), null, 'contact');
 }
 
 export const publicService = {

@@ -1,4 +1,4 @@
-import type { Profile } from '@/types/schema';
+import type { Profile } from '@/api/schema';
 
 export const FALLBACK_PROFILE: Profile = {
 	id: 'main',

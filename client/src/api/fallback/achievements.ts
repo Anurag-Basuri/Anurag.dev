@@ -1,4 +1,4 @@
-import type { Achievement } from '@/types/schema';
+import type { Achievement } from '@/api/schema';
 
 export const FALLBACK_ACHIEVEMENTS: Achievement[] = [
 	{

@@ -1,4 +1,4 @@
-import type { JourneyEntry } from '@/types/schema';
+import type { JourneyEntry } from '@/api/schema';
 
 export const FALLBACK_JOURNEY: JourneyEntry[] = [
 	{

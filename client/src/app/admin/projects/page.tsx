@@ -7,7 +7,7 @@ import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
 import { StatusBadge } from '../components/StatusBadge';
-import type { Project } from '@/types/schema';
+import type { Project } from '@/api/schema';
 
 const EMPTY_PROJECT = {
 	title: '',
@@ -62,7 +62,7 @@ export default function ProjectsPage() {
 	}
 
 	function updateField(name: string, value: unknown) {
-		setForm((prev) => ({ ...prev, [name]: value }));
+		setForm(prev => ({ ...prev, [name]: value }));
 	}
 
 	async function handleSave() {
@@ -72,7 +72,9 @@ export default function ProjectsPage() {
 			if (modal.editing) {
 				await adminService.updateProject(modal.editing.id, form);
 			} else {
-				await adminService.createProject(form as Omit<Project, 'id' | 'createdAt' | 'updatedAt'>);
+				await adminService.createProject(
+					form as Omit<Project, 'id' | 'createdAt' | 'updatedAt'>,
+				);
 			}
 			setModal({ open: false, editing: null });
 			refetch();
@@ -95,8 +97,18 @@ export default function ProjectsPage() {
 
 	const columns = [
 		{ key: 'title', label: 'Title' },
-		{ key: 'slug', label: 'Slug', render: (p: Project) => <span className="font-mono text-xs text-zinc-500">{p.slug}</span> },
-		{ key: 'status', label: 'Status', render: (p: Project) => <StatusBadge status={p.status} /> },
+		{
+			key: 'slug',
+			label: 'Slug',
+			render: (p: Project) => (
+				<span className="font-mono text-xs text-zinc-500">{p.slug}</span>
+			),
+		},
+		{
+			key: 'status',
+			label: 'Status',
+			render: (p: Project) => <StatusBadge status={p.status} />,
+		},
 		{ key: 'featured', label: 'Featured', render: (p: Project) => (p.featured ? '⭐' : '—') },
 	];
 
@@ -104,7 +116,10 @@ export default function ProjectsPage() {
 		<div className="max-w-5xl">
 			<div className="flex items-center justify-between mb-6">
 				<h1 className="text-2xl font-bold">Projects</h1>
-				<button onClick={openCreate} className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
+				<button
+					onClick={openCreate}
+					className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
+				>
 					+ New Project
 				</button>
 			</div>
@@ -112,25 +127,120 @@ export default function ProjectsPage() {
 			{loading ? (
 				<div className="text-zinc-500">Loading...</div>
 			) : (
-				<DataTable columns={columns} data={projects || []} onEdit={openEdit} onDelete={handleDelete} emptyMessage="No projects yet" />
+				<DataTable
+					columns={columns}
+					data={projects || []}
+					onEdit={openEdit}
+					onDelete={handleDelete}
+					emptyMessage="No projects yet"
+				/>
 			)}
 
-			<FormModal open={modal.open} onClose={() => setModal({ open: false, editing: null })} title={modal.editing ? 'Edit Project' : 'New Project'} onSubmit={handleSave} loading={saving}>
-				{error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">{error}</div>}
-				<FormField label="Title" name="title" value={form.title} onChange={updateField} required />
-				<FormField label="Slug" name="slug" value={form.slug} onChange={updateField} required />
-				<FormField label="Description" name="description" type="textarea" value={form.description} onChange={updateField} required rows={4} />
-				<TagField label="Tech Stack" name="techStack" value={form.techStack} onChange={updateField} />
-				<FormField label="Thumbnail URL" name="thumbnail" type="url" value={form.thumbnail} onChange={updateField} />
-				<TagField label="Image URLs" name="images" value={form.images} onChange={updateField} placeholder="Paste image URLs" />
-				<FormField label="GitHub URL" name="githubUrl" type="url" value={form.githubUrl} onChange={updateField} />
-				<FormField label="Live URL" name="liveUrl" type="url" value={form.liveUrl} onChange={updateField} />
+			<FormModal
+				open={modal.open}
+				onClose={() => setModal({ open: false, editing: null })}
+				title={modal.editing ? 'Edit Project' : 'New Project'}
+				onSubmit={handleSave}
+				loading={saving}
+			>
+				{error && (
+					<div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+						{error}
+					</div>
+				)}
+				<FormField
+					label="Title"
+					name="title"
+					value={form.title}
+					onChange={updateField}
+					required
+				/>
+				<FormField
+					label="Slug"
+					name="slug"
+					value={form.slug}
+					onChange={updateField}
+					required
+				/>
+				<FormField
+					label="Description"
+					name="description"
+					type="textarea"
+					value={form.description}
+					onChange={updateField}
+					required
+					rows={4}
+				/>
+				<TagField
+					label="Tech Stack"
+					name="techStack"
+					value={form.techStack}
+					onChange={updateField}
+				/>
+				<FormField
+					label="Thumbnail URL"
+					name="thumbnail"
+					type="url"
+					value={form.thumbnail}
+					onChange={updateField}
+				/>
+				<TagField
+					label="Image URLs"
+					name="images"
+					value={form.images}
+					onChange={updateField}
+					placeholder="Paste image URLs"
+				/>
+				<FormField
+					label="GitHub URL"
+					name="githubUrl"
+					type="url"
+					value={form.githubUrl}
+					onChange={updateField}
+				/>
+				<FormField
+					label="Live URL"
+					name="liveUrl"
+					type="url"
+					value={form.liveUrl}
+					onChange={updateField}
+				/>
 				<div className="grid grid-cols-2 gap-4">
-					<FormField label="Stars" name="stars" type="number" value={form.stars} onChange={updateField} />
-					<FormField label="Forks" name="forks" type="number" value={form.forks} onChange={updateField} />
+					<FormField
+						label="Stars"
+						name="stars"
+						type="number"
+						value={form.stars}
+						onChange={updateField}
+					/>
+					<FormField
+						label="Forks"
+						name="forks"
+						type="number"
+						value={form.forks}
+						onChange={updateField}
+					/>
 				</div>
-				<FormField label="Status" name="status" type="select" value={form.status} onChange={updateField} options={[{ label: 'Draft', value: 'draft' }, { label: 'Published', value: 'published' }, { label: 'Completed', value: 'completed' }, { label: 'Archived', value: 'archived' }]} />
-				<FormField label="Featured" name="featured" type="checkbox" value={form.featured} onChange={updateField} />
+				<FormField
+					label="Status"
+					name="status"
+					type="select"
+					value={form.status}
+					onChange={updateField}
+					options={[
+						{ label: 'Draft', value: 'draft' },
+						{ label: 'Published', value: 'published' },
+						{ label: 'Completed', value: 'completed' },
+						{ label: 'Archived', value: 'archived' },
+					]}
+				/>
+				<FormField
+					label="Featured"
+					name="featured"
+					type="checkbox"
+					value={form.featured}
+					onChange={updateField}
+				/>
 			</FormModal>
 		</div>
 	);

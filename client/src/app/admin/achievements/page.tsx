@@ -6,7 +6,7 @@ import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
-import type { Achievement } from '@/types/schema';
+import type { Achievement } from '@/api/schema';
 
 const CATEGORIES = [
 	{ label: 'Hackathon', value: 'hackathon' },
@@ -38,7 +38,10 @@ export default function AchievementsPage() {
 	const fetcher = useCallback(() => adminService.getAchievements(), []);
 	const { data: items, loading, refetch } = useApi<Achievement[]>(fetcher);
 
-	const [modal, setModal] = useState<{ open: boolean; editing: Achievement | null }>({ open: false, editing: null });
+	const [modal, setModal] = useState<{ open: boolean; editing: Achievement | null }>({
+		open: false,
+		editing: null,
+	});
 	const [form, setForm] = useState(EMPTY);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -71,7 +74,7 @@ export default function AchievementsPage() {
 	}
 
 	function updateField(name: string, value: unknown) {
-		setForm((prev) => ({ ...prev, [name]: value }));
+		setForm(prev => ({ ...prev, [name]: value }));
 	}
 
 	async function handleSave() {
@@ -84,7 +87,10 @@ export default function AchievementsPage() {
 			if (!payload.date) delete (payload as Record<string, unknown>).date;
 
 			if (modal.editing) {
-				await adminService.updateAchievement(modal.editing.id, payload as Partial<Achievement>);
+				await adminService.updateAchievement(
+					modal.editing.id,
+					payload as Partial<Achievement>,
+				);
 			} else {
 				await adminService.createAchievement(payload as Omit<Achievement, 'id'>);
 			}
@@ -109,9 +115,17 @@ export default function AchievementsPage() {
 
 	const columns = [
 		{ key: 'title', label: 'Title' },
-		{ key: 'category', label: 'Category', render: (a: Achievement) => <span className="capitalize">{a.category}</span> },
+		{
+			key: 'category',
+			label: 'Category',
+			render: (a: Achievement) => <span className="capitalize">{a.category}</span>,
+		},
 		{ key: 'issuer', label: 'Issuer', render: (a: Achievement) => a.issuer || '—' },
-		{ key: 'featured', label: 'Featured', render: (a: Achievement) => (a.featured ? '⭐' : '—') },
+		{
+			key: 'featured',
+			label: 'Featured',
+			render: (a: Achievement) => (a.featured ? '⭐' : '—'),
+		},
 		{ key: 'order', label: 'Order' },
 	];
 
@@ -119,7 +133,10 @@ export default function AchievementsPage() {
 		<div className="max-w-5xl">
 			<div className="flex items-center justify-between mb-6">
 				<h1 className="text-2xl font-bold">Achievements</h1>
-				<button onClick={openCreate} className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
+				<button
+					onClick={openCreate}
+					className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
+				>
 					+ New Achievement
 				</button>
 			</div>
@@ -127,25 +144,116 @@ export default function AchievementsPage() {
 			{loading ? (
 				<div className="text-zinc-500">Loading...</div>
 			) : (
-				<DataTable columns={columns} data={items || []} onEdit={openEdit} onDelete={handleDelete} emptyMessage="No achievements yet" />
+				<DataTable
+					columns={columns}
+					data={items || []}
+					onEdit={openEdit}
+					onDelete={handleDelete}
+					emptyMessage="No achievements yet"
+				/>
 			)}
 
-			<FormModal open={modal.open} onClose={() => setModal({ open: false, editing: null })} title={modal.editing ? 'Edit Achievement' : 'New Achievement'} onSubmit={handleSave} loading={saving}>
-				{error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">{error}</div>}
-				<FormField label="Title" name="title" value={form.title} onChange={updateField} required />
-				<FormField label="Category" name="category" type="select" value={form.category} onChange={updateField} options={CATEGORIES} required />
-				<FormField label="Issuer" name="issuer" value={form.issuer} onChange={updateField} />
+			<FormModal
+				open={modal.open}
+				onClose={() => setModal({ open: false, editing: null })}
+				title={modal.editing ? 'Edit Achievement' : 'New Achievement'}
+				onSubmit={handleSave}
+				loading={saving}
+			>
+				{error && (
+					<div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
+						{error}
+					</div>
+				)}
+				<FormField
+					label="Title"
+					name="title"
+					value={form.title}
+					onChange={updateField}
+					required
+				/>
+				<FormField
+					label="Category"
+					name="category"
+					type="select"
+					value={form.category}
+					onChange={updateField}
+					options={CATEGORIES}
+					required
+				/>
+				<FormField
+					label="Issuer"
+					name="issuer"
+					value={form.issuer}
+					onChange={updateField}
+				/>
 				<FormField label="Event" name="event" value={form.event} onChange={updateField} />
-				<FormField label="Description" name="description" type="textarea" value={form.description} onChange={updateField} rows={3} />
-				<FormField label="Rank" name="rank" value={form.rank} onChange={updateField} placeholder="e.g. 1st Place, Top 10" />
-				<FormField label="Date" name="date" type="date" value={form.date} onChange={updateField} />
-				<FormField label="Proof URL" name="proofUrl" type="url" value={form.proofUrl} onChange={updateField} placeholder="Certificate / proof link" />
-				<FormField label="URL" name="url" type="url" value={form.url} onChange={updateField} placeholder="Related external link" />
+				<FormField
+					label="Description"
+					name="description"
+					type="textarea"
+					value={form.description}
+					onChange={updateField}
+					rows={3}
+				/>
+				<FormField
+					label="Rank"
+					name="rank"
+					value={form.rank}
+					onChange={updateField}
+					placeholder="e.g. 1st Place, Top 10"
+				/>
+				<FormField
+					label="Date"
+					name="date"
+					type="date"
+					value={form.date}
+					onChange={updateField}
+				/>
+				<FormField
+					label="Proof URL"
+					name="proofUrl"
+					type="url"
+					value={form.proofUrl}
+					onChange={updateField}
+					placeholder="Certificate / proof link"
+				/>
+				<FormField
+					label="URL"
+					name="url"
+					type="url"
+					value={form.url}
+					onChange={updateField}
+					placeholder="Related external link"
+				/>
 				<TagField label="Tags" name="tags" value={form.tags} onChange={updateField} />
-				<TagField label="Team Members" name="team" value={form.team} onChange={updateField} />
-				<FormField label="Journey Entry ID" name="journeyEntryId" value={form.journeyEntryId} onChange={updateField} placeholder="Link to a journey entry (optional)" />
-				<FormField label="Order" name="order" type="number" value={form.order} onChange={updateField} />
-				<FormField label="Featured" name="featured" type="checkbox" value={form.featured} onChange={updateField} />
+				<TagField
+					label="Team Members"
+					name="team"
+					value={form.team}
+					onChange={updateField}
+				/>
+				<FormField
+					label="Journey Entry ID"
+					name="journeyEntryId"
+					value={form.journeyEntryId}
+					onChange={updateField}
+					placeholder="Link to a journey entry (optional)"
+				/>
+				<FormField
+					label="Order"
+					name="order"
+					type="number"
+					value={form.order}
+					onChange={updateField}
+				/>
+				<FormField
+					label="Featured"
+					name="featured"
+					type="checkbox"
+					value={form.featured}
+					onChange={updateField}
+				/>
 			</FormModal>
 		</div>
 	);

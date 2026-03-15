@@ -1,4 +1,4 @@
-import type { Certification } from '@/types/schema';
+import type { Certification } from '@/api/schema';
 
 export const FALLBACK_CERTIFICATIONS: Certification[] = [
 	{

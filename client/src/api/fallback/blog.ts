@@ -1,4 +1,4 @@
-import type { BlogPost } from '@/types/schema';
+import type { BlogPost } from '@/api/schema';
 
 export const FALLBACK_BLOG_POSTS: BlogPost[] = [
 	{

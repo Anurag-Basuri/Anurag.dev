@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { FileSystemItem } from '@/data/filesystem';
+import type { FileSystemItem } from '@/lib/filesystem';
 import {
 	User,
 	Briefcase,
@@ -87,7 +87,9 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 						<div
 							className={cn(
 								'flex items-center justify-center shrink-0 w-8 h-8 rounded-lg transition-transform duration-300',
-								isActive ? 'scale-110 bg-background/50 shadow-sm' : 'group-hover:scale-110',
+								isActive
+									? 'scale-110 bg-background/50 shadow-sm'
+									: 'group-hover:scale-110',
 							)}
 						>
 							{getSectionIcon(item.id, 'w-4 h-4')}

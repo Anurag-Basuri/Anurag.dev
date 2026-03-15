@@ -7,7 +7,7 @@ import type {
 	BlogPost,
 	AboutData,
 	ContactMessage,
-} from '@/types/schema';
+} from '@/api/schema';
 
 // Admin API service — all endpoints require auth
 
@@ -25,7 +25,9 @@ async function getProjects(): Promise<Project[]> {
 	return apiClient.get<Project[]>('/admin/projects', true);
 }
 
-async function createProject(data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> {
+async function createProject(
+	data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>,
+): Promise<Project> {
 	return apiClient.post<Project>('/admin/projects', data, true);
 }
 
@@ -92,7 +94,10 @@ async function createCertification(data: Omit<Certification, 'id'>): Promise<Cer
 	return apiClient.post<Certification>('/admin/certifications', data, true);
 }
 
-async function updateCertification(id: string, data: Partial<Certification>): Promise<Certification> {
+async function updateCertification(
+	id: string,
+	data: Partial<Certification>,
+): Promise<Certification> {
 	return apiClient.put<Certification>(`/admin/certifications/${id}`, data);
 }
 
@@ -105,7 +110,9 @@ async function getBlogPosts(): Promise<BlogPost[]> {
 	return apiClient.get<BlogPost[]>('/admin/blog', true);
 }
 
-async function createBlogPost(data: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>): Promise<BlogPost> {
+async function createBlogPost(
+	data: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>,
+): Promise<BlogPost> {
 	return apiClient.post<BlogPost>('/admin/blog', data, true);
 }
 
