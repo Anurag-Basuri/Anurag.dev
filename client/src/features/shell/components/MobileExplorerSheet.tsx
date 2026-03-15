@@ -12,13 +12,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 interface MobileExplorerSheetProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	onNavigate: (moduleId: string) => void;
 }
 
 export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 	isOpen,
 	onOpenChange,
-	onNavigate,
 }: MobileExplorerSheetProps) {
 	return (
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>

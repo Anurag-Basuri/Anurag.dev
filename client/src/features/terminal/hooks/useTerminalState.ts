@@ -176,7 +176,11 @@ export function useTerminalState() {
 					case 'open_module':
 						addToHistory(trimmedCommand, response);
 						if (response.moduleId) {
-							router.push(`/portfolio/${response.moduleId}`);
+							window.dispatchEvent(
+								new CustomEvent('scroll-to-section', {
+									detail: { sectionId: response.moduleId },
+								}),
+							);
 						}
 						break;
 
