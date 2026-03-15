@@ -20,6 +20,24 @@ async function updateProfile(data: Partial<AboutData>): Promise<AboutData> {
 	return apiClient.put<AboutData>('/admin/profile', data);
 }
 
+async function uploadAvatar(file: File): Promise<AboutData> {
+	const formData = new FormData();
+	formData.append('avatar', file);
+	return apiClient.upload<AboutData>('/admin/profile/avatar', formData);
+}
+
+async function uploadCover(file: File): Promise<AboutData> {
+	const formData = new FormData();
+	formData.append('cover', file);
+	return apiClient.upload<AboutData>('/admin/profile/cover', formData);
+}
+
+async function uploadResume(file: File): Promise<AboutData> {
+	const formData = new FormData();
+	formData.append('resume', file);
+	return apiClient.upload<AboutData>('/admin/profile/resume', formData);
+}
+
 // Projects
 async function getProjects(): Promise<Project[]> {
 	return apiClient.get<Project[]>('/admin/projects', true);
@@ -144,6 +162,9 @@ async function deleteMessage(id: string): Promise<void> {
 export const adminService = {
 	getProfile,
 	updateProfile,
+	uploadAvatar,
+	uploadCover,
+	uploadResume,
 	getProjects,
 	createProject,
 	updateProject,
@@ -172,4 +193,3 @@ export const adminService = {
 	getMessage,
 	deleteMessage,
 };
-

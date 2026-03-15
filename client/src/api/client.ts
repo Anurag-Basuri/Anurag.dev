@@ -75,17 +75,26 @@ async function request<T>(
 		headers?: Record<string, string>;
 		timeout?: number;
 		auth?: boolean;
+		isFormData?: boolean;
 	} = {},
 ): Promise<T> {
-	const { body, headers = {}, timeout = REQUEST_TIMEOUT, auth = false } = options;
+	const {
+		body,
+		headers = {},
+		timeout = REQUEST_TIMEOUT,
+		auth = false,
+		isFormData = false,
+	} = options;
 
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-	const reqHeaders: Record<string, string> = {
-		'Content-Type': 'application/json',
-		...headers,
-	};
+	const reqHeaders: Record<string, string> = { ...headers };
+
+	// Don't set Content-Type for FormData — browser sets it with boundary
+	if (!isFormData) {
+		reqHeaders['Content-Type'] = 'application/json';
+	}
 
 	if (auth) {
 		const token = tokenStore.getAccess();
@@ -96,7 +105,7 @@ async function request<T>(
 		const response = await fetch(`${API_BASE}${endpoint}`, {
 			method,
 			headers: reqHeaders,
-			body: body ? JSON.stringify(body) : undefined,
+			body: isFormData ? (body as FormData) : body ? JSON.stringify(body) : undefined,
 			signal: controller.signal,
 		});
 
@@ -143,8 +152,7 @@ async function request<T>(
 
 // Public API methods
 export const apiClient = {
-	get: <T>(endpoint: string, auth = false) =>
-		request<T>('GET', endpoint, { auth }),
+	get: <T>(endpoint: string, auth = false) => request<T>('GET', endpoint, { auth }),
 
 	post: <T>(endpoint: string, body: unknown, auth = false) =>
 		request<T>('POST', endpoint, { body, auth }),
@@ -155,7 +163,8 @@ export const apiClient = {
 	patch: <T>(endpoint: string, body: unknown, auth = true) =>
 		request<T>('PATCH', endpoint, { body, auth }),
 
-	del: <T = void>(endpoint: string, auth = true) =>
-		request<T>('DELETE', endpoint, { auth }),
-};
+	del: <T = void>(endpoint: string, auth = true) => request<T>('DELETE', endpoint, { auth }),
 
+	upload: <T>(endpoint: string, formData: FormData, auth = true) =>
+		request<T>('POST', endpoint, { body: formData, auth, isFormData: true, timeout: 30000 }),
+};

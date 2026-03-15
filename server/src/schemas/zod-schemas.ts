@@ -2,12 +2,6 @@ import { z } from 'zod';
 
 // ─── Common Schemas ─────────────────────────────────────────────
 
-export const SkillItemSchema = z.object({
-	name: z.string(),
-	level: z.number().min(0).max(100).optional(), // 0–100 proficiency
-	icon: z.string().optional(), // icon identifier / URL
-});
-
 export const SocialLinkSchema = z.object({
 	platform: z.string(),
 	url: z.string().url(),
@@ -15,45 +9,31 @@ export const SocialLinkSchema = z.object({
 	handle: z.string().optional(),
 });
 
-const CodingPlatformSchema = z.object({
-	username: z.string(),
-	url: z.string().url(),
-	stats: z.record(z.unknown()).optional(), // Platform-specific — kept flexible
-});
-
 // ─── Profile (singleton) ─────────────────────────────────────────
+// Matches Prisma Profile model exactly.
+// JSON fields (workPreferences, skills, socials) are validated structurally.
 
 export const ProfileSchema = z.object({
-	// Identity
+	// Personal Info
 	name: z.string().min(1),
-	displayName: z.string().optional(),
 	pronouns: z.string().optional(),
 	email: z.string().email().optional(),
 	phone: z.string().optional(),
 
-	// Headline
-	role: z.string().optional(),
-	tagline: z.string().optional(),
-	summary: z.string().optional(),
-	bio: z.string().optional(),
+	// Career & Bio
+	header: z.string().nullable().optional(),
+	bio: z.string().nullable().optional(),
 
-	// Location & Availability
-	location: z.string().optional(),
-	timezone: z.string().optional(),
-	openToWork: z.boolean().default(false),
-	availableFrom: z.string().optional(),
-	noticePeriod: z.string().optional(),
+	// Location
+	Currentlocation: z.string().nullable().optional(),
+	Originallocation: z.string().nullable().optional(),
 
-	// Media
-	avatarUrl: z.string().url().optional().or(z.literal('')),
-	coverUrl: z.string().url().optional().or(z.literal('')),
-	resumeUrl: z.string().url().optional().or(z.literal('')),
+	// Job Seeking & Availability
+	openToWork: z.boolean().default(true),
+	availableFrom: z.string().nullable().optional(),
+	noticePeriod: z.string().nullable().optional(),
 
-	// Quick Stats
-	experienceYears: z.number().int().min(0).default(0),
-	projectsCount: z.number().int().min(0).default(0),
-
-	// Work Preferences
+	// Job Preferences
 	workPreferences: z
 		.object({
 			remote: z.boolean().optional(),
@@ -61,206 +41,110 @@ export const ProfileSchema = z.object({
 			onsite: z.boolean().optional(),
 			relocation: z.boolean().optional(),
 		})
+		.nullable()
 		.optional(),
-	jobTypes: z
-		.array(z.enum(['full-time', 'part-time', 'contract', 'freelance', 'internship']))
-		.optional(),
-	preferredRoles: z.array(z.string()).optional(),
-	industries: z.array(z.string()).optional(),
-	salaryRange: z
-		.object({
-			min: z.number().optional(),
-			max: z.number().optional(),
-			currency: z.string().default('USD'),
-			period: z.enum(['annual', 'monthly', 'hourly']).default('annual'),
-		})
-		.optional(),
+	jobTypes: z.array(z.string()).optional(),
 
-	// Skills
-	skills: z
-		.object({
-			frontend: z.array(SkillItemSchema).optional(),
-			backend: z.array(SkillItemSchema).optional(),
-			ml: z.array(SkillItemSchema).optional(),
-			devops: z.array(SkillItemSchema).optional(),
-			databases: z.array(SkillItemSchema).optional(),
-			tools: z.array(SkillItemSchema).optional(),
-			other: z.array(SkillItemSchema).optional(),
-		})
-		.optional(),
-	techStack: z.array(z.string()).optional(),
+	// Media — URLs are set by file upload endpoints, but can also be set directly
+	avatarUrl: z.string().nullable().optional(),
+	coverUrl: z.string().nullable().optional(),
+	resumeUrl: z.string().nullable().optional(),
 
-	// Status, Highlights & Focus
-	currentStatus: z
-		.object({
-			label: z.string(),
-			description: z.string().optional(),
-			emoji: z.string().optional(),
-			show: z.boolean().default(true),
-		})
-		.optional(),
-	highlights: z
-		.array(z.object({ label: z.string(), value: z.string(), icon: z.string().optional() }))
-		.optional(),
-	focusAreas: z.array(z.string()).optional(),
-	achievements: z
-		.array(
-			z.object({
-				title: z.string(),
-				description: z.string().optional(),
-				year: z.number().optional(),
-				url: z.string().url().optional(),
-			}),
-		)
-		.optional(),
+	// Quick Stats
+	experienceYears: z.number().int().min(0).default(0),
+	projectsCount: z.number().int().min(0).default(0),
+
+	// Skills — { category: skills[] }
+	skills: z.record(z.string(), z.array(z.string())).nullable().optional(),
 
 	// Personal
 	languages: z.array(z.string()).optional(),
-	hobbies: z.array(z.string()).optional(),
 
 	// Social & Web
-	socials: z.array(SocialLinkSchema).optional(),
-	website: z.string().url().optional().or(z.literal('')),
+	socials: z.array(SocialLinkSchema).nullable().optional(),
+	website: z.string().nullable().optional(),
 
-	// Coding Platforms
-	github: CodingPlatformSchema.optional(),
-	leetcode: CodingPlatformSchema.optional(),
-	codeforces: CodingPlatformSchema.optional(),
-	codechef: CodingPlatformSchema.optional(),
-	hackerrank: CodingPlatformSchema.optional(),
-	gfg: CodingPlatformSchema.optional(),
-	kaggle: CodingPlatformSchema.optional(),
-	otherProfiles: z.array(CodingPlatformSchema.extend({ platform: z.string() })).optional(),
+	// Coding Platforms — plain string URLs/usernames (matches Prisma String?)
+	github: z.string().nullable().optional(),
+	leetcode: z.string().nullable().optional(),
+	codeforces: z.string().nullable().optional(),
+	codechef: z.string().nullable().optional(),
+	gfg: z.string().nullable().optional(),
+	kaggle: z.string().nullable().optional(),
+	otherProfiles: z.array(z.string()).optional(),
 
-	// Open Source
-	openSource: z
-		.array(
-			z.object({
-				repo: z.string(),
-				description: z.string().optional(),
-				url: z.string().url(),
-				stars: z.number().optional(),
-				language: z.string().optional(),
-				role: z.string().optional(),
-			}),
-		)
-		.optional(),
-
-	// Publications & Talks
-	publications: z
-		.array(
-			z.object({
-				title: z.string(),
-				url: z.string().url().optional(),
-				venue: z.string().optional(),
-				date: z.string().optional(),
-				type: z.enum(['article', 'talk', 'paper', 'video', 'podcast']).optional(),
-			}),
-		)
-		.optional(),
-
-	// Education Quick-Reference
-	education: z
-		.array(
-			z.object({
-				institution: z.string(),
-				degree: z.string().optional(),
-				field: z.string().optional(),
-				year: z.string().optional(),
-				gpa: z.string().optional(),
-				url: z.string().url().optional(),
-			}),
-		)
-		.optional(),
-
-	// Testimonials
-	testimonials: z
-		.array(
-			z.object({
-				name: z.string(),
-				role: z.string().optional(),
-				company: z.string().optional(),
-				text: z.string(),
-				avatarUrl: z.string().url().optional(),
-			}),
-		)
-		.optional(),
-
-	// SEO
-	seoTitle: z.string().optional(),
-	seoDesc: z.string().optional(),
+	// SEO / Meta
+	seoTitle: z.string().nullable().optional(),
+	seoDesc: z.string().nullable().optional(),
 	seoKeywords: z.array(z.string()).optional(),
 });
 
 // ─── Project ────────────────────────────────────────────────────
+// Matches Prisma Project model exactly.
 
 export const ProjectSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(2, 'Title is required'),
 	slug: z.string().min(2, 'Slug is required'),
+	title: z.string().min(2, 'Title is required'),
 	description: z.string().min(10),
-	content: z.string().optional(),
-
 	techStack: z.array(z.string()),
-	tags: z.array(z.string()).optional(),
 
+	thumbnail: z.string().nullable().optional(),
+	images: z.array(z.string()).optional(),
 	githubUrl: z.string().url().nullable().optional(),
 	liveUrl: z.string().url().nullable().optional(),
-	thumbnail: z.string().optional(),
-	images: z.array(z.string()).optional(),
 
 	status: z.enum(['draft', 'published', 'archived', 'completed']).default('draft'),
 	featured: z.boolean().default(false),
-	priority: z.number().default(0),
 
-	stars: z.number().nullable().optional(),
-	forks: z.number().nullable().optional(),
+	stars: z.number().int().nullable().optional(),
+	forks: z.number().int().nullable().optional(),
 
 	createdAt: z.string().datetime().optional(),
 	updatedAt: z.string().datetime().optional(),
 });
 
 // ─── Journey Entry ──────────────────────────────────────────────
+// Matches Prisma JourneyEntry model exactly.
 
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
 	type: z.enum(['work', 'education', 'volunteering', 'research', 'other']),
 	title: z.string().min(1),
-	organization: z.string().optional(),
-	location: z.string().optional(),
+	organization: z.string().nullable().optional(),
+	location: z.string().nullable().optional(),
 
 	date: z.string().min(1),
-	startDate: z.string().datetime().optional(),
+	startDate: z.string().datetime().nullable().optional(),
 	endDate: z.string().datetime().nullable().optional(),
 	isCurrent: z.boolean().default(false),
 
 	description: z.string().min(1),
 	skills: z.array(z.string()).optional(),
-	url: z.string().url().optional(),
+	url: z.string().url().nullable().optional(),
 
 	// Education-specific
-	degree: z.string().optional(),
-	fieldOfStudy: z.string().optional(),
-	grade: z.string().optional(),
-	board: z.string().optional(),
+	degree: z.string().nullable().optional(),
+	fieldOfStudy: z.string().nullable().optional(),
+	grade: z.string().nullable().optional(),
+	board: z.string().nullable().optional(),
 
 	// Work-specific
-	employmentType: z
-		.enum(['full-time', 'part-time', 'internship', 'contract', 'freelance'])
-		.optional(),
+	employmentType: z.string().nullable().optional(),
 
 	// Research-specific
-	publication: z.string().optional(),
-	doi: z.string().optional(),
+	publication: z.string().nullable().optional(),
+	doi: z.string().nullable().optional(),
 
 	// Display
-	icon: z.string().optional(),
+	icon: z.string().nullable().optional(),
 	highlighted: z.boolean().default(false),
 
-	order: z.number().default(0),
+	order: z.number().int().default(0),
 });
 
 // ─── Achievement ────────────────────────────────────────────────
+// Matches Prisma Achievement model exactly.
 
 export const AchievementSchema = z.object({
 	id: z.string().optional(),
@@ -273,56 +157,61 @@ export const AchievementSchema = z.object({
 		'publication',
 		'scholarship',
 	]),
-	issuer: z.string().optional(),
-	event: z.string().optional(),
+	issuer: z.string().nullable().optional(),
+	event: z.string().nullable().optional(),
 
-	description: z.string().optional(),
-	rank: z.string().optional(),
+	description: z.string().nullable().optional(),
+	rank: z.string().nullable().optional(),
 
 	date: z.string().datetime().nullable().optional(),
-	proofUrl: z.string().url().optional(),
-	url: z.string().url().optional(),
+	proofUrl: z.string().url().nullable().optional(),
+	url: z.string().url().nullable().optional(),
 
 	tags: z.array(z.string()).optional(),
 	team: z.array(z.string()).optional(),
 
 	featured: z.boolean().default(false),
-	order: z.number().default(0),
+	order: z.number().int().default(0),
 
 	journeyEntryId: z.string().nullable().optional(),
 });
 
 // ─── Certification ──────────────────────────────────────────────
+// Matches Prisma Certification model exactly.
 
 export const CertificationSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(1),
 	issuer: z.string().min(1),
-	date: z.string().datetime(),
-	expirationDate: z.string().datetime().nullable().optional(),
-	credentialId: z.string().optional(),
-	credentialUrl: z.string().url().optional(),
+
+	description: z.string().nullable().optional(),
+	credentialId: z.string().nullable().optional(),
+	credentialUrl: z.string().url().nullable().optional(),
+
+	certificateUrl: z.string().nullable().optional(),
 
 	skills: z.array(z.string()).optional(),
-	image: z.string().optional(),
+
+	startDate: z.string().datetime().nullable().optional(),
+	endDate: z.string().datetime().nullable().optional(),
 });
 
 // ─── Blog Post ──────────────────────────────────────────────────
+// Matches Prisma BlogPost model exactly.
 
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(5),
 	slug: z.string().min(3),
-	summary: z.string().min(1),
+	title: z.string().min(5),
 	content: z.string().min(1),
-	coverImage: z.string().optional(),
-
 	tags: z.array(z.string()),
-	status: z.enum(['draft', 'published', 'archived']).default('draft'),
-	featured: z.boolean().default(false),
 
+	coverImage: z.string().nullable().optional(),
+	otherImages: z.array(z.string()).optional(),
+	link: z.string().nullable().optional(),
+
+	status: z.enum(['draft', 'published', 'archived']).default('draft'),
 	publishedAt: z.string().datetime().nullable().optional(),
-	readingTime: z.number().optional(),
 
 	createdAt: z.string().datetime().optional(),
 	updatedAt: z.string().datetime().optional(),
@@ -350,10 +239,21 @@ export const RefreshSchema = z.object({
 
 // ─── Derived Schemas (Create / Update / Status) ──────────────────
 
-// Project
-export const ProjectCreateSchema = ProjectSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export const ProjectUpdateSchema = ProjectSchema.partial().omit({ id: true, createdAt: true, updatedAt: true });
-export const ProjectStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived', 'completed']) });
+// Profile — update is always partial since it's a singleton upsert
+export const ProfileUpdateSchema = ProfileSchema.partial();
+export const ProjectCreateSchema = ProjectSchema.omit({
+	id: true,
+	createdAt: true,
+	updatedAt: true,
+});
+export const ProjectUpdateSchema = ProjectSchema.partial().omit({
+	id: true,
+	createdAt: true,
+	updatedAt: true,
+});
+export const ProjectStatusSchema = z.object({
+	status: z.enum(['draft', 'published', 'archived', 'completed']),
+});
 
 // Journey
 export const JourneyCreateSchema = JourneyItemSchema.omit({ id: true });
@@ -372,7 +272,11 @@ export const CertificationUpdateSchema = CertificationSchema.partial().omit({ id
 
 // Blog
 export const BlogCreateSchema = BlogPostSchema.omit({ id: true, createdAt: true, updatedAt: true });
-export const BlogUpdateSchema = BlogPostSchema.partial().omit({ id: true, createdAt: true, updatedAt: true });
+export const BlogUpdateSchema = BlogPostSchema.partial().omit({
+	id: true,
+	createdAt: true,
+	updatedAt: true,
+});
 export const BlogStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived']) });
 
 // ─── Inferred Types ─────────────────────────────────────────────
@@ -384,4 +288,3 @@ export type Achievement = z.infer<typeof AchievementSchema>;
 export type Certification = z.infer<typeof CertificationSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type ContactMessage = z.infer<typeof ContactSchema>;
-
