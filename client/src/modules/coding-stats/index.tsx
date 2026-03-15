@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/components/layout/SectionHeader';
-import { staggerContainer, staggerItem, fadeInUp } from '@/lib/animations';
+import { staggerContainer, staggerItem, fadeInUp } from '@/design-system/motion';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
@@ -667,3 +667,4 @@ export function CodingStatsModule() {
 		</ScrollArea>
 	);
 }
+

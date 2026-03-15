@@ -8,7 +8,7 @@ import type { JourneyEntry } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem } from '@/lib/animations';
+import { staggerContainer, staggerItem } from '@/design-system/motion';
 
 export function ExperienceModule() {
 	const [entries, setEntries] = useState<JourneyEntry[]>([]);
@@ -171,3 +171,4 @@ export function ExperienceModule() {
 		</ScrollArea>
 	);
 }
+

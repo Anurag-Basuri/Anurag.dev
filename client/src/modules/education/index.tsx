@@ -8,7 +8,7 @@ import type { JourneyEntry } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, fadeInUp } from '@/lib/animations';
+import { staggerContainer, fadeInUp } from '@/design-system/motion';
 
 // --- 3D Card Component ---
 const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
@@ -214,3 +214,4 @@ export function EducationModule() {
 		</ScrollArea>
 	);
 }
+

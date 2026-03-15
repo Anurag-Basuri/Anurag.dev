@@ -6,7 +6,7 @@ import type { BlogPost } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { staggerContainer, staggerItem } from '@/lib/animations';
+import { staggerContainer, staggerItem } from '@/design-system/motion';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 
 export function BlogModule() {
@@ -172,3 +172,4 @@ export function BlogModule() {
 		</ScrollArea>
 	);
 }
+

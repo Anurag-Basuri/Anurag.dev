@@ -8,7 +8,7 @@ import type { Achievement } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, scaleIn } from '@/lib/animations';
+import { staggerContainer, scaleIn } from '@/design-system/motion';
 
 const getCategoryIcon = (category: string) => {
 	switch (category.toLowerCase()) {
@@ -176,3 +176,4 @@ export function AchievementsModule() {
 		</ScrollArea>
 	);
 }
+

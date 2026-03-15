@@ -6,7 +6,7 @@ import type { Certification } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShieldCheck, Award, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { staggerContainer, staggerItem } from '@/lib/animations';
+import { staggerContainer, staggerItem } from '@/design-system/motion';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 
 export function CertificationModule() {
@@ -128,3 +128,4 @@ export function CertificationModule() {
 		</ScrollArea>
 	);
 }
+

@@ -89,3 +89,4 @@ export function FormModal({ open, onClose, title, onSubmit, loading, children }:
 		</div>
 	);
 }
+

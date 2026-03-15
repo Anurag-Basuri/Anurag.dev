@@ -89,3 +89,4 @@ export const SECTION_IDS = SECTIONS.map(s => s.id);
 export function getSectionIndex(id: string): number {
 	return SECTIONS.findIndex(s => s.id === id);
 }
+

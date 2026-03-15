@@ -19,3 +19,4 @@ export const INITIAL_FILE_SYSTEM: FileSystemItem[] = SECTIONS.map(section => ({
 	moduleId: section.moduleId as FileSystemItem['moduleId'],
 	content: section.description,
 }));
+
