@@ -6,14 +6,14 @@
  */
 
 import type { ReactNode } from 'react';
-import { AppProviders } from '@/components/providers/AppProviders';
-import { Scene3D } from '@/design-system/background/Scene3D';
+import { AppProviders } from '@/layout/AppProviders';
+import { Scene3D } from '@/theme/Scene3D';
 
 export default function ClientShell({ children }: { children: ReactNode }) {
-  return (
-    <AppProviders>
-      <Scene3D />
-      {children}
-    </AppProviders>
-  );
+	return (
+		<AppProviders>
+			<Scene3D />
+			{children}
+		</AppProviders>
+	);
 }
