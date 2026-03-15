@@ -115,3 +115,5 @@ export function getModuleTitle(id: string): string {
 export function isValidModuleId(id: string): id is AppModuleId {
 	return id in moduleConfigs;
 }
+
+export type { AppModuleId };

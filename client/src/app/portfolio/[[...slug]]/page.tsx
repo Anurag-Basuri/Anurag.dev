@@ -12,9 +12,9 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { slug } = await params;
 
-	// Root or About
+	// Root or Profile
 	if (!slug || slug.length === 0) {
-		const aboutMeta = getModuleMetadata('about');
+		const aboutMeta = getModuleMetadata('profile');
 		return {
 			title: aboutMeta.title,
 			description: aboutMeta.description,
@@ -54,7 +54,7 @@ export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 
 	// Determine initial section from URL (for deep links)
-	let initialSection = 'about';
+	let initialSection = 'profile';
 	if (slug && slug.length > 0) {
 		const moduleId = resolveModuleFromSlug(slug);
 		if (moduleId) initialSection = moduleId;

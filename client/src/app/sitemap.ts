@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		url: `${baseUrl}${getModulePath(moduleId)}`,
 		lastModified: currentDate,
 		changeFrequency: 'weekly' as const,
-		priority: moduleId === 'about' ? 1.0 : 0.8,
+		priority: moduleId === 'profile' ? 1.0 : 0.8,
 	}));
 
 	return [
