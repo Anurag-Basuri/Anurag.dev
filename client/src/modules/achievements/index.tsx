@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { apiClient } from '@/api/client';
-import type { Achievement } from '@/types/schema';
+import type { Achievement } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
@@ -83,7 +83,7 @@ export function AchievementsModule() {
 						animate="visible"
 						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 auto-rows-fr"
 					>
-						{achievements.map((achievement) => {
+						{achievements.map(achievement => {
 							const colorClass = getCategoryColor(achievement.category);
 							const link = achievement.url || achievement.proofUrl;
 
@@ -92,21 +92,27 @@ export function AchievementsModule() {
 									key={achievement.id}
 									variants={scaleIn}
 									whileHover={{ y: -8, scale: 1.02 }}
-									transition={{ type: "spring", stiffness: 300, damping: 20 }}
+									transition={{ type: 'spring', stiffness: 300, damping: 20 }}
 									className={cn(
-										"relative group flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border rounded-[2rem] overflow-hidden transition-all duration-500",
-										colorClass
+										'relative group flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border rounded-[2rem] overflow-hidden transition-all duration-500',
+										colorClass,
 									)}
 								>
 									{/* Top glowing gradient */}
-									<div className={cn("absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none", colorClass.split(' ')[0], colorClass.split(' ')[1])} />
-									
+									<div
+										className={cn(
+											'absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
+											colorClass.split(' ')[0],
+											colorClass.split(' ')[1],
+										)}
+									/>
+
 									<div className="p-8 relative z-10 flex flex-col grow">
 										<div className="flex justify-between items-start mb-6">
 											<div className="p-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-inner">
 												{getCategoryIcon(achievement.category)}
 											</div>
-											
+
 											{achievement.featured && (
 												<div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest shadow-inner">
 													<Sparkles className="w-3 h-3" />
@@ -118,7 +124,7 @@ export function AchievementsModule() {
 										<h3 className="text-xl md:text-2xl font-black text-white tracking-tight mb-3 leading-tight">
 											{achievement.title}
 										</h3>
-										
+
 										{achievement.issuer && (
 											<p className="text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2">
 												<span className="w-4 h-[1px] bg-muted-foreground/30" />
@@ -148,9 +154,9 @@ export function AchievementsModule() {
 
 											{link && (
 												<div className="pt-5 border-t border-white/10 flex items-center justify-between">
-													<a 
-														href={link} 
-														target="_blank" 
+													<a
+														href={link}
+														target="_blank"
 														rel="noreferrer"
 														className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white transition-colors group/link"
 													>

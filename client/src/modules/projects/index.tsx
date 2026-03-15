@@ -3,18 +3,9 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { apiClient } from '@/api/client';
-import type { Project } from '@/types/schema';
+import type { Project } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-	Folder,
-	Github,
-	ExternalLink,
-	Layout,
-	X,
-	Layers,
-	Globe,
-	Eye,
-} from 'lucide-react';
+import { Folder, Github, ExternalLink, Layout, X, Layers, Globe, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, scaleIn, fadeIn } from '@/lib/animations';
 import { SectionHeader } from '@/components/layout/SectionHeader';

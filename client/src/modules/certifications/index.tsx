@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/api/client';
-import type { Certification } from '@/types/schema';
+import type { Certification } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ShieldCheck, Award, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -56,12 +56,12 @@ export function CertificationModule() {
 						animate="visible"
 						className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8"
 					>
-						{certs.map((cert) => (
+						{certs.map(cert => (
 							<motion.div
 								key={cert.id}
 								variants={staggerItem}
 								whileHover={{ y: -8, scale: 1.02 }}
-								transition={{ type: "spring", stiffness: 300, damping: 20 }}
+								transition={{ type: 'spring', stiffness: 300, damping: 20 }}
 								className="group relative flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 hover:border-emerald-500/30 rounded-[2rem] overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_0px_rgba(16,185,129,0.15)]"
 							>
 								{/* Ambient Glow */}
@@ -72,7 +72,7 @@ export function CertificationModule() {
 										<div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:scale-110 transition-transform duration-500 shadow-inner">
 											<Award className="w-8 h-8 text-emerald-400" />
 										</div>
-										
+
 										{/* Issuer Badge */}
 										<div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full shadow-inner">
 											<span className="text-xs font-black uppercase tracking-widest text-emerald-400">
@@ -84,10 +84,15 @@ export function CertificationModule() {
 									<h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-tight group-hover:text-emerald-400 transition-colors mb-4">
 										{cert.title}
 									</h3>
-									
+
 									<div className="flex items-center gap-2 text-xs font-bold font-mono text-muted-foreground mb-6 bg-white/5 w-fit px-3 py-1.5 rounded-lg border border-white/5">
 										<Activity className="w-3.5 h-3.5" />
-										<span>Issued: {new Date(cert.startDate ?? cert.createdAt).getFullYear()}</span>
+										<span>
+											Issued:{' '}
+											{new Date(
+												cert.startDate ?? cert.createdAt,
+											).getFullYear()}
+										</span>
 									</div>
 
 									{cert.skills && cert.skills.length > 0 && (

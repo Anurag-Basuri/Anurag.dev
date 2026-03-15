@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { apiClient } from '@/api/client';
-import type { CodingStats } from '@/types/schema';
+import type { CodingStats } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Code2,
@@ -44,7 +44,8 @@ const STAT_CARD_CONFIG: Array<{
 		label: 'Problems Solved',
 		icon: Code2,
 		bgClass: 'from-emerald-500/10 to-transparent',
-		glowClass: 'group-hover:shadow-[0_0_30px_0px_rgba(16,185,129,0.15)] group-hover:border-emerald-500/30',
+		glowClass:
+			'group-hover:shadow-[0_0_30px_0px_rgba(16,185,129,0.15)] group-hover:border-emerald-500/30',
 		iconBgClass: 'bg-emerald-500/10 border-emerald-500/20',
 		iconTextClass: 'text-emerald-500',
 		getValue: (stats: CodingStats) => stats.leetcode.stats?.solved || 0,
@@ -54,7 +55,8 @@ const STAT_CARD_CONFIG: Array<{
 		label: 'Stars Earned',
 		icon: Star,
 		bgClass: 'from-amber-500/10 to-transparent',
-		glowClass: 'group-hover:shadow-[0_0_30px_0px_rgba(245,158,11,0.15)] group-hover:border-amber-500/30',
+		glowClass:
+			'group-hover:shadow-[0_0_30px_0px_rgba(245,158,11,0.15)] group-hover:border-amber-500/30',
 		iconBgClass: 'bg-amber-500/10 border-amber-500/20',
 		iconTextClass: 'text-amber-500',
 		getValue: (stats: CodingStats) => stats.github.stats?.stars || 0,
@@ -64,7 +66,8 @@ const STAT_CARD_CONFIG: Array<{
 		label: 'Peak Rating',
 		icon: Trophy,
 		bgClass: 'from-rose-500/10 to-transparent',
-		glowClass: 'group-hover:shadow-[0_0_30px_0px_rgba(244,63,94,0.15)] group-hover:border-rose-500/30',
+		glowClass:
+			'group-hover:shadow-[0_0_30px_0px_rgba(244,63,94,0.15)] group-hover:border-rose-500/30',
 		iconBgClass: 'bg-rose-500/10 border-rose-500/20',
 		iconTextClass: 'text-rose-500',
 		getValue: (stats: CodingStats) => stats.codeforces.stats?.maxRating || 'N/A',
@@ -74,7 +77,8 @@ const STAT_CARD_CONFIG: Array<{
 		label: 'Lines of Code',
 		icon: GitCommit,
 		bgClass: 'from-blue-500/10 to-transparent',
-		glowClass: 'group-hover:shadow-[0_0_30px_0px_rgba(59,130,246,0.15)] group-hover:border-blue-500/30',
+		glowClass:
+			'group-hover:shadow-[0_0_30px_0px_rgba(59,130,246,0.15)] group-hover:border-blue-500/30',
 		iconBgClass: 'bg-blue-500/10 border-blue-500/20',
 		iconTextClass: 'text-blue-500',
 		getValue: (stats: CodingStats) => stats.github.stats?.linesOfCode || 0,
@@ -114,7 +118,10 @@ const CodingStatsSkeleton = memo(function CodingStatsSkeleton() {
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 				{[1, 2, 3, 4].map(i => (
-					<div key={i} className="h-40 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]" />
+					<div
+						key={i}
+						className="h-40 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]"
+					/>
 				))}
 			</div>
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -221,8 +228,8 @@ const QuickStatCard = memo(function QuickStatCard({
 			custom={index}
 			whileHover={{ y: -5, transition: { duration: 0.2 } }}
 			className={cn(
-				"relative p-6 rounded-[2rem] bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 overflow-hidden group transition-all duration-500",
-				glowClass
+				'relative p-6 rounded-[2rem] bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 overflow-hidden group transition-all duration-500',
+				glowClass,
 			)}
 		>
 			<div
@@ -242,7 +249,9 @@ const QuickStatCard = memo(function QuickStatCard({
 					<Icon className="w-5 h-5" />
 				</div>
 				<div>
-					<div className="text-3xl font-black text-white tracking-tight drop-shadow-sm">{value}</div>
+					<div className="text-3xl font-black text-white tracking-tight drop-shadow-sm">
+						{value}
+					</div>
 					<div className="text-[10px] mt-1 font-bold text-muted-foreground uppercase tracking-[0.15em]">
 						{label}
 					</div>
@@ -269,10 +278,17 @@ const DifficultyBar = memo(function DifficultyBar({
 	return (
 		<div className="space-y-2">
 			<div className="flex justify-between items-center text-xs px-1">
-				<span className={cn('font-black uppercase tracking-[0.2em]', config.color)}>{config.label}</span>
+				<span className={cn('font-black uppercase tracking-[0.2em]', config.color)}>
+					{config.label}
+				</span>
 				<span className="text-white font-bold">{count}</span>
 			</div>
-			<div className={cn("h-2.5 w-full rounded-full overflow-hidden shadow-inner border border-white/5", config.bgContainer)}>
+			<div
+				className={cn(
+					'h-2.5 w-full rounded-full overflow-hidden shadow-inner border border-white/5',
+					config.bgContainer,
+				)}
+			>
 				<motion.div
 					initial={{ width: 0 }}
 					whileInView={{ width: `${percentage}%` }}
@@ -281,7 +297,10 @@ const DifficultyBar = memo(function DifficultyBar({
 						duration: shouldReduceMotion ? 0 : PROGRESS_BAR_DURATION,
 						ease: 'easeOut',
 					}}
-					className={cn('h-full shadow-[0_0_10px_currentColor] opacity-90', config.bgColor)}
+					className={cn(
+						'h-full shadow-[0_0_10px_currentColor] opacity-90',
+						config.bgColor,
+					)}
 				/>
 			</div>
 		</div>
@@ -316,22 +335,39 @@ const PlatformCard = memo(function PlatformCard({
 	}, [url]);
 
 	return (
-		<div className={cn(
-			"relative bg-[#0a0a0a]/80 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 overflow-hidden group transition-all duration-500 hover:shadow-[0_0_40px_0px_rgba(255,255,255,0.05)]",
-			borderHover
-		)}>
+		<div
+			className={cn(
+				'relative bg-[#0a0a0a]/80 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 overflow-hidden group transition-all duration-500 hover:shadow-[0_0_40px_0px_rgba(255,255,255,0.05)]',
+				borderHover,
+			)}
+		>
 			{/* Ambient Hover Space */}
 			<div className="absolute inset-0 bg-linear-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
 			{/* Header */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 relative z-10">
 				<div className="flex items-center gap-4">
-					<div className={cn('p-4 rounded-[1.25rem] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500', iconBg, iconColor)}>
+					<div
+						className={cn(
+							'p-4 rounded-[1.25rem] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500',
+							iconBg,
+							iconColor,
+						)}
+					>
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h2 className="text-2xl font-black text-white tracking-tight leading-tight">{title}</h2>
-						<p className={cn('text-[11px] font-bold uppercase tracking-wider mt-1 opacity-80', usernameBg)}>@{username}</p>
+						<h2 className="text-2xl font-black text-white tracking-tight leading-tight">
+							{title}
+						</h2>
+						<p
+							className={cn(
+								'text-[11px] font-bold uppercase tracking-wider mt-1 opacity-80',
+								usernameBg,
+							)}
+						>
+							@{username}
+						</p>
 					</div>
 				</div>
 				<motion.button
@@ -346,14 +382,10 @@ const PlatformCard = memo(function PlatformCard({
 			</div>
 
 			{/* Stats Section */}
-			<div className="relative z-10">
-				{stats}
-			</div>
+			<div className="relative z-10">{stats}</div>
 
 			{/* Children (additional content) */}
-			<div className="relative z-10">
-				{children}
-			</div>
+			<div className="relative z-10">{children}</div>
 		</div>
 	);
 });
@@ -382,11 +414,13 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 	stats: Array<{ label: string; value: string | number }>;
 }) {
 	return (
-		<div className={cn(
-			"bg-[#0a0a0a]/80 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 flex flex-col justify-center relative overflow-hidden group transition-all duration-500",
-			borderHover,
-			glowHover
-		)}>
+		<div
+			className={cn(
+				'bg-[#0a0a0a]/80 backdrop-blur-xl rounded-[2.5rem] border border-white/5 p-8 flex flex-col justify-center relative overflow-hidden group transition-all duration-500',
+				borderHover,
+				glowHover,
+			)}
+		>
 			<div
 				className={cn(
 					'absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none',
@@ -395,12 +429,27 @@ const MiniPlatformCard = memo(function MiniPlatformCard({
 			/>
 
 			<div className="flex items-center gap-4 mb-8 relative z-10">
-				<div className={cn('p-3 rounded-[1.25rem] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500', iconBg, iconColor)}>
+				<div
+					className={cn(
+						'p-3 rounded-[1.25rem] border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500',
+						iconBg,
+						iconColor,
+					)}
+				>
 					<Icon className="w-7 h-7" />
 				</div>
 				<div>
-					<h3 className="text-xl font-black text-white tracking-tight leading-tight">{title}</h3>
-					<p className={cn('text-[10px] font-bold uppercase tracking-wider mt-1 opacity-80', usernameBg)}>@{username}</p>
+					<h3 className="text-xl font-black text-white tracking-tight leading-tight">
+						{title}
+					</h3>
+					<p
+						className={cn(
+							'text-[10px] font-bold uppercase tracking-wider mt-1 opacity-80',
+							usernameBg,
+						)}
+					>
+						@{username}
+					</p>
 				</div>
 			</div>
 

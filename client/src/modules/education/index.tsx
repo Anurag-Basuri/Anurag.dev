@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { GraduationCap, MapPin, Calendar, Award, BookOpen } from 'lucide-react';
 import { apiClient } from '@/api/client';
-import type { JourneyEntry } from '@/types/schema';
+import type { JourneyEntry } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
@@ -59,15 +59,15 @@ const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
 					'relative flex flex-col justify-between h-full min-h-[300px] p-8 rounded-3xl backdrop-blur-xl border shadow-2xl transition-all duration-300',
 					entry.highlighted
 						? 'bg-blue-500/10 border-blue-500/30 hover:border-blue-500/50 hover:bg-blue-500/15'
-						: 'bg-[#0a0a0a]/80 border-white/10 hover:border-white/20 hover:bg-[#111]'
+						: 'bg-[#0a0a0a]/80 border-white/10 hover:border-white/20 hover:bg-[#111]',
 				)}
 				style={{ transform: 'translateZ(50px)' }}
 			>
 				{/* Ambient Glow behind card on hover */}
-				<div 
+				<div
 					className={cn(
-						"absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl -z-10",
-						entry.highlighted ? "bg-blue-500/20" : "bg-white/5"
+						'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl -z-10',
+						entry.highlighted ? 'bg-blue-500/20' : 'bg-white/5',
 					)}
 				/>
 
@@ -84,7 +84,7 @@ const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
 								</p>
 							)}
 						</div>
-						
+
 						{entry.grade && (
 							<div className="flex shrink-0 items-center justify-center px-3 py-1.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-sm shadow-inner group-hover:scale-110 transition-transform">
 								{entry.grade}
@@ -120,7 +120,10 @@ const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
 				</div>
 
 				{/* Description & Skills */}
-				<div className="pt-6 mt-6 border-t border-white/10 space-y-4" style={{ transform: 'translateZ(40px)' }}>
+				<div
+					className="pt-6 mt-6 border-t border-white/10 space-y-4"
+					style={{ transform: 'translateZ(40px)' }}
+				>
 					<p className="text-sm text-muted-foreground/90 leading-relaxed whitespace-pre-wrap">
 						{entry.description}
 					</p>

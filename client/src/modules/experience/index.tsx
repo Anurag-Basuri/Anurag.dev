@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Building2, MapPin, Calendar, Star, ChevronRight } from 'lucide-react';
 import { apiClient } from '@/api/client';
-import type { JourneyEntry } from '@/types/schema';
+import type { JourneyEntry } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { cn } from '@/lib/utils';
@@ -80,8 +80,8 @@ export function ExperienceModule() {
 										key={job.id}
 										variants={staggerItem}
 										className={cn(
-											"relative flex flex-col md:flex-row items-start md:items-center gap-8 group",
-											isEven ? "md:flex-row" : "md:flex-row-reverse"
+											'relative flex flex-col md:flex-row items-start md:items-center gap-8 group',
+											isEven ? 'md:flex-row' : 'md:flex-row-reverse',
 										)}
 									>
 										{/* Glowing Node */}
@@ -90,16 +90,24 @@ export function ExperienceModule() {
 										</div>
 
 										{/* Content Card */}
-										<div className={cn(
-											"w-full pl-20 md:pl-0 md:w-1/2",
-											isEven ? "md:pr-12" : "md:pl-12"
-										)}>
-											<motion.div 
+										<div
+											className={cn(
+												'w-full pl-20 md:pl-0 md:w-1/2',
+												isEven ? 'md:pr-12' : 'md:pl-12',
+											)}
+										>
+											<motion.div
 												whileHover={{ y: -5, scale: 1.02 }}
-												transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+												transition={{
+													type: 'spring',
+													stiffness: 300,
+													damping: 20,
+												}}
 												className={cn(
-													"relative p-6 rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 shadow-2xl transition-colors duration-500",
-													job.highlighted ? "border-primary/30 bg-primary/5" : "hover:border-white/10"
+													'relative p-6 rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 shadow-2xl transition-colors duration-500',
+													job.highlighted
+														? 'border-primary/30 bg-primary/5'
+														: 'hover:border-white/10',
 												)}
 											>
 												{/* Highlight Badge */}
@@ -110,8 +118,10 @@ export function ExperienceModule() {
 												)}
 
 												{/* Header */}
-												<h3 className="text-2xl font-black tracking-tight text-white mb-2">{job.title}</h3>
-												
+												<h3 className="text-2xl font-black tracking-tight text-white mb-2">
+													{job.title}
+												</h3>
+
 												<div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-muted-foreground mb-4">
 													{job.organization && (
 														<span className="flex items-center gap-1.5 text-primary">
@@ -140,8 +150,8 @@ export function ExperienceModule() {
 												{job.skills && job.skills.length > 0 && (
 													<div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
 														{job.skills.map(skill => (
-															<span 
-																key={skill} 
+															<span
+																key={skill}
 																className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-white/5 text-muted-foreground border border-white/5 hover:bg-white/10 hover:text-white transition-colors"
 															>
 																{skill}

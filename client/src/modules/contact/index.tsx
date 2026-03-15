@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { apiClient } from '@/api/client';
-import type { AboutData } from '@/types/schema';
+import type { AboutData } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
 	Send,
@@ -314,7 +314,9 @@ export function ContactModule() {
 											</>
 										) : (
 											<>
-												<span className="relative z-10">Initiate Contact</span>
+												<span className="relative z-10">
+													Initiate Contact
+												</span>
 												<Send className="w-4 h-4 relative z-10" />
 											</>
 										)}

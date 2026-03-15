@@ -1,4 +1,4 @@
-import type { FileSystemItem } from '@/types/file-system';
+import type { FileSystemItem } from '@/lib/file-system';
 import { getModuleTitle, type AppModuleId } from '@/lib/moduleRegistry';
 
 // Helper to sanitize paths

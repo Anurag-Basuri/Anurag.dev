@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/api/client';
-import type { BlogPost } from '@/types/schema';
+import type { BlogPost } from '@/api/schema';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, Calendar, ArrowUpRight, FileText, BookOpen, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -72,8 +72,11 @@ export function BlogModule() {
 						<div className="p-4 rounded-full bg-white/5 mb-6">
 							<Search className="w-8 h-8 opacity-50 text-primary" />
 						</div>
-						<p className="text-lg">No articles found matching <span className="text-white">"{searchQuery}"</span></p>
-						<button 
+						<p className="text-lg">
+							No articles found matching{' '}
+							<span className="text-white">"{searchQuery}"</span>
+						</p>
+						<button
 							onClick={() => setSearchQuery('')}
 							className="mt-6 text-sm text-primary hover:text-white transition-colors uppercase tracking-wider font-bold"
 						>
@@ -87,7 +90,7 @@ export function BlogModule() {
 						animate="visible"
 						className="grid gap-6 mt-12"
 					>
-						{filteredPosts.map((post) => {
+						{filteredPosts.map(post => {
 							const publishedDate = post.publishedAt
 								? new Date(post.publishedAt)
 								: new Date();
@@ -135,7 +138,15 @@ export function BlogModule() {
 										<div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-4 border-t border-white/5">
 											<div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-primary/80">
 												<Clock className="w-3.5 h-3.5" />
-												<span>{Math.max(1, Math.ceil(post.content.split(/\s+/).length / 200))} min read</span>
+												<span>
+													{Math.max(
+														1,
+														Math.ceil(
+															post.content.split(/\s+/).length / 200,
+														),
+													)}{' '}
+													min read
+												</span>
 											</div>
 
 											{post.tags.length > 0 && (
