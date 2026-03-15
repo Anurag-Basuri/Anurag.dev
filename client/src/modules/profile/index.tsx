@@ -56,14 +56,9 @@ export function ProfileModule() {
 
 	useEffect(() => {
 		async function fetchProfile() {
-			try {
-				const { data } = await publicService.getProfile();
-				setProfile(data);
-			} catch (err) {
-				console.error('Failed to load profile', err);
-			} finally {
-				setLoading(false);
-			}
+			const { data } = await publicService.getProfile();
+			setProfile(data);
+			setLoading(false);
 		}
 		fetchProfile();
 	}, []);

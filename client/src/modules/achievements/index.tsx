@@ -42,14 +42,9 @@ export function AchievementsModule() {
 
 	useEffect(() => {
 		async function fetchAchievements() {
-			try {
-				const { data } = await publicService.getAchievements();
-				setAchievements(data || []);
-			} catch (err) {
-				console.error('Failed to load achievements', err);
-			} finally {
-				setLoading(false);
-			}
+			const { data } = await publicService.getAchievements();
+			setAchievements(data || []);
+			setLoading(false);
 		}
 		fetchAchievements();
 	}, []);

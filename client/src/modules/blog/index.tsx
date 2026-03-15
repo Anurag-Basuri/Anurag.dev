@@ -16,14 +16,9 @@ export function BlogModule() {
 
 	useEffect(() => {
 		async function fetchPosts() {
-			try {
-				const { data } = await publicService.getBlogPosts();
-				setPosts(data || []);
-			} catch (err) {
-				console.error('Failed to load blog posts', err);
-			} finally {
-				setLoading(false);
-			}
+			const { data } = await publicService.getBlogPosts();
+			setPosts(data || []);
+			setLoading(false);
 		}
 		fetchPosts();
 	}, []);

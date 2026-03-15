@@ -15,14 +15,9 @@ export function CertificationModule() {
 
 	useEffect(() => {
 		async function fetchCerts() {
-			try {
-				const { data } = await publicService.getCertifications();
-				setCerts(data || []);
-			} catch (err) {
-				console.error('Failed to load certifications', err);
-			} finally {
-				setLoading(false);
-			}
+			const { data } = await publicService.getCertifications();
+			setCerts(data || []);
+			setLoading(false);
 		}
 		fetchCerts();
 	}, []);

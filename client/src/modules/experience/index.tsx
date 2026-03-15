@@ -16,14 +16,9 @@ export function ExperienceModule() {
 
 	useEffect(() => {
 		async function fetchJourney() {
-			try {
-				const { data } = await publicService.getJourney();
-				setEntries(data || []);
-			} catch (err) {
-				console.error('Failed to load experience', err);
-			} finally {
-				setLoading(false);
-			}
+			const { data } = await publicService.getJourney();
+			setEntries(data || []);
+			setLoading(false);
 		}
 		fetchJourney();
 	}, []);

@@ -37,20 +37,10 @@ export function ProjectsModule() {
 	const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 	const fetchData = async () => {
-		try {
-			setLoading(true);
-			setError(null);
-			const { data } = await publicService.getProjects();
-			setProjects(data || []);
-		} catch (err: unknown) {
-			if (err instanceof Error) {
-				setError(err.message);
-			} else {
-				setError('An unknown error occurred');
-			}
-		} finally {
-			setLoading(false);
-		}
+		setLoading(true);
+		const { data } = await publicService.getProjects();
+		setProjects(data || []);
+		setLoading(false);
 	};
 
 	useEffect(() => {
