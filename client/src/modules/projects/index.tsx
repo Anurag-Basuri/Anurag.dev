@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import Image from 'next/image';
 import { publicService } from '@/api';
 import type { Project } from '@/api/schema';
@@ -28,6 +28,40 @@ function ProjectsSkeleton() {
 		</div>
 	);
 }
+
+// ─── Project Thumbnail ──────────────────────────────────────────
+
+const ProjectThumbnail = memo(function ProjectThumbnail({
+	src,
+	title,
+}: {
+	src: string | null | undefined;
+	title: string;
+}) {
+	const [imgFailed, setImgFailed] = useState(false);
+
+	if (src && !imgFailed) {
+		return (
+			<>
+				<div className="absolute inset-0 bg-[#050505] z-0" />
+				<Image
+					src={src}
+					alt={title}
+					fill
+					className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
+					onError={() => setImgFailed(true)}
+				/>
+			</>
+		);
+	}
+
+	return (
+		<div className="w-full h-full bg-linear-to-br from-[#111] via-[#050505] to-black flex items-center justify-center relative overflow-hidden">
+			<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+			<Folder className="w-12 h-12 text-white/10 group-hover:text-primary/30 transition-colors duration-500" />
+		</div>
+	);
+});
 
 export function ProjectsModule() {
 	const [projects, setProjects] = useState<Project[]>([]);
@@ -124,20 +158,7 @@ export function ProjectsModule() {
 								>
 									{/* Image Container */}
 									<div className="relative aspect-video overflow-hidden mt-3 mx-3 rounded-t-3xl border border-white/5">
-										<div className="absolute inset-0 bg-[#050505] z-0" />
-										{project.thumbnail ? (
-											<Image
-												src={project.thumbnail}
-												alt={project.title}
-												fill
-												className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
-											/>
-										) : (
-											<div className="w-full h-full bg-linear-to-br from-[#111] via-[#050505] to-black flex items-center justify-center relative overflow-hidden">
-												<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
-												<Folder className="w-12 h-12 text-white/10 group-hover:text-primary/30 transition-colors duration-500" />
-											</div>
-										)}
+										<ProjectThumbnail src={project.thumbnail || project.liveUrl} title={project.title} />
 
 										{/* Hover Overlay */}
 										<div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10 backdrop-blur-sm">
@@ -249,19 +270,7 @@ export function ProjectsModule() {
 
 								{/* Left Side: Thumbnail */}
 								<div className="relative w-full md:w-5/12 h-72 md:h-full bg-black shrink-0 overflow-hidden border-r border-white/5">
-									{selectedProject.thumbnail ? (
-										<Image
-											src={selectedProject.thumbnail}
-											alt={selectedProject.title}
-											fill
-											className="object-cover"
-										/>
-									) : (
-										<div className="w-full h-full bg-linear-to-br from-[#111] to-[#050505] flex items-center justify-center">
-											<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
-											<Folder className="w-20 h-20 text-white/10" />
-										</div>
-									)}
+									<ProjectThumbnail src={selectedProject.thumbnail || selectedProject.liveUrl} title={selectedProject.title} />
 									<div className="absolute inset-0 bg-linear-to-t from-[#080808] via-transparent to-transparent opacity-100 md:opacity-50" />
 
 									{/* Embedded Mobile Header */}
