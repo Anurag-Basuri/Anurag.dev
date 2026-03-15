@@ -79,8 +79,8 @@ async function submitContact(data: {
 	email: string;
 	subject: string;
 	message: string;
-}): Promise<{ data: null; source: 'api' | 'fallback' }> {
-	return withFallback(() => apiClient.post<null>('/contact', data), null, 'contact');
+}): Promise<null> {
+	return apiClient.post<null>('/contact', data);
 }
 
 async function getCodingStats() {

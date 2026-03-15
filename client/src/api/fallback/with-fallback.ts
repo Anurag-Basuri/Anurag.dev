@@ -11,14 +11,21 @@ export async function withFallback<T>(
 	fallbackData: T,
 	label?: string,
 ): Promise<{ data: T; source: 'api' | 'fallback' }> {
+	const tag = label || 'unknown';
+
 	try {
 		const data = await fetcher();
+
+		// If the API returned null/undefined, use fallback data instead
+		if (data === null || data === undefined) {
+			console.warn(`[Fallback:${tag}] API returned empty data, using fallback.`);
+			return { data: fallbackData, source: 'fallback' };
+		}
+
 		return { data, source: 'api' };
 	} catch (error) {
-		const tag = label || 'unknown';
 		const message = error instanceof Error ? error.message : 'Unknown error';
 		console.warn(`[Fallback:${tag}] API failed, using fallback data. Reason: ${message}`);
 		return { data: fallbackData, source: 'fallback' };
 	}
 }
-

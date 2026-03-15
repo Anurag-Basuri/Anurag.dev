@@ -113,10 +113,6 @@ export function ContactModule() {
 
 	if (initialLoading) return <ContactSkeleton />;
 
-	if (error) {
-		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
-	}
-
 	const socialIcons: Record<string, any> = {
 		GitHub: Github,
 		Twitter: Twitter,

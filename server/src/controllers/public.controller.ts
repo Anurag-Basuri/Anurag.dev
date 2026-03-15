@@ -77,16 +77,6 @@ async function getPublicBlogPosts(_req: Request, res: Response): Promise<void> {
 	const posts = await prisma.blogPost.findMany({
 		where: { status: 'published' },
 		orderBy: { publishedAt: 'desc' },
-		select: {
-			id: true,
-			title: true,
-			slug: true,
-			coverImage: true,
-			tags: true,
-			publishedAt: true,
-			createdAt: true,
-			updatedAt: true,
-		},
 	});
 
 	ApiResponse.ok(res, posts);
