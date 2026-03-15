@@ -25,6 +25,8 @@ interface PlatformStats {
 interface CodingStatsResult {
 	leetcode: PlatformStats;
 	codeforces: PlatformStats;
+	codechef: PlatformStats;
+	gfg: PlatformStats;
 	github: PlatformStats;
 }
 
@@ -46,6 +48,8 @@ function extractUsername(url: string | null | undefined, pattern: RegExp): strin
 const GITHUB_PATTERN = /github\.com\/([a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38})\/?$/;
 const LEETCODE_PATTERN = /leetcode\.com\/(?:u\/)?([a-zA-Z0-9_-]+)\/?$/;
 const CODEFORCES_PATTERN = /codeforces\.com\/profile\/([a-zA-Z0-9_.]+)\/?$/;
+const CODECHEF_PATTERN = /codechef\.com\/users\/([a-zA-Z0-9_]+)\/?$/;
+const GFG_PATTERN = /geeksforgeeks\.org\/user\/([a-zA-Z0-9_]+)\/?$/;
 
 // ─── GitHub API ─────────────────────────────────────────────────
 
@@ -243,6 +247,8 @@ export async function getCodingStatsData(): Promise<CodingStatsResult> {
 	const githubUsername = extractUsername(profile?.github, GITHUB_PATTERN);
 	const leetcodeUsername = extractUsername(profile?.leetcode, LEETCODE_PATTERN);
 	const codeforcesHandle = extractUsername(profile?.codeforces, CODEFORCES_PATTERN);
+	const codechefUsername = extractUsername(profile?.codechef, CODECHEF_PATTERN);
+	const gfgUsername = extractUsername(profile?.gfg, GFG_PATTERN);
 
 	// Fetch all platforms in parallel — each handles its own errors
 	const [github, leetcode, codeforces] = await Promise.all([
@@ -251,7 +257,15 @@ export async function getCodingStatsData(): Promise<CodingStatsResult> {
 		codeforcesHandle ? fetchCodeforces(codeforcesHandle) : Promise.resolve(EMPTY_PLATFORM),
 	]);
 
-	const result: CodingStatsResult = { leetcode, codeforces, github };
+	// CodeChef and GFG have no public API — pass through as link-only
+	const codechef: PlatformStats = codechefUsername
+		? { username: codechefUsername, url: `https://www.codechef.com/users/${codechefUsername}` }
+		: EMPTY_PLATFORM;
+	const gfg: PlatformStats = gfgUsername
+		? { username: gfgUsername, url: `https://www.geeksforgeeks.org/user/${gfgUsername}` }
+		: EMPTY_PLATFORM;
+
+	const result: CodingStatsResult = { leetcode, codeforces, codechef, gfg, github };
 
 	// Update cache
 	cachedResult = result;

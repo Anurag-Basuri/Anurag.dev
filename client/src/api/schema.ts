@@ -282,10 +282,10 @@ export const codingStatsSchema = z.object({
 	leetcode: platformStatsSchema,
 	codeforces: platformStatsSchema,
 	codechef: platformStatsSchema.optional(),
+	gfg: platformStatsSchema.optional(),
 	github: platformStatsSchema,
 	updatedAt: z.string().optional(),
 });
 
 export type PlatformStats = z.infer<typeof platformStatsSchema>;
 export type CodingStats = z.infer<typeof codingStatsSchema>;
-
