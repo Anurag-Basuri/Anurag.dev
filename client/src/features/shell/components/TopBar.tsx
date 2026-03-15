@@ -5,7 +5,6 @@ import { useAtom } from 'jotai';
 import { mobileSidebarOpenAtom } from '@/store';
 import { Clock, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { type FileSystemItem } from '@/data/filesystem';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import Image from 'next/image';
 import { StatusBar } from './StatusBar';
@@ -19,10 +18,10 @@ const ThemeToggle = dynamic(() => import('@/components/ui/theme-toggle').then(m 
 
 interface TopBarProps {
 	isMobile: boolean;
-	onFileSelect: (item: FileSystemItem) => void;
+	onNavigate: (moduleId: string) => void;
 }
 
-export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarProps) {
+export const TopBar = memo(function TopBar({ isMobile, onNavigate }: TopBarProps) {
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 	const [mounted, setMounted] = useState(false);
@@ -44,8 +43,8 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 	}, []);
 
 	const handleContactClick = useCallback(() => {
-		onFileSelect({ id: 'contact', name: 'contact', type: 'file', moduleId: 'contact' });
-	}, [onFileSelect]);
+		onNavigate('contact');
+	}, [onNavigate]);
 
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
@@ -64,7 +63,7 @@ export const TopBar = memo(function TopBar({ isMobile, onFileSelect }: TopBarPro
 						<MobileExplorerSheet
 							isOpen={isExplorerOpen}
 							onOpenChange={setIsExplorerOpen}
-							onFileSelect={onFileSelect}
+							onNavigate={onNavigate}
 						/>
 					)}
 

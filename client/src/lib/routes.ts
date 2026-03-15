@@ -143,5 +143,4 @@ export const navigationItems: Array<{ id: ModuleId; label: string; description: 
 	{ id: 'contact', label: 'Contact', description: 'Get in Touch' },
 ];
 
-// Quick access modules for taskbar
-export const taskbarModules: ModuleId[] = ['about', 'projects', 'journey', 'contact'];
+

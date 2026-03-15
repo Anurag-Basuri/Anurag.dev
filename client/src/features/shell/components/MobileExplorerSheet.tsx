@@ -6,20 +6,20 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderTree } from '@/features/sidebar/FolderTree';
 import { SidebarProfile } from '@/features/sidebar/SidebarProfile';
-import { INITIAL_FILE_SYSTEM, type FileSystemItem } from '@/data/filesystem';
+import { INITIAL_FILE_SYSTEM } from '@/data/filesystem';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MobileExplorerSheetProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	onFileSelect: (item: FileSystemItem) => void;
+	onNavigate: (moduleId: string) => void;
 }
 
 export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 	isOpen,
 	onOpenChange,
-	onFileSelect,
+	onNavigate,
 }: MobileExplorerSheetProps) {
 	return (
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -55,7 +55,9 @@ export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 							<FolderTree
 								items={INITIAL_FILE_SYSTEM}
 								onSelect={item => {
-									onFileSelect(item);
+									if (item.moduleId) {
+										onNavigate(item.moduleId);
+									}
 									onOpenChange(false);
 								}}
 							/>
