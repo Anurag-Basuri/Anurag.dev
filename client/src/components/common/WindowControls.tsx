@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { X, Minus, Maximize2, Minimize2, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { PANEL_TOKENS, SPRINGS } from '@/design-system/tokens';
+import { PANEL_TOKENS } from '@/design-system/tokens';
+import { SPRINGS } from '@/design-system/motion';
 
 // ============================================================================
 // Constants
