@@ -4,6 +4,7 @@ import { useCallback, useState, useEffect } from 'react';
 import { useApi } from '@/api';
 import { adminService } from '@/api';
 import { FormField, TagField } from '../components/FormField';
+import { FileUploadField } from '../components/FileUploadField';
 import type { Profile } from '@/api/schema';
 
 // ─── Socials sub-editor ──────────────────────────────────────────
@@ -454,26 +455,29 @@ export default function ProfilePage() {
 						Media &amp; Links
 					</h2>
 					<div className="grid grid-cols-2 gap-4">
-						<FormField
-							label="Avatar URL"
-							name="avatarUrl"
-							type="url"
-							value={(form.avatarUrl as string) || ''}
-							onChange={updateField}
+						<FileUploadField
+							label="Avatar"
+							currentUrl={form.avatarUrl}
+							onUpload={adminService.uploadAvatar}
+							onSuccess={refetch}
+							accept="image/*"
+							maxSizeMB={10}
 						/>
-						<FormField
-							label="Cover URL"
-							name="coverUrl"
-							type="url"
-							value={(form.coverUrl as string) || ''}
-							onChange={updateField}
+						<FileUploadField
+							label="Cover Image"
+							currentUrl={form.coverUrl}
+							onUpload={adminService.uploadCover}
+							onSuccess={refetch}
+							accept="image/*"
+							maxSizeMB={10}
 						/>
-						<FormField
-							label="Resume URL"
-							name="resumeUrl"
-							type="url"
-							value={(form.resumeUrl as string) || ''}
-							onChange={updateField}
+						<FileUploadField
+							label="Resume"
+							currentUrl={form.resumeUrl}
+							onUpload={adminService.uploadResume}
+							onSuccess={refetch}
+							accept=".pdf,.doc,.docx"
+							maxSizeMB={10}
 						/>
 						<FormField
 							label="Website"
@@ -636,4 +640,3 @@ export default function ProfilePage() {
 		</div>
 	);
 }
-
