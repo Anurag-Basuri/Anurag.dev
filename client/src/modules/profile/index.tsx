@@ -13,10 +13,10 @@ import {
 	Mail,
 	Code2,
 } from 'lucide-react';
-import { apiClient } from '@/api/client';
+import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/ui/scroll-area';
 
 // --- Animations ---
 const fadeInUp: Variants = {
@@ -57,7 +57,7 @@ export function ProfileModule() {
 	useEffect(() => {
 		async function fetchProfile() {
 			try {
-				const data = await apiClient.get<Profile>('/profile');
+				const { data } = await publicService.getProfile();
 				setProfile(data);
 			} catch (err) {
 				console.error('Failed to load profile', err);
@@ -252,4 +252,3 @@ export function ProfileModule() {
 		</ScrollArea>
 	);
 }
-

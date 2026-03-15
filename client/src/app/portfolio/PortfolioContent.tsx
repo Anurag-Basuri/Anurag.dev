@@ -1,6 +1,6 @@
 'use client';
 
-import { ScrollContainer } from '@/features/scroll';
+import { ScrollContainer } from '@/layout/ScrollContainer';
 
 interface PortfolioContentProps {
 	initialSection?: string;
@@ -13,4 +13,3 @@ interface PortfolioContentProps {
 export function PortfolioContent({ initialSection }: PortfolioContentProps) {
 	return <ScrollContainer initialSection={initialSection} />;
 }
-

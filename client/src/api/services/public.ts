@@ -15,6 +15,7 @@ import type {
 	Certification,
 	BlogPost,
 	AboutData,
+	CodingStats,
 } from '@/api/schema';
 
 // Public-facing API service — falls back to hardcoded data if backend is unreachable
@@ -82,6 +83,10 @@ async function submitContact(data: {
 	return withFallback(() => apiClient.post<null>('/contact', data), null, 'contact');
 }
 
+async function getCodingStats() {
+	return withFallback(() => apiClient.get<CodingStats>('/coding-stats'), null, 'coding-stats');
+}
+
 export const publicService = {
 	getProfile,
 	getProjects,
@@ -91,6 +96,6 @@ export const publicService = {
 	getCertifications,
 	getBlogPosts,
 	getBlogPostBySlug,
+	getCodingStats,
 	submitContact,
 };
-
