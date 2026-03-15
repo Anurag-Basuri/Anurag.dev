@@ -252,3 +252,4 @@ export function ProfileModule() {
 		</ScrollArea>
 	);
 }
+

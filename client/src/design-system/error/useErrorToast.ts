@@ -36,3 +36,4 @@ export function useErrorToast(label?: string) {
 
   return { reportError };
 }
+

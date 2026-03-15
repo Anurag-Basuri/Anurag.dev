@@ -38,3 +38,4 @@ export function ScrollSection({ id, children, className = '' }: ScrollSectionPro
 		</section>
 	);
 }
+

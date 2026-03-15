@@ -114,3 +114,4 @@ export function useBootSequence(): UseBootSequenceReturn {
 
 	return { status, progress, isCompleting, skip };
 }
+

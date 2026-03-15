@@ -76,3 +76,4 @@ export function useScrollSpy(containerRef: React.RefObject<HTMLElement | null>) 
 
 	return { activeSectionId, suppressSpy };
 }
+

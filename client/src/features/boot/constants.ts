@@ -29,3 +29,4 @@ export const ROLES = [
 
 // Computed
 export const BOOT_TOTAL_DURATION = BOOT_CONFIG.PHASE_DURATION * BOOT_PHASES.length;
+

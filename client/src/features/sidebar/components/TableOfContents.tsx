@@ -115,3 +115,4 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 		</div>
 	);
 }
+

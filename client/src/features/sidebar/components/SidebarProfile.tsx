@@ -4,7 +4,7 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import { Linkedin, Github, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PANEL_TOKENS } from '@/lib/constants';
+import { PANEL_TOKENS } from '@/design-system/tokens';
 
 // ============================================================================
 // Social Button Component
@@ -104,3 +104,4 @@ export const SidebarProfile = memo(function SidebarProfile() {
 		</div>
 	);
 });
+

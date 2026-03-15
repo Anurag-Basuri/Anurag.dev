@@ -88,3 +88,4 @@ export const MatrixRain = memo(function MatrixRain() {
 		<canvas ref={canvasRef} className="absolute inset-0 opacity-[0.12]" aria-hidden="true" />
 	);
 });
+

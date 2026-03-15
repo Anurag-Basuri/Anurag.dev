@@ -38,3 +38,4 @@ export function useScrollNavigation(
 
 	return { scrollTo, isScrolling: scrollingRef.current };
 }
+

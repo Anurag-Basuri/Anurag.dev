@@ -27,3 +27,4 @@ export const BootProgress = memo(function BootProgress({ status, progress }: Boo
 		</div>
 	);
 });
+

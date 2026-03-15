@@ -52,3 +52,4 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 		</TooltipProvider>
 	);
 });
+
