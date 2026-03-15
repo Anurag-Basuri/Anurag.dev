@@ -1,92 +1,87 @@
 /**
  * design-system/tokens.ts
  * Single source of truth for all design tokens.
- * Replaces: src/lib/constants.ts
+ * 4 themes: Obsidian (dark), Ember (dark), Sakura (light), Ocean (medium)
  */
 
 // ─── Theme Palettes ────────────────────────────────────────────────────────────
-export type ThemeName = 'dark' | 'cyberpunk' | 'aurora';
+export type ThemeName = 'obsidian' | 'ember' | 'sakura' | 'ocean';
+
+export type ThemeBrightness = 'dark' | 'light' | 'medium';
 
 export interface ThemePalette {
   name: ThemeName;
   label: string;
-  /** CSS class applied to <html> for next-themes */
-  htmlClass: string;
-  /** Primary accent color (Tailwind name) */
+  brightness: ThemeBrightness;
+  /** Primary accent hex */
   primary: string;
-  /** Hex for glow effects */
-  primaryHex: string;
-  /** Secondary accent */
+  /** Secondary accent hex */
   secondary: string;
-  secondaryHex: string;
-  /** 3D scene identifier for Scene3D */
-  scene: 'deep-space' | 'neon-grid' | 'aurora';
-  /** Background gradient CSS */
-  bgGradient: string;
-  /** Sidebar/panel bg opacity */
+  /** Background hex (for canvas clear + body) */
+  bg: string;
+  /** Foreground text hex */
+  fg: string;
+  /** Muted text hex */
+  muted: string;
+  /** Panel glass tint (Tailwind class) */
   panelBg: string;
+  /** Border for glass panels */
+  panelBorder: string;
 }
 
 export const THEMES: Record<ThemeName, ThemePalette> = {
-  dark: {
-    name: 'dark',
-    label: 'Deep Space',
-    htmlClass: 'dark',
-    primary: 'emerald-400',
-    primaryHex: '#34d399',
-    secondary: 'blue-400',
-    secondaryHex: '#60a5fa',
-    scene: 'deep-space',
-    bgGradient: 'from-[#020409] via-[#050d14] to-[#020409]',
-    panelBg: 'bg-black/60',
+  obsidian: {
+    name: 'obsidian',
+    label: 'Obsidian',
+    brightness: 'dark',
+    primary: '#34d399',
+    secondary: '#60a5fa',
+    bg: '#020409',
+    fg: '#f0f0f0',
+    muted: '#6b7280',
+    panelBg: 'bg-black/30 backdrop-blur-xl',
+    panelBorder: 'border-white/10',
   },
-  cyberpunk: {
-    name: 'cyberpunk',
-    label: 'Cyberpunk',
-    htmlClass: 'dark cyberpunk',
-    primary: 'cyan-400',
-    primaryHex: '#22d3ee',
-    secondary: 'fuchsia-500',
-    secondaryHex: '#d946ef',
-    scene: 'neon-grid',
-    bgGradient: 'from-[#020010] via-[#050014] to-[#020010]',
-    panelBg: 'bg-[#06002a]/70',
+  ember: {
+    name: 'ember',
+    label: 'Ember',
+    brightness: 'dark',
+    primary: '#f59e0b',
+    secondary: '#ef4444',
+    bg: '#0c0a06',
+    fg: '#fef3c7',
+    muted: '#92786a',
+    panelBg: 'bg-black/30 backdrop-blur-xl',
+    panelBorder: 'border-amber-500/10',
   },
-  aurora: {
-    name: 'aurora',
-    label: 'Aurora',
-    htmlClass: 'aurora',
-    primary: 'violet-500',
-    primaryHex: '#8b5cf6',
-    secondary: 'teal-400',
-    secondaryHex: '#2dd4bf',
-    scene: 'aurora',
-    bgGradient: 'from-[#f0f4ff] via-[#e8f0fe] to-[#f5f0ff]',
-    panelBg: 'bg-white/60',
+  sakura: {
+    name: 'sakura',
+    label: 'Sakura',
+    brightness: 'light',
+    primary: '#ec4899',
+    secondary: '#8b5cf6',
+    bg: '#fef7f0',
+    fg: '#1e293b',
+    muted: '#94a3b8',
+    panelBg: 'bg-white/40 backdrop-blur-xl',
+    panelBorder: 'border-pink-300/20',
+  },
+  ocean: {
+    name: 'ocean',
+    label: 'Ocean',
+    brightness: 'medium',
+    primary: '#06b6d4',
+    secondary: '#3b82f6',
+    bg: '#1a2332',
+    fg: '#e2e8f0',
+    muted: '#64748b',
+    panelBg: 'bg-slate-900/40 backdrop-blur-xl',
+    panelBorder: 'border-cyan-500/10',
   },
 } as const;
 
-export const DEFAULT_THEME: ThemeName = 'dark';
-
-// ─── Spacing ───────────────────────────────────────────────────────────────────
-export const SPACING = {
-  xs: '0.25rem',  // 4px
-  sm: '0.5rem',   // 8px
-  md: '1rem',     // 16px
-  lg: '1.5rem',   // 24px
-  xl: '2rem',     // 32px
-  '2xl': '3rem',  // 48px
-} as const;
-
-// ─── Border Radius ─────────────────────────────────────────────────────────────
-export const RADII = {
-  sm: 'rounded-lg',    // 8px
-  md: 'rounded-xl',   // 12px
-  lg: 'rounded-2xl',  // 16px
-  xl: 'rounded-3xl',  // 24px
-  '2xl': 'rounded-4xl', // 32px
-  full: 'rounded-full',
-} as const;
+export const THEME_LIST = Object.values(THEMES);
+export const DEFAULT_THEME: ThemeName = 'obsidian';
 
 // ─── Z-Index Scale ─────────────────────────────────────────────────────────────
 export const Z = {
@@ -100,22 +95,6 @@ export const Z = {
   tooltip: 70,
 } as const;
 
-// ─── Blur Values ───────────────────────────────────────────────────────────────
-export const BLUR = {
-  sm: 'backdrop-blur-sm',
-  md: 'backdrop-blur-md',
-  lg: 'backdrop-blur-lg',
-  xl: 'backdrop-blur-xl',
-} as const;
-
-// ─── Shadow Presets ────────────────────────────────────────────────────────────
-export const SHADOWS = {
-  glow: (hex: string, intensity = 0.4) =>
-    `0 0 20px ${hex}${Math.round(intensity * 255).toString(16).padStart(2, '0')}`,
-  card: '0 4px 32px rgba(0,0,0,0.4)',
-  panel: '0 8px 48px rgba(0,0,0,0.6)',
-} as const;
-
 // ─── Icon Sizes ────────────────────────────────────────────────────────────────
 export const ICON_SIZES = {
   xs: 'w-3 h-3',
@@ -125,16 +104,7 @@ export const ICON_SIZES = {
   xl: 'w-8 h-8',
 } as const;
 
-// ─── Spring Configs ────────────────────────────────────────────────────────────
-/** For use outside of framer-motion (e.g., CSS transitions) */
-export const DURATION = {
-  fast:   150,
-  normal: 300,
-  slow:   500,
-  xslow:  800,
-} as const;
-
-// ─── Panel Tokens (backwards compat with Sidebar/controls) ────────────────────
+// ─── Panel Tokens (backward compat) ───────────────────────────────────────────
 export const PANEL_TOKENS = {
   header: {
     height: 'h-9',
@@ -162,4 +132,3 @@ export const PANEL_TOKENS = {
     gap: 'gap-1.5',
   },
 } as const;
-

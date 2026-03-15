@@ -2,7 +2,8 @@
 
 /**
  * design-system/theme-context.tsx
- * Centralized theme state: React Context + Jotai atom + next-themes integration.
+ * Centralized theme state for 4 themes.
+ * Bridges Jotai atom + CSS custom properties.
  */
 
 import {
@@ -11,9 +12,8 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
-import { useTheme as useNextTheme } from 'next-themes';
 import { atom, useAtom } from 'jotai';
-import { THEMES, DEFAULT_THEME, type ThemeName, type ThemePalette } from './tokens';
+import { THEMES, DEFAULT_THEME, THEME_LIST, type ThemeName, type ThemePalette } from './tokens';
 
 // ─── Atoms ─────────────────────────────────────────────────────────────────────
 export const themeNameAtom = atom<ThemeName>(DEFAULT_THEME);
@@ -23,6 +23,7 @@ interface ThemeContextValue {
   theme: ThemePalette;
   themeName: ThemeName;
   setTheme: (name: ThemeName) => void;
+  isDark: boolean;
   availableThemes: ThemePalette[];
 }
 
@@ -30,33 +31,35 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 // ─── Provider ──────────────────────────────────────────────────────────────────
 export function ThemeContextProvider({ children }: { children: ReactNode }) {
-  const [themeName, setThemeAtom] = useAtom(themeNameAtom);
-  const { setTheme: setNextTheme } = useNextTheme();
-
+  const [themeName, setThemeName] = useAtom(themeNameAtom);
   const theme = THEMES[themeName];
+  const isDark = theme.brightness === 'dark' || theme.brightness === 'medium';
 
   const setTheme = (name: ThemeName) => {
-    setThemeAtom(name);
-    // Sync CSS classes with next-themes
-    setNextTheme(THEMES[name].htmlClass);
+    setThemeName(name);
   };
 
-  // Apply CSS custom properties on theme change
+  // Apply CSS custom properties when theme changes
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty('--theme-primary-hex', theme.primaryHex);
-    root.style.setProperty('--theme-secondary-hex', theme.secondaryHex);
+    root.style.setProperty('--theme-primary', theme.primary);
+    root.style.setProperty('--theme-secondary', theme.secondary);
+    root.style.setProperty('--theme-bg', theme.bg);
+    root.style.setProperty('--theme-fg', theme.fg);
+    root.style.setProperty('--theme-muted', theme.muted);
     root.dataset.theme = themeName;
-  }, [theme, themeName]);
+
+    // Set color-scheme for browser chrome
+    root.style.colorScheme = isDark ? 'dark' : 'light';
+
+    // Set body background
+    document.body.style.backgroundColor = theme.bg;
+    document.body.style.color = theme.fg;
+  }, [theme, themeName, isDark]);
 
   return (
     <ThemeContext.Provider
-      value={{
-        theme,
-        themeName,
-        setTheme,
-        availableThemes: Object.values(THEMES),
-      }}
+      value={{ theme, themeName, setTheme, isDark, availableThemes: THEME_LIST }}
     >
       {children}
     </ThemeContext.Provider>
@@ -70,9 +73,7 @@ export function useAppTheme(): ThemeContextValue {
   return ctx;
 }
 
-/** Read-only theme name atom hook (no re-render on unrelated state) */
 export function useThemeName(): ThemeName {
   const [name] = useAtom(themeNameAtom);
   return name;
 }
-
