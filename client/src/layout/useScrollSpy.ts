@@ -55,6 +55,11 @@ export function useScrollSpy(containerRef: React.RefObject<HTMLElement | null>) 
 					// Update URL without navigation
 					const url = id === SECTIONS[0].id ? '/portfolio' : `/portfolio/${id}`;
 					window.history.replaceState(null, '', url);
+
+					// Notify sidebar of active section change
+					window.dispatchEvent(
+						new CustomEvent('sidebar-active-section', { detail: { sectionId: id } }),
+					);
 				}
 			},
 			{

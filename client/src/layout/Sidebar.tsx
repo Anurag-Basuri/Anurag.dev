@@ -1,25 +1,22 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SidebarProfile } from './SidebarProfile';
 import { TableOfContents } from './TableOfContents';
 import { SECTIONS, type SectionConfig } from '@/lib/sections';
 import { ScrollArea } from '@/ui/scroll-area';
 
-// ============================================================================
-// Main Sidebar Component
-// ============================================================================
 export const Sidebar: React.FC = () => {
-	const pathname = usePathname();
+	const [activeSectionId, setActiveSectionId] = useState(SECTIONS[0].id);
 
-	const currentModule = useMemo(() => {
-		const segments = pathname
-			.split('/')
-			.filter(Boolean)
-			.filter(s => s !== 'portfolio');
-		return segments[0] || 'about';
-	}, [pathname]);
+	// Listen for scroll-spy updates (fired by ScrollContainer/useScrollSpy via URL changes)
+	useEffect(() => {
+		const handler = (e: CustomEvent<{ sectionId: string }>) => {
+			setActiveSectionId(e.detail.sectionId);
+		};
+		window.addEventListener('sidebar-active-section', handler as EventListener);
+		return () => window.removeEventListener('sidebar-active-section', handler as EventListener);
+	}, []);
 
 	const handleFileSelect = useCallback((section: SectionConfig) => {
 		window.dispatchEvent(
@@ -31,7 +28,7 @@ export const Sidebar: React.FC = () => {
 
 	return (
 		<div className="h-full w-full flex flex-col">
-			<div className="flex items-center h-full px-3 text-xs tracking-wider text-muted-foreground/70 font-semibold select-none">
+			<div className="flex items-center h-12 shrink-0 px-3 text-xs tracking-wider text-muted-foreground/70 font-semibold select-none">
 				CONTENTS
 			</div>
 
@@ -43,7 +40,7 @@ export const Sidebar: React.FC = () => {
 						<TableOfContents
 							items={SECTIONS}
 							onSelect={handleFileSelect}
-							activeSectionId={currentModule}
+							activeSectionId={activeSectionId}
 						/>
 					</div>
 				</ScrollArea>

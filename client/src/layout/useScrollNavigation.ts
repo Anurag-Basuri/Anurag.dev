@@ -25,8 +25,13 @@ export function useScrollNavigation(
 			target.scrollIntoView({ behavior, block: 'start' });
 
 			// Update URL immediately
-			const url = sectionId === 'about' ? '/portfolio' : `/portfolio/${sectionId}`;
+			const url = sectionId === 'profile' ? '/portfolio' : `/portfolio/${sectionId}`;
 			window.history.replaceState(null, '', url);
+
+			// Notify sidebar immediately
+			window.dispatchEvent(
+				new CustomEvent('sidebar-active-section', { detail: { sectionId } }),
+			);
 
 			// Reset scrolling flag after animation completes
 			setTimeout(() => {
