@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { SidebarProfile } from './SidebarProfile';
-import { FolderTree } from './FolderTree';
+import { TableOfContents } from './TableOfContents';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderOpen } from 'lucide-react';
@@ -39,24 +39,19 @@ export const Sidebar: React.FC = () => {
 
 	return (
 		<div className="h-full w-full flex flex-col">
-			<PanelHeader
-				type="sidebar"
-				icon={FolderOpen}
-				title="EXPLORER"
-				controls={
-					<SidebarControls onToggleFolders={() => setFolderSignal(prev => prev + 1)} />
-				}
-			/>
+				<div className="flex items-center h-full px-3 text-xs tracking-wider text-muted-foreground/70 font-semibold select-none">
+					CONTENTS
+				</div>
 
 			<SidebarProfile />
 
 			<div className="flex-1 min-h-0">
 				<ScrollArea className="h-full">
 					<div className="p-2">
-						<FolderTree
+						<TableOfContents
 							items={fileSystem}
 							onSelect={handleFileSelect}
-							activeModuleId={currentModule ?? null}
+							activeSectionId={currentModule}
 						/>
 					</div>
 				</ScrollArea>

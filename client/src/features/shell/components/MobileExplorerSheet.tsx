@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { FolderTree, SidebarProfile } from '@/features/sidebar';
+import { TableOfContents, SidebarProfile } from '@/features/sidebar';
 import { INITIAL_FILE_SYSTEM } from '@/data/filesystem';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,6 +18,8 @@ export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 	isOpen,
 	onOpenChange,
 }: MobileExplorerSheetProps) {
+	const currentSection = typeof window !== 'undefined' ? window.location.pathname.split('/').pop() || 'about' : 'about';
+
 	return (
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>
 			<SheetTrigger asChild>
@@ -49,8 +51,9 @@ export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 				<div className="flex-1 overflow-hidden">
 					<ScrollArea className="h-full">
 						<div className="p-4">
-							<FolderTree
+							<TableOfContents
 								items={INITIAL_FILE_SYSTEM}
+								activeSectionId={currentSection}
 								onSelect={item => {
 									if (item.moduleId) {
 										window.dispatchEvent(

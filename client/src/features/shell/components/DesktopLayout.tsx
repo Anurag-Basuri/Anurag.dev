@@ -5,10 +5,6 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { Loader } from '@/components/common/Loader';
 import dynamic from 'next/dynamic';
 
-const CLI = dynamic(() => import('@/features/terminal/CLI').then(m => m.CLI), {
-	ssr: false,
-	loading: () => <Loader height="h-full" />,
-});
 
 const Sidebar = dynamic(() => import('@/features/sidebar/components/Sidebar').then(m => m.Sidebar), {
 	ssr: false,
@@ -30,21 +26,13 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 				</ErrorBoundary>
 			</aside>
 
-			{/* Main + Terminal */}
+		{/* Main */}
 			<div className="flex-1 min-w-0 flex flex-col gap-2">
 				<main className={`${panel} flex-1 min-h-0 overflow-hidden`}>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>{children}</Suspense>
 					</ErrorBoundary>
 				</main>
-
-				<section className={`${panel} h-56 lg:h-64 shrink-0 overflow-hidden`}>
-					<ErrorBoundary>
-						<Suspense fallback={<Loader height="h-full" />}>
-							<CLI />
-						</Suspense>
-					</ErrorBoundary>
-				</section>
 			</div>
 		</div>
 	);
