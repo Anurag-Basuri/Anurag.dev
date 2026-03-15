@@ -2,93 +2,81 @@
 
 /**
  * design-system/ui/ThemeSelector.tsx
- * Three-theme switcher with live preview swatches.
- * Replaces: src/components/ui/theme-toggle.tsx
+ * Four-theme switcher with live color swatches.
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppTheme } from '../theme-context';
-import { RADII } from '../tokens';
 import type { ThemeName } from '../tokens';
-import { Palette, Check } from 'lucide-react';
+import { Palette, Check, Sun, Moon, Eclipse } from 'lucide-react';
 import { useState } from 'react';
 
-const SWATCH_COLORS: Record<ThemeName, [string, string]> = {
-  dark:      ['#34d399', '#020409'],
-  cyberpunk: ['#22d3ee', '#020010'],
-  aurora:    ['#8b5cf6', '#f0f4ff'],
+const BRIGHTNESS_ICON: Record<string, React.FC<{ className?: string }>> = {
+  dark: Moon,
+  light: Sun,
+  medium: Eclipse,
 };
 
 export function ThemeSelector() {
-  const { themeName, setTheme, availableThemes } = useAppTheme();
+  const { themeName, setTheme, availableThemes, isDark } = useAppTheme();
   const [open, setOpen] = useState(false);
 
   return (
     <div className="relative">
-      {/* Trigger */}
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen(v => !v)}
-        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 bg-muted/60 transition-colors hover:border-primary/40 hover:bg-muted focus:outline-none"
+        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-md transition-colors hover:bg-white/10 focus:outline-none"
         aria-label="Change theme"
       >
-        <Palette className="h-4 w-4 text-muted-foreground" />
-        {/* Active theme dot */}
-        <span
-          className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full border border-background shadow"
-          style={{ backgroundColor: SWATCH_COLORS[themeName][0] }}
-        />
+        <Palette className="h-4 w-4 text-[var(--theme-primary)]" />
       </motion.button>
 
-      {/* Dropdown */}
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setOpen(false)}
-            />
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
             <motion.div
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0,  scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-10 z-50 w-52 overflow-hidden rounded-xl border border-white/10 bg-black/90 p-1.5 shadow-2xl backdrop-blur-xl"
+              className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-xl border border-white/10 bg-black/90 p-2 shadow-2xl backdrop-blur-2xl"
             >
-              <p className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
                 Theme
               </p>
 
               {availableThemes.map(t => {
-                const [accent, bg] = SWATCH_COLORS[t.name];
                 const isActive = t.name === themeName;
+                const BrightnessIcon = BRIGHTNESS_ICON[t.brightness] ?? Moon;
 
                 return (
                   <button
                     key={t.name}
                     onClick={() => { setTheme(t.name); setOpen(false); }}
-                    className={`flex w-full items-center gap-3 rounded-lg px-2.5 py-2.5 text-left text-sm transition-all ${
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all ${
                       isActive
                         ? 'bg-white/10 text-white'
                         : 'text-white/60 hover:bg-white/5 hover:text-white'
                     }`}
                   >
-                    {/* Swatch */}
+                    {/* Color swatch */}
                     <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-xs font-bold shadow-inner"
-                      style={{ background: `linear-gradient(135deg, ${bg} 40%, ${accent})` }}
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg shadow-inner"
+                      style={{
+                        background: `linear-gradient(135deg, ${t.bg} 40%, ${t.primary})`,
+                        border: `1px solid ${t.primary}30`,
+                      }}
                     >
-                      <span style={{ color: accent, textShadow: `0 0 8px ${accent}` }}>◈</span>
+                      <BrightnessIcon className="h-3 w-3" style={{ color: t.primary }} />
                     </span>
 
                     <span className="flex-1 font-medium">{t.label}</span>
 
-                    {isActive && (
-                      <Check className="h-3.5 w-3.5 text-primary" />
-                    )}
+                    {isActive && <Check className="h-3.5 w-3.5" style={{ color: t.primary }} />}
                   </button>
                 );
               })}
@@ -99,4 +87,3 @@ export function ThemeSelector() {
     </div>
   );
 }
-
