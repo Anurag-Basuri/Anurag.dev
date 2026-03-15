@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
 
 	// Experimental features
 	experimental: {
-		optimizePackageImports: ['@/components', 'lucide-react', 'framer-motion', 'gsap'],
+		optimizePackageImports: ['lucide-react', 'framer-motion'],
 	},
 
 	// Headers for better caching

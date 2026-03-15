@@ -19,12 +19,7 @@ interface FileIconProps {
 	className?: string;
 }
 
-/**
- * Get the appropriate icon and color for a file based on its name
- * @param name - File name (including extension)
- * @param moduleId - Optional module ID for .app files
- * @returns Icon component and color class
- */
+// getIconForFile is a utility function that returns a Lucide icon based on the file name and module context.
 export function getIconForFile(name: string, moduleId?: string): LucideIcon {
 	// App shortcuts
 	if (name.endsWith('.app')) {
