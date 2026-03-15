@@ -79,3 +79,4 @@ export function FileIcon({ name, moduleId, className }: FileIconProps) {
 
 	return <Icon className={cn('shrink-0', color, className)} />;
 }
+

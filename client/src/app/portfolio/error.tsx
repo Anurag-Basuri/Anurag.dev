@@ -56,3 +56,4 @@ export default function PortfolioError({ error, reset }: ErrorProps) {
 		</div>
 	);
 }
+

@@ -13,3 +13,4 @@ interface PortfolioContentProps {
 export function PortfolioContent({ initialSection }: PortfolioContentProps) {
 	return <ScrollContainer initialSection={initialSection} />;
 }
+

@@ -47,3 +47,4 @@ export function Loader({
 export const ModuleLoader = ({ message = 'Loading module...' }: { message?: string }) => (
 	<Loader height="h-full" message={message} showMessage />
 );
+

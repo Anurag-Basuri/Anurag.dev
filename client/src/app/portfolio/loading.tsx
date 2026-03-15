@@ -3,3 +3,4 @@ export default function PortfolioLoading() {
 	// and ModuleLoader handles individual module lazy-loading.
 	return <div className="h-full w-full bg-transparent" />;
 }
+
