@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { publicService } from '@/api';
@@ -9,6 +9,30 @@ import { ScrollArea } from '@/ui/scroll-area';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { staggerContainer, scaleIn } from '@/animations/motion';
+
+// ─── Skeleton ───────────────────────────────────────────────────
+
+function AchievementsSkeleton() {
+	return (
+		<div className="p-6 md:p-12 max-w-6xl mx-auto animate-pulse pb-32">
+			<div className="space-y-4 mb-12 pb-8">
+				<div className="h-6 w-28 bg-white/5 rounded-lg" />
+				<div className="h-12 w-64 bg-white/5 rounded-xl" />
+				<div className="h-5 w-96 bg-white/5 rounded-lg" />
+			</div>
+			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+				{[1, 2, 3, 4, 5, 6].map(i => (
+					<div
+						key={i}
+						className="h-72 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]"
+					/>
+				))}
+			</div>
+		</div>
+	);
+}
+
+// ─── Helpers ────────────────────────────────────────────────────
 
 const getCategoryIcon = (category: string) => {
 	switch (category.toLowerCase()) {
@@ -36,6 +60,104 @@ const getCategoryColor = (category: string) => {
 	}
 };
 
+// ─── Achievement Card ───────────────────────────────────────────
+
+const AchievementCard = memo(function AchievementCard({
+	achievement,
+}: {
+	achievement: Achievement;
+}) {
+	const colorClass = getCategoryColor(achievement.category);
+	const link = achievement.url || achievement.proofUrl;
+
+	return (
+		<motion.div
+			variants={scaleIn}
+			whileHover={{ y: -8, scale: 1.02 }}
+			transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+			className={cn(
+				'relative group flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-all duration-500',
+				colorClass,
+			)}
+		>
+			{/* Top glowing gradient */}
+			<div
+				className={cn(
+					'absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
+					colorClass.split(' ')[0],
+					colorClass.split(' ')[1],
+				)}
+			/>
+
+			<div className="p-6 sm:p-8 relative z-10 flex flex-col grow">
+				<div className="flex justify-between items-start mb-4 sm:mb-6">
+					<div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-inner">
+						{getCategoryIcon(achievement.category)}
+					</div>
+
+					{achievement.featured && (
+						<div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-inner">
+							<Sparkles className="w-3 h-3" />
+							Featured
+						</div>
+					)}
+				</div>
+
+				<h3 className="text-lg sm:text-xl md:text-2xl font-black text-white tracking-tight mb-3 leading-tight">
+					{achievement.title}
+				</h3>
+
+				{achievement.issuer && (
+					<p className="text-xs sm:text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2">
+						<span className="w-4 h-[1px] bg-muted-foreground/30" />
+						{achievement.issuer}
+					</p>
+				)}
+
+				{achievement.description && (
+					<p className="text-xs sm:text-sm text-foreground/70 leading-relaxed mb-6 sm:mb-8 flex-grow">
+						{achievement.description}
+					</p>
+				)}
+
+				<div className="mt-auto space-y-4 sm:space-y-5">
+					{(achievement.rank || achievement.event) && (
+						<div className="flex flex-wrap gap-2">
+							{achievement.rank && (
+								<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white shadow-inner">
+									{achievement.rank}
+								</span>
+							)}
+							{achievement.event && (
+								<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white/70 shadow-inner">
+									{achievement.event}
+								</span>
+							)}
+						</div>
+					)}
+
+					{link && (
+						<div className="pt-4 sm:pt-5 border-t border-white/10 flex items-center justify-between">
+							<a
+								href={link}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white transition-colors group/link"
+								aria-label={`View certificate for ${achievement.title}`}
+							>
+								View Certificate
+								<ExternalLink className="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+							</a>
+						</div>
+					)}
+				</div>
+			</div>
+		</motion.div>
+	);
+});
+
+// ─── Main Module ────────────────────────────────────────────────
+
 export function AchievementsModule() {
 	const [achievements, setAchievements] = useState<Achievement[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -49,17 +171,11 @@ export function AchievementsModule() {
 		fetchAchievements();
 	}, []);
 
-	if (loading) {
-		return (
-			<div className="flex h-full w-full items-center justify-center">
-				<div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-			</div>
-		);
-	}
+	if (loading) return <AchievementsSkeleton />;
 
 	return (
 		<ScrollArea className="h-full w-full">
-			<div className="p-6 md:p-12 max-w-6xl mx-auto pb-32">
+			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
 				<SectionHeader
 					icon={Trophy}
 					label="Triumphs"
@@ -68,7 +184,7 @@ export function AchievementsModule() {
 				/>
 
 				{achievements.length === 0 ? (
-					<div className="text-center py-20 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50 mt-12">
+					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
 						No achievements recorded yet.
 					</div>
 				) : (
@@ -76,97 +192,14 @@ export function AchievementsModule() {
 						variants={staggerContainer}
 						initial="hidden"
 						animate="visible"
-						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 auto-rows-fr"
+						className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 auto-rows-fr"
 					>
-						{achievements.map(achievement => {
-							const colorClass = getCategoryColor(achievement.category);
-							const link = achievement.url || achievement.proofUrl;
-
-							return (
-								<motion.div
-									key={achievement.id}
-									variants={scaleIn}
-									whileHover={{ y: -8, scale: 1.02 }}
-									transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-									className={cn(
-										'relative group flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border rounded-[2rem] overflow-hidden transition-all duration-500',
-										colorClass,
-									)}
-								>
-									{/* Top glowing gradient */}
-									<div
-										className={cn(
-											'absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
-											colorClass.split(' ')[0],
-											colorClass.split(' ')[1],
-										)}
-									/>
-
-									<div className="p-8 relative z-10 flex flex-col grow">
-										<div className="flex justify-between items-start mb-6">
-											<div className="p-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/10 shadow-inner">
-												{getCategoryIcon(achievement.category)}
-											</div>
-
-											{achievement.featured && (
-												<div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest shadow-inner">
-													<Sparkles className="w-3 h-3" />
-													Featured
-												</div>
-											)}
-										</div>
-
-										<h3 className="text-xl md:text-2xl font-black text-white tracking-tight mb-3 leading-tight">
-											{achievement.title}
-										</h3>
-
-										{achievement.issuer && (
-											<p className="text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2">
-												<span className="w-4 h-[1px] bg-muted-foreground/30" />
-												{achievement.issuer}
-											</p>
-										)}
-
-										{achievement.description && (
-											<p className="text-sm text-foreground/70 leading-relaxed mb-8 flex-grow">
-												{achievement.description}
-											</p>
-										)}
-
-										<div className="mt-auto space-y-5">
-											{(achievement.rank || achievement.event) && (
-												<div className="flex flex-wrap gap-2">
-													{achievement.rank && (
-														<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white shadow-inner">
-															🏆 {achievement.rank}
-														</span>
-													)}
-													{achievement.event && (
-														<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white/70 shadow-inner">
-															{achievement.event}
-														</span>
-													)}
-												</div>
-											)}
-
-											{link && (
-												<div className="pt-5 border-t border-white/10 flex items-center justify-between">
-													<a
-														href={link}
-														target="_blank"
-														rel="noreferrer"
-														className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white transition-colors group/link"
-													>
-														View Certificate
-														<ExternalLink className="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
-													</a>
-												</div>
-											)}
-										</div>
-									</div>
-								</motion.div>
-							);
-						})}
+						{achievements.map(achievement => (
+							<AchievementCard
+								key={achievement.id}
+								achievement={achievement}
+							/>
+						))}
 					</motion.div>
 				)}
 			</div>
