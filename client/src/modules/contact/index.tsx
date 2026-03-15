@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import type { ChangeEvent, FormEvent, ComponentType, SVGProps } from 'react';
 import { publicService } from '@/api';
 import type { AboutData } from '@/api/schema';
 import { ScrollArea } from '@/ui/scroll-area';
@@ -22,17 +22,24 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { SectionHeader } from '@/ui/SectionHeader';
 
+const SOCIAL_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
+	GitHub: Github,
+	Twitter: Twitter,
+	LinkedIn: Linkedin,
+};
+
 function ContactSkeleton() {
 	return (
-		<div className="p-6 md:p-10 max-w-6xl mx-auto animate-pulse">
+		<div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto animate-pulse pb-32">
+			<div className="space-y-4 mb-12 pb-8">
+				<div className="h-6 w-24 bg-white/5 rounded-lg" />
+				<div className="h-12 w-56 bg-white/5 rounded-xl" />
+				<div className="h-5 w-96 bg-white/5 rounded-lg" />
+			</div>
 			<div className="flex flex-col md:flex-row gap-12">
-				<div className="flex-1 space-y-8">
-					<div className="h-8 bg-white/5 rounded w-64" />
-					<div className="h-20 bg-white/5 rounded" />
-					<div className="space-y-4">
-						<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
-						<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
-					</div>
+				<div className="flex-1 space-y-6">
+					<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
+					<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
 				</div>
 				<div className="flex-1">
 					<div className="h-96 bg-[#0a0a0a]/60 backdrop-blur rounded-[2.5rem] border border-white/5" />
@@ -58,16 +65,11 @@ export function ContactModule() {
 
 	// Fetch data
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const { data: profileData } = await publicService.getProfile();
-				setAbout(profileData);
-			} catch (err) {
-				console.error('Failed to fetch about data in contact module', err);
-			} finally {
-				setInitialLoading(false);
-			}
-		};
+		async function fetchData() {
+			const { data: profileData } = await publicService.getProfile();
+			setAbout(profileData);
+			setInitialLoading(false);
+		}
 		fetchData();
 	}, []);
 
@@ -93,14 +95,14 @@ export function ContactModule() {
 		}
 	};
 
-	const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setFormData(prev => ({
 			...prev,
 			[e.target.name]: e.target.value,
 		}));
-	};
+	}, []);
 
-	const copyEmail = () => {
+	const copyEmail = useCallback(() => {
 		if (about?.email) {
 			navigator.clipboard.writeText(about.email);
 		} else {
@@ -109,19 +111,13 @@ export function ContactModule() {
 		setCopied(true);
 		toast.success('Email copied to clipboard');
 		setTimeout(() => setCopied(false), 2000);
-	};
+	}, [about?.email]);
 
 	if (initialLoading) return <ContactSkeleton />;
 
-	const socialIcons: Record<string, any> = {
-		GitHub: Github,
-		Twitter: Twitter,
-		LinkedIn: Linkedin,
-	};
-
 	return (
 		<ScrollArea className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-32">
+			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}
@@ -156,7 +152,7 @@ export function ContactModule() {
 											<button
 												onClick={copyEmail}
 												className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white transition-colors border border-white/5 hover:border-white/10"
-												title="Copy Email"
+												aria-label="Copy email address"
 											>
 												{copied ? (
 													<Check className="w-4 h-4 text-primary" />
@@ -196,7 +192,7 @@ export function ContactModule() {
 							</h3>
 							<div className="flex gap-4">
 								{(about?.socials ?? []).map(social => {
-									const Icon = socialIcons[social.platform] || Mail;
+									const Icon = SOCIAL_ICONS[social.platform] || Mail;
 									return (
 										<a
 											key={social.platform}
@@ -204,7 +200,7 @@ export function ContactModule() {
 											target="_blank"
 											rel="noopener noreferrer"
 											className="p-4 rounded-[1.25rem] bg-[#0a0a0a]/80 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 text-muted-foreground hover:text-white group hover:scale-105 active:scale-95 shadow-inner hover:shadow-[0_0_20px_0px_rgba(255,255,255,0.05)]"
-											title={social.platform}
+											aria-label={`Visit ${social.platform} profile`}
 										>
 											<Icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-500" />
 										</a>
