@@ -55,7 +55,11 @@ export const MobileExplorerSheet = memo(function MobileExplorerSheet({
 								items={INITIAL_FILE_SYSTEM}
 								onSelect={item => {
 									if (item.moduleId) {
-										onNavigate(item.moduleId);
+										window.dispatchEvent(
+											new CustomEvent('scroll-to-section', {
+												detail: { sectionId: item.moduleId },
+											}),
+										);
 									}
 									onOpenChange(false);
 								}}

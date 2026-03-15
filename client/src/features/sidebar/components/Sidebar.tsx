@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useCallback, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { SidebarProfile } from './SidebarProfile';
 import { FolderTree } from './FolderTree';
 import { INITIAL_FILE_SYSTEM as fileSystem, type FileSystemItem } from '@/data/filesystem';
-import { resolveModuleFromSlug } from '@/lib/routes';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { FolderOpen } from 'lucide-react';
 import { PanelHeader } from '@/components/layout/PanelHeader';
@@ -17,25 +16,25 @@ import { folderExpansionSignalAtom } from '@/store';
 // Main Sidebar Component
 // ============================================================================
 export const Sidebar: React.FC = () => {
-	const router = useRouter();
 	const pathname = usePathname();
 	const setFolderSignal = useSetAtom(folderExpansionSignalAtom);
 
 	const currentModule = useMemo(() => {
-		const segments = pathname
-			.split('/')
-			.filter(Boolean)
-			.filter(s => s !== 'portfolio');
-		return resolveModuleFromSlug(segments);
+		const segments = pathname.split('/').filter(Boolean).filter(s => s !== 'portfolio');
+		return segments[0] || 'about';
 	}, [pathname]);
 
 	const handleFileSelect = useCallback(
 		(item: FileSystemItem) => {
 			if (item.type === 'file' && item.moduleId) {
-				router.push(`/portfolio/${item.moduleId}`);
+				window.dispatchEvent(
+					new CustomEvent('scroll-to-section', {
+						detail: { sectionId: item.moduleId },
+					}),
+				);
 			}
 		},
-		[router],
+		[],
 	);
 
 	return (

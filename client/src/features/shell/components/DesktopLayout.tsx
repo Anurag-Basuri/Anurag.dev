@@ -32,7 +32,7 @@ export function DesktopLayout({ children }: { children: ReactNode }) {
 
 			{/* Main + Terminal */}
 			<div className="flex-1 min-w-0 flex flex-col gap-2">
-				<main className={`${panel} flex-1 min-h-0 overflow-auto`}>
+				<main className={`${panel} flex-1 min-h-0 overflow-hidden`}>
 					<ErrorBoundary>
 						<Suspense fallback={<Loader />}>{children}</Suspense>
 					</ErrorBoundary>
