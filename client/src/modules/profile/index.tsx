@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import type { Variants, Easing } from 'framer-motion';
 import { User, MapPin, Briefcase, ChevronRight, Github, ExternalLink, Mail, Code2 } from 'lucide-react';
 import { apiClient } from '@/api/client';
 import type { Profile } from '@/types/schema';
@@ -9,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 // --- Animations ---
-const fadeInUp = {
+const fadeInUp: Variants = {
 	hidden: { opacity: 0, y: 30 },
 	visible: { 
 		opacity: 1, 
@@ -18,7 +19,7 @@ const fadeInUp = {
 	}
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
 	hidden: { opacity: 0 },
 	visible: {
 		opacity: 1,
@@ -34,8 +35,8 @@ const floatingAnimation = {
 		y: {
 			duration: 4,
 			repeat: Infinity,
-			repeatType: 'reverse',
-			ease: 'easeInOut'
+			repeatType: 'reverse' as const,
+			ease: [0.42, 0, 0.58, 1] as Easing
 		}
 	}
 };
@@ -94,7 +95,7 @@ export function ProfileModule() {
 
 						{/* Header & Name */}
 						<motion.div variants={fadeInUp} className="space-y-4">
-							<h1 className="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-foreground to-foreground/60 leading-tight pb-2">
+							<h1 className="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-foreground to-foreground/60 leading-tight pb-2">
 								{profile.name}
 							</h1>
 							<p className="text-xl md:text-2xl font-medium text-muted-foreground max-w-2xl leading-relaxed">
@@ -151,11 +152,11 @@ export function ProfileModule() {
 					{/* Right Content Area (Image / Hero visual) */}
 					<motion.div 
 						variants={fadeInUp} 
-						className="relative flex-shrink-0 w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px]"
+						className="relative shrink-0 w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px]"
 					>
 						<motion.div 
 							animate={floatingAnimation}
-							className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/20 via-blue-500/20 to-purple-500/20 blur-3xl -z-10" 
+							className="absolute inset-0 rounded-full bg-linear-to-tr from-primary/20 via-blue-500/20 to-purple-500/20 blur-3xl -z-10" 
 						/>
 						
 						{/* Main Image Container */}
@@ -174,7 +175,7 @@ export function ProfileModule() {
 							)}
 							
 							{/* Hover Overlay Stats overlaying the image */}
-							<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 gap-4">
+							<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 gap-4">
 								<div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-100">
 									<p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-2">Core Stack</p>
 									<div className="flex flex-wrap gap-2">
