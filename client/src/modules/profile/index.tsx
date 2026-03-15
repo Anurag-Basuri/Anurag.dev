@@ -114,18 +114,22 @@ export function ProfileModule() {
 							<h1 className="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-foreground to-foreground/60 leading-tight pb-2">
 								{profile.name}
 							</h1>
-							<p className="text-xl md:text-2xl font-medium text-muted-foreground max-w-2xl leading-relaxed">
-								{profile.header}
-							</p>
+							{profile.header && (
+								<p className="text-xl md:text-2xl font-medium text-muted-foreground max-w-2xl leading-relaxed">
+									{profile.header}
+								</p>
+							)}
 						</motion.div>
 
 						{/* Bio */}
-						<motion.p
-							variants={fadeInUp}
-							className="text-base text-muted-foreground/80 max-w-2xl leading-relaxed whitespace-pre-wrap"
-						>
-							{profile.bio}
-						</motion.p>
+						{profile.bio && (
+							<motion.p
+								variants={fadeInUp}
+								className="text-base text-muted-foreground/80 max-w-2xl leading-relaxed whitespace-pre-wrap"
+							>
+								{profile.bio}
+							</motion.p>
+						)}
 
 						{/* Quick Meta Stats */}
 						<motion.div

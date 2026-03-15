@@ -30,9 +30,9 @@ export function BlogModule() {
 
 	const filteredPosts = posts.filter(
 		p =>
-			p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			p.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase())),
+			(p.title ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+			(p.content ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+			(p.tags ?? []).some(t => t.toLowerCase().includes(searchQuery.toLowerCase())),
 	);
 
 	if (loading) {
@@ -151,7 +151,7 @@ export function BlogModule() {
 
 											{post.tags.length > 0 && (
 												<div className="flex flex-wrap gap-2">
-													{post.tags.map(tag => (
+													{(post.tags ?? []).map(tag => (
 														<span
 															key={tag}
 															className="px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider bg-black/50 text-muted-foreground border border-white/5 group-hover:border-primary/20 hover:text-white transition-colors shadow-inner"

@@ -132,9 +132,11 @@ export function AchievementsModule() {
 											</p>
 										)}
 
-										<p className="text-sm text-foreground/70 leading-relaxed mb-8 flex-grow">
-											{achievement.description}
-										</p>
+										{achievement.description && (
+											<p className="text-sm text-foreground/70 leading-relaxed mb-8 flex-grow">
+												{achievement.description}
+											</p>
+										)}
 
 										<div className="mt-auto space-y-5">
 											{(achievement.rank || achievement.event) && (

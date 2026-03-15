@@ -147,9 +147,9 @@ export function ExperienceModule() {
 												</p>
 
 												{/* Skills Tags */}
-												{job.skills && job.skills.length > 0 && (
+												{(job.skills ?? []).length > 0 && (
 													<div className="flex flex-wrap gap-2 pt-4 border-t border-white/5">
-														{job.skills.map(skill => (
+														{(job.skills ?? []).map(skill => (
 															<span
 																key={skill}
 																className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-white/5 text-muted-foreground border border-white/5 hover:bg-white/10 hover:text-white transition-colors"

@@ -83,8 +83,15 @@ async function submitContact(data: {
 	return apiClient.post<null>('/contact', data);
 }
 
+const EMPTY_PLATFORM = { username: '', url: '', stats: undefined };
+const FALLBACK_CODING_STATS: CodingStats = {
+	leetcode: EMPTY_PLATFORM,
+	codeforces: EMPTY_PLATFORM,
+	github: EMPTY_PLATFORM,
+};
+
 async function getCodingStats() {
-	return withFallback(() => apiClient.get<CodingStats>('/coding-stats'), null, 'coding-stats');
+	return withFallback(() => apiClient.get<CodingStats>('/coding-stats'), FALLBACK_CODING_STATS, 'coding-stats');
 }
 
 export const publicService = {

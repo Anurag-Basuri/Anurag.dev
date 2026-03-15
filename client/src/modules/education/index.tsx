@@ -130,7 +130,7 @@ const TiltCard = ({ entry }: { entry: JourneyEntry }) => {
 
 					{entry.skills && entry.skills.length > 0 && (
 						<div className="flex flex-wrap gap-2 pt-2">
-							{entry.skills.map(skill => (
+							{(entry.skills ?? []).map(skill => (
 								<span
 									key={skill}
 									className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-black/40 text-muted-foreground border border-white/5 group-hover:border-white/10 transition-colors"

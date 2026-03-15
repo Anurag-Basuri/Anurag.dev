@@ -195,7 +195,7 @@ export function ContactModule() {
 								Social Protocols
 							</h3>
 							<div className="flex gap-4">
-								{about?.socials.map(social => {
+								{(about?.socials ?? []).map(social => {
 									const Icon = socialIcons[social.platform] || Mail;
 									return (
 										<a

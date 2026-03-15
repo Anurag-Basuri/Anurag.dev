@@ -97,7 +97,7 @@ export function CertificationModule() {
 
 									{cert.skills && cert.skills.length > 0 && (
 										<div className="flex flex-wrap gap-2 mb-8 flex-grow content-start">
-											{cert.skills.map(skill => (
+											{(cert.skills ?? []).map(skill => (
 												<span
 													key={skill}
 													className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-black/50 text-muted-foreground/80 border border-white/5 group-hover:border-white/10 transition-colors shadow-inner"
@@ -108,17 +108,19 @@ export function CertificationModule() {
 										</div>
 									)}
 
-									<div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
-										<a
-											href={cert.credentialUrl}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors group/link"
-										>
-											Verify Credential
-											<ExternalLink className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1 group-hover/link:-translate-y-1" />
-										</a>
-									</div>
+									{cert.credentialUrl && (
+										<div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
+											<a
+												href={cert.credentialUrl}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-400 hover:text-emerald-300 transition-colors group/link"
+											>
+												Verify Credential
+												<ExternalLink className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1 group-hover/link:-translate-y-1" />
+											</a>
+										</div>
+									)}
 								</div>
 							</motion.div>
 						))}

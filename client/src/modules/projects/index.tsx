@@ -59,7 +59,7 @@ export function ProjectsModule() {
 
 	const filteredProjects = projects.filter(p => {
 		if (filter === 'All') return true;
-		return p.techStack.some(t => t.toLowerCase().includes(filter.toLowerCase()));
+		return (p.techStack ?? []).some(t => t.toLowerCase().includes(filter.toLowerCase()));
 	});
 
 	if (loading) return <ProjectsSkeleton />;
@@ -177,7 +177,7 @@ export function ProjectsModule() {
 										<div className="mt-auto space-y-6">
 											{/* Tech Stack */}
 											<div className="flex flex-wrap gap-2">
-												{project.techStack.slice(0, 3).map(tech => (
+												{(project.techStack ?? []).slice(0, 3).map(tech => (
 													<span
 														key={tech}
 														className="text-[10px] px-3 py-1.5 rounded-lg bg-black/50 text-muted-foreground border border-white/5 group-hover:border-primary/20 group-hover:text-primary/90 transition-colors uppercase tracking-wider font-bold shadow-inner"
@@ -328,7 +328,7 @@ export function ProjectsModule() {
 													<span>Technologies</span>
 												</div>
 												<div className="flex flex-wrap gap-2.5">
-													{selectedProject.techStack.map(tech => (
+													{(selectedProject.techStack ?? []).map(tech => (
 														<span
 															key={tech}
 															className="px-4 py-2 rounded-xl bg-[#111] border border-white/5 text-sm font-semibold text-white/80 hover:border-primary/30 hover:text-primary transition-colors cursor-default shadow-inner"
