@@ -30,6 +30,12 @@ const ContactModule = lazy(() =>
 const CodingStatsModule = lazy(() =>
 	import('@/modules/coding-stats').then(m => ({ default: m.CodingStatsModule })),
 );
+const ResumeModule = lazy(() =>
+	import('@/modules/resume').then(m => ({ default: m.ResumeModule })),
+);
+const ReadmeModule = lazy(() =>
+	import('@/modules/readme').then(m => ({ default: m.ReadmeModule })),
+);
 
 // Loading fallback component
 const ModuleLoader = () => (
@@ -66,7 +72,9 @@ type ModuleId =
 	| 'blog'
 	| 'contact'
 	| 'ailab'
-	| 'profiles';
+	| 'profiles'
+	| 'resume'
+	| 'readme';
 
 const moduleConfigs: Record<ModuleId, ModuleConfig> = {
 	about: {
@@ -108,6 +116,16 @@ const moduleConfigs: Record<ModuleId, ModuleConfig> = {
 		component: withSuspense(CodingStatsModule),
 		icon: Code,
 		title: 'Coding Profiles',
+	},
+	resume: {
+		component: withSuspense(ResumeModule),
+		icon: Info,
+		title: 'Resume',
+	},
+	readme: {
+		component: withSuspense(ReadmeModule),
+		icon: Book,
+		title: 'README',
 	},
 };
 

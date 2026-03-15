@@ -9,7 +9,9 @@ export type ModuleId =
 	| 'blog'
 	| 'contact'
 	| 'ailab'
-	| 'profiles';
+	| 'profiles'
+	| 'resume'
+	| 'readme';
 
 // Module metadata for SEO and display
 interface ModuleMetadata {
@@ -67,6 +69,16 @@ const moduleMetadata: Record<ModuleId, ModuleMetadata> = {
 			'My coding statistics, competitive programming achievements, and contribution graphs.',
 		keywords: ['leetcode', 'github', 'codeforces', 'coding', 'statistics'],
 	},
+	resume: {
+		title: 'Resume',
+		description: 'Professional resume with experience, skills, and education.',
+		keywords: ['resume', 'cv', 'experience', 'skills', 'hire'],
+	},
+	readme: {
+		title: 'README',
+		description: 'About this portfolio — how it works, the tech stack, and design philosophy.',
+		keywords: ['readme', 'about', 'portfolio', 'documentation'],
+	},
 };
 
 // Route segments to module ID mapping
@@ -82,6 +94,8 @@ const routeToModuleMap: Record<string, ModuleId> = {
 	contact: 'contact',
 	ailab: 'ailab',
 	profiles: 'profiles',
+	resume: 'resume',
+	readme: 'readme',
 
 	// Nested route aliases (folder/file structure)
 	bio: 'about',
