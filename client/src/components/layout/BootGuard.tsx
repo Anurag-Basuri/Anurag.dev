@@ -11,7 +11,7 @@ const BootFallback = () => (
 );
 
 // Dynamically import the full boot animation - use direct path, not barrel export
-const BootScreen = dynamic(() => import('@/features/boot/BootScreen').then(mod => mod.BootScreen), {
+const BootScreen = dynamic(() => import('@/features/boot/components/BootScreen').then(mod => mod.BootScreen), {
 	ssr: false,
 	loading: BootFallback,
 });

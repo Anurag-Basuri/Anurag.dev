@@ -10,7 +10,7 @@ const CLI = dynamic(() => import('@/features/terminal/CLI').then(m => m.CLI), {
 	loading: () => <Loader height="h-full" />,
 });
 
-const Sidebar = dynamic(() => import('@/features/sidebar/Sidebar').then(m => m.Sidebar), {
+const Sidebar = dynamic(() => import('@/features/sidebar/components/Sidebar').then(m => m.Sidebar), {
 	ssr: false,
 	loading: () => <Loader />,
 });
