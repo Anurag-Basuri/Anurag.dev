@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '@/store';
 import gsap from 'gsap';
-import { BOOT_CONFIG, BOOT_PHASES } from './constants';
+import { BOOT_CONFIG, BOOT_PHASES } from '../constants';
 
 const { PHASE_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
 

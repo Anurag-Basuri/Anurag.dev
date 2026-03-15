@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect, useRef } from 'react';
-import { BOOT_CONFIG } from './constants';
+import { BOOT_CONFIG } from '../constants';
 
 const { MATRIX_CHARS, MATRIX_FONT_SIZE, MATRIX_INTERVAL } = BOOT_CONFIG;
 

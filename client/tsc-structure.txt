@@ -1,2 +1,0 @@
-﻿src/features/boot/components/MatrixRain.tsx(4,29): error TS2307: Cannot find module './constants' or its corresponding type declarations.
-src/features/boot/hooks/useBootSequence.ts(7,42): error TS2307: Cannot find module './constants' or its corresponding type declarations.
