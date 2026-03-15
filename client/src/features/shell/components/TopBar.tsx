@@ -18,10 +18,9 @@ const ThemeToggle = dynamic(() => import('@/components/ui/theme-toggle').then(m 
 
 interface TopBarProps {
 	isMobile: boolean;
-	onNavigate: (moduleId: string) => void;
 }
 
-export const TopBar = memo(function TopBar({ isMobile, onNavigate }: TopBarProps) {
+export const TopBar = memo(function TopBar({ isMobile }: TopBarProps) {
 	const [isExplorerOpen, setIsExplorerOpen] = useAtom(mobileSidebarOpenAtom);
 	const [currentTime, setCurrentTime] = useState('');
 	const [mounted, setMounted] = useState(false);
@@ -43,8 +42,12 @@ export const TopBar = memo(function TopBar({ isMobile, onNavigate }: TopBarProps
 	}, []);
 
 	const handleContactClick = useCallback(() => {
-		onNavigate('contact');
-	}, [onNavigate]);
+		window.dispatchEvent(
+			new CustomEvent('scroll-to-section', {
+				detail: { sectionId: 'contact' },
+			}),
+		);
+	}, []);
 
 	useEffect(() => {
 		const handleEscape = (e: KeyboardEvent) => {
@@ -63,7 +66,7 @@ export const TopBar = memo(function TopBar({ isMobile, onNavigate }: TopBarProps
 						<MobileExplorerSheet
 							isOpen={isExplorerOpen}
 							onOpenChange={setIsExplorerOpen}
-							onNavigate={onNavigate}
+						/>
 						/>
 					)}
 

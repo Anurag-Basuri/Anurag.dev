@@ -1,10 +1,6 @@
-import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-
-import { getModuleComponent } from '@/lib/moduleRegistry';
 import { getModuleMetadata, resolveModuleFromSlug, getAllModuleIds } from '@/lib/routes';
-import { ModuleLoader } from '@/components/common/Loader';
+import { PortfolioContent } from '../PortfolioContent';
 
 interface PageProps {
 	params: Promise<{
@@ -16,7 +12,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
 	const { slug } = await params;
 
-	// Root portfolio page: default to About Me
+	// Root or About
 	if (!slug || slug.length === 0) {
 		const aboutMeta = getModuleMetadata('about');
 		return {
@@ -28,7 +24,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 	const moduleId = resolveModuleFromSlug(slug);
 
-	// Invalid slug: let Next render 404, but keep metadata sane
 	if (!moduleId) {
 		return {
 			title: 'Not Found',
@@ -38,8 +33,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 	const metadata = getModuleMetadata(moduleId);
 
-	// IMPORTANT: return a short title so root layout template applies
-	// Root layout already does: "%s | Anurag Basuri"
 	return {
 		title: metadata.title,
 		description: metadata.description,
@@ -60,21 +53,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PortfolioModulePage({ params }: PageProps) {
 	const { slug } = await params;
 
-	// Root: default to About Me
-	const moduleId = (!slug || slug.length === 0) ? 'about' : resolveModuleFromSlug(slug);
-
-	// Invalid route: 404 (not EmptyState)
-	if (!moduleId) {
-		notFound();
+	// Determine initial section from URL (for deep links)
+	let initialSection = 'about';
+	if (slug && slug.length > 0) {
+		const moduleId = resolveModuleFromSlug(slug);
+		if (moduleId) initialSection = moduleId;
 	}
 
-	const title = getModuleMetadata(moduleId).title;
-
-	return (
-		<Suspense fallback={<ModuleLoader message={`Loading ${title}...`} />}>
-			{getModuleComponent(moduleId)}
-		</Suspense>
-	);
+	return <PortfolioContent initialSection={initialSection} />;
 }
 
 // Pre-generate common routes for better performance
