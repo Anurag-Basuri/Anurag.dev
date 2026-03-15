@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
+import Image from 'next/image';
 import { publicService } from '@/api';
 import type { Certification } from '@/api/schema';
 import { ScrollArea } from '@/ui/scroll-area';
@@ -23,13 +24,55 @@ function CertificationsSkeleton() {
 				{[1, 2, 3, 4].map(i => (
 					<div
 						key={i}
-						className="h-64 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]"
+						className="h-80 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]"
 					/>
 				))}
 			</div>
 		</div>
 	);
 }
+
+// ─── Certificate Thumbnail ─────────────────────────────────────
+
+const CertThumbnail = memo(function CertThumbnail({
+	url,
+	title,
+	issuer,
+}: {
+	url: string | null | undefined;
+	title: string;
+	issuer: string;
+}) {
+	const [imgFailed, setImgFailed] = useState(false);
+
+	if (url && !imgFailed) {
+		return (
+			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
+				<div className="absolute inset-0 bg-[#050505] z-0" />
+				<Image
+					src={url}
+					alt={`${title} certificate`}
+					fill
+					className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
+					onError={() => setImgFailed(true)}
+				/>
+				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+			</div>
+		);
+	}
+
+	return (
+		<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
+			<div className="w-full h-full bg-gradient-to-br from-emerald-950/60 via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3">
+				<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+				<Award className="w-10 h-10 text-emerald-500/30 group-hover:text-emerald-400/50 transition-colors duration-500" />
+				<span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/40 group-hover:text-emerald-400/60 transition-colors">
+					{issuer}
+				</span>
+			</div>
+		</div>
+	);
+});
 
 // ─── Certification Card ─────────────────────────────────────────
 
@@ -44,25 +87,22 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 			{/* Ambient Glow */}
 			<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-			<div className="p-6 sm:p-8 relative z-10 flex flex-col h-full">
-				<div className="flex justify-between items-start gap-4 mb-6 sm:mb-8">
-					<div className="p-2.5 sm:p-3 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10 group-hover:scale-110 transition-transform duration-500 shadow-inner">
-						<Award className="w-6 sm:w-8 h-6 sm:h-8 text-emerald-400" />
-					</div>
+			{/* Thumbnail */}
+			<CertThumbnail url={cert.certificateUrl} title={cert.title} issuer={cert.issuer} />
 
-					{/* Issuer Badge */}
-					<div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full shadow-inner">
-						<span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-emerald-400">
-							{cert.issuer}
-						</span>
-					</div>
+			<div className="p-5 sm:p-6 relative z-10 flex flex-col flex-1">
+				{/* Issuer Badge */}
+				<div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full shadow-inner w-fit mb-4">
+					<span className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-emerald-400">
+						{cert.issuer}
+					</span>
 				</div>
 
-				<h3 className="text-lg sm:text-xl md:text-2xl font-black text-white tracking-tight leading-tight group-hover:text-emerald-400 transition-colors mb-4">
+				<h3 className="text-lg sm:text-xl font-black text-white tracking-tight leading-tight group-hover:text-emerald-400 transition-colors mb-3">
 					{cert.title}
 				</h3>
 
-				<div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold font-mono text-muted-foreground mb-6 bg-white/5 w-fit px-3 py-1.5 rounded-lg border border-white/5">
+				<div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold font-mono text-muted-foreground mb-4 bg-white/5 w-fit px-3 py-1.5 rounded-lg border border-white/5">
 					<Activity className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
 					<span>
 						Issued:{' '}
@@ -71,7 +111,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 				</div>
 
 				{(cert.skills ?? []).length > 0 && (
-					<div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-8 flex-grow content-start">
+					<div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 flex-grow content-start">
 						{(cert.skills ?? []).map(skill => (
 							<span
 								key={skill}
@@ -84,7 +124,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 				)}
 
 				{cert.credentialUrl && (
-					<div className="mt-auto pt-5 sm:pt-6 border-t border-white/10 flex items-center justify-between">
+					<div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
 						<a
 							href={cert.credentialUrl}
 							target="_blank"

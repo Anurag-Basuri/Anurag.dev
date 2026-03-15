@@ -2,14 +2,7 @@
 
 import { useEffect, useState, memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import {
-	User,
-	MapPin,
-	Briefcase,
-	ChevronRight,
-	ExternalLink,
-	Code2,
-} from 'lucide-react';
+import { User, MapPin, Briefcase, ChevronRight, ExternalLink, Code2 } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
@@ -174,7 +167,10 @@ export function ProfileModule() {
 						</motion.div>
 
 						{/* Action Buttons */}
-						<motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 sm:gap-4 pt-4">
+						<motion.div
+							variants={fadeInUp}
+							className="flex flex-wrap items-center gap-3 sm:gap-4 pt-4"
+						>
 							<button
 								onClick={() =>
 									window.dispatchEvent(

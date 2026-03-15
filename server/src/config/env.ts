@@ -27,6 +27,9 @@ const envSchema = z.object({
 	CLOUDINARY_CLOUD_NAME: z.string().min(1),
 	CLOUDINARY_API_KEY: z.string().min(1),
 	CLOUDINARY_API_SECRET: z.string().min(1),
+
+	// External APIs (optional)
+	GITHUB_TOKEN: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

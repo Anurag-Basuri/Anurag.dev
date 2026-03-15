@@ -16,6 +16,7 @@ import {
 	getPublicBlogPostBySlug,
 	submitContact,
 } from '../controllers/public.controller';
+import { getCodingStats } from '../controllers/coding-stats.controller';
 
 const router = Router();
 const cache5min = cacheControl(300);
@@ -42,6 +43,9 @@ router.get('/certifications', cache5min, asyncHandler(getPublicCertifications));
 // Blog
 router.get('/blog', cache5min, asyncHandler(getPublicBlogPosts));
 router.get('/blog/:slug', cache5min, asyncHandler(getPublicBlogPostBySlug));
+
+// Coding Stats (aggregated from external platforms)
+router.get('/coding-stats', cache5min, asyncHandler(getCodingStats));
 
 // Contact (no cache — write operation)
 router.post(
