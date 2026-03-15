@@ -21,6 +21,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, fadeIn, scaleIn, fadeInUp } from '@/animations/motion';
 import { SectionHeader } from '@/ui/SectionHeader';
+import { UrlThumbnail } from '@/ui/UrlThumbnail';
 import { cn } from '@/lib/utils';
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -136,48 +137,6 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 	);
 });
 
-// ─── Blog Thumbnail ──────────────────────────────────────────────
-
-const BlogThumbnail = memo(function BlogThumbnail({
-	src,
-	title,
-	fill: shouldFill = true,
-	priority = false,
-	sizes,
-	className = 'object-cover transition-transform duration-700 group-hover:scale-110',
-}: {
-	src: string | null | undefined;
-	title: string;
-	fill?: boolean;
-	priority?: boolean;
-	sizes?: string;
-	className?: string;
-}) {
-	const [imgFailed, setImgFailed] = useState(false);
-
-	if (src && !imgFailed) {
-		return (
-			<>
-				<Image
-					src={src}
-					alt={title}
-					fill={shouldFill}
-					sizes={sizes}
-					className={className}
-					onError={() => setImgFailed(true)}
-					priority={priority}
-				/>
-			</>
-		);
-	}
-
-	return (
-		<div className="w-full h-full bg-linear-to-br from-[#111] via-[#080808] to-black flex items-center justify-center">
-			<FileText className="w-10 h-10 text-white/5 group-hover:text-primary/20 transition-colors duration-500" />
-		</div>
-	);
-});
-
 // ─── Featured Card (latest post, hero-sized) ────────────────────
 
 const FeaturedCard = memo(function FeaturedCard({
@@ -201,12 +160,13 @@ const FeaturedCard = memo(function FeaturedCard({
 			className="group relative rounded-2xl sm:rounded-4xl lg:rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-500 cursor-pointer hover:shadow-[0_0_60px_-10px_rgba(255,255,255,0.08)] focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
 		>
 			<div className="relative h-56 sm:h-72 md:h-[360px] lg:h-[420px] w-full bg-[#050505]">
-				<BlogThumbnail
-					src={post.coverImage || post.link}
+				<UrlThumbnail
+					url={post.coverImage || post.link}
 					title={post.title ?? 'Blog post'}
 					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
-					className="object-cover transition-transform duration-700 group-hover:scale-105"
+					imgClassName="object-cover transition-transform duration-700 group-hover:scale-105"
 					priority
+					fallbackIcon={BookOpen}
 				/>
 
 				{/* Gradient overlay */}
@@ -298,10 +258,11 @@ const PostCard = memo(function PostCard({
 		>
 			{/* Thumbnail */}
 			<div className="relative aspect-16/10 overflow-hidden bg-[#050505]">
-				<BlogThumbnail
-					src={post.coverImage || post.link}
+				<UrlThumbnail
+					url={post.coverImage || post.link}
 					title={post.title ?? 'Blog post'}
 					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+					fallbackIcon={FileText}
 				/>
 
 				{/* External link icon */}

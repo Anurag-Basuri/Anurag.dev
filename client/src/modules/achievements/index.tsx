@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useState, memo, type ReactNode } from 'react';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Achievement } from '@/api/schema';
 import { ScrollArea } from '@/ui/scroll-area';
 import { SectionHeader } from '@/ui/SectionHeader';
+import { UrlThumbnail } from '@/ui/UrlThumbnail';
 import { cn } from '@/lib/utils';
 import { staggerContainer, scaleIn } from '@/animations/motion';
 
@@ -48,19 +48,6 @@ const getCategoryIcon = (category: string): ReactNode => {
 	}
 };
 
-const getCategoryPlaceholderIcon = (category: string): ReactNode => {
-	switch (category.toLowerCase()) {
-		case 'hackathon':
-			return <Target className="w-10 h-10 text-rose-500/30 group-hover:text-rose-400/50 transition-colors duration-500" />;
-		case 'competition':
-			return <Medal className="w-10 h-10 text-amber-500/30 group-hover:text-amber-400/50 transition-colors duration-500" />;
-		case 'opensource':
-			return <Star className="w-10 h-10 text-emerald-500/30 group-hover:text-emerald-400/50 transition-colors duration-500" />;
-		default:
-			return <Award className="w-10 h-10 text-blue-500/30 group-hover:text-blue-400/50 transition-colors duration-500" />;
-	}
-};
-
 const getCategoryColor = (category: string) => {
 	switch (category.toLowerCase()) {
 		case 'hackathon':
@@ -87,55 +74,6 @@ const getCategoryGradient = (category: string) => {
 	}
 };
 
-// ─── Achievement Thumbnail ─────────────────────────────────────
-
-const AchievementThumbnail = memo(function AchievementThumbnail({
-	url,
-	title,
-	category,
-	issuer,
-}: {
-	url: string | null | undefined;
-	title: string;
-	category: string;
-	issuer: string | null | undefined;
-}) {
-	const [imgFailed, setImgFailed] = useState(false);
-
-	if (url && !imgFailed) {
-		return (
-			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
-				<div className="absolute inset-0 bg-[#050505] z-0" />
-				<Image
-					src={url}
-					alt={`${title} proof`}
-					fill
-					className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
-					onError={() => setImgFailed(true)}
-				/>
-				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-			</div>
-		);
-	}
-
-	return (
-		<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
-			<div className={cn(
-				'w-full h-full bg-gradient-to-br via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3',
-				getCategoryGradient(category),
-			)}>
-				<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-				{getCategoryPlaceholderIcon(category)}
-				{issuer && (
-					<span className="text-[10px] font-bold uppercase tracking-widest text-white/20 group-hover:text-white/40 transition-colors">
-						{issuer}
-					</span>
-				)}
-			</div>
-		</div>
-	);
-});
-
 // ─── Achievement Card ───────────────────────────────────────────
 
 const AchievementCard = memo(function AchievementCard({
@@ -145,6 +83,17 @@ const AchievementCard = memo(function AchievementCard({
 }) {
 	const colorClass = getCategoryColor(achievement.category);
 	const link = achievement.url || achievement.proofUrl;
+	const categoryIcon = getCategoryIcon(achievement.category);
+
+	// Map category to a fallback Lucide icon for UrlThumbnail
+	const getFallbackIcon = (cat: string) => {
+		switch (cat.toLowerCase()) {
+			case 'hackathon': return Target;
+			case 'competition': return Medal;
+			case 'opensource': return Star;
+			default: return Award;
+		}
+	};
 
 	return (
 		<motion.div
@@ -157,17 +106,21 @@ const AchievementCard = memo(function AchievementCard({
 			)}
 		>
 			{/* Thumbnail */}
-			<AchievementThumbnail
-				url={achievement.proofUrl || achievement.url}
-				title={achievement.title}
-				category={achievement.category}
-				issuer={achievement.issuer}
-			/>
+			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
+				<UrlThumbnail
+					url={achievement.proofUrl || achievement.url}
+					title={achievement.title}
+					fallbackIcon={getFallbackIcon(achievement.category)}
+					fallbackLabel={achievement.issuer || undefined}
+					fallbackGradient={getCategoryGradient(achievement.category)}
+				/>
+				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+			</div>
 
 			<div className="p-5 sm:p-6 relative z-10 flex flex-col grow">
 				<div className="flex justify-between items-start mb-4">
 					<div className="p-3 rounded-xl bg-black/50 backdrop-blur-md border border-white/10 shadow-inner">
-						{getCategoryIcon(achievement.category)}
+						{categoryIcon}
 					</div>
 
 					{achievement.featured && (

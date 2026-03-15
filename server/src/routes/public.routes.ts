@@ -17,9 +17,11 @@ import {
 	submitContact,
 } from '../controllers/public.controller';
 import { getCodingStats } from '../controllers/coding-stats.controller';
+import { getLinkPreview } from '../controllers/link-preview.controller';
 
 const router = Router();
 const cache5min = cacheControl(300);
+const cache24hr = cacheControl(86400);
 
 // Health
 router.get('/health', asyncHandler(healthCheck));
@@ -46,6 +48,9 @@ router.get('/blog/:slug', cache5min, asyncHandler(getPublicBlogPostBySlug));
 
 // Coding Stats (aggregated from external platforms)
 router.get('/coding-stats', cache5min, asyncHandler(getCodingStats));
+
+// Link Preview (OG image extraction)
+router.get('/link-preview', cache24hr, asyncHandler(getLinkPreview));
 
 // Contact (no cache — write operation)
 router.post(

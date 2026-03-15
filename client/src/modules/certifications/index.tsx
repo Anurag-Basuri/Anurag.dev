@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
-import Image from 'next/image';
 import { publicService } from '@/api';
 import type { Certification } from '@/api/schema';
 import { ScrollArea } from '@/ui/scroll-area';
@@ -9,6 +8,7 @@ import { ShieldCheck, Award, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/animations/motion';
 import { SectionHeader } from '@/ui/SectionHeader';
+import { UrlThumbnail } from '@/ui/UrlThumbnail';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -32,48 +32,6 @@ function CertificationsSkeleton() {
 	);
 }
 
-// ─── Certificate Thumbnail ─────────────────────────────────────
-
-const CertThumbnail = memo(function CertThumbnail({
-	url,
-	title,
-	issuer,
-}: {
-	url: string | null | undefined;
-	title: string;
-	issuer: string;
-}) {
-	const [imgFailed, setImgFailed] = useState(false);
-
-	if (url && !imgFailed) {
-		return (
-			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
-				<div className="absolute inset-0 bg-[#050505] z-0" />
-				<Image
-					src={url}
-					alt={`${title} certificate`}
-					fill
-					className="object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform"
-					onError={() => setImgFailed(true)}
-				/>
-				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-			</div>
-		);
-	}
-
-	return (
-		<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
-			<div className="w-full h-full bg-gradient-to-br from-emerald-950/60 via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3">
-				<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-				<Award className="w-10 h-10 text-emerald-500/30 group-hover:text-emerald-400/50 transition-colors duration-500" />
-				<span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/40 group-hover:text-emerald-400/60 transition-colors">
-					{issuer}
-				</span>
-			</div>
-		</div>
-	);
-});
-
 // ─── Certification Card ─────────────────────────────────────────
 
 const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
@@ -88,7 +46,16 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 			<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
 			{/* Thumbnail */}
-			<CertThumbnail url={cert.certificateUrl} title={cert.title} issuer={cert.issuer} />
+			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
+				<UrlThumbnail
+					url={cert.certificateUrl}
+					title={`${cert.title} certificate`}
+					fallbackIcon={Award}
+					fallbackLabel={cert.issuer}
+					fallbackGradient="from-emerald-950/60"
+				/>
+				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+			</div>
 
 			<div className="p-5 sm:p-6 relative z-10 flex flex-col flex-1">
 				{/* Issuer Badge */}
