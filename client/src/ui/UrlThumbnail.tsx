@@ -22,11 +22,10 @@ function classifyUrl(url: string | null | undefined): UrlKind {
 
 /**
  * Generates a screenshot URL for any website using free public services.
- * Falls back through multiple providers for reliability.
+ * WordPress mshots API provides highly reliable website previews.
  */
-function getScreenshotUrl(websiteUrl: string, width = 1280, height = 800): string {
-	// Google's PageSpeed Insights API — free, no key needed, returns real screenshot
-	return `https://image.thum.io/get/width/${width}/crop/${height}/noanimate/${encodeURIComponent(websiteUrl)}`;
+function getScreenshotUrl(websiteUrl: string, width = 1280): string {
+	return `https://s0.wp.com/mshots/v1/${encodeURIComponent(websiteUrl)}?w=${width}`;
 }
 
 // ─── Component ──────────────────────────────────────────────────

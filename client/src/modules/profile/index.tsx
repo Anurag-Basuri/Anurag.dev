@@ -73,7 +73,14 @@ export function ProfileModule() {
 				animate="visible"
 				className="relative w-full h-48 sm:h-64 md:h-112 bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
 			>
-				<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-[#0a0a0a] to-[#0a0a0a]" />
+				{profile.coverUrl && (
+					<img 
+						src={profile.coverUrl} 
+						alt="Cover" 
+						className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-lighten" 
+					/>
+				)}
+				<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-[#0a0a0a]/60 to-[#0a0a0a]/80" />
 				<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#020409] to-transparent" />
 			</motion.div>
@@ -123,7 +130,11 @@ export function ProfileModule() {
 											)}
 										/>
 										<span className="text-[10px] font-bold tracking-widest text-primary uppercase hidden sm:inline-block">
-											{profile.openToWork ? 'Available' : 'Busy'}
+											{profile.openToWork 
+												? (profile.workPreferences && Object.entries(profile.workPreferences).filter(([_, v]) => v).length > 0
+													? `Available • ${Object.entries(profile.workPreferences).filter(([_, v]) => v).map(([k]) => k.charAt(0).toUpperCase() + k.slice(1)).join(', ')}`
+													: 'Available')
+												: 'Busy'}
 										</span>
 									</div>
 								</motion.div>
@@ -187,13 +198,6 @@ export function ProfileModule() {
 								color: 'text-sky-400',
 								bg: 'bg-sky-400/10 border-sky-400/20',
 							},
-							{
-								icon: Code2,
-								label: 'Projects',
-								value: `${profile.projectsCount}+ Shipped`,
-								color: 'text-emerald-400',
-								bg: 'bg-emerald-400/10 border-emerald-400/20',
-							},
 						].map((stat, i) => (
 							<div
 								key={i}
@@ -215,13 +219,13 @@ export function ProfileModule() {
 					</motion.div>
 
 					{/* Bio & Skills Bento Grid */}
-					<div className="mt-8 grid grid-cols-1 md:grid-cols-5 gap-6">
+					<div className="mt-8 flex flex-col gap-6">
 						{/* Bio Card */}
 						{profile.bio && (
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="md:col-span-3 p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
+								className="w-full p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -240,7 +244,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="md:col-span-2 p-6 sm:p-8 rounded-4xl bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
+								className="w-full p-6 sm:p-8 rounded-4xl bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-bl from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -253,33 +257,26 @@ export function ProfileModule() {
 										initial="hidden"
 										whileInView="visible"
 										viewport={{ once: true }}
-										className="flex flex-col gap-5"
+										className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
 									>
-										{Object.entries(profile.skills)
-											.slice(0, 3)
-											.map(([category, items]) => (
-												<div key={category}>
-													<p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">
-														{category}
-													</p>
-													<div className="flex flex-wrap gap-2">
-														{items.slice(0, 5).map(skill => (
-															<motion.span
-																key={skill}
-																variants={staggerFastItem}
-																className="text-xs font-semibold px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-white/90 transition-colors"
-															>
-																{skill}
-															</motion.span>
-														))}
-														{items.length > 5 && (
-															<span className="text-xs font-semibold px-2.5 py-1.5 bg-transparent border border-dashed border-white/10 rounded-lg text-white/40">
-																+{items.length - 5}
-															</span>
-														)}
-													</div>
+										{Object.entries(profile.skills).map(([category, items]) => (
+											<div key={category}>
+												<p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">
+													{category}
+												</p>
+												<div className="flex flex-wrap gap-2">
+													{items.map(skill => (
+														<motion.span
+															key={skill}
+															variants={staggerFastItem}
+															className="text-xs font-semibold px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-white/90 transition-colors"
+														>
+															{skill}
+														</motion.span>
+													))}
 												</div>
-											))}
+											</div>
+										))}
 									</motion.div>
 								</div>
 							</motion.div>

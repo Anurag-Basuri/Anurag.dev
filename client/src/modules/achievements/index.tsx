@@ -196,7 +196,7 @@ export function AchievementsModule() {
 				<SectionHeader
 					icon={Trophy}
 					label="Triumphs"
-					title="Awards & Honors"
+					title="Achievements"
 					description="Hackathon wins, open-source milestones, and competitive programming ranks."
 					accent="rose"
 				/>

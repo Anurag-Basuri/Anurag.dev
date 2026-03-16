@@ -6,6 +6,18 @@ import { Linkedin, Github, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/theme/tokens';
 
+import { useState, useEffect } from 'react';
+import { publicService } from '@/api';
+import type { Profile } from '@/api/schema';
+import { Twitter, Globe } from 'lucide-react';
+
+const SOCIAL_ICONS: Record<string, React.ElementType<{ className?: string }>> = {
+	GitHub: Github,
+	Twitter: Twitter,
+	LinkedIn: Linkedin,
+	Website: Globe,
+};
+
 // ============================================================================
 // Social Button Component
 // ============================================================================
@@ -33,9 +45,7 @@ const SocialButton = memo(function SocialButton({ href, icon: Icon, label }: Soc
 			)}
 			title={label}
 		>
-			<Icon
-				className={cn(PANEL_TOKENS.icons.md, 'transition-transform group-hover:scale-110')}
-			/>
+			<Icon className={cn(PANEL_TOKENS.icons.md, 'transition-transform group-hover:scale-110')} />
 		</a>
 	);
 });
@@ -45,30 +55,44 @@ const SocialButton = memo(function SocialButton({ href, icon: Icon, label }: Soc
 // ============================================================================
 
 export const SidebarProfile = memo(function SidebarProfile() {
+	const [profile, setProfile] = useState<Profile | null>(null);
+
+	useEffect(() => {
+		publicService.getProfile().then(({ data }) => setProfile(data)).catch(console.error);
+	}, []);
+
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">
 			{/* Profile Section */}
 			<div className="p-2 sm:p-3 border-b border-sidebar-border/20 bg-white/2">
 				{/* Avatar + Info Row */}
-				<div className="flex items-center gap-2 sm:gap-3 mb-2">
+				<div className="flex items-center gap-2 sm:gap-3 mb-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">
 						<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-border/40 ring-1 ring-emerald-400/20">
-							<Image
-								src="/logo.png"
-								alt="AnuragOS Logo"
-								width={40}
-								height={40}
-								className="w-full h-full object-cover"
-								priority
-							/>
+							{profile?.avatarUrl ? (
+								<img 
+									src={profile.avatarUrl} 
+									alt={profile.name} 
+									className="w-full h-full object-cover" 
+								/>
+							) : (
+								<Image
+									src="/logo.png"
+									alt="AnuragOS Logo"
+									width={40}
+									height={40}
+									className="w-full h-full object-cover"
+									priority
+								/>
+							)}
 						</div>
 						{/* Online indicator */}
 						<div
 							className={cn(
 								'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3',
-								'bg-primary rounded-full border-2 border-background',
-								'shadow-[0_0_8px_rgba(52,211,153,0.6)] animate-pulse',
+								profile?.openToWork ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-primary shadow-[0_0_8px_rgba(52,211,153,0.6)]',
+								'rounded-full border-2 border-background animate-pulse',
 							)}
 						/>
 					</div>
@@ -76,28 +100,36 @@ export const SidebarProfile = memo(function SidebarProfile() {
 					{/* Info */}
 					<div className="min-w-0 flex-1">
 						<h3 className="font-semibold text-xs sm:text-sm text-foreground truncate leading-tight">
-							Anurag Basuri
+							{profile?.name || 'Anurag Basuri'}
 						</h3>
 						<p className="text-[9px] sm:text-[10px] text-muted-foreground font-mono truncate">
-							Full Stack Engineer
+							{profile?.header ? profile.header.split(',')[0] : 'Full Stack Engineer'}
 						</p>
 					</div>
 				</div>
 
 				{/* Social Links */}
 				<div className="grid gap-1.5 relative z-10" onClick={e => e.stopPropagation()}>
-					<div className="flex gap-1.5">
-						<SocialButton
-							href="https://linkedin.com/in/anurag-basuri"
-							icon={Linkedin}
-							label="LinkedIn"
-						/>
-						<SocialButton
-							href="https://github.com/Anurag-Basuri"
-							icon={Github}
-							label="GitHub"
-						/>
-						<SocialButton href="mailto:contact@anurag.dev" icon={Mail} label="Email" />
+					<div className="flex flex-wrap gap-1.5 justify-start">
+						{(profile?.socials ?? []).length > 0 ? (
+							(profile?.socials ?? []).map(social => {
+								const Icon = SOCIAL_ICONS[social.platform] || Globe;
+								return (
+									<SocialButton
+										key={social.platform}
+										href={social.url}
+										icon={Icon}
+										label={social.platform}
+									/>
+								);
+							})
+						) : (
+							<>
+								<SocialButton href="https://linkedin.com" icon={Linkedin} label="LinkedIn" />
+								<SocialButton href="https://github.com" icon={Github} label="GitHub" />
+								<SocialButton href="mailto:contact@example.com" icon={Mail} label="Email" />
+							</>
+						)}
 					</div>
 				</div>
 			</div>

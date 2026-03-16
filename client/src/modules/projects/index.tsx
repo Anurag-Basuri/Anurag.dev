@@ -47,7 +47,6 @@ export function ProjectsModule() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const [filter, setFilter] = useState<'All' | 'Web' | 'App' | 'AI'>('All');
 	const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 	useEffect(() => {
@@ -65,36 +64,6 @@ export function ProjectsModule() {
 		fetchProjects();
 	}, []);
 
-	// Categorize projects for filtering
-	const filteredProjects = useMemo(() => {
-		if (filter === 'All') return projects;
-		return projects.filter(p => {
-			const techList = p.techStack?.map(t => t.toLowerCase()) ?? [];
-			const titleDesc = `${p.title} ${p.description}`.toLowerCase();
-
-			if (filter === 'Web') {
-				return (
-					techList.some(t => ['react', 'next', 'node', 'express', 'vue'].includes(t)) ||
-					titleDesc.includes('web')
-				);
-			}
-			if (filter === 'App') {
-				return (
-					techList.some(t => ['react native', 'flutter', 'android', 'ios'].includes(t)) ||
-					titleDesc.includes('app')
-				);
-			}
-			if (filter === 'AI') {
-				return (
-					techList.some(t => ['python', 'pytorch', 'tensorflow', 'machine learning', 'ai', 'langchain'].includes(t)) ||
-					titleDesc.includes('ai') ||
-					titleDesc.includes('model')
-				);
-			}
-			return true;
-		});
-	}, [projects, filter]);
-
 	if (loading) return <ProjectsSkeleton />;
 
 	if (error) {
@@ -111,38 +80,9 @@ export function ProjectsModule() {
 					title="Featured Projects"
 					description="A collection of my work, ranging from full-stack web applications to AI experiments and open source tools."
 					accent="amber"
-					actions={
-						<div className="flex p-1.5 bg-black/40 backdrop-blur-xl rounded-2xl border border-white/10 shadow-inner overflow-x-auto hide-scrollbar max-w-[calc(100vw-2rem)]">
-							{['All', 'Web', 'App', 'AI'].map(tab => (
-								<button
-									key={tab}
-									onClick={() => setFilter(tab as 'All' | 'Web' | 'App' | 'AI')}
-									className={cn(
-										'relative px-4 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 z-10 whitespace-nowrap',
-										filter === tab
-											? 'text-white'
-											: 'text-white/40 hover:text-white',
-									)}
-								>
-									{filter === tab && (
-										<motion.div
-											layoutId="projectActiveTab"
-											className="absolute inset-0 bg-amber-500/20 border border-amber-500/30 rounded-xl -z-10 shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-											transition={{
-												type: 'spring',
-												bounce: 0.15,
-												duration: 0.5,
-											}}
-										/>
-									)}
-									{tab}
-								</button>
-							))}
-						</div>
-					}
 				/>
 
-				{filteredProjects.length === 0 ? (
+				{projects.length === 0 ? (
 					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
 						No projects found for the selected category.
 					</div>
@@ -157,7 +97,7 @@ export function ProjectsModule() {
 						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
 					>
 						<AnimatePresence mode="popLayout">
-							{filteredProjects.map(project => (
+							{projects.map(project => (
 								<motion.div
 									layout
 									key={project.id}

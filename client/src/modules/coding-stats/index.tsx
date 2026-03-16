@@ -3,7 +3,7 @@
 import { useEffect, useState, memo, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { publicService } from '@/api';
-import type { CodingStats, PlatformStats } from '@/api/schema';
+import type { CodingStats, PlatformStats, Profile } from '@/api/schema';
 
 import { Terminal, ExternalLink } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -81,6 +81,14 @@ interface PlatformConfig {
 	accentText: string;    // branded text color class
 }
 
+function KaggleIcon({ className }: { className?: string }) {
+	return (
+		<svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+			<path d="M18.825 23.859c-.022.092-.117.141-.281.141h-3.139c-.187 0-.351-.082-.492-.248l-5.178-6.589-1.448 1.374v5.111c0 .235-.117.352-.351.352H5.505c-.234 0-.351-.117-.351-.352V.353c0-.234.117-.353.351-.353h2.431c.234 0 .351.119.351.353v14.343l6.203-6.272c.164-.165.328-.247.492-.247h3.22c.164 0 .258.071.281.212.023.141-.012.235-.105.282L11.66 15.027l7.27 8.549c.094.094.059.188-.105.283z" />
+		</svg>
+	);
+}
+
 const PLATFORMS: PlatformConfig[] = [
 	{
 		key: 'leetcode',
@@ -126,6 +134,15 @@ const PLATFORMS: PlatformConfig[] = [
 		accentBg: 'from-emerald-500/20 to-emerald-500/0 hover:border-emerald-500/50',
 		accentBorder: 'hover:border-emerald-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.15)] bg-emerald-500/5',
 		accentText: 'text-emerald-400',
+	},
+	{
+		key: 'kaggle',
+		name: 'Kaggle',
+		icon: KaggleIcon,
+		accent: '#20BEFF',
+		accentBg: 'from-sky-500/20 to-sky-500/0 hover:border-sky-500/50',
+		accentBorder: 'hover:border-sky-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(14,165,233,0.15)] bg-sky-500/5',
+		accentText: 'text-sky-400',
 	},
 ];
 
@@ -371,13 +388,19 @@ const LeetCodeCard = memo(function LeetCodeCard({
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-10 md:gap-14 relative z-10 bg-[#0a0a0a]/40 p-6 rounded-4xl border border-white/5">
+			<div className="flex flex-col md:flex-row items-center gap-10 md:gap-14 relative z-10 bg-[#0a0a0a]/40 p-6 sm:p-8 rounded-4xl border border-white/5 w-full">
 				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} />
 				<div className="flex-1 w-full space-y-6">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
 					<DifficultyBar count={medium} total={solved} config={DIFF_CONFIG.medium} />
 					<DifficultyBar count={hard} total={solved} config={DIFF_CONFIG.hard} />
 				</div>
+				{(s?.globalRank || s?.rating) && (
+					<div className="flex flex-row md:flex-col gap-4 w-full md:w-40 justify-center">
+						{s?.globalRank && <StatPill label="Global Rank" value={s.globalRank} />}
+						{s?.rating && <StatPill label="Rating" value={Math.round(s.rating)} />}
+					</div>
+				)}
 			</div>
 		</motion.div>
 	);
@@ -513,15 +536,22 @@ const CompetitiveCard = memo(function CompetitiveCard({
 
 export function CodingStatsModule() {
 	const [stats, setStats] = useState<CodingStats | null>(null);
+	const [profile, setProfile] = useState<Profile | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
-		async function fetch() {
+		async function fetchData() {
 			try {
-				const { data } = await publicService.getCodingStats();
-				if (!cancelled) setStats(data);
+				const [statsRes, profileRes] = await Promise.all([
+					publicService.getCodingStats(),
+					publicService.getProfile(),
+				]);
+				if (!cancelled) {
+					setStats(statsRes.data);
+					setProfile(profileRes.data);
+				}
 			} catch (err) {
 				console.error('Failed to load coding stats', err);
 				if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load');
@@ -529,25 +559,34 @@ export function CodingStatsModule() {
 				if (!cancelled) setLoading(false);
 			}
 		}
-		fetch();
+		fetchData();
 		return () => { cancelled = true; };
 	}, []);
 
 	// Determine which platforms have data
 	const platformEntries = useMemo(() => {
-		if (!stats) return [];
+		if (!stats && !profile) return [];
 
 		const entries: Array<{ config: PlatformConfig; platform: PlatformStats | null; hasData: boolean }> = [];
 
 		for (const cfg of PLATFORMS) {
-			const p = (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null;
-			if (p && p.username) {
+			let p = stats ? (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null : null;
+			
+			// Inject from profile if fallback needed
+			if (!p && profile) {
+				const profileUrl = (profile as unknown as Record<string, string | null>)[cfg.key];
+				if (profileUrl) {
+					p = { url: profileUrl, username: profileUrl.split('/').pop() || '', stats: {} };
+				}
+			}
+
+			if (p && p.username && p.url) {
 				entries.push({ config: cfg, platform: p, hasData: hasStats(p) });
 			}
 		}
 
 		return entries;
-	}, [stats]);
+	}, [stats, profile]);
 
 	if (loading) return <CodingStatsSkeleton />;
 

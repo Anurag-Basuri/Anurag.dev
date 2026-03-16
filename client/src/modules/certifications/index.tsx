@@ -48,7 +48,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 			{/* Thumbnail */}
 			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-white/5 bg-[#0a0a0a]">
 				<UrlThumbnail
-					url={cert.certificateUrl}
+					url={cert.certificateUrl || cert.credentialUrl}
 					title={`${cert.title} certificate`}
 					fallbackIcon={Award}
 					fallbackLabel={cert.issuer}
