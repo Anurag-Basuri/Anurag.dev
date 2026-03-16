@@ -3,40 +3,30 @@
 import { useState, useEffect, memo, useCallback } from 'react';
 import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
-import { FileText } from 'lucide-react';
-import { apiClient, ApiClientError } from '@/api/client';
+import { FileText, Globe } from 'lucide-react';
 
 // ─── URL type detection ─────────────────────────────────────────
 
 const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|svg|avif|bmp|ico)(\?.*)?$/i;
 const PDF_EXT = /\.pdf(\?.*)?$/i;
 
-function getUrlType(url: string): 'image' | 'pdf' | 'website' {
+type UrlKind = 'image' | 'pdf' | 'website' | 'empty';
+
+function classifyUrl(url: string | null | undefined): UrlKind {
+	if (!url) return 'empty';
 	const cleaned = url.split('#')[0];
 	if (IMAGE_EXTS.test(cleaned)) return 'image';
 	if (PDF_EXT.test(cleaned)) return 'pdf';
 	return 'website';
 }
 
-// ─── In-memory client cache for OG results ──────────────────────
-
-const ogCache = new Map<string, string | null>();
-
-async function fetchOgImage(url: string): Promise<string | null> {
-	if (ogCache.has(url)) return ogCache.get(url)!;
-
-	try {
-		const result = await apiClient.get<{ ogImage: string | null }>(
-			`/link-preview?url=${encodeURIComponent(url)}`,
-		);
-		ogCache.set(url, result.ogImage);
-		return result.ogImage;
-	} catch (err) {
-		if (err instanceof ApiClientError) {
-			ogCache.set(url, null);
-		}
-		return null;
-	}
+/**
+ * Generates a screenshot URL for any website using free public services.
+ * Falls back through multiple providers for reliability.
+ */
+function getScreenshotUrl(websiteUrl: string, width = 1280, height = 800): string {
+	// Google's PageSpeed Insights API — free, no key needed, returns real screenshot
+	return `https://image.thum.io/get/width/${width}/crop/${height}/noanimate/${encodeURIComponent(websiteUrl)}`;
 }
 
 // ─── Component ──────────────────────────────────────────────────
@@ -70,59 +60,18 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 	priority = false,
 	imgClassName = 'object-cover transition-transform duration-700 group-hover:scale-110 will-change-transform',
 }: UrlThumbnailProps) {
-	const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
 	const [imgFailed, setImgFailed] = useState(false);
-	const [isPdf, setIsPdf] = useState(false);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		let cancelled = false;
-
-		if (!url) {
-			setLoading(false);
-			return;
-		}
-
-		const type = getUrlType(url);
-
-		if (type === 'image') {
-			setResolvedSrc(url);
-			setLoading(false);
-			return;
-		}
-
-		if (type === 'pdf') {
-			setIsPdf(true);
-			setLoading(false);
-			return;
-		}
-
-		// Website URL → fetch OG image from server
-		fetchOgImage(url).then(og => {
-			if (cancelled) return;
-			if (og) setResolvedSrc(og);
-			setLoading(false);
-		});
-
-		return () => {
-			cancelled = true;
-		};
-	}, [url]);
-
 	const handleImgError = useCallback(() => setImgFailed(true), []);
 
-	// Loading shimmer
-	if (loading) {
-		return <div className="w-full h-full bg-[#0a0a0a] animate-pulse" />;
-	}
+	const kind = classifyUrl(url);
 
-	// Resolved image (direct image or OG image from website)
-	if (resolvedSrc && !imgFailed) {
+	// ── Direct image URL → use next/image directly ──────────────
+	if (kind === 'image' && url && !imgFailed) {
 		return (
 			<>
 				<div className="absolute inset-0 bg-[#050505] z-0" />
 				<Image
-					src={resolvedSrc}
+					src={url}
 					alt={title}
 					fill
 					sizes={sizes}
@@ -134,10 +83,35 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		);
 	}
 
-	// PDF placeholder
-	if (isPdf) {
+	// ── Website URL → use screenshot service ────────────────────
+	if (kind === 'website' && url && !imgFailed) {
+		const screenshotSrc = getScreenshotUrl(url);
 		return (
-			<div className="w-full h-full bg-gradient-to-br from-rose-950/60 via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-2 relative overflow-hidden">
+			<>
+				<div className="absolute inset-0 bg-[#050505] z-0" />
+				<Image
+					src={screenshotSrc}
+					alt={`Preview of ${title}`}
+					fill
+					sizes={sizes}
+					className={imgClassName}
+					onError={handleImgError}
+					priority={priority}
+					unoptimized
+				/>
+				{/* Small website badge */}
+				<div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10">
+					<Globe className="w-3 h-3 text-white/60" />
+					<span className="text-[8px] font-bold text-white/60 uppercase tracking-wider">Live Preview</span>
+				</div>
+			</>
+		);
+	}
+
+	// ── PDF → styled placeholder ────────────────────────────────
+	if (kind === 'pdf') {
+		return (
+			<div className="w-full h-full bg-linear-to-br from-rose-950/60 via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-2 relative overflow-hidden">
 				<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 				<div className="relative flex flex-col items-center gap-2">
 					<div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20">
@@ -151,10 +125,10 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		);
 	}
 
-	// Fallback placeholder
+	// ── Fallback placeholder (no URL, or image load failed) ─────
 	return (
 		<div
-			className={`w-full h-full bg-gradient-to-br ${fallbackGradient} via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3 relative overflow-hidden`}
+			className={`w-full h-full bg-linear-to-br ${fallbackGradient} via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3 relative overflow-hidden`}
 		>
 			<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 			<FallbackIcon className="w-10 h-10 text-white/10 group-hover:text-white/20 transition-colors duration-500 relative" />

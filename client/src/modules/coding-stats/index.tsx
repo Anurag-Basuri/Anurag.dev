@@ -417,7 +417,7 @@ const GitHubCard = memo(function GitHubCard({
 				config.accentGlow,
 			)}
 		>
-			<div className="absolute inset-0 bg-linear-to-br from-white/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+			<div className="absolute inset-0 bg-linear-to-br from-white/3 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
 			{/* Header */}
 			<div className="flex items-center justify-between gap-3 mb-5 sm:mb-6 relative z-10">
