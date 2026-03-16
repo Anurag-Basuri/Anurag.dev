@@ -1,78 +1,46 @@
 'use client';
 
-import { useEffect, useState, memo, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, MapPin, Briefcase, ChevronRight, ExternalLink, Code2 } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/ui/scroll-area';
-import { fadeInUp, staggerContainer, floatLoop } from '@/animations/motion';
+import {
+	fadeInUp,
+	fadeIn,
+	staggerContainer,
+	staggerFast,
+	staggerFastItem,
+	cardHover,
+} from '@/animations/motion';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
 function ProfileSkeleton() {
 	return (
-		<div className="max-w-6xl mx-auto p-6 md:p-12 animate-pulse min-h-full flex flex-col justify-center">
-			<div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center justify-between">
-				<div className="flex-1 space-y-8 w-full">
-					<div className="h-8 w-40 bg-white/5 rounded-full" />
-					<div className="space-y-4">
-						<div className="h-14 w-3/4 bg-white/5 rounded-xl" />
-						<div className="h-8 w-1/2 bg-white/5 rounded-lg" />
-					</div>
-					<div className="h-20 w-full bg-white/5 rounded-lg" />
-					<div className="flex gap-4">
-						<div className="h-10 w-28 bg-white/5 rounded-lg" />
-						<div className="h-10 w-28 bg-white/5 rounded-lg" />
-						<div className="h-10 w-28 bg-white/5 rounded-lg" />
-					</div>
-					<div className="flex gap-4">
-						<div className="h-12 w-36 bg-white/5 rounded-xl" />
-						<div className="h-12 w-28 bg-white/5 rounded-xl" />
-					</div>
+		<div className="w-full animate-pulse">
+			{/* Cover */}
+			<div className="h-48 sm:h-64 md:h-80 w-full bg-white/5" />
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-24">
+				{/* Avatar */}
+				<div className="w-32 h-32 md:w-40 md:h-40 bg-white/10 rounded-3xl -mt-16 md:-mt-20 border-4 border-[#020409]" />
+				{/* Info */}
+				<div className="mt-6 space-y-4">
+					<div className="h-10 w-64 bg-white/5 rounded-xl" />
+					<div className="h-6 w-96 bg-white/5 rounded-lg" />
 				</div>
-				<div className="shrink-0 w-64 h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] bg-white/5 rounded-[2.5rem] md:rounded-[3rem]" />
+				{/* Stats */}
+				<div className="mt-8 h-20 w-full bg-white/5 rounded-2xl" />
+				{/* Bento */}
+				<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+					<div className="md:col-span-2 h-64 bg-white/5 rounded-3xl" />
+					<div className="h-64 bg-white/5 rounded-3xl" />
+				</div>
 			</div>
 		</div>
 	);
 }
-
-// ─── Core Stack Overlay ─────────────────────────────────────────
-
-const CoreStackOverlay = memo(function CoreStackOverlay({
-	skills,
-}: {
-	skills: Record<string, string[]> | null | undefined;
-}) {
-	const topSkills = useMemo(() => {
-		if (!skills) return [];
-		const first = Object.values(skills)[0];
-		return first?.slice(0, 3) ?? [];
-	}, [skills]);
-
-	if (topSkills.length === 0) return null;
-
-	return (
-		<div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6 sm:p-8 gap-4">
-			<div className="bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-100">
-				<p className="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-2">
-					Core Stack
-				</p>
-				<div className="flex flex-wrap gap-2">
-					{topSkills.map((skill: string) => (
-						<span
-							key={skill}
-							className="text-[10px] font-bold px-2 py-1 bg-white/10 rounded-md text-white"
-						>
-							{skill}
-						</span>
-					))}
-				</div>
-			</div>
-		</div>
-	);
-});
 
 // ─── Main Module ────────────────────────────────────────────────
 
@@ -93,84 +61,85 @@ export function ProfileModule() {
 	if (!profile) return null;
 
 	return (
-		<ScrollArea className="h-full w-full relative">
-			{/* Ambient Background Glow */}
-			<div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
-			<div className="absolute bottom-1/4 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px] -z-10" />
+		<div className="w-full relative min-h-full">
+			{/* Ambient Background Glows */}
+			<div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
+			<div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
-			<div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-12 pb-24 sm:pb-32 min-h-full flex flex-col justify-center">
+			{/* Hero Cover Image Area (gradient fallback if none) */}
+			<motion.div
+				variants={fadeIn}
+				initial="hidden"
+				animate="visible"
+				className="relative w-full h-48 sm:h-64 md:h-[28rem] bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
+			>
+				<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-[#0a0a0a] to-[#0a0a0a]" />
+				<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
+				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#020409] to-transparent" />
+			</motion.div>
+
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-24 sm:pb-32 -mt-16 sm:-mt-20 md:-mt-24 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					animate="visible"
-					className="flex flex-col lg:flex-row gap-8 sm:gap-12 lg:gap-20 items-center justify-between"
+					className="flex flex-col"
 				>
-					{/* Left Content Area (Text) */}
-					<div className="flex-1 space-y-6 sm:space-y-8 z-10">
-						{/* Availability Badge */}
-						<motion.div
-							variants={fadeInUp}
-							className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md"
-						>
-							<div
-								className={cn(
-									'w-2 h-2 rounded-full animate-pulse',
-									profile.openToWork ? 'bg-green-400' : 'bg-primary',
-								)}
-							/>
-							<span className="text-xs font-semibold tracking-wide text-primary uppercase">
-								{profile.openToWork ? 'Open to Work' : 'Currently Unavailable'}
-							</span>
-						</motion.div>
-
-						{/* Header & Name */}
-						<motion.div variants={fadeInUp} className="space-y-4">
-							<h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-foreground to-foreground/60 leading-tight pb-2">
-								{profile.name}
-							</h1>
-							{profile.header && (
-								<p className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground max-w-2xl leading-relaxed">
-									{profile.header}
-								</p>
-							)}
-						</motion.div>
-
-						{/* Bio */}
-						{profile.bio && (
-							<motion.p
+					{/* Header Row: Avatar + Name + Actions */}
+					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+						{/* Avatar & Title */}
+						<div className="flex flex-col gap-4">
+							<motion.div
 								variants={fadeInUp}
-								className="text-sm sm:text-base text-muted-foreground/80 max-w-2xl leading-relaxed whitespace-pre-wrap"
+								className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-[2rem] overflow-hidden border-4 border-[#020409] bg-[#0a0a0a] shadow-2xl flex items-center justify-center group"
 							>
-								{profile.bio}
-							</motion.p>
-						)}
+								{profile.avatarUrl ? (
+									<img
+										src={profile.avatarUrl}
+										alt={profile.name}
+										className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+									/>
+								) : (
+									<User className="w-16 h-16 text-white/20" />
+								)}
+								<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none" />
+							</motion.div>
 
-						{/* Quick Meta Stats */}
-						<motion.div
-							variants={fadeInUp}
-							className="flex flex-wrap items-center gap-3 sm:gap-6 pt-4 text-sm font-medium text-muted-foreground"
-						>
-							{profile.Currentlocation && (
-								<div className="flex items-center gap-2 bg-muted/20 px-3 sm:px-4 py-2 rounded-lg border border-border/40 backdrop-blur-sm shadow-sm transition-colors hover:bg-muted/40">
-									<MapPin className="w-4 h-4 text-rose-400" />
-									<span>{profile.Currentlocation}</span>
-								</div>
-							)}
-							<div className="flex items-center gap-2 bg-muted/20 px-3 sm:px-4 py-2 rounded-lg border border-border/40 backdrop-blur-sm shadow-sm transition-colors hover:bg-muted/40">
-								<Briefcase className="w-4 h-4 text-blue-400" />
-								<span>{profile.experienceYears}+ Yrs Exp</span>
+							<div className="pt-2">
+								<motion.div variants={fadeInUp} className="flex items-center gap-4 mb-2">
+									<h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-br from-white to-white/60">
+										{profile.name}
+									</h1>
+									<div
+										className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full backdrop-blur-md"
+										title={profile.openToWork ? 'Open to Work' : 'Currently Unavailable'}
+									>
+										<div
+											className={cn(
+												'w-2 h-2 rounded-full shadow-[0_0_10px]',
+												profile.openToWork
+													? 'bg-green-400 shadow-green-400/50 animate-pulse'
+													: 'bg-primary shadow-primary/50',
+											)}
+										/>
+										<span className="text-[10px] font-bold tracking-widest text-primary uppercase hidden sm:inline-block">
+											{profile.openToWork ? 'Available' : 'Busy'}
+										</span>
+									</div>
+								</motion.div>
+								{profile.header && (
+									<motion.p
+										variants={fadeInUp}
+										className="text-lg md:text-2xl font-medium text-muted-foreground/90 max-w-2xl"
+									>
+										{profile.header}
+									</motion.p>
+								)}
 							</div>
-							<div className="flex items-center gap-2 bg-muted/20 px-3 sm:px-4 py-2 rounded-lg border border-border/40 backdrop-blur-sm shadow-sm transition-colors hover:bg-muted/40">
-								<Code2 className="w-4 h-4 text-emerald-400" />
-								<span>{profile.projectsCount}+ Projects</span>
-							</div>
-						</motion.div>
+						</div>
 
 						{/* Action Buttons */}
-						<motion.div
-							variants={fadeInUp}
-							className="flex flex-wrap items-center gap-3 sm:gap-4 pt-4"
-						>
+						<motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3">
 							<button
 								onClick={() =>
 									window.dispatchEvent(
@@ -179,8 +148,7 @@ export function ProfileModule() {
 										}),
 									)
 								}
-								className="group flex items-center gap-2 bg-primary text-primary-foreground px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-95"
-								aria-label="Scroll to contact section"
+								className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-2xl font-semibold transition-all active:scale-95 shadow-[0_0_40px_-10px] shadow-primary/40 hover:shadow-primary/60"
 							>
 								Let&apos;s Connect
 								<ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -191,8 +159,7 @@ export function ProfileModule() {
 									href={profile.resumeUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="flex items-center gap-2 bg-secondary text-secondary-foreground px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-secondary/80 transition-all border border-border/50 active:scale-95"
-									aria-label="View resume"
+									className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl font-semibold transition-all border border-white/10 active:scale-95"
 								>
 									Resume <ExternalLink className="w-4 h-4" />
 								</a>
@@ -200,36 +167,126 @@ export function ProfileModule() {
 						</motion.div>
 					</div>
 
-					{/* Right Content Area (Image / Hero visual) */}
+					{/* Stats Bar */}
 					<motion.div
 						variants={fadeInUp}
-						className="relative shrink-0 w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px]"
+						className="mt-12 flex flex-wrap md:flex-nowrap items-stretch gap-4"
 					>
-						<motion.div
-							animate={floatLoop}
-							className="absolute inset-0 rounded-full bg-linear-to-tr from-primary/20 via-blue-500/20 to-purple-500/20 blur-3xl -z-10"
-						/>
-
-						{/* Main Image Container */}
-						<motion.div
-							animate={floatLoop}
-							className="relative w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl shadow-black/50 bg-[#0a0a0a]/80 backdrop-blur-xl flex items-center justify-center group"
-						>
-							{profile.avatarUrl ? (
-								<img
-									src={profile.avatarUrl}
-									alt={profile.name}
-									className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-								/>
-							) : (
-								<User className="w-24 sm:w-32 h-24 sm:h-32 text-muted-foreground/30" />
-							)}
-
-							<CoreStackOverlay skills={profile.skills} />
-						</motion.div>
+						{[
+							{
+								icon: MapPin,
+								label: 'Location',
+								value: profile.Currentlocation ?? 'Remote',
+								color: 'text-rose-400',
+								bg: 'bg-rose-400/10 border-rose-400/20',
+							},
+							{
+								icon: Briefcase,
+								label: 'Experience',
+								value: `${profile.experienceYears}+ Years`,
+								color: 'text-sky-400',
+								bg: 'bg-sky-400/10 border-sky-400/20',
+							},
+							{
+								icon: Code2,
+								label: 'Projects',
+								value: `${profile.projectsCount}+ Shipped`,
+								color: 'text-emerald-400',
+								bg: 'bg-emerald-400/10 border-emerald-400/20',
+							},
+						].map((stat, i) => (
+							<div
+								key={i}
+								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/[0.08] transition-colors"
+							>
+								<div className={cn('p-3 rounded-2xl border', stat.bg)}>
+									<stat.icon className={cn('w-5 h-5', stat.color)} />
+								</div>
+								<div>
+									<p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-0.5">
+										{stat.label}
+									</p>
+									<p className="text-lg font-bold text-white tracking-tight">
+										{stat.value}
+									</p>
+								</div>
+							</div>
+						))}
 					</motion.div>
+
+					{/* Bio & Skills Bento Grid */}
+					<div className="mt-8 grid grid-cols-1 md:grid-cols-5 gap-6">
+						{/* Bio Card */}
+						{profile.bio && (
+							<motion.div
+								variants={fadeInUp}
+								whileHover={cardHover}
+								className="md:col-span-3 p-6 sm:p-8 rounded-[2rem] bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
+							>
+								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+								<div className="relative z-10 flex flex-col h-full">
+									<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
+										About Me
+									</h2>
+									<p className="text-sm sm:text-base md:text-lg text-white/80 leading-relaxed whitespace-pre-wrap font-medium">
+										{profile.bio}
+									</p>
+								</div>
+							</motion.div>
+						)}
+
+						{/* Skills Card */}
+						{profile.skills && Object.keys(profile.skills).length > 0 && (
+							<motion.div
+								variants={fadeInUp}
+								whileHover={cardHover}
+								className="md:col-span-2 p-6 sm:p-8 rounded-[2rem] bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
+							>
+								<div className="absolute inset-0 bg-linear-to-bl from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+								<div className="relative z-10 flex flex-col h-full">
+									<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6">
+										Core Stack
+									</h2>
+
+									<motion.div
+										variants={staggerFast}
+										initial="hidden"
+										whileInView="visible"
+										viewport={{ once: true }}
+										className="flex flex-col gap-5"
+									>
+										{Object.entries(profile.skills)
+											.slice(0, 3)
+											.map(([category, items]) => (
+												<div key={category}>
+													<p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2">
+														{category}
+													</p>
+													<div className="flex flex-wrap gap-2">
+														{items.slice(0, 5).map(skill => (
+															<motion.span
+																key={skill}
+																variants={staggerFastItem}
+																className="text-xs font-semibold px-2.5 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-lg text-white/90 transition-colors"
+															>
+																{skill}
+															</motion.span>
+														))}
+														{items.length > 5 && (
+															<span className="text-xs font-semibold px-2.5 py-1.5 bg-transparent border border-dashed border-white/10 rounded-lg text-white/40">
+																+{items.length - 5}
+															</span>
+														)}
+													</div>
+												</div>
+											))}
+									</motion.div>
+								</div>
+							</motion.div>
+						)}
+					</div>
 				</motion.div>
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }

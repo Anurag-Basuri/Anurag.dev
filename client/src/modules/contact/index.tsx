@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent, ComponentType, SVGProps } from 'react';
 import { publicService } from '@/api';
 import type { AboutData } from '@/api/schema';
-import { ScrollArea } from '@/ui/scroll-area';
+
 import {
 	Send,
 	CheckCircle,
@@ -116,7 +116,7 @@ export function ContactModule() {
 	if (initialLoading) return <ContactSkeleton />;
 
 	return (
-		<ScrollArea className="h-full w-full">
+		<div className="h-full w-full">
 			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
 				{/* Standardized Header */}
 				<SectionHeader
@@ -124,6 +124,7 @@ export function ContactModule() {
 					label="Connect"
 					title="Get In Touch"
 					description="I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions."
+					accent="teal"
 				/>
 
 				<div className="flex flex-col md:flex-row gap-12 mt-12">
@@ -332,6 +333,6 @@ export function ContactModule() {
 					</motion.div>
 				</div>
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }

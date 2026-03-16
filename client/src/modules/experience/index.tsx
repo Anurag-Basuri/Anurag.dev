@@ -5,10 +5,9 @@ import { motion } from 'framer-motion';
 import { Briefcase, Building2, MapPin, Calendar, Star } from 'lucide-react';
 import { publicService } from '@/api';
 import type { JourneyEntry } from '@/api/schema';
-import { ScrollArea } from '@/ui/scroll-area';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem } from '@/animations/motion';
+import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -20,11 +19,14 @@ function ExperienceSkeleton() {
 				<div className="h-12 w-72 bg-white/5 rounded-xl" />
 				<div className="h-5 w-96 bg-white/5 rounded-lg" />
 			</div>
-			<div className="max-w-4xl mx-auto space-y-12 mt-16">
+			<div className="max-w-4xl mx-auto space-y-12 mt-16 relative">
+				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-white/10" />
 				{[1, 2, 3].map(i => (
-					<div key={i} className="flex items-start gap-8">
-						<div className="w-6 h-6 rounded-full bg-white/5 shrink-0" />
-						<div className="flex-1 h-56 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-3xl" />
+					<div key={i} className="flex items-start gap-8 relative z-10">
+						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-white/10 border-4 border-[#0a0a0a]" />
+						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
+							<div className="h-48 bg-white/5 rounded-[2rem]" />
+						</div>
 					</div>
 				))}
 			</div>
@@ -45,85 +47,93 @@ const JobCard = memo(function JobCard({
 		<motion.div
 			variants={staggerItem}
 			className={cn(
-				'relative flex flex-col md:flex-row items-start md:items-center gap-8 group',
-				isEven ? 'md:flex-row' : 'md:flex-row-reverse',
+				'relative flex flex-col md:flex-row items-start md:items-center w-full group',
+				!isEven && 'md:flex-row-reverse',
 			)}
 		>
-			{/* Glowing Node */}
-			<div className="absolute left-8 md:left-1/2 -ml-3 md:-ml-3 mt-1.5 md:mt-0 z-10">
-				<div className="w-6 h-6 rounded-full bg-background border-4 border-primary group-hover:border-purple-400 group-hover:scale-125 transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+			{/* Timeline Node */}
+			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
+				<div className="w-4 h-4 rounded-full bg-[#0a0a0a] border-4 border-sky-500/50 group-hover:border-sky-400 group-hover:bg-sky-400 group-hover:scale-150 transition-all duration-500 shadow-[0_0_15px_rgba(56,189,248,0)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.5)]" />
 			</div>
 
-			{/* Content Card */}
+			{/* Content Card Wrapper */}
 			<div
 				className={cn(
-					'w-full pl-20 md:pl-0 md:w-1/2',
-					isEven ? 'md:pr-12' : 'md:pl-12',
+					'w-full pl-20 md:pl-0 md:w-1/2 relative',
+					isEven ? 'md:pr-16 md:text-right' : 'md:pl-16',
 				)}
 			>
-				<motion.div
-					whileHover={{ y: -5, scale: 1.02 }}
-					transition={{
-						type: 'spring',
-						stiffness: 300,
-						damping: 20,
-					}}
+				{/* Connector Line to Node (Desktop Only) */}
+				<div
 					className={cn(
-						'relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 shadow-2xl transition-colors duration-500',
+						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-white/10 group-hover:bg-sky-500/50 transition-colors duration-500',
+						isEven ? 'right-8' : 'left-8',
+					)}
+				/>
+
+				<motion.div
+					whileHover={cardHover}
+					className={cn(
+						'relative p-6 sm:p-8 rounded-[2rem] bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
 						job.highlighted
-							? 'border-primary/30 bg-primary/5'
-							: 'hover:border-white/10',
+							? 'border-sky-500/30 bg-sky-500/5'
+							: 'hover:border-white/20',
 					)}
 				>
+					<div className="absolute inset-0 bg-linear-to-br from-sky-500/0 to-transparent group-hover:from-sky-500/5 transition-colors duration-500" />
+
 					{/* Highlight Badge */}
 					{job.highlighted && (
-						<div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 backdrop-blur-sm">
-							<Star className="w-4 h-4 text-primary fill-primary" />
-						</div>
+						<div className="absolute -top-3 -right-3 w-16 h-16 rounded-full bg-sky-500/10 blur-xl pointer-events-none" />
 					)}
 
-					{/* Header */}
-					<h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mb-2">
-						{job.title}
-					</h3>
+					<div className="relative z-10 flex flex-col h-full">
+						{/* Header */}
+						<h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mb-2 relative inline-flex items-center gap-2">
+							{job.title}
+							{job.highlighted && (
+								<Star className="w-4 h-4 text-sky-400 fill-sky-400 shrink-0" />
+							)}
+						</h3>
 
-					<div className="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-xs sm:text-sm font-medium text-muted-foreground mb-4">
-						{job.organization && (
-							<span className="flex items-center gap-1.5 text-primary">
-								<Building2 className="w-4 h-4" />
-								{job.organization}
-							</span>
-						)}
-						<span className="flex items-center gap-1.5 text-blue-400">
-							<Calendar className="w-4 h-4" />
-							{job.date}
-						</span>
-						{job.location && (
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-5">
+							{job.organization && (
+								<span className="flex items-center gap-1.5 text-sky-400 bg-sky-400/10 px-2 py-1 rounded-md">
+									<Building2 className="w-3.5 h-3.5" />
+									{job.organization}
+								</span>
+							)}
 							<span className="flex items-center gap-1.5">
-								<MapPin className="w-4 h-4" />
-								{job.location}
+								<Calendar className="w-3.5 h-3.5" />
+								{job.date}
 							</span>
+							{job.location && (
+								<span className="flex items-center gap-1.5">
+									<MapPin className="w-3.5 h-3.5" />
+									{job.location}
+								</span>
+							)}
+						</div>
+
+						{/* Description */}
+						<p className="text-white/70 leading-relaxed text-sm font-medium mb-6 whitespace-pre-wrap">
+							{job.description}
+						</p>
+
+						{/* Skills Tags */}
+						{(job.skills ?? []).length > 0 && (
+							<div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/5">
+								{(job.skills ?? []).map(skill => (
+									<span
+										key={skill}
+										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-white/5 text-muted-foreground border border-white/10 group-hover:border-sky-500/20 transition-colors"
+									>
+										{skill}
+									</span>
+								))}
+							</div>
 						)}
 					</div>
-
-					{/* Description */}
-					<p className="text-muted-foreground/90 leading-relaxed text-xs sm:text-sm mb-6 whitespace-pre-wrap">
-						{job.description}
-					</p>
-
-					{/* Skills Tags */}
-					{(job.skills ?? []).length > 0 && (
-						<div className="flex flex-wrap gap-1.5 sm:gap-2 pt-4 border-t border-white/5">
-							{(job.skills ?? []).map(skill => (
-								<span
-									key={skill}
-									className="px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-lg bg-white/5 text-muted-foreground border border-white/5 hover:bg-white/10 hover:text-white transition-colors"
-								>
-									{skill}
-								</span>
-							))}
-						</div>
-					)}
 				</motion.div>
 			</div>
 		</motion.div>
@@ -158,13 +168,14 @@ export function ExperienceModule() {
 	if (loading) return <ExperienceSkeleton />;
 
 	return (
-		<ScrollArea className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-5xl mx-auto pb-24 sm:pb-32">
+		<div className="h-full w-full">
+			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
 				<SectionHeader
 					icon={Briefcase}
 					label="Work History"
 					title="Professional Experience"
 					description="My career journey, roles, and impact across companies and startups."
+					accent="sky"
 				/>
 
 				{workEntries.length === 0 ? (
@@ -172,15 +183,16 @@ export function ExperienceModule() {
 						No work experience data found.
 					</div>
 				) : (
-					<div className="relative mt-16 max-w-4xl mx-auto">
+					<div className="relative mt-16 max-w-5xl mx-auto">
 						{/* Timeline Center Line */}
-						<div className="absolute left-8 md:left-1/2 top-4 bottom-4 w-1 -ml-[0.5px] bg-gradient-to-b from-primary/50 via-purple-500/30 to-transparent rounded-full" />
+						<div className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 bg-linear-to-b from-transparent via-sky-500/20 to-transparent" />
 
 						<motion.div
 							variants={staggerContainer}
 							initial="hidden"
-							animate="visible"
-							className="space-y-12"
+							whileInView="visible"
+							viewport={{ once: true, margin: '-20px' }}
+							className="space-y-12 sm:space-y-20 flex flex-col"
 						>
 							{workEntries.map((job, index) => (
 								<JobCard
@@ -193,6 +205,6 @@ export function ExperienceModule() {
 					</div>
 				)}
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }

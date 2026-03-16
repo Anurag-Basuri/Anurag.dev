@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, memo, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { publicService } from '@/api';
 import type { CodingStats, PlatformStats } from '@/api/schema';
-import { ScrollArea } from '@/ui/scroll-area';
+
 import { Terminal, ExternalLink } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/ui/SectionHeader';
@@ -576,13 +576,14 @@ export function CodingStatsModule() {
 	}
 
 	return (
-		<ScrollArea className="h-full w-full">
+		<div className="h-full w-full">
 			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
 				<SectionHeader
 					icon={Terminal}
 					label="Telemetry"
 					title="Coding Profiles"
 					description="Performance metrics and activity across competitive programming and open source platforms."
+					accent="orange"
 				/>
 
 				<motion.div
@@ -621,6 +622,6 @@ export function CodingStatsModule() {
 					})}
 				</motion.div>
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }
