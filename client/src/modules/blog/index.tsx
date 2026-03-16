@@ -555,7 +555,7 @@ export function BlogModule() {
 	}
 
 	return (
-		<ScrollArea className="h-full w-full">
+		<div className="h-full w-full">
 			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
 				{/* Header */}
 				<SectionHeader
@@ -563,6 +563,7 @@ export function BlogModule() {
 					icon={BookOpen}
 					title="Engineering Log"
 					description="Thoughts, tutorials, and deep dives into software engineering, systems design, and technology."
+					accent="indigo"
 					actions={
 						<div className="relative group w-full sm:w-72 md:w-80 mt-4 md:mt-0">
 							<div className="absolute inset-0 bg-primary/10 rounded-xl sm:rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
@@ -675,6 +676,6 @@ export function BlogModule() {
 					)}
 				</AnimatePresence>
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }

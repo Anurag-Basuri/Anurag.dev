@@ -2,6 +2,7 @@
 
 import { useRef, type ReactNode } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { EASE } from '@/animations/motion';
 
 interface ScrollSectionProps {
 	id: string;
@@ -10,27 +11,31 @@ interface ScrollSectionProps {
 }
 
 /**
- * Wraps a module in a scroll-snapping section with entrance animation.
- * Each section takes at least full viewport height and snaps to top.
+ * Wraps each module in a scroll-snapping section with a premium
+ * blur + scale + fade entrance animation.
  */
 export function ScrollSection({ id, children, className = '' }: ScrollSectionProps) {
 	const ref = useRef<HTMLDivElement>(null);
-	const isInView = useInView(ref, { once: true, amount: 0.15 });
+	const isInView = useInView(ref, { once: true, amount: 0.08 });
 
 	return (
 		<section
 			id={`section-${id}`}
-			className={`min-h-dvh w-full relative ${className}`}
+			className={`w-full relative ${className}`}
 			style={{ scrollSnapAlign: 'start' }}
 		>
 			<motion.div
 				ref={ref}
-				className="h-full w-full"
-				initial={{ opacity: 0, y: 40 }}
-				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+				className="w-full"
+				initial={{ opacity: 0, y: 50, scale: 0.98, filter: 'blur(6px)' }}
+				animate={
+					isInView
+						? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+						: { opacity: 0, y: 50, scale: 0.98, filter: 'blur(6px)' }
+				}
 				transition={{
-					duration: 0.6,
-					ease: [0.25, 0.46, 0.45, 0.94],
+					duration: 0.7,
+					ease: EASE.smooth,
 				}}
 			>
 				{children}
@@ -38,4 +43,3 @@ export function ScrollSection({ id, children, className = '' }: ScrollSectionPro
 		</section>
 	);
 }
-

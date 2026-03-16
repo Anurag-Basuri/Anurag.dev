@@ -1,7 +1,6 @@
 /**
  * design-system/motion.ts
  * Centralized Framer Motion variants, transitions, and spring configs.
- * Replaces: src/lib/animations.ts
  */
 
 import type { Variants, Transition } from 'framer-motion';
@@ -67,6 +66,12 @@ export const blurIn: Variants = {
   visible: { opacity: 1, filter: 'blur(0px)',  scale: 1, transition: { duration: 0.5, ease: EASE.out } },
 };
 
+// ─── Premium Entrance (blur + fade + y) ────────────────────────────────────────
+export const blurFadeUp: Variants = {
+  hidden:  { opacity: 0, y: 30, filter: 'blur(8px)' },
+  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6, ease: EASE.smooth } },
+};
+
 // ─── List / Stagger Variants ───────────────────────────────────────────────────
 export const staggerContainer: Variants = {
   hidden:  { opacity: 0 },
@@ -81,11 +86,36 @@ export const staggerItem: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
 };
 
-// ─── Hover Presets (for `whileHover`) ─────────────────────────────────────────
+// Faster stagger for grids with many items
+export const staggerFast: Variants = {
+  hidden:  { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.02 },
+  },
+};
+
+export const staggerFastItem: Variants = {
+  hidden:  { opacity: 0, y: 16, scale: 0.98 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: EASE.smooth } },
+};
+
+// ─── Card Hover Presets ───────────────────────────────────────────────────────
 export const hoverLift   = { y: -4, transition: TRANSITIONS.fast };
 export const hoverScale  = { scale: 1.04, transition: TRANSITIONS.fast };
 export const hoverGlow   = { scale: 1.02, transition: TRANSITIONS.fast };
 export const tapScale    = { scale: 0.96 };
+
+export const cardHover = {
+  scale: 1.02,
+  y: -4,
+  transition: { duration: 0.2, ease: EASE.out },
+};
+
+export const cardTap = {
+  scale: 0.98,
+  transition: { duration: 0.1 },
+};
 
 // ─── Page Transition ───────────────────────────────────────────────────────────
 export const pageTransition: Variants = {
@@ -104,9 +134,24 @@ export const floatLoop = {
   },
 };
 
+// ─── Glow Pulse (for active/highlighted elements) ─────────────────────────────
+export const glowPulse = {
+  opacity: [0.5, 1, 0.5],
+  scale: [1, 1.15, 1],
+  transition: {
+    duration: 2,
+    repeat: Infinity,
+    ease: 'easeInOut' as const,
+  },
+};
+
 // ─── Viewport Settings ─────────────────────────────────────────────────────────
 export const VIEWPORT = {
   once: true,
   margin: '-60px',
 } as const;
 
+export const VIEWPORT_EAGER = {
+  once: true,
+  margin: '-20px',
+} as const;

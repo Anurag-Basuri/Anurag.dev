@@ -5,11 +5,10 @@ import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Achievement } from '@/api/schema';
-import { ScrollArea } from '@/ui/scroll-area';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
 import { cn } from '@/lib/utils';
-import { staggerContainer, scaleIn } from '@/animations/motion';
+import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -21,11 +20,11 @@ function AchievementsSkeleton() {
 				<div className="h-12 w-64 bg-white/5 rounded-xl" />
 				<div className="h-5 w-96 bg-white/5 rounded-lg" />
 			</div>
-			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 auto-rows-fr">
 				{[1, 2, 3, 4, 5, 6].map(i => (
 					<div
 						key={i}
-						className="h-96 bg-[#0a0a0a]/60 backdrop-blur border border-white/5 rounded-[2rem]"
+						className="h-96 bg-white/5 rounded-[2.5rem]"
 					/>
 				))}
 			</div>
@@ -35,42 +34,40 @@ function AchievementsSkeleton() {
 
 // ─── Helpers ────────────────────────────────────────────────────
 
-const getCategoryIcon = (category: string): ReactNode => {
+const getCategoryDetails = (category: string) => {
 	switch (category.toLowerCase()) {
 		case 'hackathon':
-			return <Target className="w-6 h-6 text-rose-400" />;
+			return {
+				icon: <Target className="w-5 h-5 text-rose-400" />,
+				color: 'from-rose-500/20 to-rose-500/0 border-rose-500/30 group-hover:border-rose-500/50 shadow-rose-500/10',
+				accent: 'rose',
+				gradient: 'from-rose-950/60',
+				fallback: Target,
+			};
 		case 'competition':
-			return <Medal className="w-6 h-6 text-amber-400" />;
+			return {
+				icon: <Medal className="w-5 h-5 text-amber-400" />,
+				color: 'from-amber-500/20 to-amber-500/0 border-amber-500/30 group-hover:border-amber-500/50 shadow-amber-500/10',
+				accent: 'amber',
+				gradient: 'from-amber-950/60',
+				fallback: Medal,
+			};
 		case 'opensource':
-			return <Star className="w-6 h-6 text-emerald-400" />;
+			return {
+				icon: <Star className="w-5 h-5 text-emerald-400" />,
+				color: 'from-emerald-500/20 to-emerald-500/0 border-emerald-500/30 group-hover:border-emerald-500/50 shadow-emerald-500/10',
+				accent: 'emerald',
+				gradient: 'from-emerald-950/60',
+				fallback: Star,
+			};
 		default:
-			return <Award className="w-6 h-6 text-blue-400" />;
-	}
-};
-
-const getCategoryColor = (category: string) => {
-	switch (category.toLowerCase()) {
-		case 'hackathon':
-			return 'from-rose-500/20 to-rose-500/0 border-rose-500/30 group-hover:border-rose-500/60 shadow-[0_0_30px_-5px_rgba(244,63,94,0.15)] group-hover:shadow-[0_0_40px_0px_rgba(244,63,94,0.3)]';
-		case 'competition':
-			return 'from-amber-500/20 to-amber-500/0 border-amber-500/30 group-hover:border-amber-500/60 shadow-[0_0_30px_-5px_rgba(245,158,11,0.15)] group-hover:shadow-[0_0_40px_0px_rgba(245,158,11,0.3)]';
-		case 'opensource':
-			return 'from-emerald-500/20 to-emerald-500/0 border-emerald-500/30 group-hover:border-emerald-500/60 shadow-[0_0_30px_-5px_rgba(16,185,129,0.15)] group-hover:shadow-[0_0_40px_0px_rgba(16,185,129,0.3)]';
-		default:
-			return 'from-blue-500/20 to-blue-500/0 border-blue-500/30 group-hover:border-blue-500/60 shadow-[0_0_30px_-5px_rgba(59,130,246,0.15)] group-hover:shadow-[0_0_40px_0px_rgba(59,130,246,0.3)]';
-	}
-};
-
-const getCategoryGradient = (category: string) => {
-	switch (category.toLowerCase()) {
-		case 'hackathon':
-			return 'from-rose-950/60';
-		case 'competition':
-			return 'from-amber-950/60';
-		case 'opensource':
-			return 'from-emerald-950/60';
-		default:
-			return 'from-blue-950/60';
+			return {
+				icon: <Award className="w-5 h-5 text-blue-400" />,
+				color: 'from-blue-500/20 to-blue-500/0 border-blue-500/30 group-hover:border-blue-500/50 shadow-blue-500/10',
+				accent: 'blue',
+				gradient: 'from-blue-950/60',
+				fallback: Award,
+			};
 	}
 };
 
@@ -81,83 +78,75 @@ const AchievementCard = memo(function AchievementCard({
 }: {
 	achievement: Achievement;
 }) {
-	const colorClass = getCategoryColor(achievement.category);
+	const details = getCategoryDetails(achievement.category);
 	const link = achievement.url || achievement.proofUrl;
-	const categoryIcon = getCategoryIcon(achievement.category);
-
-	// Map category to a fallback Lucide icon for UrlThumbnail
-	const getFallbackIcon = (cat: string) => {
-		switch (cat.toLowerCase()) {
-			case 'hackathon': return Target;
-			case 'competition': return Medal;
-			case 'opensource': return Star;
-			default: return Award;
-		}
-	};
 
 	return (
 		<motion.div
-			variants={scaleIn}
-			whileHover={{ y: -8, scale: 1.02 }}
-			transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+			variants={staggerItem}
+			whileHover={cardHover}
 			className={cn(
-				'relative group flex flex-col h-full bg-[#0a0a0a]/80 backdrop-blur-xl border rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-all duration-500',
-				colorClass,
+				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-[2rem] overflow-hidden transition-all duration-500 shadow-2xl',
+				details.color,
 			)}
 		>
+			<div className={`absolute inset-0 bg-linear-to-br from-${details.accent}-500/0 to-transparent group-hover:from-${details.accent}-500/10 transition-colors duration-500 pointer-events-none`} />
+
 			{/* Thumbnail */}
-			<div className="relative aspect-video overflow-hidden mx-3 mt-3 rounded-t-2xl sm:rounded-t-3xl border border-white/5">
+			<div className="relative aspect-[16/10] overflow-hidden mx-3 mt-3 rounded-t-[1.5rem] border border-white/5 bg-[#0a0a0a]">
 				<UrlThumbnail
 					url={achievement.proofUrl || achievement.url}
 					title={achievement.title}
-					fallbackIcon={getFallbackIcon(achievement.category)}
+					fallbackIcon={details.fallback}
 					fallbackLabel={achievement.issuer || undefined}
-					fallbackGradient={getCategoryGradient(achievement.category)}
+					fallbackGradient={details.gradient}
 				/>
-				<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+				
+				{/* Inner shadow */}
+				<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
 			</div>
 
-			<div className="p-5 sm:p-6 relative z-10 flex flex-col grow">
-				<div className="flex justify-between items-start mb-4">
-					<div className="p-3 rounded-xl bg-black/50 backdrop-blur-md border border-white/10 shadow-inner">
-						{categoryIcon}
+			<div className="p-6 relative z-10 flex flex-col grow -mt-6">
+				<div className="flex justify-between items-start mb-6">
+					<div className="p-3 rounded-2xl bg-[#0a0a0a] border border-white/10 shadow-xl group-hover:scale-110 transition-transform duration-500">
+						{details.icon}
 					</div>
 
 					{achievement.featured && (
-						<div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-inner">
+						<div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest shadow-inner relative z-20">
 							<Sparkles className="w-3 h-3" />
 							Featured
 						</div>
 					)}
 				</div>
 
-				<h3 className="text-lg sm:text-xl font-black text-white tracking-tight mb-2 leading-tight">
+				<h3 className="text-xl font-black text-white tracking-tight mb-2 leading-tight group-hover:text-white/90 transition-colors">
 					{achievement.title}
 				</h3>
 
 				{achievement.issuer && (
-					<p className="text-xs sm:text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-						<span className="w-4 h-[1px] bg-muted-foreground/30" />
+					<p className={`text-xs font-bold uppercase tracking-wider text-${details.accent}-400 mb-4 flex items-center gap-2`}>
+						<span className={`w-4 h-[2px] bg-${details.accent}-400/50 rounded-full`} />
 						{achievement.issuer}
 					</p>
 				)}
 
 				{achievement.description && (
-					<p className="text-xs sm:text-sm text-foreground/70 leading-relaxed mb-4 flex-grow line-clamp-3">
+					<p className="text-sm text-white/60 leading-relaxed mb-6 flex-grow line-clamp-3 font-medium">
 						{achievement.description}
 					</p>
 				)}
 
-				<div className="mt-auto space-y-4">
+				<div className="mt-auto space-y-5">
 					{(achievement.rank || achievement.event) && (
 						<div className="flex flex-wrap gap-2">
 							{achievement.rank && (
-								<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white shadow-inner">
+								<span className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white shadow-inner">
 									{achievement.rank}
 								</span>
 							)}
 							{achievement.event && (
-								<span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-white/70 shadow-inner">
+								<span className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[10px] font-black uppercase text-white/60 shadow-inner">
 									{achievement.event}
 								</span>
 							)}
@@ -165,15 +154,15 @@ const AchievementCard = memo(function AchievementCard({
 					)}
 
 					{link && (
-						<div className="pt-4 border-t border-white/10 flex items-center justify-between">
+						<div className="pt-5 border-t border-white/5 flex items-center justify-between">
 							<a
 								href={link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white transition-colors group/link"
+								className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/60 hover:text-${details.accent}-400 transition-colors group/link`}
 								aria-label={`View certificate for ${achievement.title}`}
 							>
-								View Certificate
+								View Details
 								<ExternalLink className="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
 							</a>
 						</div>
@@ -202,13 +191,14 @@ export function AchievementsModule() {
 	if (loading) return <AchievementsSkeleton />;
 
 	return (
-		<ScrollArea className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
+		<div className="h-full w-full">
+			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
 				<SectionHeader
 					icon={Trophy}
 					label="Triumphs"
 					title="Awards & Honors"
 					description="Hackathon wins, open-source milestones, and competitive programming ranks."
+					accent="rose"
 				/>
 
 				{achievements.length === 0 ? (
@@ -219,8 +209,9 @@ export function AchievementsModule() {
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
-						animate="visible"
-						className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 auto-rows-fr"
+						whileInView="visible"
+						viewport={{ once: true, margin: '-20px' }}
+						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr"
 					>
 						{achievements.map(achievement => (
 							<AchievementCard
@@ -231,6 +222,6 @@ export function AchievementsModule() {
 					</motion.div>
 				)}
 			</div>
-		</ScrollArea>
+		</div>
 	);
 }
