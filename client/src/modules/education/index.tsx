@@ -25,7 +25,7 @@ function EducationSkeleton() {
 					<div key={i} className="flex items-start gap-8 relative z-10">
 						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-white/10 border-4 border-[#0a0a0a]" />
 						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-48 bg-white/5 rounded-[2rem]" />
+							<div className="h-48 bg-white/5 rounded-4xl" />
 						</div>
 					</div>
 				))}
@@ -74,7 +74,7 @@ const EducationCard = memo(function EducationCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-6 sm:p-8 rounded-[2rem] bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
+						'relative p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
 						entry.highlighted
 							? 'border-violet-500/30 bg-violet-500/5'
 							: 'hover:border-white/20',

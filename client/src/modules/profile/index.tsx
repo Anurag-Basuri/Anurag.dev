@@ -71,10 +71,10 @@ export function ProfileModule() {
 				variants={fadeIn}
 				initial="hidden"
 				animate="visible"
-				className="relative w-full h-48 sm:h-64 md:h-[28rem] bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
+				className="relative w-full h-48 sm:h-64 md:h-112 bg-[#0a0a0a] border-b border-white/5 overflow-hidden"
 			>
 				<div className="absolute inset-0 bg-linear-to-br from-primary/20 via-[#0a0a0a] to-[#0a0a0a]" />
-				<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
+				<div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_60%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#020409] to-transparent" />
 			</motion.div>
 
@@ -91,7 +91,7 @@ export function ProfileModule() {
 						<div className="flex flex-col gap-4">
 							<motion.div
 								variants={fadeInUp}
-								className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-[2rem] overflow-hidden border-4 border-[#020409] bg-[#0a0a0a] shadow-2xl flex items-center justify-center group"
+								className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-4xl overflow-hidden border-4 border-[#020409] bg-[#0a0a0a] shadow-2xl flex items-center justify-center group"
 							>
 								{profile.avatarUrl ? (
 									<img
@@ -102,7 +102,7 @@ export function ProfileModule() {
 								) : (
 									<User className="w-16 h-16 text-white/20" />
 								)}
-								<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none" />
+								<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-4xl pointer-events-none" />
 							</motion.div>
 
 							<div className="pt-2">
@@ -197,7 +197,7 @@ export function ProfileModule() {
 						].map((stat, i) => (
 							<div
 								key={i}
-								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/[0.08] transition-colors"
+								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/8 transition-colors"
 							>
 								<div className={cn('p-3 rounded-2xl border', stat.bg)}>
 									<stat.icon className={cn('w-5 h-5', stat.color)} />
@@ -221,7 +221,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="md:col-span-3 p-6 sm:p-8 rounded-[2rem] bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
+								className="md:col-span-3 p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -240,7 +240,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="md:col-span-2 p-6 sm:p-8 rounded-[2rem] bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
+								className="md:col-span-2 p-6 sm:p-8 rounded-4xl bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-bl from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">

@@ -40,13 +40,13 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-[2rem] overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
+			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-4xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
 		>
 			{/* Ambient Glow */}
 			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/10 transition-colors duration-500 pointer-events-none" />
 
 			{/* Thumbnail */}
-			<div className="relative aspect-[16/10] overflow-hidden mx-3 mt-3 rounded-t-[1.5rem] border border-white/5 bg-[#0a0a0a]">
+			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-white/5 bg-[#0a0a0a]">
 				<UrlThumbnail
 					url={cert.certificateUrl}
 					title={`${cert.title} certificate`}
@@ -82,7 +82,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 				</div>
 
 				{(cert.skills ?? []).length > 0 && (
-					<div className="flex flex-wrap gap-2 mb-6 flex-grow content-start">
+					<div className="flex flex-wrap gap-2 mb-6 grow content-start">
 						{(cert.skills ?? []).map(skill => (
 							<span
 								key={skill}

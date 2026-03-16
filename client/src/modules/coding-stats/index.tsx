@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, memo, useMemo } from 'react';
+import { useEffect, useState, memo, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { publicService } from '@/api';
 import type { CodingStats, PlatformStats } from '@/api/schema';
@@ -8,7 +8,7 @@ import type { CodingStats, PlatformStats } from '@/api/schema';
 import { Terminal, ExternalLink } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { SectionHeader } from '@/ui/SectionHeader';
-import { staggerContainer, staggerItem, fadeInUp } from '@/animations/motion';
+import { staggerContainer, staggerItem, fadeInUp, cardHover } from '@/animations/motion';
 import { cn } from '@/lib/utils';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -75,12 +75,10 @@ interface PlatformConfig {
 	key: string;
 	name: string;
 	icon: (props: { className?: string }) => ReactNode;
-	accent: string;        // primary color
-	accentBg: string;      // icon/badge bg
-	accentBorder: string;  // hover border
-	accentGlow: string;    // hover glow
-	accentText: string;    // branded text
-	accentGradient: string; // ambient gradient (static class for Tailwind)
+	accent: string;        // primary hex color
+	accentBg: string;      // custom gradient bg string (Tailwind classes)
+	accentBorder: string;  // hover border specific to color
+	accentText: string;    // branded text color class
 }
 
 const PLATFORMS: PlatformConfig[] = [
@@ -89,55 +87,45 @@ const PLATFORMS: PlatformConfig[] = [
 		name: 'LeetCode',
 		icon: LeetCodeIcon,
 		accent: '#fbbf24',
-		accentBg: 'bg-amber-500/10',
-		accentBorder: 'hover:border-amber-500/40',
-		accentGlow: 'hover:shadow-[0_0_40px_-5px_rgba(251,191,36,0.2)]',
+		accentBg: 'from-amber-500/20 to-amber-500/0 hover:border-amber-500/50',
+		accentBorder: 'hover:border-amber-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(251,191,36,0.15)] bg-amber-500/5',
 		accentText: 'text-amber-400',
-		accentGradient: 'from-amber-500/5',
 	},
 	{
 		key: 'github',
 		name: 'GitHub',
 		icon: GitHubIcon,
 		accent: '#f0f0f0',
-		accentBg: 'bg-zinc-400/10',
-		accentBorder: 'hover:border-zinc-400/40',
-		accentGlow: 'hover:shadow-[0_0_40px_-5px_rgba(240,240,240,0.1)]',
+		accentBg: 'from-zinc-400/20 to-zinc-400/0 hover:border-zinc-400/50',
+		accentBorder: 'hover:border-zinc-400/30 group-hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.05)] bg-zinc-400/5',
 		accentText: 'text-zinc-300',
-		accentGradient: 'from-zinc-400/5',
 	},
 	{
 		key: 'codeforces',
 		name: 'Codeforces',
 		icon: CodeforcesIcon,
 		accent: '#ef4444',
-		accentBg: 'bg-red-500/10',
-		accentBorder: 'hover:border-red-500/40',
-		accentGlow: 'hover:shadow-[0_0_40px_-5px_rgba(239,68,68,0.2)]',
+		accentBg: 'from-red-500/20 to-red-500/0 hover:border-red-500/50',
+		accentBorder: 'hover:border-red-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.15)] bg-red-500/5',
 		accentText: 'text-red-400',
-		accentGradient: 'from-red-500/5',
 	},
 	{
 		key: 'codechef',
 		name: 'CodeChef',
 		icon: CodeChefIcon,
 		accent: '#d97706',
-		accentBg: 'bg-yellow-600/10',
-		accentBorder: 'hover:border-yellow-600/40',
-		accentGlow: 'hover:shadow-[0_0_40px_-5px_rgba(217,119,6,0.2)]',
-		accentText: 'text-yellow-500',
-		accentGradient: 'from-yellow-600/5',
+		accentBg: 'from-orange-500/20 to-orange-500/0 hover:border-orange-500/50',
+		accentBorder: 'hover:border-orange-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.15)] bg-orange-500/5',
+		accentText: 'text-orange-400',
 	},
 	{
 		key: 'gfg',
 		name: 'GeeksforGeeks',
 		icon: GFGIcon,
 		accent: '#22c55e',
-		accentBg: 'bg-green-500/10',
-		accentBorder: 'hover:border-green-500/40',
-		accentGlow: 'hover:shadow-[0_0_40px_-5px_rgba(34,197,94,0.2)]',
-		accentText: 'text-green-400',
-		accentGradient: 'from-green-500/5',
+		accentBg: 'from-emerald-500/20 to-emerald-500/0 hover:border-emerald-500/50',
+		accentBorder: 'hover:border-emerald-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.15)] bg-emerald-500/5',
+		accentText: 'text-emerald-400',
 	},
 ];
 
@@ -147,17 +135,12 @@ const PLATFORMS: PlatformConfig[] = [
 
 function CodingStatsSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 space-y-6 animate-pulse max-w-7xl mx-auto">
-			<div className="h-10 bg-white/5 rounded w-56 mb-6" />
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-				{[1, 2, 3, 4, 5].map(i => (
-					<div
-						key={i}
-						className={cn(
-							'rounded-2xl sm:rounded-3xl border border-white/5 bg-[#0a0a0a]/60',
-							i === 1 ? 'h-80 sm:col-span-2 lg:col-span-2 lg:row-span-2' : 'h-56',
-						)}
-					/>
+		<div className="p-4 sm:p-6 md:p-12 space-y-6 animate-pulse max-w-7xl mx-auto pb-32">
+			<div className="h-10 bg-white/5 rounded w-56 mb-8" />
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+				<div className="h-[400px] border border-white/5 bg-white/5 rounded-[2.5rem] md:col-span-2 lg:col-span-2 lg:row-span-2" />
+				{[1, 2, 3].map(i => (
+					<div key={i} className="h-64 rounded-[2.5rem] border border-white/5 bg-white/5" />
 				))}
 			</div>
 		</div>
@@ -172,8 +155,8 @@ const CircularProgress = memo(function CircularProgress({
 	value,
 	max,
 	color,
-	size = 130,
-	strokeWidth = 8,
+	size = 150,
+	strokeWidth = 10,
 }: {
 	value: number;
 	max: number;
@@ -189,13 +172,16 @@ const CircularProgress = memo(function CircularProgress({
 
 	return (
 		<div
-			className="relative flex items-center justify-center"
+			className="relative flex items-center justify-center shrink-0"
 			style={{ width: size, height: size }}
 			role="progressbar"
 			aria-valuenow={value}
 			aria-valuemin={0}
 			aria-valuemax={max}
 		>
+			{/* Ambient Drop Shadow inside circle */}
+			<div className="absolute inset-0 rounded-full shadow-[inset_0_0_30px_rgba(0,0,0,0.5)] z-10 pointer-events-none" />
+
 			<svg width={size} height={size} className="transform -rotate-90">
 				<circle
 					cx={size / 2}
@@ -204,7 +190,7 @@ const CircularProgress = memo(function CircularProgress({
 					stroke="currentColor"
 					strokeWidth={strokeWidth}
 					fill="transparent"
-					className="text-white/5"
+					className="text-black/50"
 				/>
 				<motion.circle
 					cx={size / 2}
@@ -215,13 +201,14 @@ const CircularProgress = memo(function CircularProgress({
 					fill="transparent"
 					strokeLinecap="round"
 					initial={{ strokeDasharray: circumference, strokeDashoffset: circumference }}
-					animate={{ strokeDashoffset: dashoffset }}
+					whileInView={{ strokeDashoffset: dashoffset }}
+					viewport={{ once: true }}
 					transition={{ duration: shouldReduceMotion ? 0 : ANIM_DURATION, ease: 'easeOut' }}
 				/>
 			</svg>
-			<div className="absolute inset-0 flex flex-col items-center justify-center">
-				<span className="text-2xl sm:text-3xl font-black text-white tracking-tighter">{value}</span>
-				<span className="text-[9px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-0.5">
+			<div className="absolute inset-0 flex flex-col items-center justify-center pt-1 z-20">
+				<span className="text-3xl sm:text-4xl font-black text-white tracking-tighter drop-shadow-md">{value}</span>
+				<span className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em] mt-1">
 					solved
 				</span>
 			</div>
@@ -252,18 +239,18 @@ const DifficultyBar = memo(function DifficultyBar({
 	const pct = total > 0 ? (count / total) * 100 : 0;
 
 	return (
-		<div className="space-y-1.5">
-			<div className="flex justify-between items-center text-[10px] sm:text-xs px-0.5">
+		<div className="space-y-2">
+			<div className="flex justify-between items-end text-xs px-1">
 				<span className={cn('font-black uppercase tracking-[0.15em]', config.color)}>{config.label}</span>
 				<span className="text-white font-bold">{count}</span>
 			</div>
-			<div className={cn('h-2 w-full rounded-full overflow-hidden border border-white/5', config.container)}>
+			<div className={cn('h-2.5 w-full rounded-full overflow-hidden border border-black/50 shadow-inner', config.container)}>
 				<motion.div
 					initial={{ width: 0 }}
 					whileInView={{ width: `${pct}%` }}
 					viewport={{ once: true }}
-					transition={{ duration: shouldReduceMotion ? 0 : 1, ease: 'easeOut' }}
-					className={cn('h-full rounded-full', config.bg)}
+					transition={{ duration: shouldReduceMotion ? 0 : 1.2, ease: [0.25, 1, 0.5, 1] }}
+					className={cn('h-full rounded-full shadow-[0_0_10px_currentColor]', config.bg)}
 				/>
 			</div>
 		</div>
@@ -276,11 +263,11 @@ const DifficultyBar = memo(function DifficultyBar({
 
 function StatPill({ label, value }: { label: string; value: string | number }) {
 	return (
-		<div className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-black/40 border border-white/5 group-hover:border-white/10 transition-colors">
-			<div className="text-[8px] sm:text-[9px] font-bold text-muted-foreground uppercase tracking-[0.15em] mb-1">
+		<div className="flex flex-col justify-center px-4 py-3 rounded-2xl bg-black/40 border border-white/5 shadow-inner transition-colors group-hover:bg-[#0a0a0a]">
+			<div className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">
 				{label}
 			</div>
-			<div className="text-lg sm:text-xl font-black text-white tracking-tight">{value}</div>
+			<div className="text-xl sm:text-2xl font-black text-white tracking-tight">{value}</div>
 		</div>
 	);
 }
@@ -305,22 +292,23 @@ const LinkOnlyCard = memo(function LinkOnlyCard({
 			href={url}
 			target="_blank"
 			rel="noopener noreferrer"
+			whileHover={cardHover}
 			className={cn(
-				'group relative flex items-center gap-4 sm:gap-5 p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 overflow-hidden transition-all duration-500',
+				'group relative flex items-center gap-5 p-6 rounded-4xl bg-linear-to-br border border-white/10 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
 				config.accentBorder,
-				config.accentGlow,
+				config.accentBg,
 			)}
 		>
-			<div className={cn('p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border border-white/5', config.accentBg, config.accentText)}>
-				<Icon className="w-6 sm:w-7 h-6 sm:h-7" />
+			<div className={cn('p-4 rounded-3xl bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+				<Icon className="w-8 h-8" />
 			</div>
 			<div className="flex-1 min-w-0">
-				<h3 className="text-base sm:text-lg font-black text-white tracking-tight">{config.name}</h3>
-				<p className={cn('text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mt-0.5 truncate', config.accentText)}>
+				<h3 className="text-lg sm:text-xl font-black text-white tracking-tight">{config.name}</h3>
+				<p className={cn('text-[10px] font-black uppercase tracking-wider mt-1 truncate', config.accentText)}>
 					@{username}
 				</p>
 			</div>
-			<ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-white transition-colors shrink-0" />
+			<ExternalLink className="w-5 h-5 text-white/30 group-hover:text-white transition-colors shrink-0 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 		</motion.a>
 	);
 });
@@ -349,24 +337,25 @@ const LeetCodeCard = memo(function LeetCodeCard({
 			initial="hidden"
 			whileInView="visible"
 			viewport={{ once: true }}
+			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-2xl sm:rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 p-5 sm:p-7 overflow-hidden transition-all duration-500 sm:col-span-2 lg:col-span-2 lg:row-span-2',
+				'group relative rounded-[2.5rem] bg-linear-to-br border border-white/10 backdrop-blur-md p-8 sm:p-10 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 lg:row-span-2 shadow-2xl',
+				config.accentBg,
 				config.accentBorder,
-				config.accentGlow,
 			)}
 		>
 			{/* Ambient glow */}
-			<div className="absolute inset-0 bg-linear-to-br from-amber-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+			<div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] -z-10 pointer-events-none group-hover:bg-amber-500/20 transition-colors duration-700" />
 
 			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 relative z-10">
-				<div className="flex items-center gap-3 sm:gap-4">
-					<div className={cn('p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5', config.accentBg, config.accentText)}>
-						<Icon className="w-7 sm:w-8 h-7 sm:h-8" />
+			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-10 relative z-10">
+				<div className="flex items-center gap-5">
+					<div className={cn('p-4 rounded-3xl bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+						<Icon className="w-10 sm:w-12 h-10 sm:h-12" />
 					</div>
 					<div>
-						<h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">{config.name}</h2>
-						<p className={cn('text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mt-0.5', config.accentText)}>
+						<h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1">{config.name}</h2>
+						<p className={cn('text-[10px] sm:text-[11px] font-black uppercase tracking-[0.15em]', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -375,16 +364,16 @@ const LeetCodeCard = memo(function LeetCodeCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-white/5 border border-white/10 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-white hover:bg-white/10 transition-all self-start sm:self-auto"
+					className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-400 hover:text-white hover:bg-[#0a0a0a] hover:border-amber-500/30 transition-all self-start shadow-inner"
 				>
-					Profile <ExternalLink className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
+					Profile <ExternalLink className="w-3.5 h-3.5" />
 				</a>
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8 relative z-10">
+			<div className="flex flex-col md:flex-row items-center gap-10 md:gap-14 relative z-10 bg-[#0a0a0a]/40 p-6 rounded-4xl border border-white/5">
 				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} />
-				<div className="flex-1 w-full space-y-3 sm:space-y-4">
+				<div className="flex-1 w-full space-y-6">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
 					<DifficultyBar count={medium} total={solved} config={DIFF_CONFIG.medium} />
 					<DifficultyBar count={hard} total={solved} config={DIFF_CONFIG.hard} />
@@ -411,23 +400,25 @@ const GitHubCard = memo(function GitHubCard({
 	return (
 		<motion.div
 			variants={staggerItem}
+			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-2xl sm:rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 p-5 sm:p-7 overflow-hidden transition-all duration-500',
+				'group relative rounded-4xl bg-linear-to-br backdrop-blur-md border border-white/10 p-6 sm:p-8 overflow-hidden transition-all duration-500 shadow-xl',
+				config.accentBg,
 				config.accentBorder,
-				config.accentGlow,
 			)}
 		>
-			<div className="absolute inset-0 bg-linear-to-br from-white/3 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+			{/* Ambient glow */}
+			<div className="absolute top-0 right-0 w-32 h-32 bg-zinc-500/10 rounded-full blur-[50px] -z-10 pointer-events-none group-hover:bg-zinc-500/20 transition-colors duration-700" />
 
 			{/* Header */}
-			<div className="flex items-center justify-between gap-3 mb-5 sm:mb-6 relative z-10">
-				<div className="flex items-center gap-3">
-					<div className={cn('p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-white/5', config.accentBg, config.accentText)}>
-						<Icon className="w-6 sm:w-7 h-6 sm:h-7" />
+			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
+				<div className="flex items-center gap-4">
+					<div className={cn('p-3 rounded-[1.2rem] bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-lg sm:text-xl font-black text-white tracking-tight">{config.name}</h3>
-						<p className={cn('text-[9px] sm:text-[10px] font-bold uppercase tracking-wider', config.accentText)}>
+						<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">{config.name}</h3>
+						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -436,19 +427,19 @@ const GitHubCard = memo(function GitHubCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-white transition-colors"
+					className="p-3 rounded-xl bg-black/40 border border-white/5 text-zinc-400 hover:text-white hover:bg-[#0a0a0a] hover:border-zinc-500/30 transition-all self-start shadow-inner"
 					aria-label="View GitHub profile"
 				>
-					<ExternalLink className="w-3.5 h-3.5" />
+					<ExternalLink className="w-4 h-4" />
 				</a>
 			</div>
 
 			{/* Stats */}
-			<div className="grid grid-cols-2 gap-2.5 sm:gap-3 relative z-10">
+			<div className="grid grid-cols-2 gap-3 relative z-10">
 				<StatPill label="Stars" value={s?.stars ?? 0} />
+				<StatPill label="Followers" value={s?.followers ?? 0} />
 				<StatPill label="PRs" value={s?.prs ?? 0} />
 				<StatPill label="Issues" value={s?.issues ?? 0} />
-				<StatPill label="Followers" value={s?.followers ?? 0} />
 			</div>
 		</motion.div>
 	);
@@ -471,26 +462,24 @@ const CompetitiveCard = memo(function CompetitiveCard({
 	return (
 		<motion.div
 			variants={staggerItem}
+			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-2xl sm:rounded-3xl bg-[#0a0a0a]/80 backdrop-blur-xl border border-white/5 p-5 sm:p-7 overflow-hidden transition-all duration-500',
+				'group relative rounded-4xl bg-linear-to-br backdrop-blur-md border border-white/10 p-6 sm:p-8 overflow-hidden transition-all duration-500 shadow-xl',
+				config.accentBg,
 				config.accentBorder,
-				config.accentGlow,
 			)}
 		>
-			<div className={cn(
-				'absolute inset-0 bg-linear-to-br via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none',
-				config.accentGradient,
-			)} />
+			<div className="absolute top-0 right-0 w-32 h-32 bg-current/5 rounded-full blur-[50px] -z-10 pointer-events-none transition-colors duration-700" style={{ color: config.accent }} />
 
 			{/* Header */}
-			<div className="flex items-center justify-between gap-3 mb-5 sm:mb-6 relative z-10">
-				<div className="flex items-center gap-3">
-					<div className={cn('p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-white/5', config.accentBg, config.accentText)}>
-						<Icon className="w-6 sm:w-7 h-6 sm:h-7" />
+			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
+				<div className="flex items-center gap-4">
+					<div className={cn('p-3 rounded-[1.2rem] bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-lg sm:text-xl font-black text-white tracking-tight">{config.name}</h3>
-						<p className={cn('text-[9px] sm:text-[10px] font-bold uppercase tracking-wider', config.accentText)}>
+						<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">{config.name}</h3>
+						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -499,15 +488,15 @@ const CompetitiveCard = memo(function CompetitiveCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-white transition-colors"
+					className={cn('p-3 rounded-xl bg-black/40 border border-white/5 hover:text-white hover:bg-[#0a0a0a] transition-all self-start shadow-inner', config.accentText, `hover:border-${config.accentBg.split('-')[1]}-500/30`)}
 					aria-label={`View ${config.name} profile`}
 				>
-					<ExternalLink className="w-3.5 h-3.5" />
+					<ExternalLink className="w-4 h-4" />
 				</a>
 			</div>
 
 			{/* Stats */}
-			<div className="grid grid-cols-2 gap-2.5 sm:gap-3 relative z-10">
+			<div className="grid grid-cols-2 gap-3 relative z-10">
 				<StatPill label="Rating" value={s?.rating ?? 'N/A'} />
 				<StatPill label="Max Rating" value={s?.maxRating ?? 'N/A'} />
 				{s?.globalRank != null && <StatPill label="Global Rank" value={s.globalRank} />}
@@ -564,12 +553,15 @@ export function CodingStatsModule() {
 
 	if (error || platformEntries.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center h-full p-8 text-center">
-				<div className="p-4 rounded-full bg-white/5 mb-4">
-					<Terminal className="w-8 h-8 text-muted-foreground" />
+			<div className="flex flex-col items-center justify-center py-32 text-center max-w-7xl mx-auto">
+				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-6 shadow-inner">
+					<Terminal className="w-8 h-8 text-orange-400" />
 				</div>
-				<p className="text-muted-foreground">
-					{error ? 'Failed to load coding stats' : 'No coding profiles configured'}
+				<p className="text-xl font-bold text-white mb-2 tracking-tight">
+					{error ? 'Failed to Sync Telemetry' : 'No Profiles Configured'}
+				</p>
+				<p className="text-sm text-white/50 mb-8 max-w-sm">
+					{error || "Connect your coding profiles in the admin dashboard to see your stats here."}
 				</p>
 			</div>
 		);
@@ -582,15 +574,16 @@ export function CodingStatsModule() {
 					icon={Terminal}
 					label="Telemetry"
 					title="Coding Profiles"
-					description="Performance metrics and activity across competitive programming and open source platforms."
+					description="Live performance metrics and activity across competitive programming, problem solving, and open source platforms."
 					accent="orange"
 				/>
 
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
-					animate="visible"
-					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-10 sm:mt-12"
+					whileInView="visible"
+					viewport={{ once: true, margin: '-20px' }}
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-16"
 				>
 					{platformEntries.map(({ config, platform, hasData }) => {
 						if (!platform) return null;

@@ -86,14 +86,14 @@ const AchievementCard = memo(function AchievementCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-[2rem] overflow-hidden transition-all duration-500 shadow-2xl',
+				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-4xl overflow-hidden transition-all duration-500 shadow-2xl',
 				details.color,
 			)}
 		>
 			<div className={`absolute inset-0 bg-linear-to-br from-${details.accent}-500/0 to-transparent group-hover:from-${details.accent}-500/10 transition-colors duration-500 pointer-events-none`} />
 
 			{/* Thumbnail */}
-			<div className="relative aspect-[16/10] overflow-hidden mx-3 mt-3 rounded-t-[1.5rem] border border-white/5 bg-[#0a0a0a]">
+			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-white/5 bg-[#0a0a0a]">
 				<UrlThumbnail
 					url={achievement.proofUrl || achievement.url}
 					title={achievement.title}
@@ -132,7 +132,7 @@ const AchievementCard = memo(function AchievementCard({
 				)}
 
 				{achievement.description && (
-					<p className="text-sm text-white/60 leading-relaxed mb-6 flex-grow line-clamp-3 font-medium">
+					<p className="text-sm text-white/60 leading-relaxed mb-6 grow line-clamp-3 font-medium">
 						{achievement.description}
 					</p>
 				)}

@@ -30,19 +30,19 @@ const SOCIAL_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
 
 function ContactSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto animate-pulse pb-32">
+		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-32">
 			<div className="space-y-4 mb-12 pb-8">
 				<div className="h-6 w-24 bg-white/5 rounded-lg" />
 				<div className="h-12 w-56 bg-white/5 rounded-xl" />
 				<div className="h-5 w-96 bg-white/5 rounded-lg" />
 			</div>
-			<div className="flex flex-col md:flex-row gap-12">
+			<div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 				<div className="flex-1 space-y-6">
-					<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
-					<div className="h-32 bg-[#0a0a0a]/60 backdrop-blur rounded-[2rem] border border-white/5" />
+					<div className="h-40 bg-white/5 rounded-[2.5rem]" />
+					<div className="h-40 bg-white/5 rounded-[2.5rem]" />
 				</div>
-				<div className="flex-1">
-					<div className="h-96 bg-[#0a0a0a]/60 backdrop-blur rounded-[2.5rem] border border-white/5" />
+				<div className="flex-1 lg:max-w-xl">
+					<div className="h-[500px] bg-white/5 rounded-[2.5rem]" />
 				</div>
 			</div>
 		</div>
@@ -65,12 +65,21 @@ export function ContactModule() {
 
 	// Fetch data
 	useEffect(() => {
+		let cancelled = false;
 		async function fetchData() {
-			const { data: profileData } = await publicService.getProfile();
-			setAbout(profileData);
-			setInitialLoading(false);
+			try {
+				const { data: profileData } = await publicService.getProfile();
+				if (!cancelled) {
+					setAbout(profileData);
+				}
+			} catch (err) {
+				console.error(err);
+			} finally {
+				if (!cancelled) setInitialLoading(false);
+			}
 		}
 		fetchData();
+		return () => { cancelled = true; };
 	}, []);
 
 	const handleSubmit = async (e: FormEvent) => {
@@ -84,6 +93,7 @@ export function ContactModule() {
 			setSuccess(true);
 			setFormData({ name: '', email: '', subject: '', message: '' });
 			toast.success('Message sent successfully!');
+			setTimeout(() => setSuccess(false), 5000); // Reset success after 5s
 		} catch (err: unknown) {
 			if (err instanceof Error) {
 				setError(err.message);
@@ -105,19 +115,20 @@ export function ContactModule() {
 	const copyEmail = useCallback(() => {
 		if (about?.email) {
 			navigator.clipboard.writeText(about.email);
-		} else {
-			navigator.clipboard.writeText('contact@example.com');
+			setCopied(true);
+			toast.success('Email copied to clipboard');
+			setTimeout(() => setCopied(false), 2000);
 		}
-		setCopied(true);
-		toast.success('Email copied to clipboard');
-		setTimeout(() => setCopied(false), 2000);
 	}, [about?.email]);
 
 	if (initialLoading) return <ContactSkeleton />;
 
 	return (
-		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
+		<div className="h-full w-full relative">
+			{/* Very subtle ambient spotlight behind contact module to signify "end of page" */}
+			<div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}
@@ -127,71 +138,86 @@ export function ContactModule() {
 					accent="teal"
 				/>
 
-				<div className="flex flex-col md:flex-row gap-12 mt-12">
+				<div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mt-12 sm:mt-16">
 					{/* Left Column: Info */}
 					<motion.div
 						initial={{ opacity: 0, x: -20 }}
-						animate={{ opacity: 1, x: 0 }}
+						whileInView={{ opacity: 1, x: 0 }}
+						viewport={{ once: true }}
 						transition={{ duration: 0.5 }}
-						className="flex-1 space-y-8"
+						className="flex-1 space-y-6 sm:space-y-8"
 					>
 						<div className="space-y-6">
-							<div className="relative p-6 sm:p-8 rounded-[2rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl hover:border-primary/40 hover:shadow-[0_0_40px_0px_rgba(16,185,129,0.1)] transition-all duration-500 overflow-hidden group">
-								<div className="absolute inset-0 bg-linear-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-								<div className="relative z-10 flex items-start gap-5">
-									<div className="p-4 rounded-[1.25rem] bg-white/5 text-primary group-hover:scale-110 group-hover:bg-primary/20 group-hover:text-primary transition-all duration-500 shadow-inner">
-										<Mail className="w-6 h-6" />
+							{/* Email Card (Teal Accent) */}
+							<div className="relative p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
+								<div className="absolute inset-0 bg-linear-to-br from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/10 transition-colors duration-700 pointer-events-none" />
+								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
+									<div className="p-4 sm:p-5 rounded-3xl bg-[#050505] border border-white/10 text-teal-400 group-hover:scale-110 group-hover:bg-teal-500/10 group-hover:border-teal-500/30 transition-all duration-500 shadow-xl shrink-0">
+										<Mail className="w-8 h-8" />
 									</div>
-									<div className="flex-1 mt-1">
-										<h3 className="text-white font-bold mb-2 tracking-tight">
+									<div className="flex-1 w-full max-w-[16rem] sm:max-w-none mx-auto sm:mx-0">
+										<h3 className="text-xl sm:text-2xl text-white font-black mb-3 sm:mb-2 tracking-tight">
 											Email Me
 										</h3>
-										<div className="flex items-center gap-3">
-											<span className="text-muted-foreground font-mono text-sm sm:text-base selection:bg-primary/30">
+										<div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 bg-[#0a0a0a] p-3 sm:p-2 sm:pl-4 rounded-2xl border border-white/5 shadow-inner">
+											<span className="text-white/60 font-mono text-sm sm:text-base selection:bg-teal-500/30 truncate flex-1">
 												{about?.email || 'contact@example.com'}
 											</span>
-											<button
-												onClick={copyEmail}
-												className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white transition-colors border border-white/5 hover:border-white/10"
-												aria-label="Copy email address"
-											>
-												{copied ? (
-													<Check className="w-4 h-4 text-primary" />
-												) : (
-													<Copy className="w-4 h-4" />
-												)}
-											</button>
+											{about?.email && (
+												<button
+													onClick={copyEmail}
+													className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all border border-white/5 hover:border-white/10 shrink-0 w-full sm:w-auto flex justify-center mt-2 sm:mt-0"
+													aria-label="Copy email address"
+												>
+													{copied ? (
+														<Check className="w-4 h-4 text-teal-400" />
+													) : (
+														<Copy className="w-4 h-4 group-hover:text-teal-400/50" />
+													)}
+												</button>
+											)}
 										</div>
 									</div>
 								</div>
 							</div>
 
-							<div className="relative p-6 sm:p-8 rounded-[2rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl hover:border-purple-500/40 hover:shadow-[0_0_40px_0px_rgba(168,85,247,0.1)] transition-all duration-500 overflow-hidden group">
-								<div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-								<div className="relative z-10 flex items-start gap-5">
-									<div className="p-4 rounded-[1.25rem] bg-white/5 text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-all duration-500 shadow-inner">
-										<MapPin className="w-6 h-6" />
+							{/* Location Card (Purple Accent) */}
+							<div className="relative p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
+								<div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-transparent to-transparent group-hover:from-purple-500/10 transition-colors duration-700 pointer-events-none" />
+								{/* Faint map background icon */}
+								<MapPin className="absolute right-[-10%] top-[-20%] w-64 h-64 text-white/5 group-hover:text-purple-500/5 transition-colors duration-700 -rotate-12 pointer-events-none" />
+								
+								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
+									<div className="p-4 sm:p-5 rounded-3xl bg-[#050505] border border-white/10 text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all duration-500 shadow-xl shrink-0">
+										<MapPin className="w-8 h-8" />
 									</div>
 									<div className="mt-1">
-										<h3 className="text-white font-bold mb-2 tracking-tight">
+										<h3 className="text-xl sm:text-2xl text-white font-black mb-2 tracking-tight">
 											Location
 										</h3>
-										<p className="text-muted-foreground">
+										<p className="text-white/60 font-medium text-base sm:text-lg">
 											{about?.Currentlocation || 'San Francisco Bay Area, CA'}
 										</p>
-										<p className="text-[10px] text-primary/80 mt-2 uppercase tracking-[0.2em] font-bold">
-											Remote Available
-										</p>
+										<div className="inline-flex items-center gap-2 mt-4 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+											<span className="relative flex h-2 w-2">
+												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+												<span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
+											</span>
+											<span className="text-[10px] text-purple-400 uppercase tracking-widest font-black">
+												Remote Available
+											</span>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 
-						<div className="space-y-4 pt-4">
-							<h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60 ml-1">
+						{/* Links Wrapper */}
+						<div className="pt-4  px-2">
+							<h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-6 text-center sm:text-left">
 								Social Protocols
 							</h3>
-							<div className="flex gap-4">
+							<div className="flex flex-wrap justify-center sm:justify-start gap-4">
 								{(about?.socials ?? []).map(social => {
 									const Icon = SOCIAL_ICONS[social.platform] || Mail;
 									return (
@@ -200,10 +226,10 @@ export function ContactModule() {
 											href={social.url}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="p-4 rounded-[1.25rem] bg-[#0a0a0a]/80 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 text-muted-foreground hover:text-white group hover:scale-105 active:scale-95 shadow-inner hover:shadow-[0_0_20px_0px_rgba(255,255,255,0.05)]"
+											className="p-4 sm:p-5 flex items-center justify-center rounded-3xl bg-[#050505] border border-white/10 hover:bg-[#0a0a0a] hover:border-white/30 transition-all duration-300 text-white/50 hover:text-white group hover:scale-110 active:scale-95 shadow-xl"
 											aria-label={`Visit ${social.platform} profile`}
 										>
-											<Icon className="w-6 h-6 group-hover:scale-110 transition-transform duration-500" />
+											<Icon className="w-6 sm:w-7 h-6 sm:h-7 transition-colors duration-300" />
 										</a>
 									);
 								})}
@@ -214,22 +240,24 @@ export function ContactModule() {
 					{/* Right Column: Form */}
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
-						animate={{ opacity: 1, y: 0 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true }}
 						transition={{ duration: 0.5, delay: 0.2 }}
-						className="flex-1"
+						className="flex-1 lg:max-w-xl"
 					>
-						<div className="p-8 sm:p-10 rounded-[2.5rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl shadow-[0_0_40px_0_rgba(0,0,0,0.5)] relative overflow-hidden group hover:border-white/10 transition-colors duration-500">
-							<div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
+						<div className="p-8 sm:p-10 rounded-[2.5rem] bg-[#050505] border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-teal-500/30 transition-colors duration-500">
+							<div className="absolute inset-0 bg-linear-to-br from-teal-500/5 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-							<h2 className="text-2xl font-black text-white mb-8 flex items-center gap-4 relative z-10 tracking-tight">
-								<span className="w-2 h-10 rounded-full bg-linear-to-b from-primary to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
-								Send a Message
+							<h2 className="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight relative z-10 flex items-center gap-3">
+								<span className="w-2 h-8 rounded-full bg-teal-500 shadow-[0_0_15px_rgba(20,184,166,0.5)]" />
+								Transmission
 							</h2>
+							<p className="text-white/40 text-sm mb-8 font-medium ml-5 relative z-10">Send a direct message. I'll get back to you soon.</p>
 
 							<form onSubmit={handleSubmit} className="space-y-6 relative z-10">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 									<div className="space-y-2.5">
-										<label className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] ml-1">
+										<label className="text-[10px] font-black text-white/60 uppercase tracking-widest ml-1">
 											Name
 										</label>
 										<input
@@ -238,12 +266,12 @@ export function ContactModule() {
 											value={formData.name}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/40 border border-white/10 rounded-[1.25rem] px-5 py-4 min-h-[52px] text-white focus:border-primary/50 focus:bg-black/60 transition-all placeholder:text-muted-foreground/30 text-sm shadow-inner outline-hidden"
+											className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-white/20 text-sm shadow-inner outline-hidden"
 											placeholder="Jane Doe"
 										/>
 									</div>
 									<div className="space-y-2.5">
-										<label className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] ml-1">
+										<label className="text-[10px] font-black text-white/60 uppercase tracking-widest ml-1">
 											Email
 										</label>
 										<input
@@ -252,14 +280,14 @@ export function ContactModule() {
 											value={formData.email}
 											onChange={handleChange}
 											required
-											className="w-full bg-black/40 border border-white/10 rounded-[1.25rem] px-5 py-4 min-h-[52px] text-white focus:border-primary/50 focus:bg-black/60 transition-all placeholder:text-muted-foreground/30 text-sm shadow-inner outline-hidden"
+											className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-white/20 text-sm shadow-inner outline-hidden"
 											placeholder="jane@example.com"
 										/>
 									</div>
 								</div>
 
 								<div className="space-y-2.5">
-									<label className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] ml-1">
+									<label className="text-[10px] font-black text-white/60 uppercase tracking-widest ml-1">
 										Subject
 									</label>
 									<input
@@ -267,13 +295,13 @@ export function ContactModule() {
 										name="subject"
 										value={formData.subject}
 										onChange={handleChange}
-										className="w-full bg-black/40 border border-white/10 rounded-[1.25rem] px-5 py-4 min-h-[52px] text-white focus:border-primary/50 focus:bg-black/60 transition-all placeholder:text-muted-foreground/30 text-sm shadow-inner outline-hidden"
-										placeholder="Inquiry or Project Idea"
+										className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all placeholder:text-white/20 text-sm shadow-inner outline-hidden"
+										placeholder="Project Inquiry"
 									/>
 								</div>
 
 								<div className="space-y-2.5">
-									<label className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.15em] ml-1">
+									<label className="text-[10px] font-black text-white/60 uppercase tracking-widest ml-1">
 										Message
 									</label>
 									<textarea
@@ -282,7 +310,7 @@ export function ContactModule() {
 										onChange={handleChange}
 										required
 										rows={5}
-										className="w-full bg-black/40 border border-white/10 rounded-[1.25rem] px-5 py-4 text-white focus:border-primary/50 focus:bg-black/60 transition-all resize-none placeholder:text-muted-foreground/30 text-sm shadow-inner outline-hidden"
+										className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all resize-none placeholder:text-white/20 text-sm shadow-inner outline-hidden"
 										placeholder="Describe your vision..."
 									/>
 								</div>
@@ -292,10 +320,10 @@ export function ContactModule() {
 										type="submit"
 										disabled={loading || success}
 										className={cn(
-											'w-full py-4 min-h-[56px] rounded-[1.25rem] font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-3 transition-all duration-300 shadow-xl overflow-hidden relative',
+											'w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 transition-all duration-300 shadow-xl overflow-hidden relative group/btn',
 											success
-												? 'bg-primary text-black cursor-default border-transparent'
-												: 'bg-white/5 border border-white/10 text-white hover:bg-white hover:text-black hover:border-transparent hover:scale-[1.02]',
+												? 'bg-teal-500 text-black cursor-default border-transparent'
+												: 'bg-white/5 border border-white/10 text-white hover:bg-teal-500 hover:text-black hover:border-teal-400',
 										)}
 									>
 										{loading ? (
@@ -307,10 +335,10 @@ export function ContactModule() {
 											</>
 										) : (
 											<>
-												<span className="relative z-10">
+												<span className="relative z-10 transition-transform group-hover/btn:-translate-x-1">
 													Initiate Contact
 												</span>
-												<Send className="w-4 h-4 relative z-10" />
+												<Send className="w-4 h-4 relative z-10 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
 											</>
 										)}
 									</button>
@@ -322,9 +350,11 @@ export function ContactModule() {
 											initial={{ opacity: 0, height: 0 }}
 											animate={{ opacity: 1, height: 'auto' }}
 											exit={{ opacity: 0, height: 0 }}
-											className="text-rose-400 text-sm text-center bg-rose-500/10 p-3 rounded-xl border border-rose-500/20 font-medium"
+											className="overflow-hidden"
 										>
-											{error}
+											<div className="text-rose-400 text-[10px] font-black uppercase tracking-wider text-center bg-rose-500/10 py-3 px-4 rounded-xl border border-rose-500/20 mt-4 shadow-inner">
+												{error}
+											</div>
 										</motion.div>
 									)}
 								</AnimatePresence>
