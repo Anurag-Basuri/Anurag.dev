@@ -1,6 +1,7 @@
 'use client';
 
-import { ThemeSelector } from '@/theme/ThemeSelector';
+import { ThemeSelector } from '@/theme/colors/ThemeSelector';
+import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 
 export function TopBar() {
 	return (
@@ -32,6 +33,7 @@ export function TopBar() {
 					Contact
 				</button>
 
+				<BackgroundSelector />
 				<ThemeSelector />
 			</div>
 		</header>

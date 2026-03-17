@@ -4,7 +4,7 @@ import React, { memo } from 'react';
 import Image from 'next/image';
 import { Linkedin, Github, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { PANEL_TOKENS } from '@/theme/tokens';
+import { PANEL_TOKENS } from '@/theme/colors/tokens';
 
 import { useState, useEffect } from 'react';
 import { publicService } from '@/api';
