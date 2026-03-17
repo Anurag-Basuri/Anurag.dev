@@ -5,7 +5,7 @@
  */
 
 // ─── Theme Palettes ────────────────────────────────────────────────────────────
-export type ThemeName = 'obsidian' | 'ember' | 'sakura' | 'ocean';
+export type ThemeName = 'obsidian' | 'ember' | 'sakura' | 'pureWhite' | 'nebula';
 
 export type ThemeBrightness = 'dark' | 'light' | 'medium';
 
@@ -66,17 +66,29 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     panelBg: 'bg-white/40 backdrop-blur-xl',
     panelBorder: 'border-pink-300/20',
   },
-  ocean: {
-    name: 'ocean',
-    label: 'Ocean',
-    brightness: 'medium',
-    primary: '#06b6d4',
-    secondary: '#3b82f6',
-    bg: '#1a2332',
-    fg: '#e2e8f0',
+  pureWhite: {
+    name: 'pureWhite',
+    label: 'Pure White',
+    brightness: 'light',
+    primary: '#0ea5e9',
+    secondary: '#6366f1',
+    bg: '#ffffff',
+    fg: '#0b1220',
     muted: '#64748b',
-    panelBg: 'bg-slate-900/40 backdrop-blur-xl',
-    panelBorder: 'border-cyan-500/10',
+    panelBg: 'bg-white/70 backdrop-blur-xl',
+    panelBorder: 'border-slate-200/50',
+  },
+  nebula: {
+    name: 'nebula',
+    label: 'Nebula',
+    brightness: 'dark',
+    primary: '#a78bfa',
+    secondary: '#22d3ee',
+    bg: '#06010f',
+    fg: '#f1f5f9',
+    muted: '#94a3b8',
+    panelBg: 'bg-black/35 backdrop-blur-xl',
+    panelBorder: 'border-fuchsia-400/10',
   },
 } as const;
 
