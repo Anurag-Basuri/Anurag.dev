@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { X, Minus, Maximize2, Minimize2, ChevronsUpDown, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui/tooltip';
-import { PANEL_TOKENS } from '@/theme/tokens';
+import { PANEL_TOKENS } from '@/theme/colors/tokens';
 import { SPRINGS } from '@/animations/motion';
 
 // ============================================================================
