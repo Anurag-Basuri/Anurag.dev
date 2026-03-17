@@ -5,7 +5,7 @@ import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 
 export function TopBar() {
 	return (
-		<header className="h-12 w-full bg-background/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 shrink-0 z-30 relative">
+		<header className="h-12 w-full bg-black/20 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 shrink-0 z-30 relative">
 			{/* Left: window controls + title */}
 			<div className="flex items-center gap-3">
 				<div className="flex gap-1.5 items-center bg-white/5 px-2 py-1 rounded-md border border-white/10">

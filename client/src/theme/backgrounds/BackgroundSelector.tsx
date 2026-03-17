@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAtom } from 'jotai';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Check, ImageOff, Sparkles, Stars, Grid3X3 } from 'lucide-react';
 import { backgroundModeAtom, type BackgroundMode } from './background';
 
@@ -20,9 +20,22 @@ const BACKGROUNDS: Array<{
 export function BackgroundSelector() {
 	const [mode, setMode] = useAtom(backgroundModeAtom);
 	const [open, setOpen] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+				setOpen(false);
+			}
+		}
+		if (open) {
+			document.addEventListener('mousedown', handleClickOutside);
+		}
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, [open]);
 
 	return (
-		<div className="relative">
+		<div className="relative" ref={containerRef}>
 			<motion.button
 				whileHover={{ scale: 1.08 }}
 				whileTap={{ scale: 0.92 }}
@@ -35,9 +48,6 @@ export function BackgroundSelector() {
 
 			<AnimatePresence>
 				{open && (
-					<>
-						<div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-
 						<motion.div
 							initial={{ opacity: 0, y: 8, scale: 0.95 }}
 							animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -82,7 +92,6 @@ export function BackgroundSelector() {
 								);
 							})}
 						</motion.div>
-					</>
 				)}
 			</AnimatePresence>
 		</div>

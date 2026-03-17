@@ -1,15 +1,12 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Linkedin, Github, Mail } from 'lucide-react';
+import { Linkedin, Github, Mail, Twitter, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/theme/colors/tokens';
-
-import { useState, useEffect } from 'react';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
-import { Twitter, Globe } from 'lucide-react';
 
 const SOCIAL_ICONS: Record<string, React.ElementType<{ className?: string }>> = {
 	GitHub: Github,

@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAppTheme } from './theme-context';
 import type { ThemeName } from './tokens';
 import { Palette, Check, Sun, Moon, Eclipse } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const BRIGHTNESS_ICON: Record<string, React.FC<{ className?: string }>> = {
   dark: Moon,
@@ -20,9 +20,22 @@ const BRIGHTNESS_ICON: Record<string, React.FC<{ className?: string }>> = {
 export function ThemeSelector() {
   const { themeName, setTheme, availableThemes, isDark } = useAppTheme();
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <motion.button
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
@@ -30,14 +43,11 @@ export function ThemeSelector() {
         className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-md transition-colors hover:bg-white/10 focus:outline-none"
         aria-label="Change theme"
       >
-        <Palette className="h-4 w-4 text-[var(--theme-primary)]" />
+        <Palette className="h-4 w-4 text-(--theme-primary)" />
       </motion.button>
 
       <AnimatePresence>
         {open && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-
             <motion.div
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -81,7 +91,6 @@ export function ThemeSelector() {
                 );
               })}
             </motion.div>
-          </>
         )}
       </AnimatePresence>
     </div>
