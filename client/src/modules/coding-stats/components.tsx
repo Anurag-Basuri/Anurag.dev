@@ -166,7 +166,7 @@ export const LinkOnlyCard = memo(function LinkOnlyCard({
 			rel="noopener noreferrer"
 			whileHover={cardHover}
 			className={cn(
-				'group relative flex items-center gap-5 p-6 rounded-4xl bg-linear-to-br border border-white/10 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
+				'group relative flex items-center gap-5 p-5 md:p-6 rounded-3xl bg-linear-to-br border border-white/10 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
 				config.accentBorder,
 				config.accentBg,
 			)}
@@ -211,7 +211,7 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 			viewport={{ once: true }}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-[2.5rem] bg-linear-to-br border border-white/10 backdrop-blur-md p-8 sm:p-10 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 lg:row-span-2 shadow-2xl',
+				'group relative rounded-3xl bg-linear-to-br border border-white/10 backdrop-blur-md p-6 sm:p-8 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -226,8 +226,8 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 						<Icon className="w-10 sm:w-12 h-10 sm:h-12" />
 					</div>
 					<div>
-						<h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-1">{config.name}</h2>
-						<p className={cn('text-[10px] sm:text-[11px] font-black uppercase tracking-[0.15em]', config.accentText)}>
+						<h2 className="text-xl sm:text-3xl font-black text-white tracking-tight mb-1">{config.name}</h2>
+						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em]', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -243,9 +243,9 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-10 md:gap-14 relative z-10 bg-[#0a0a0a]/40 p-6 sm:p-8 rounded-4xl border border-white/5 w-full">
-				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} />
-				<div className="flex-1 w-full space-y-6">
+			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-[#0a0a0a]/40 p-5 sm:p-6 rounded-2xl border border-white/5 w-full">
+				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} size={130} />
+				<div className="flex-1 w-full space-y-5">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
 					<DifficultyBar count={medium} total={solved} config={DIFF_CONFIG.medium} />
 					<DifficultyBar count={hard} total={solved} config={DIFF_CONFIG.hard} />
@@ -280,7 +280,7 @@ export const GitHubCard = memo(function GitHubCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-4xl bg-linear-to-br backdrop-blur-md border border-white/10 p-6 sm:p-8 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-white/10 p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -342,7 +342,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-4xl bg-linear-to-br backdrop-blur-md border border-white/10 p-6 sm:p-8 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-white/10 p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}

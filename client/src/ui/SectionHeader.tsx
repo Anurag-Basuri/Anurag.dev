@@ -112,8 +112,8 @@ export function SectionHeader({
 			variants={fadeInUp}
 			initial="hidden"
 			whileInView="visible"
-			viewport={{ once: true, margin: '-40px' }}
-			className="relative flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12 pb-6 sm:pb-8"
+			viewport={{ once: true, margin: '-20px' }}
+			className="relative flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8 pb-4 border-b border-white/5"
 		>
 			<div className="relative z-10">
 				<motion.div
@@ -122,7 +122,7 @@ export function SectionHeader({
 					viewport={{ once: true }}
 					transition={{ delay: 0.1 }}
 					className={cn(
-						'flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-2 sm:mb-3',
+						'flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] mb-2',
 						styles.text,
 					)}
 				>
@@ -132,12 +132,12 @@ export function SectionHeader({
 					<span>{label}</span>
 				</motion.div>
 
-				<h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-1.5 sm:mb-2 tracking-tight">
+				<h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-2 tracking-tight">
 					{title}
 				</h1>
 
 				{description && (
-					<p className="text-xs sm:text-sm text-muted-foreground/80 mt-1.5 sm:mt-2 max-w-lg leading-relaxed font-medium">
+					<p className="text-sm text-muted-foreground/80 max-w-lg leading-relaxed font-medium">
 						{description}
 					</p>
 				)}
@@ -162,7 +162,7 @@ export function SectionHeader({
 					styles.line,
 				)}
 			/>
-			<div className={cn('absolute -bottom-px left-0 w-20 sm:w-24 h-0.5 blur-[1px]', styles.glow)} />
+			<div className={cn('absolute -bottom-px left-0 w-16 h-px blur-[1px]', styles.glow)} />
 		</motion.div>
 	);
 }

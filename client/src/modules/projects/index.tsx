@@ -10,6 +10,7 @@ import {
 	Layout,
 	X,
 	ArrowUpRight,
+	Briefcase,
 } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Project } from '@/api/schema';
@@ -72,29 +73,28 @@ export function ProjectsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
-				{/* Header & Filters */}
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				<SectionHeader
-					icon={Layers}
-					label="Innovations"
-					title="Featured Projects"
-					description="A collection of my work, ranging from full-stack web applications to AI experiments and open source tools."
+					icon={Briefcase}
+					label="Portfolio"
+					title="Projects & Work"
+					description="A collection of my recent work, open-source projects, and technical experiments."
 					accent="amber"
 				/>
 
-				{projects.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
-						No projects found for the selected category.
+				{/* Grid */}
+				{projects.length === 0 && !loading ? (
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
+						No projects found.
 					</div>
 				) : (
-					/* Grid */
 					<motion.div
 						layout
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12"
 					>
 						<AnimatePresence mode="popLayout">
 							{projects.map(project => (
@@ -106,7 +106,7 @@ export function ProjectsModule() {
 									animate="visible"
 									exit="hidden"
 									whileHover={cardHover}
-									className="group cursor-pointer h-full flex flex-col bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:border-amber-500/40 relative shadow-2xl"
+									className="group cursor-pointer h-full flex flex-col bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:border-amber-500/40 relative shadow-2xl"
 									onClick={() => setSelectedProject(project)}
 								>
 									<div className="absolute inset-0 bg-linear-to-br from-amber-500/0 to-transparent group-hover:from-amber-500/10 transition-colors duration-500 pointer-events-none" />
@@ -148,11 +148,11 @@ export function ProjectsModule() {
 											)}
 										</div>
 
-										<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight mb-3 group-hover:text-amber-400 transition-colors line-clamp-2">
+										<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight mb-2 group-hover:text-amber-400 transition-colors line-clamp-2">
 											{project.title}
 										</h3>
 										
-										<p className="text-sm text-white/60 line-clamp-3 leading-relaxed font-medium mb-6">
+										<p className="text-sm text-white/60 line-clamp-2 leading-relaxed font-medium mb-6">
 											{project.description}
 										</p>
 
@@ -201,7 +201,7 @@ export function ProjectsModule() {
 								initial="hidden"
 								animate="visible"
 								exit="hidden"
-								className="relative w-full max-w-5xl bg-[#080808] border border-white/10 rounded-[2.5rem] shadow-3xl shadow-amber-500/10 overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] md:max-h-[700px] z-10"
+								className="relative w-full max-w-4xl bg-[#080808] border border-white/10 rounded-3xl shadow-3xl shadow-amber-500/10 overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] md:max-h-[600px] z-10"
 							>
 								{/* Close Button */}
 								<button
@@ -217,8 +217,8 @@ export function ProjectsModule() {
 									<div className="absolute inset-0 bg-linear-to-t from-[#080808] via-[#080808]/40 to-transparent" />
 
 									{/* Embedded Mobile Header */}
-									<div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10 bg-linear-to-t from-[#080808] to-transparent">
-										<h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2 leading-tight drop-shadow-lg">
+									<div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-linear-to-t from-[#080808] to-transparent">
+										<h2 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2 leading-tight drop-shadow-lg">
 											{selectedProject.title}
 										</h2>
 										<div className="flex flex-wrap gap-3 mt-6">

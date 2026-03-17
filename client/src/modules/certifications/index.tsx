@@ -40,7 +40,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-4xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
+			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
 		>
 			{/* Ambient Glow */}
 			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/10 transition-colors duration-500 pointer-events-none" />
@@ -132,7 +132,7 @@ export function CertificationModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				<SectionHeader
 					label="Credentials"
 					icon={ShieldCheck}
@@ -142,7 +142,7 @@ export function CertificationModule() {
 				/>
 
 				{certs.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
 						No verified credentials found.
 					</div>
 				) : (
@@ -150,8 +150,8 @@ export function CertificationModule() {
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
-						viewport={{ once: true, margin: '-20px' }}
-						className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr"
+						viewport={{ once: true, margin: '-40px' }}
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12 auto-rows-fr"
 					>
 						{certs.map(cert => (
 							<CertCard key={cert.id} cert={cert} />

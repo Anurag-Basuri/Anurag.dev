@@ -74,7 +74,7 @@ const JobCard = memo(function JobCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
+						'relative p-6 sm:p-8 rounded-3xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
 						job.highlighted
 							? 'border-sky-500/30 bg-sky-500/5'
 							: 'hover:border-white/20',
@@ -89,7 +89,7 @@ const JobCard = memo(function JobCard({
 
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Header */}
-						<h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mb-2 relative inline-flex items-center gap-2">
+						<h3 className="text-lg sm:text-xl font-black tracking-tight text-white mb-2 relative inline-flex items-center gap-2">
 							{job.title}
 							{job.highlighted && (
 								<Star className="w-4 h-4 text-sky-400 fill-sky-400 shrink-0" />
@@ -169,7 +169,7 @@ export function ExperienceModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				<SectionHeader
 					icon={Briefcase}
 					label="Work History"
@@ -179,11 +179,11 @@ export function ExperienceModule() {
 				/>
 
 				{workEntries.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
 						No work experience data found.
 					</div>
 				) : (
-					<div className="relative mt-16 max-w-5xl mx-auto">
+					<div className="relative mt-8 md:mt-12 max-w-4xl mx-auto">
 						{/* Timeline Center Line */}
 						<div className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 bg-linear-to-b from-transparent via-sky-500/20 to-transparent" />
 

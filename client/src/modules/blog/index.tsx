@@ -169,7 +169,7 @@ const FeaturedCard = memo(function FeaturedCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative rounded-4xl sm:rounded-[2.5rem] overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
+			className="group relative rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
@@ -265,7 +265,7 @@ const PostCard = memo(function PostCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative flex flex-col h-full rounded-4xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
+			className="group relative flex flex-col h-full rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
@@ -363,8 +363,11 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 		};
 	}, []);
 
+	// Progress bar state
+	const [scrollProgress, setScrollProgress] = useState(0);
+
 	return (
-		<div className="fixed inset-0 z-100 flex items-center justify-center p-2 sm:p-4 md:p-8">
+		<div className="fixed inset-0 z-100 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8">
 			{/* Backdrop */}
 			<motion.div
 				variants={fadeIn}
@@ -372,129 +375,149 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				animate="visible"
 				exit="hidden"
 				onClick={onClose}
-				className="absolute inset-0 bg-black/85 backdrop-blur-2xl"
+				className="absolute inset-0 bg-black/90 backdrop-blur-3xl"
 			/>
 
-			{/* Modal */}
+			{/* Modal Container */}
 			<motion.div
 				variants={scaleIn}
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
-				className="relative w-full max-w-4xl max-h-[92vh] sm:max-h-[85vh] bg-[#080808] border border-white/10 rounded-4xl lg:rounded-[2.5rem] shadow-3xl shadow-indigo-500/10 overflow-hidden flex flex-col z-10"
+				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-[#050505] border border-white/10 rounded-3xl sm:rounded-[2rem] shadow-2xl flex flex-col z-10 overflow-hidden"
 			>
-				{/* Close */}
-				<button
-					onClick={onClose}
-					className="absolute top-4 right-4 z-50 p-3 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all hover:rotate-90 hover:scale-110"
-					aria-label="Close modal"
-				>
-					<X className="w-5 h-5" />
-				</button>
-
-				<ScrollArea className="h-full">
-					<div className="flex flex-col relative pb-24">
-						{/* Hero Cover */}
-						{post.coverImage && (
-							<div className="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 shrink-0 border-b border-white/5">
-								<Image
-									src={post.coverImage}
-									alt={post.title ?? 'Blog post'}
-									fill
-									sizes="(max-width: 768px) 100vw, 800px"
-									className="object-cover"
-									priority
-								/>
-								<div className="absolute inset-0 bg-linear-to-t from-[#080808] via-[#080808]/40 to-transparent" />
-							</div>
-						)}
-
-						{/* Content */}
+				{/* Top Bar with Progress */}
+				<div className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-linear-to-b from-[#050505] to-transparent pointer-events-none">
+					{/* Progress Indicator Line */}
+					<div className="absolute top-0 left-0 right-0 h-1 bg-white/10">
 						<div
-							className={cn(
-								'p-6 sm:p-8 md:p-12 lg:p-14 space-y-8 sm:space-y-10',
-								post.coverImage ? '-mt-16 sm:-mt-24 relative z-10' : 'pt-12',
-							)}
+							className="h-full bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.5)] transition-all duration-150"
+							style={{ width: `${scrollProgress}%` }}
+						/>
+					</div>
+				</div>
+
+				{/* Floating Action Menu */}
+				<div className="absolute top-6 right-6 z-50 flex items-center gap-3">
+					{post.link && (
+						<a
+							href={post.link}
+							target="_blank"
+							rel="noopener noreferrer"
+							title="Read Original Article"
+							className="p-3 sm:px-5 sm:py-2.5 rounded-full bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 hover:border-indigo-500/40 text-indigo-400 font-bold uppercase tracking-wider text-[10px] sm:text-xs backdrop-blur-md transition-all flex items-center gap-2 shadow-xl group"
 						>
-							{/* Meta */}
-							<div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-indigo-400">
-								<span className="flex items-center gap-1.5 font-bold uppercase tracking-widest px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg backdrop-blur-md shadow-inner">
-									<Calendar className="w-3.5 h-3.5" />
-									{formatDate(post.publishedAt ?? post.createdAt)}
-								</span>
-								<span className="flex items-center gap-1.5 font-bold uppercase tracking-widest px-3 py-1.5 bg-white/5 border border-white/10 text-white/70 rounded-lg backdrop-blur-md shadow-inner">
-									<Clock className="w-3.5 h-3.5" />
-									{readingTime(post.content)} min read
-								</span>
-								{post.updatedAt && post.updatedAt !== post.createdAt && (
-									<span className="font-bold uppercase tracking-widest text-muted-foreground/60">
-										Updated {timeAgo(post.updatedAt)}
+							<BookOpen className="w-4 h-4" />
+							<span className="hidden sm:inline">Original</span>
+							<ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
+						</a>
+					)}
+					<button
+						onClick={onClose}
+						className="p-3 rounded-full bg-black/50 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white backdrop-blur-md transition-all hover:rotate-90 hover:scale-105 shadow-xl"
+						aria-label="Close article"
+					>
+						<X className="w-5 h-5" />
+					</button>
+				</div>
+
+				<ScrollArea
+					className="h-full w-full custom-scrollbar"
+					onScrollCapture={(e) => {
+						const target = e.currentTarget;
+						if (target) {
+							const { scrollTop, scrollHeight, clientHeight } = target;
+							const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
+							setScrollProgress(Number.isNaN(progress) ? 0 : Math.min(progress, 100));
+						}
+					}}
+				>
+					<div className="flex flex-col relative pb-32">
+						{/* Massive Hero Cover */}
+						<div className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] shrink-0 bg-[#0a0a0a]">
+							{post.coverImage ? (
+								<>
+									<Image
+										src={post.coverImage}
+										alt={post.title ?? 'Article cover'}
+										fill
+										sizes="100vw"
+										className="object-cover"
+										priority
+									/>
+									<div className="absolute inset-0 bg-linear-to-t from-[#050505] via-[#050505]/60 to-transparent" />
+								</>
+							) : (
+								<div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-indigo-900/20 to-black">
+									<FileText className="w-24 h-24 text-white/5" />
+									<div className="absolute inset-0 bg-linear-to-t from-[#050505] to-transparent" />
+								</div>
+							)}
+						</div>
+
+						{/* Editorial Content Container */}
+						<div className="relative z-10 mx-auto w-full max-w-[700px] px-6 sm:px-10 md:px-12 -mt-24 sm:-mt-32">
+							{/* Header Meta */}
+							<div className="mb-6 space-y-5">
+								<div className="flex flex-wrap items-center gap-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-300">
+									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 shadow-xl backdrop-blur-md">
+										<Calendar className="w-3.5 h-3.5" />
+										{formatDate(post.publishedAt ?? post.createdAt)}
 									</span>
+									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 shadow-xl backdrop-blur-md">
+										<Clock className="w-3.5 h-3.5" />
+										{readingTime(post.content)} min read
+									</span>
+								</div>
+
+								<h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-[1.15] tracking-tight drop-shadow-2xl">
+									{post.title ?? 'Untitled Article'}
+								</h1>
+								
+								{tags.length > 0 && (
+									<div className="flex flex-wrap gap-2 pt-2">
+										{tags.map(tag => (
+											<span
+												key={tag}
+												className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-inner"
+											>
+												{tag}
+											</span>
+										))}
+									</div>
 								)}
 							</div>
 
-							{/* Title */}
-							<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
-								{post.title ?? 'Untitled'}
-							</h1>
-
-							{/* Tags */}
-							{tags.length > 0 && (
-								<div className="flex flex-wrap gap-2">
-									{tags.map(tag => (
-										<span
-											key={tag}
-											className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] uppercase font-black tracking-widest bg-[#111] text-white/80 border border-white/10 shadow-inner"
-										>
-											<Tag className="w-3 h-3 text-indigo-400" />
-											{tag}
-										</span>
-									))}
+							{/* Main Body */}
+							<article className="prose prose-invert prose-base md:prose-lg max-w-none text-white/80 leading-loose font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-3xl prose-img:border prose-img:border-white/10">
+								{/* 
+									Since raw markdown isn't processed by a markdown parser here,
+									we maintain the whitespace-pre-wrap but style it beautifully.
+								*/}
+								<div className="whitespace-pre-wrap tracking-wide text-sm md:text-base">
+									{post.content ?? ''}
 								</div>
-							)}
-
-							{/* External Link */}
-							{post.link && (
-								<div className="pt-2">
-									<a
-										href={post.link}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 hover:border-indigo-500/40 text-indigo-400 text-xs font-bold uppercase tracking-wider transition-all group/link shadow-lg w-full sm:w-auto justify-center"
-									>
-										<BookOpen className="w-4 h-4" />
-										Read Original Article Here
-										<ArrowUpRight className="w-4 h-4 opacity-50 group-hover/link:opacity-100 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-all" />
-									</a>
-								</div>
-							)}
-
-							{/* Article body */}
-							<div className="text-white/80 leading-loose whitespace-pre-wrap text-sm sm:text-base font-medium">
-								{post.content ?? ''}
-							</div>
+							</article>
 
 							{/* Image Gallery */}
 							{allImages.length > 1 && (
-								<div className="pt-8 border-t border-white/5">
-									<h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-6">
-										Article Media
+								<div className="mt-16 pt-10 border-t border-white/10">
+									<h4 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-500 mb-8 flex items-center gap-3">
+										<BookOpen className="w-4 h-4" />
+										Article Media Gallery
 									</h4>
 									<ImageGallery images={allImages} />
 								</div>
 							)}
 
-							{/* Footer Meta Details Component */}
-							<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-10 border-t border-white/5 text-[10px] text-muted-foreground/50 font-mono uppercase tracking-widest font-bold">
-								<span>/{post.slug ?? ''}</span>
-								{post.publishedAt && (
-									<span>Published {formatDate(post.publishedAt)}</span>
+							{/* Footer Meta */}
+							<div className="mt-16 sm:mt-24 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[10px] font-mono font-bold uppercase tracking-widest text-white/30">
+								<span>ID: {post.id}</span>
+								{post.updatedAt && post.updatedAt !== post.createdAt && (
+									<span>Last Updated: {formatDate(post.updatedAt)}</span>
 								)}
 							</div>
 						</div>
-
-						{/* Scroll indicator fade */}
-						<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#080808] via-[#080808]/90 to-transparent pointer-events-none" />
 					</div>
 				</ScrollArea>
 			</motion.div>
@@ -508,9 +531,7 @@ export function BlogModule() {
 	const [posts, setPosts] = useState<BlogPost[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-	const [activeTag, setActiveTag] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -532,27 +553,7 @@ export function BlogModule() {
 		};
 	}, []);
 
-	const allTags = useMemo(() => {
-		const tagSet = new Set<string>();
-		posts.forEach(p => safeArray(p.tags).forEach(t => tagSet.add(t)));
-		return Array.from(tagSet).sort();
-	}, [posts]);
-
-	const filteredPosts = useMemo(() => {
-		const q = searchQuery.toLowerCase();
-		return posts.filter(p => {
-			const pTags = safeArray(p.tags);
-			const matchesSearch =
-				!q ||
-				(p.title ?? '').toLowerCase().includes(q) ||
-				(p.content ?? '').toLowerCase().includes(q) ||
-				pTags.some(t => t.toLowerCase().includes(q));
-			const matchesTag = !activeTag || pTags.includes(activeTag);
-			return matchesSearch && matchesTag;
-		});
-	}, [posts, searchQuery, activeTag]);
-
-	const [featured, ...rest] = filteredPosts;
+	const [featured, ...rest] = posts;
 
 	const handleSelectPost = useCallback((post: BlogPost) => setSelectedPost(post), []);
 	const handleCloseModal = useCallback(() => setSelectedPost(null), []);
@@ -581,7 +582,7 @@ export function BlogModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				{/* Header */}
 				<SectionHeader
 					label="Insights"
@@ -589,90 +590,19 @@ export function BlogModule() {
 					title="Engineering Log"
 					description="Thoughts, tutorials, and deep dives into software engineering, systems design, and technology."
 					accent="indigo"
-					actions={
-						<div className="relative group w-full sm:w-72 md:w-80 mt-6 sm:mt-0">
-							<div className="absolute inset-0 bg-indigo-500/5 rounded-2xl blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-700 pointer-events-none" />
-							<Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-indigo-400 transition-colors z-20 pointer-events-none" />
-							<input
-								type="text"
-								placeholder="Search articles..."
-								value={searchQuery}
-								onChange={e => {
-									setSearchQuery(e.target.value);
-									setActiveTag(null);
-								}}
-								className="relative z-10 w-full bg-black/40 border border-white/10 rounded-2xl pl-12 pr-6 py-3 text-sm font-medium text-white focus:outline-none focus:border-indigo-500/50 focus:bg-black/60 focus:ring-1 focus:ring-indigo-500/50 transition-all placeholder:text-white/30 backdrop-blur-xl shadow-inner shadow-indigo-500/5"
-							/>
-						</div>
-					}
 				/>
 
-				{/* Tag Filters */}
-				{allTags.length > 0 && (
-					<motion.div
-						initial={{ opacity: 0, y: 10 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true }}
-						transition={{ delay: 0.2 }}
-						className="flex flex-wrap gap-2 mb-10 overflow-x-auto hide-scrollbar mt-6 sm:mt-8 pb-2"
-					>
-						<button
-							onClick={() => setActiveTag(null)}
-							className={cn(
-								'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all duration-300 shrink-0 outline-none',
-								!activeTag
-									? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-inner'
-									: 'bg-[#0a0a0a] border-white/5 text-white/40 hover:border-white/20 hover:text-white hover:bg-white/5',
-							)}
-						>
-							All Details
-						</button>
-						{allTags.map(tag => (
-							<button
-								key={tag}
-								onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-								className={cn(
-									'px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all duration-300 shrink-0 outline-none',
-									activeTag === tag
-										? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-inner'
-										: 'bg-[#0a0a0a] border-white/5 text-white/40 hover:border-white/20 hover:text-white hover:bg-white/5',
-								)}
-							>
-								{tag}
-							</button>
-						))}
-					</motion.div>
-				)}
-
-				{filteredPosts.length === 0 ? (
+				{posts.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-24 mt-4 text-muted-foreground border border-dashed border-white/10 rounded-[2.5rem] bg-[#0a0a0a]/50">
 						<div className="p-4 rounded-full bg-white/5 mb-6 shadow-inner">
-							<Search className="w-8 h-8 text-indigo-400/50" />
+							<BookOpen className="w-8 h-8 text-indigo-400/50" />
 						</div>
 						<p className="text-lg font-medium text-white/80 px-4 text-center">
-							No articles found
-							{searchQuery && (
-								<>
-									{' '}
-									matching{' '}
-									<span className="text-white font-bold">
-										&ldquo;{searchQuery}&rdquo;
-									</span>
-								</>
-							)}
+							No articles published yet.
 						</p>
-						<button
-							onClick={() => {
-								setSearchQuery('');
-								setActiveTag(null);
-							}}
-							className="mt-6 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white uppercase tracking-wider font-bold transition-all"
-						>
-							Clear Filters
-						</button>
 					</div>
 				) : (
-					<div className="space-y-4">
+					<div className="space-y-4 mt-8">
 						{/* Featured (latest) post */}
 						<motion.div
 							variants={staggerContainer}
@@ -695,7 +625,7 @@ export function BlogModule() {
 								initial="hidden"
 								whileInView="visible"
 								viewport={{ once: true, margin: '-20px' }}
-								className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr"
+								className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 auto-rows-fr"
 							>
 								{rest.map(post => (
 									<PostCard

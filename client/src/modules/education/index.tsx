@@ -74,27 +74,17 @@ const EducationCard = memo(function EducationCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
-						entry.highlighted
-							? 'border-violet-500/30 bg-violet-500/5'
-							: 'hover:border-white/20',
+						'relative p-6 sm:p-8 rounded-3xl bg-linear-to-bl from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
+						'hover:border-white/20',
 					)}
 				>
-					<div className="absolute inset-0 bg-linear-to-br from-violet-500/0 to-transparent group-hover:from-violet-500/5 transition-colors duration-500" />
-
-					{/* Highlight Badge */}
-					{entry.highlighted && (
-						<div className="absolute -top-3 -right-3 w-16 h-16 rounded-full bg-violet-500/10 blur-xl pointer-events-none" />
-					)}
+					<div className="absolute inset-0 bg-linear-to-bl from-violet-500/0 to-transparent group-hover:from-violet-500/5 transition-colors duration-500" />
 
 					<div className="relative z-10 flex flex-col h-full">
-						{/* Header */}
-						<div className="flex justify-between items-start gap-4 mb-2">
-							<h3 className="text-xl sm:text-2xl font-black tracking-tight text-white relative inline-flex items-center gap-2">
+						{/* Header row: Title + Grade (if any) */}
+						<div className="flex items-start justify-between gap-4 mb-2">
+							<h3 className="text-lg sm:text-xl font-black tracking-tight text-white line-clamp-2">
 								{entry.title}
-								{entry.highlighted && (
-									<Star className="w-4 h-4 text-violet-400 fill-violet-400 shrink-0" />
-								)}
 							</h3>
 							{entry.grade && (
 								<div className="shrink-0 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-xs shadow-inner">
@@ -104,7 +94,7 @@ const EducationCard = memo(function EducationCard({
 						</div>
 
 						{entry.degree && entry.fieldOfStudy && (
-							<p className="text-base sm:text-lg font-medium text-violet-400 mb-4">
+							<p className="text-sm sm:text-base font-medium text-violet-400 mb-4">
 								{entry.degree} in {entry.fieldOfStudy}
 							</p>
 						)}
@@ -136,14 +126,14 @@ const EducationCard = memo(function EducationCard({
 
 						{/* Description */}
 						{entry.description && (
-							<p className="text-white/70 leading-relaxed text-sm font-medium mb-6 whitespace-pre-wrap">
+							<p className="text-white/70 leading-relaxed text-sm font-medium mb-4 whitespace-pre-wrap">
 								{entry.description}
 							</p>
 						)}
 
 						{/* Skills Tags */}
 						{(entry.skills ?? []).length > 0 && (
-							<div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-white/5">
+							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-white/5">
 								{(entry.skills ?? []).map(skill => (
 									<span
 										key={skill}
@@ -190,21 +180,21 @@ export function EducationModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-6xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				<SectionHeader
 					icon={GraduationCap}
-					label="Academics"
-					title="Educational Background"
-					description="Degrees, academic progression, and key coursework."
+					label="Academic Path"
+					title="Education"
+					description="Academic background, degrees, and institutions."
 					accent="violet"
 				/>
 
 				{educationEntries.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-white/10 rounded-3xl bg-[#0a0a0a]/50">
-						No educational history found.
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
+						No education data found.
 					</div>
 				) : (
-					<div className="relative mt-16 max-w-5xl mx-auto">
+					<div className="relative mt-8 md:mt-12 max-w-4xl mx-auto">
 						{/* Timeline Center Line */}
 						<div className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 bg-linear-to-b from-transparent via-violet-500/20 to-transparent" />
 

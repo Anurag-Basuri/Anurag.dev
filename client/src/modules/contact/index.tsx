@@ -128,7 +128,7 @@ export function ContactModule() {
 			{/* Very subtle ambient spotlight behind contact module to signify "end of page" */}
 			<div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}
@@ -138,7 +138,7 @@ export function ContactModule() {
 					accent="teal"
 				/>
 
-				<div className="flex flex-col lg:flex-row gap-8 lg:gap-16 mt-12 sm:mt-16">
+				<div className="flex flex-col lg:flex-row gap-8 lg:gap-12 mt-8 md:mt-12">
 					{/* Left Column: Info */}
 					<motion.div
 						initial={{ opacity: 0, x: -20 }}
@@ -149,7 +149,7 @@ export function ContactModule() {
 					>
 						<div className="space-y-6">
 							{/* Email Card (Teal Accent) */}
-							<div className="relative p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
+							<div className="relative p-6 sm:p-8 rounded-3xl bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/10 transition-colors duration-700 pointer-events-none" />
 								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
 									<div className="p-4 sm:p-5 rounded-3xl bg-[#050505] border border-white/10 text-teal-400 group-hover:scale-110 group-hover:bg-teal-500/10 group-hover:border-teal-500/30 transition-all duration-500 shadow-xl shrink-0">
@@ -182,7 +182,7 @@ export function ContactModule() {
 							</div>
 
 							{/* Location Card (Purple Accent) */}
-							<div className="relative p-6 sm:p-8 rounded-4xl sm:rounded-[2.5rem] bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
+							<div className="relative p-6 sm:p-8 rounded-3xl bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-transparent to-transparent group-hover:from-purple-500/10 transition-colors duration-700 pointer-events-none" />
 								{/* Faint map background icon */}
 								<MapPin className="absolute right-[-10%] top-[-20%] w-64 h-64 text-white/5 group-hover:text-purple-500/5 transition-colors duration-700 -rotate-12 pointer-events-none" />
@@ -213,7 +213,7 @@ export function ContactModule() {
 						</div>
 
 						{/* Links Wrapper */}
-						<div className="pt-4  px-2">
+						<div className="pt-4 px-2">
 							<h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-6 text-center sm:text-left">
 								Social Protocols
 							</h3>
@@ -245,8 +245,11 @@ export function ContactModule() {
 						transition={{ duration: 0.5, delay: 0.2 }}
 						className="flex-1 lg:max-w-xl"
 					>
-						<div className="p-8 sm:p-10 rounded-[2.5rem] bg-[#050505] border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden group hover:border-teal-500/30 transition-colors duration-500">
-							<div className="absolute inset-0 bg-linear-to-br from-teal-500/5 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+						<form
+							onSubmit={handleSubmit}
+							className="relative p-6 sm:p-8 rounded-3xl bg-[#0a0a0a]/80 border border-white/5 backdrop-blur-xl shadow-2xl flex flex-col gap-5 sm:gap-6 group hover:border-teal-500/20 transition-colors duration-500"
+						>
+							<div className="absolute inset-0 bg-linear-to-tl from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/5 transition-colors duration-700 pointer-events-none rounded-3xl" />
 
 							<h2 className="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight relative z-10 flex items-center gap-3">
 								<span className="w-2 h-8 rounded-full bg-teal-500 shadow-[0_0_15px_rgba(20,184,166,0.5)]" />
@@ -254,7 +257,7 @@ export function ContactModule() {
 							</h2>
 							<p className="text-white/40 text-sm mb-8 font-medium ml-5 relative z-10">Send a direct message. I'll get back to you soon.</p>
 
-							<form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+							<div className="space-y-6 relative z-10">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 									<div className="space-y-2.5">
 										<label className="text-[10px] font-black text-white/60 uppercase tracking-widest ml-1">
@@ -358,8 +361,8 @@ export function ContactModule() {
 										</motion.div>
 									)}
 								</AnimatePresence>
-							</form>
-						</div>
+							</div>
+						</form>
 					</motion.div>
 				</div>
 			</div>

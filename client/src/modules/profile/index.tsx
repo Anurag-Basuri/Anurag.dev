@@ -85,7 +85,7 @@ export function ProfileModule() {
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-[#020409] to-transparent" />
 			</motion.div>
 
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-24 sm:pb-32 -mt-16 sm:-mt-20 md:-mt-24 relative z-10">
+			<div className="max-w-5xl mx-auto px-4 sm:px-5 md:px-8 pb-16 sm:pb-24 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
@@ -98,23 +98,23 @@ export function ProfileModule() {
 						<div className="flex flex-col gap-4">
 							<motion.div
 								variants={fadeInUp}
-								className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-4xl overflow-hidden border-4 border-[#020409] bg-[#0a0a0a] shadow-2xl flex items-center justify-center group"
+								className="relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-4 border-[#020409] bg-[#0a0a0a] shadow-2xl flex items-center justify-center group"
 							>
 								{profile.avatarUrl ? (
 									<img
 										src={profile.avatarUrl}
 										alt={profile.name}
-										className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+										className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
 									/>
 								) : (
-									<User className="w-16 h-16 text-white/20" />
+									<User className="w-12 h-12 text-white/20" />
 								)}
-								<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-4xl pointer-events-none" />
+								<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-full pointer-events-none" />
 							</motion.div>
 
 							<div className="pt-2">
-								<motion.div variants={fadeInUp} className="flex items-center gap-4 mb-2">
-									<h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-br from-white to-white/60">
+								<motion.div variants={fadeInUp} className="flex items-center gap-4 mb-1.5">
+									<h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-br from-white to-white/60">
 										{profile.name}
 									</h1>
 									<div
@@ -141,7 +141,7 @@ export function ProfileModule() {
 								{profile.header && (
 									<motion.p
 										variants={fadeInUp}
-										className="text-lg md:text-2xl font-medium text-muted-foreground/90 max-w-2xl"
+										className="text-base md:text-lg font-medium text-muted-foreground/90 max-w-2xl"
 									>
 										{profile.header}
 									</motion.p>
@@ -225,14 +225,14 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-6 sm:p-8 rounded-4xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
+								className="w-full p-6 sm:p-8 rounded-3xl bg-linear-to-br from-white/5 to-transparent border border-white/10 backdrop-blur-sm relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
-									<h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
+									<h2 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-4">
 										About Me
 									</h2>
-									<p className="text-sm sm:text-base md:text-lg text-white/80 leading-relaxed whitespace-pre-wrap font-medium">
+									<p className="text-sm sm:text-base text-white/80 leading-relaxed whitespace-pre-wrap font-medium">
 										{profile.bio}
 									</p>
 								</div>
@@ -244,7 +244,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-6 sm:p-8 rounded-4xl bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
+								className="w-full p-6 sm:p-8 rounded-3xl bg-[#0a0a0a] border border-white/10 relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-bl from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">

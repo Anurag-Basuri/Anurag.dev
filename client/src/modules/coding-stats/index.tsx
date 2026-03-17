@@ -99,7 +99,7 @@ export function CodingStatsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto pb-24 sm:pb-32">
+			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
 				<SectionHeader
 					icon={Terminal}
 					label="Telemetry"
@@ -113,7 +113,7 @@ export function CodingStatsModule() {
 					initial="hidden"
 					whileInView="visible"
 					viewport={{ once: true, margin: '-20px' }}
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-16"
+					className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12"
 				>
 					{platformEntries.map(({ config, platform, hasData }) => {
 						if (!platform) return null;
