@@ -51,7 +51,7 @@ export function TopBar() {
 			{/* Right: nav actions + theme selector */}
 			<div className="flex items-center gap-3 sm:gap-4">
 				<Link
-					href="/portfolio/readme"
+					href="/readme"
 					className="text-emerald-500/80 hover:text-emerald-400 transition-colors flex items-center justify-center group relative"
 					aria-label="System Diagnostics (README)"
 				>

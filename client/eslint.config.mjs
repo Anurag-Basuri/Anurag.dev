@@ -31,7 +31,9 @@ const eslintConfig = defineConfig([
 				ecmaFeatures: { jsx: true },
 			},
 		},
-		rules: {},
+		rules: {
+			'@next/next/no-img-element': 'off',
+		},
 	},
 ]);
 
