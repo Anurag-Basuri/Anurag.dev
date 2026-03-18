@@ -2,16 +2,8 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useMemo, useState } from 'react';
-
-function slugify(input: string): string {
-	return input
-		.toLowerCase()
-		.trim()
-		.replace(/[`~!@#$%^&*()=+\[\]{\\}|;:'",.<>/?]/g, '')
-		.replace(/\s+/g, '-')
-		.replace(/-+/g, '-');
-}
+import rehypeSlug from 'rehype-slug';
+import { useState } from 'react';
 
 function textFromChildren(children: React.ReactNode): string {
 	if (typeof children === 'string') return children;
@@ -47,78 +39,53 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function MarkdownRenderer({ content }: { content: string }) {
-	const headingCounts = useMemo(() => new Map<string, number>(), []);
-
 	return (
 		<ReactMarkdown
 			remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSlug]}
 			components={{
-				h1: ({ node, children, ...props }) => {
-					const text = textFromChildren(children);
-					let id = slugify(text);
-					const n = (headingCounts.get(id) ?? 0) + 1;
-					headingCounts.set(id, n);
-					if (n > 1) id = `${id}-${n}`;
-
-					return (
-						<h1
-							id={id}
-							className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mt-12 mb-6 uppercase first:mt-0"
-							style={{ color: 'var(--theme-primary)' }}
-							{...props}
-						>
-							<a href={`#${id}`} className="no-underline hover:underline">
-								{children}
-							</a>
-						</h1>
-					);
-				},
-				h2: ({ node, children, ...props }) => {
-					const text = textFromChildren(children);
-					let id = slugify(text);
-					const n = (headingCounts.get(id) ?? 0) + 1;
-					headingCounts.set(id, n);
-					if (n > 1) id = `${id}-${n}`;
-
-					return (
-						<h2
-							id={id}
-							className="text-2xl sm:text-3xl font-bold tracking-tight border-b pb-3 mt-10 mb-5"
-							style={{
-								color: 'color-mix(in oklch, var(--theme-primary) 90%, white 10%)',
-								borderColor: 'color-mix(in oklch, var(--theme-primary) 25%, transparent)',
-							}}
-							{...props}
-						>
-							<a href={`#${id}`} className="no-underline hover:underline">
-								{children}
-							</a>
-						</h2>
-					);
-				},
-				h3: ({ node, children, ...props }) => {
-					const text = textFromChildren(children);
-					let id = slugify(text);
-					const n = (headingCounts.get(id) ?? 0) + 1;
-					headingCounts.set(id, n);
-					if (n > 1) id = `${id}-${n}`;
-
-					return (
-						<h3
-							id={id}
-							className="text-xl font-bold mt-8 mb-4 border-l-2 pl-3"
-							style={{
-								color: 'color-mix(in oklch, var(--theme-primary) 75%, white 25%)',
-								borderColor: 'color-mix(in oklch, var(--theme-primary) 45%, transparent)',
-							}}
-							{...props}
-						>
-							<a href={`#${id}`} className="no-underline hover:underline">
-								{children}
-							</a>
-						</h3>
-					);
-				},
+				h1: ({ node, children, id, ...props }) => (
+					<h1
+						id={id}
+						className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mt-12 mb-6 uppercase first:mt-0"
+						style={{ color: 'var(--theme-primary)' }}
+						{...props}
+					>
+						<a href={`#${id}`} className="no-underline hover:underline">
+							{children}
+						</a>
+					</h1>
+				),
+				h2: ({ node, children, id, ...props }) => (
+					<h2
+						id={id}
+						className="text-2xl sm:text-3xl font-bold tracking-tight border-b pb-3 mt-10 mb-5"
+						style={{
+							color: 'color-mix(in oklch, var(--theme-primary) 90%, white 10%)',
+							borderColor: 'color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+						}}
+						{...props}
+					>
+						<a href={`#${id}`} className="no-underline hover:underline">
+							{children}
+						</a>
+					</h2>
+				),
+				h3: ({ node, children, id, ...props }) => (
+					<h3
+						id={id}
+						className="text-xl font-bold mt-8 mb-4 border-l-2 pl-3"
+						style={{
+							color: 'color-mix(in oklch, var(--theme-primary) 75%, white 25%)',
+							borderColor: 'color-mix(in oklch, var(--theme-primary) 45%, transparent)',
+						}}
+						{...props}
+					>
+						<a href={`#${id}`} className="no-underline hover:underline">
+							{children}
+						</a>
+					</h3>
+				),
 				p: ({ node, ...props }) => (
 					<p className="text-white/75 text-base sm:text-lg leading-relaxed mb-6 font-sans" {...props} />
 				),

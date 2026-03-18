@@ -5,29 +5,31 @@ import { TerminalFrame } from '@/ui/TerminalFrame';
 import type { ReadmeDocMeta, TocItem } from './types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
-function slugify(input: string): string {
-	return input
-		.toLowerCase()
-		.trim()
-		.replace(/[`~!@#$%^&*()=+\[\]{\\}|;:'",.<>/?]/g, '')
-		.replace(/\s+/g, '-')
-		.replace(/-+/g, '-');
-}
+import GithubSlugger from 'github-slugger';
 
 function buildToc(content: string): TocItem[] {
+	const slugger = new GithubSlugger();
 	const lines = content.split(/\r?\n/);
 	const items: TocItem[] = [];
-	const seen = new Map<string, number>();
+	let inCodeBlock = false;
 
 	for (const line of lines) {
+		if (line.trim().startsWith('```')) {
+			inCodeBlock = !inCodeBlock;
+			continue;
+		}
+		if (inCodeBlock) continue;
+
 		const m = /^(#{1,3})\s+(.+?)\s*$/.exec(line);
 		if (!m) continue;
+
 		const depth = m[1]!.length as 1 | 2 | 3;
-		const text = m[2]!.replace(/\s+#*$/, '').trim();
-		let id = slugify(text);
-		const n = (seen.get(id) ?? 0) + 1;
-		seen.set(id, n);
-		if (n > 1) id = `${id}-${n}`;
+		let text = m[2]!.replace(/\s+#*$/, '').trim();
+		// Strip basic markdown syntax
+		text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // links
+		text = text.replace(/[*_~`]/g, '');
+
+		const id = slugger.slug(text);
 		items.push({ depth, text, id });
 	}
 
@@ -43,14 +45,24 @@ export function ReadmeViewer({
 }) {
 	const toc = useMemo(() => buildToc(content), [content]);
 
+	const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+		e.preventDefault();
+		const el = document.getElementById(id);
+		if (el) {
+			el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			// Gracefully update the URL hash without triggering native browser jumping
+			history.pushState(null, '', `#${id}`);
+		}
+	};
+
 	return (
 		<div className="w-full h-full flex flex-col p-4 sm:p-8 pt-6 pb-10">
 			<TerminalFrame meta={docMeta}>
 				<div className="h-full w-full flex gap-6 p-4 sm:p-6 lg:p-8">
 					{/* Main scroll body */}
-					<div className="flex-1 min-w-0">
-						<div className="h-[72vh] overflow-y-auto pr-2">
-							<div className="max-w-3xl mx-auto">
+					<div className="flex-1 min-w-0 relative">
+						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--theme-primary)]/20 scrollbar-track-transparent pr-4 sm:pr-8 pb-12">
+							<div className="max-w-5xl mx-auto">
 								<MarkdownRenderer content={content} />
 							</div>
 						</div>
@@ -67,7 +79,8 @@ export function ReadmeViewer({
 									<a
 										key={item.id}
 										href={`#${item.id}`}
-										className="block text-xs text-white/60 hover:text-white transition-colors"
+										onClick={(e) => handleTocClick(e, item.id)}
+										className="block text-xs text-white/60 hover:text-white transition-colors py-0.5"
 										style={{
 											paddingLeft:
 												item.depth === 1
