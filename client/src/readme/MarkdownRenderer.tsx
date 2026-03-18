@@ -30,7 +30,7 @@ function CopyButton({ text }: { text: string }) {
 					setTimeout(() => setState('idle'), 1200);
 				}
 			}}
-			className="absolute top-2 right-2 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md border border-white/10 bg-black/40 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+			className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-md border border-white/10 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors z-10"
 			aria-label="Copy code"
 		>
 			{state === 'copied' ? 'Copied' : state === 'error' ? 'Failed' : 'Copy'}
@@ -47,11 +47,10 @@ export function MarkdownRenderer({ content }: { content: string }) {
 				h1: ({ node, children, id, ...props }) => (
 					<h1
 						id={id}
-						className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tighter mt-12 mb-6 uppercase first:mt-0"
-						style={{ color: 'var(--theme-primary)' }}
+						className="text-3xl sm:text-5xl font-bold tracking-tight text-white mt-12 mb-8 first:mt-0"
 						{...props}
 					>
-						<a href={`#${id}`} className="no-underline hover:underline">
+						<a href={`#${id}`} className="no-underline hover:underline hover:text-zinc-300 transition-colors">
 							{children}
 						</a>
 					</h1>
@@ -59,14 +58,10 @@ export function MarkdownRenderer({ content }: { content: string }) {
 				h2: ({ node, children, id, ...props }) => (
 					<h2
 						id={id}
-						className="text-2xl sm:text-3xl font-bold tracking-tight border-b pb-3 mt-10 mb-5"
-						style={{
-							color: 'color-mix(in oklch, var(--theme-primary) 90%, white 10%)',
-							borderColor: 'color-mix(in oklch, var(--theme-primary) 25%, transparent)',
-						}}
+						className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100 border-b border-white/10 pb-4 mt-14 mb-6"
 						{...props}
 					>
-						<a href={`#${id}`} className="no-underline hover:underline">
+						<a href={`#${id}`} className="no-underline hover:underline hover:text-zinc-300 transition-colors">
 							{children}
 						</a>
 					</h2>
@@ -74,52 +69,35 @@ export function MarkdownRenderer({ content }: { content: string }) {
 				h3: ({ node, children, id, ...props }) => (
 					<h3
 						id={id}
-						className="text-xl font-bold mt-8 mb-4 border-l-2 pl-3"
-						style={{
-							color: 'color-mix(in oklch, var(--theme-primary) 75%, white 25%)',
-							borderColor: 'color-mix(in oklch, var(--theme-primary) 45%, transparent)',
-						}}
+						className="text-xl font-medium text-zinc-200 mt-10 mb-4"
 						{...props}
 					>
-						<a href={`#${id}`} className="no-underline hover:underline">
+						<a href={`#${id}`} className="no-underline hover:underline hover:text-zinc-300 transition-colors">
 							{children}
 						</a>
 					</h3>
 				),
 				p: ({ node, ...props }) => (
-					<p className="text-white/75 text-base sm:text-lg leading-relaxed mb-6 font-sans" {...props} />
+					<p className="text-zinc-400 text-base leading-relaxed mb-6 font-sans" {...props} />
 				),
 				a: ({ node, ...props }) => (
 					<a
-						className="no-underline hover:underline border-b pb-0.5"
-						style={{
-							color: 'var(--theme-secondary)',
-							borderColor: 'color-mix(in oklch, var(--theme-secondary) 35%, transparent)',
-						}}
+						className="text-blue-400 hover:text-blue-300 hover:underline transition-colors"
 						target="_blank"
 						rel="noopener noreferrer"
 						{...props}
 					/>
 				),
-				ul: ({ node, ...props }) => <ul className="list-none space-y-2 mb-6 text-white/75 font-sans" {...props} />,
+				ul: ({ node, ...props }) => <ul className="list-disc list-inside space-y-2 mb-6 text-zinc-400 font-sans" {...props} />,
 				ol: ({ node, ...props }) => (
-					<ol className="list-decimal list-inside space-y-2 mb-6 text-white/75 font-sans" {...props} />
+					<ol className="list-decimal list-inside space-y-2 mb-6 text-zinc-400 font-sans" {...props} />
 				),
 				li: ({ node, ...props }) => (
-					<li
-						className="relative pl-6 before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:rounded-sm"
-						style={{ ['--tw-before-bg' as any]: 'color-mix(in oklch, var(--theme-primary) 55%, transparent)' }}
-						{...props}
-					/>
+					<li className="text-zinc-400 marker:text-zinc-600" {...props} />
 				),
 				blockquote: ({ node, ...props }) => (
 					<blockquote
-						className="border-l-4 bg-linear-to-r px-6 py-3 rounded-r-xl my-8 text-white/80 italic font-serif"
-						style={{
-							borderColor: 'color-mix(in oklch, var(--theme-primary) 55%, transparent)',
-							backgroundImage:
-								'linear-gradient(to right, color-mix(in oklch, var(--theme-primary) 12%, transparent), transparent)',
-						}}
+						className="border-l-2 border-zinc-700 pl-5 py-1 text-zinc-500 italic my-8 bg-transparent"
 						{...props}
 					/>
 				),
@@ -127,17 +105,9 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					const codeText = textFromChildren(children).replace(/\n$/, '');
 					return (
 						<div className="relative group my-8">
-							<div
-								className="absolute -inset-1 rounded-xl blur-lg opacity-25 group-hover:opacity-50 transition duration-700"
-								style={{
-									background:
-										'linear-gradient(90deg, color-mix(in oklch, var(--theme-primary) 25%, transparent), color-mix(in oklch, var(--theme-secondary) 25%, transparent))',
-								}}
-							/>
 							<CopyButton text={codeText} />
 							<pre
-								className="relative bg-black/60 border p-6 pt-10 rounded-xl overflow-x-auto shadow-inner"
-								style={{ borderColor: 'color-mix(in oklch, var(--theme-primary) 25%, transparent)' }}
+								className="relative bg-[#111111] border border-white/5 p-4 sm:p-6 rounded-lg overflow-x-auto"
 								{...props}
 							>
 								{children}
@@ -150,8 +120,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					if (isBlock) {
 						return (
 							<code
-								className={`block font-mono text-xs sm:text-sm leading-relaxed ${className || ''}`}
-								style={{ color: 'color-mix(in oklch, var(--theme-primary) 70%, white 30%)' }}
+								className={`block font-mono text-[13px] leading-relaxed text-zinc-300 ${className || ''}`}
 								{...props}
 							>
 								{children}
@@ -160,12 +129,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					}
 					return (
 						<code
-							className="px-1.5 py-0.5 rounded-md border font-mono text-sm mx-0.5"
-							style={{
-								background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
-								borderColor: 'color-mix(in oklch, var(--theme-primary) 22%, transparent)',
-								color: 'color-mix(in oklch, var(--theme-primary) 70%, white 30%)',
-							}}
+							className="px-1.5 py-0.5 rounded border border-white/10 bg-zinc-800/40 text-zinc-300 font-mono text-[13px] mx-0.5 whitespace-pre-wrap wrap-break-word"
 							{...props}
 						>
 							{children}
@@ -173,9 +137,9 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					);
 				},
 				img: ({ node, ...props }) => (
-					<div className="relative my-10 rounded-xl overflow-hidden border border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.25)]">
+					<div className="relative my-12 rounded-xl overflow-hidden border border-white/10 shadow-lg">
 						<img
-							className="max-w-full h-auto w-full object-contain bg-black/30"
+							className="max-w-full h-auto w-full object-contain bg-[#111111]"
 							loading="lazy"
 							{...props}
 							alt={props.alt || 'Documentation Image'}
@@ -183,30 +147,21 @@ export function MarkdownRenderer({ content }: { content: string }) {
 					</div>
 				),
 				hr: ({ node, ...props }) => (
-					<div className="w-full flex items-center justify-center my-12" {...props}>
-						<div
-							className="w-full h-px"
-							style={{
-								background:
-									'linear-gradient(to right, transparent, color-mix(in oklch, var(--theme-primary) 30%, transparent), transparent)',
-							}}
-						/>
-					</div>
+					<hr className="border-t border-white/10 my-12 w-full" {...props} />
 				),
 				table: ({ node, ...props }) => (
-					<div className="overflow-x-auto w-full my-8 rounded-xl border border-white/10 bg-black/25">
+					<div className="overflow-x-auto w-full my-8 rounded-lg border border-white/10 bg-[#111111]">
 						<table className="w-full text-left border-collapse text-sm" {...props} />
 					</div>
 				),
 				thead: ({ node, ...props }) => (
-					<thead className="bg-black/40 border-b border-white/10 text-white/80 font-bold" {...props} />
+					<thead className="bg-[#1a1a1a] border-b border-white/10 text-zinc-300 font-medium" {...props} />
 				),
-				th: ({ node, ...props }) => <th className="p-4 tracking-wider uppercase text-xs" {...props} />,
-				td: ({ node, ...props }) => <td className="p-4 border-b border-white/5 text-white/70" {...props} />,
+				th: ({ node, ...props }) => <th className="p-4 tracking-wide text-xs" {...props} />,
+				td: ({ node, ...props }) => <td className="p-4 border-b border-white/5 text-zinc-400" {...props} />,
 			}}
 		>
 			{content}
 		</ReactMarkdown>
 	);
 }
-

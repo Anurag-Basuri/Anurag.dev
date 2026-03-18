@@ -56,13 +56,13 @@ export function ReadmeViewer({
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col p-4 sm:p-8 pt-6 pb-10">
+		<div className="w-full h-full flex flex-col p-4 sm:p-8 pt-6 pb-10 bg-[#050505]">
 			<TerminalFrame meta={docMeta}>
 				<div className="h-full w-full flex gap-6 p-4 sm:p-6 lg:p-8">
 					{/* Main scroll body */}
 					<div className="flex-1 min-w-0 relative">
-						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[color:var(--theme-primary)]/20 scrollbar-track-transparent pr-4 sm:pr-8 pb-12">
-							<div className="max-w-5xl mx-auto">
+						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 scrollbar-track-transparent pr-4 sm:pr-8 pb-12">
+							<div className="max-w-4xl mx-auto">
 								<MarkdownRenderer content={content} />
 							</div>
 						</div>
@@ -70,9 +70,10 @@ export function ReadmeViewer({
 
 					{/* TOC */}
 					<aside className="hidden lg:block w-64 shrink-0">
-						<div className="sticky top-2 rounded-xl border border-white/10 bg-black/35 backdrop-blur-xl p-4">
-							<p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">
-								Table of contents
+						<div className="sticky top-2 border border-white/5 bg-[#111111] rounded-xl p-5 shadow-xl">
+							<p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
+								<span className="w-1 h-3 bg-zinc-700/50 rounded-full" />
+								On this page
 							</p>
 							<nav className="space-y-1.5">
 								{toc.slice(0, 60).map(item => (
@@ -80,7 +81,7 @@ export function ReadmeViewer({
 										key={item.id}
 										href={`#${item.id}`}
 										onClick={(e) => handleTocClick(e, item.id)}
-										className="block text-xs text-white/60 hover:text-white transition-colors py-0.5"
+										className="block text-[13px] text-zinc-400 hover:text-white transition-colors py-1"
 										style={{
 											paddingLeft:
 												item.depth === 1

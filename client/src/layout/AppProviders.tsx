@@ -6,7 +6,6 @@ import { Toaster } from 'react-hot-toast';
 import { ThemeContextProvider } from '@/theme/colors/theme-context';
 import { ErrorBoundary } from '@/ui/ErrorBoundary';
 import { BackgroundRenderer } from '@/theme/backgrounds/BackgroundRenderer';
-import { BootGuard } from '@/boot/components/BootGuard';
 
 const jotaiStore = createStore();
 
@@ -16,7 +15,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 			<ThemeContextProvider>
 				<ErrorBoundary label="App Root">
 					<BackgroundRenderer />
-					<BootGuard>{children}</BootGuard>
+					{children}
 
 					<Toaster
 						position="top-right"
