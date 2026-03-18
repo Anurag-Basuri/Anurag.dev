@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import { TerminalFrame } from '@/ui/TerminalFrame';
 import type { ReadmeDocMeta, TocItem } from './types';
 import { MarkdownRenderer } from './MarkdownRenderer';
-
 import GithubSlugger from 'github-slugger';
 
 function buildToc(content: string): TocItem[] {
@@ -25,8 +24,7 @@ function buildToc(content: string): TocItem[] {
 
 		const depth = m[1]!.length as 1 | 2 | 3;
 		let text = m[2]!.replace(/\s+#*$/, '').trim();
-		// Strip basic markdown syntax
-		text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // links
+		text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
 		text = text.replace(/[*_~`]/g, '');
 
 		const id = slugger.slug(text);
@@ -45,52 +43,70 @@ export function ReadmeViewer({
 }) {
 	const toc = useMemo(() => buildToc(content), [content]);
 
-	const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-		e.preventDefault();
+	const scrollToId = (id: string) => {
 		const el = document.getElementById(id);
 		if (el) {
 			el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-			// Gracefully update the URL hash without triggering native browser jumping
 			history.pushState(null, '', `#${id}`);
 		}
 	};
 
+	const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+		e.preventDefault();
+		scrollToId(id);
+	};
+
 	return (
-		<div className="w-full h-full flex flex-col p-4 sm:p-8 pt-6 pb-10 bg-[#050505]">
+		<div className="w-full h-full flex flex-col p-2 sm:p-4 pt-4 pb-4 bg-transparent">
 			<TerminalFrame meta={docMeta}>
-				<div className="h-full w-full flex gap-6 p-4 sm:p-6 lg:p-8">
-					{/* Main scroll body */}
+				<div className="h-full w-full flex gap-0 lg:gap-0">
+					{/* ─── Main Scroll Body ─── */}
 					<div className="flex-1 min-w-0 relative">
-						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700/50 scrollbar-track-transparent pr-4 sm:pr-8 pb-12">
+						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent pr-3 sm:pr-6 pb-12 p-4 sm:p-6 lg:p-8"
+							style={{ scrollbarColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent) transparent' }}
+						>
 							<div className="max-w-4xl mx-auto">
-								<MarkdownRenderer content={content} />
+								<MarkdownRenderer content={content} onNavigate={scrollToId} />
 							</div>
 						</div>
 					</div>
 
-					{/* TOC */}
-					<aside className="hidden lg:block w-64 shrink-0">
-						<div className="sticky top-2 border border-white/5 bg-[#111111] rounded-xl p-5 shadow-xl">
-							<p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-								<span className="w-1 h-3 bg-zinc-700/50 rounded-full" />
+					{/* ─── Table of Contents Sidebar ─── */}
+					<aside className="hidden lg:flex w-60 shrink-0 border-l border-white/6">
+						<div className="w-full p-5 pt-6 overflow-y-auto max-h-full scrollbar-thin scrollbar-track-transparent"
+							style={{ scrollbarColor: 'color-mix(in oklch, var(--theme-primary) 15%, transparent) transparent' }}
+						>
+							<p
+								className="text-[10px] font-bold uppercase tracking-[0.2em] mb-5 flex items-center gap-2 font-mono"
+								style={{ color: 'color-mix(in oklch, var(--theme-primary) 75%, white 25%)' }}
+							>
+								<span
+									className="w-1 h-3 rounded-full"
+									style={{ background: 'var(--theme-primary)' }}
+								/>
 								On this page
 							</p>
-							<nav className="space-y-1.5">
+							<nav className="space-y-0.5">
 								{toc.slice(0, 60).map(item => (
 									<a
 										key={item.id}
 										href={`#${item.id}`}
 										onClick={(e) => handleTocClick(e, item.id)}
-										className="block text-[13px] text-zinc-400 hover:text-white transition-colors py-1"
+										className="block text-[12px] text-white/70 hover:text-white transition-colors py-1 font-mono truncate"
 										style={{
 											paddingLeft:
 												item.depth === 1
 													? 0
 													: item.depth === 2
-														? 10
-														: 20,
+														? 12
+														: 24,
 										}}
 									>
+										{item.depth > 1 && (
+											<span className="text-white/10 mr-1 select-none">
+												{item.depth === 2 ? '├' : '└'}
+											</span>
+										)}
 										{item.text}
 									</a>
 								))}
@@ -102,4 +118,3 @@ export function ReadmeViewer({
 		</div>
 	);
 }
-

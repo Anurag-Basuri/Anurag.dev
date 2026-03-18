@@ -6,10 +6,13 @@ import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 import { Maximize2, TerminalSquare } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function TopBar() {
 	const setWindowState = useSetAtom(windowStateAtom);
 	const setBootComplete = useSetAtom(bootCompleteAtom);
+	const pathname = usePathname();
+	const isPortfolioShell = pathname.startsWith('/portfolio');
 
 	const toggleFullscreen = () => {
 		if (!document.fullscreenElement) {
@@ -24,16 +27,20 @@ export function TopBar() {
 			{/* Left: window controls + title */}
 			<div className="flex items-center gap-4">
 				<div className="flex gap-2 items-center group">
-					<button
-						onClick={() => setBootComplete(false)}
-						className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors flex items-center justify-center border border-white/10"
-						aria-label="Restart Boot"
-					/>
-					<button
-						onClick={() => setWindowState('minimized')}
-						className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors flex items-center justify-center border border-white/10"
-						aria-label="Minimize"
-					/>
+					{isPortfolioShell && (
+						<>
+							<button
+								onClick={() => setBootComplete(false)}
+								className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors flex items-center justify-center border border-white/10"
+								aria-label="Restart Boot"
+							/>
+							<button
+								onClick={() => setWindowState('minimized')}
+								className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors flex items-center justify-center border border-white/10"
+								aria-label="Minimize"
+							/>
+						</>
+					)}
 					<button
 						onClick={toggleFullscreen}
 						className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors flex items-center justify-center border border-white/10 relative overflow-hidden"
