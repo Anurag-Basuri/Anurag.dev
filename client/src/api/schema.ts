@@ -289,3 +289,17 @@ export const codingStatsSchema = z.object({
 
 export type PlatformStats = z.infer<typeof platformStatsSchema>;
 export type CodingStats = z.infer<typeof codingStatsSchema>;
+
+// ─── System Documents (Readme) ───────────────────────
+
+export const readmeDataSchema = z.object({
+	content: z.string(),
+	metadata: z.object({
+		sizeBytes: z.number(),
+		lastModified: z.string(),
+		lines: z.number(),
+		words: z.number(),
+	}),
+});
+
+export type ReadmeData = z.infer<typeof readmeDataSchema>;

@@ -6,7 +6,7 @@ const allowedOrigins = env.CORS_ORIGIN.split(',')
 	.filter(Boolean);
 
 const corsOptions: cors.CorsOptions = {
-	origin: allowedOrigins,
+	origin: allowedOrigins.includes('*') ? true : allowedOrigins,
 	credentials: true,
 	methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 	allowedHeaders: ['Content-Type', 'Authorization'],
