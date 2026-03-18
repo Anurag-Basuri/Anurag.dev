@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../utils/ApiResponse';
+import { getReadme } from '../controllers/docs.controller';
 
 const router = Router();
 
@@ -63,5 +64,7 @@ const API_DOCS = {
 router.get('/docs', (_req: Request, res: Response) => {
 	ApiResponse.ok(res, API_DOCS, 'API documentation');
 });
+
+router.get('/docs/readme', getReadme);
 
 export default router;

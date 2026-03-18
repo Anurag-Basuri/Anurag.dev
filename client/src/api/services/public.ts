@@ -7,6 +7,7 @@ import {
 	FALLBACK_ACHIEVEMENTS,
 	FALLBACK_CERTIFICATIONS,
 	FALLBACK_BLOG_POSTS,
+	FALLBACK_README,
 } from '../fallback';
 import type {
 	Project,
@@ -16,6 +17,7 @@ import type {
 	BlogPost,
 	AboutData,
 	CodingStats,
+	ReadmeData,
 } from '@/api/schema';
 
 // Public-facing API service — falls back to hardcoded data if backend is unreachable
@@ -94,6 +96,10 @@ async function getCodingStats() {
 	return withFallback(() => apiClient.get<CodingStats>('/coding-stats'), FALLBACK_CODING_STATS, 'coding-stats');
 }
 
+async function getReadme() {
+	return withFallback(() => apiClient.get<ReadmeData>('/docs/readme'), FALLBACK_README, 'readme');
+}
+
 export const publicService = {
 	getProfile,
 	getProjects,
@@ -105,4 +111,5 @@ export const publicService = {
 	getBlogPostBySlug,
 	getCodingStats,
 	submitContact,
+	getReadme,
 };
