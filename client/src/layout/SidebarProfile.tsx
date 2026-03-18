@@ -61,7 +61,7 @@ export const SidebarProfile = memo(function SidebarProfile() {
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">
 			{/* Profile Section */}
-			<div className="p-2 sm:p-3 border-b border-sidebar-border/20 bg-white/2">
+			<div className="p-2 sm:p-3 border-b border-sidebar-border/20 bg-transparent">
 				{/* Avatar + Info Row */}
 				<div className="flex items-center gap-2 sm:gap-3 mb-3">
 					{/* Avatar */}

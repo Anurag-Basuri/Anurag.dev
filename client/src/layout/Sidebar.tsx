@@ -28,10 +28,6 @@ export const Sidebar: React.FC = () => {
 
 	return (
 		<div className="h-full w-full flex flex-col">
-			<div className="flex items-center h-12 shrink-0 px-3 text-xs tracking-wider text-muted-foreground/70 font-semibold select-none">
-				CONTENTS
-			</div>
-
 			<SidebarProfile />
 
 			<div className="flex-1 min-h-0">

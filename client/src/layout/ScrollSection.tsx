@@ -21,7 +21,7 @@ export function ScrollSection({ id, children, className = '' }: ScrollSectionPro
 	return (
 		<section
 			id={`section-${id}`}
-			className={`w-full relative ${className}`}
+			className={`w-full min-h-full relative ${className}`}
 			style={{ scrollSnapAlign: 'start' }}
 		>
 			<motion.div

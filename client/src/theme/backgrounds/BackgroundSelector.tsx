@@ -43,7 +43,7 @@ export function BackgroundSelector() {
 				className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-md transition-colors hover:bg-white/10 focus:outline-none"
 				aria-label="Change background"
 			>
-				<Stars className="h-4 w-4 text-[var(--theme-secondary)]" />
+				<Stars className="h-4 w-4 text-(--theme-secondary)" />
 			</motion.button>
 
 			<AnimatePresence>

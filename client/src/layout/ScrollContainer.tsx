@@ -62,11 +62,7 @@ export function ScrollContainer({ initialSection }: ScrollContainerProps) {
 			{/* Scroll indicator (side dots) */}
 			<ScrollIndicator activeSectionId={activeSectionId} onSectionClick={scrollTo} />
 
-			{/* Top edge gradient for depth */}
-			<div className="pointer-events-none absolute top-0 left-0 right-0 h-16 bg-linear-to-b from-[#020409] to-transparent z-10" />
 
-			{/* Bottom edge gradient for depth */}
-			<div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-[#020409] to-transparent z-10" />
 
 			{/* Scrollable container with custom scrollbar */}
 			<div
