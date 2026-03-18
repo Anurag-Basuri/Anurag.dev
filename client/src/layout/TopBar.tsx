@@ -1,25 +1,53 @@
 'use client';
 
+import { useSetAtom } from 'jotai';
+import { windowStateAtom } from '@/boot/atoms';
 import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
+import { Maximize2 } from 'lucide-react';
 
 export function TopBar() {
+	const setWindowState = useSetAtom(windowStateAtom);
+
+	const toggleFullscreen = () => {
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen().catch(() => {});
+		} else if (document.exitFullscreen) {
+			document.exitFullscreen();
+		}
+	};
+
 	return (
-		<header className="h-12 w-full bg-black/20 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 shrink-0 z-30 relative">
+		<header className="h-10 w-full bg-black/20 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 shrink-0 z-30 relative">
 			{/* Left: window controls + title */}
-			<div className="flex items-center gap-3">
-				<div className="flex gap-1.5 items-center bg-white/5 px-2 py-1 rounded-md border border-white/10">
-					<div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-					<div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-					<div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+			<div className="flex items-center gap-4">
+				<div className="flex gap-2 items-center group">
+					<button
+						onClick={() => setWindowState('closed')}
+						className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors flex items-center justify-center border border-white/10"
+						aria-label="Close"
+					/>
+					<button
+						onClick={() => setWindowState('minimized')}
+						className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors flex items-center justify-center border border-white/10"
+						aria-label="Minimize"
+					/>
+					<button
+						onClick={toggleFullscreen}
+						className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors flex items-center justify-center border border-white/10 relative overflow-hidden"
+						aria-label="Fullscreen"
+					>
+						<Maximize2 className="w-2 h-2 text-green-900 opacity-0 group-hover:opacity-100 transition-opacity absolute" />
+					</button>
 				</div>
-				<span className="text-sm font-semibold tracking-wide text-foreground/80 hidden sm:block">
-					anurag-os
+				<div className="h-4 w-px bg-white/10 hidden sm:block" />
+				<span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-foreground/80 hidden sm:block leading-none">
+					Anurag<span className="text-primary">.dev</span>
 				</span>
 			</div>
 
 			{/* Right: nav actions + theme selector */}
-			<div className="flex items-center gap-4">
+			<div className="flex items-center gap-3 sm:gap-4">
 				<button
 					onClick={() => {
 						window.dispatchEvent(
