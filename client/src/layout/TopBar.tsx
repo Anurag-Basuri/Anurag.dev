@@ -1,13 +1,14 @@
 'use client';
 
 import { useSetAtom } from 'jotai';
-import { windowStateAtom } from '@/boot/atoms';
+import { windowStateAtom, bootCompleteAtom } from '@/boot/atoms';
 import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 import { Maximize2 } from 'lucide-react';
 
 export function TopBar() {
 	const setWindowState = useSetAtom(windowStateAtom);
+	const setBootComplete = useSetAtom(bootCompleteAtom);
 
 	const toggleFullscreen = () => {
 		if (!document.fullscreenElement) {
@@ -23,9 +24,9 @@ export function TopBar() {
 			<div className="flex items-center gap-4">
 				<div className="flex gap-2 items-center group">
 					<button
-						onClick={() => setWindowState('closed')}
+						onClick={() => setBootComplete(false)}
 						className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors flex items-center justify-center border border-white/10"
-						aria-label="Close"
+						aria-label="Restart Boot"
 					/>
 					<button
 						onClick={() => setWindowState('minimized')}

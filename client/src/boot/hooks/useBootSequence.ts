@@ -42,20 +42,26 @@ export function useBootSequence(): UseBootSequenceReturn {
 	}, [isCompleting, setBootComplete]);
 
 	const skip = useCallback(() => {
+		if (isCompleting) return;
 		cancelledRef.current = true;
-		completeBoot();
-	}, [completeBoot]);
+		setIsCompleting(true);
+		setProgress(100);
+		setBootComplete(true);
+	}, [isCompleting, setBootComplete]);
 
 	// Keyboard and touch skip handler
 	useEffect(() => {
+		const mountTime = Date.now();
 		const handleInteraction = (event: KeyboardEvent | MouseEvent | TouchEvent) => {
-			if (
-				event.type === 'mousedown' ||
-				event.type === 'touchstart' ||
-				(event.type === 'keydown' &&
-					[' ', 'Enter', 'Escape'].includes((event as KeyboardEvent).key) || 
-					(event as KeyboardEvent).code === 'Space')
-			) {
+			// Prevent phantom skipped events (e.g., the exact click that triggered the boot sequence bubbling)
+			if (Date.now() - mountTime < 400) return;
+
+			const isSkipKey = event.type === 'keydown' && (
+				[' ', 'Enter', 'Escape'].includes((event as KeyboardEvent).key) || 
+				(event as KeyboardEvent).code === 'Space'
+			);
+
+			if (event.type === 'mousedown' || event.type === 'touchstart' || isSkipKey) {
 				// Don't prevent default on clicks/touches, only on handled keys
 				if (event.type === 'keydown') event.preventDefault();
 				skip();

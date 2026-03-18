@@ -129,31 +129,27 @@ export function BootScreen() {
 				</div>
 
 				{/* Creative Skip Prompt */}
-				<div className="absolute bottom-8 sm:bottom-12 w-full flex flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-1000 fill-mode-forwards opacity-0 [animation-delay:1.5s]">
-					<div className="flex items-center gap-3 group px-6 py-2">
-						<div className="text-emerald-500/40 font-mono text-xs uppercase tracking-[0.2em] group-hover:text-emerald-400 transition-colors">
-							PRESS
-						</div>
-						
-						{/* Stylized Spacebar Key */}
-						<div className="relative group cursor-pointer">
-							{/* Glitch layers on hover */}
-							<div className="absolute inset-0 bg-emerald-500/20 translate-x-1 animate-pulse opacity-0 group-hover:opacity-100 blur-sm rounded border border-emerald-400" />
-							<div className="absolute inset-0 bg-cyan-500/20 -translate-x-1 animate-pulse opacity-0 group-hover:opacity-100 blur-sm rounded border border-cyan-400" />
-							
-							<div className="relative border-b-4 border-r-2 border-emerald-500/30 bg-black/50 px-8 py-1.5 rounded-lg flex items-center justify-center min-w-[120px] transition-all duration-150 group-hover:bg-emerald-500/10 group-active:border-b-0 group-active:border-r-0 group-active:translate-y-1 shadow-[0_0_15px_-3px_rgba(16,185,129,0.2)] group-hover:shadow-[0_0_20px_0_rgba(16,185,129,0.5)]">
-								<div className="w-16 h-1 bg-emerald-500/30 rounded-full group-hover:bg-emerald-400 transition-colors" />
-							</div>
-						</div>
-						
-						<div className="text-emerald-500/40 font-mono text-xs uppercase tracking-[0.2em] group-hover:text-emerald-400 transition-colors">
-							TO SKIP
-						</div>
-					</div>
+				<div className="absolute bottom-8 sm:bottom-12 w-full flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-1000 fill-mode-forwards opacity-0 [animation-delay:1.5s] z-50">
 					
-					<p className="text-[9px] text-emerald-500/20 font-mono tracking-widest uppercase">
-						Or click anywhere to bypass
-					</p>
+					{/* Explicit Override Button */}
+					<button 
+						onClick={(e) => {
+							e.stopPropagation();
+							skip();
+						}}
+						className="relative group px-8 py-2.5 bg-black/50 hover:bg-emerald-950/40 border border-emerald-500/30 rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] cursor-pointer"
+					>
+						<div className="absolute inset-0 bg-emerald-500/20 translate-x-1 animate-pulse opacity-0 group-hover:opacity-100 blur-sm" />
+						<span className="relative z-10 text-emerald-400 text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase">
+							SYSTEM OVERRIDE
+						</span>
+					</button>
+
+					{/* Device-specific helper text */}
+					<div className="text-[10px] sm:text-[11px] text-emerald-500/40 font-mono tracking-widest uppercase text-center px-4">
+						<span className="hidden sm:block">Press [SPACE] or Click anywhere to bypass</span>
+						<span className="block sm:hidden animate-pulse">Tap anywhere to bypass</span>
+					</div>
 				</div>
 			</div>
 		</div>

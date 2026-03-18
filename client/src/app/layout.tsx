@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AppProviders } from '@/layout/AppProviders';
-import { Scene3D } from '@/theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,7 +20,6 @@ export default function RootLayout({
 		<html lang="en" suppressHydrationWarning>
 			<body className={inter.className} style={{ background: '#020409' }}>
 				<AppProviders>
-					<Scene3D />
 					{children}
 				</AppProviders>
 			</body>
