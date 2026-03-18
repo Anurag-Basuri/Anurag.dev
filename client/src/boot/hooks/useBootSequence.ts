@@ -46,16 +46,30 @@ export function useBootSequence(): UseBootSequenceReturn {
 		completeBoot();
 	}, [completeBoot]);
 
-	// Keyboard skip handler
+	// Keyboard and touch skip handler
 	useEffect(() => {
-		const handleKeyPress = (event: KeyboardEvent) => {
-			if ([' ', 'Enter', 'Escape'].includes(event.key)) {
-				event.preventDefault();
+		const handleInteraction = (event: KeyboardEvent | MouseEvent | TouchEvent) => {
+			if (
+				event.type === 'mousedown' ||
+				event.type === 'touchstart' ||
+				(event.type === 'keydown' &&
+					[' ', 'Enter', 'Escape'].includes((event as KeyboardEvent).key) || 
+					(event as KeyboardEvent).code === 'Space')
+			) {
+				// Don't prevent default on clicks/touches, only on handled keys
+				if (event.type === 'keydown') event.preventDefault();
 				skip();
 			}
 		};
-		window.addEventListener('keydown', handleKeyPress);
-		return () => window.removeEventListener('keydown', handleKeyPress);
+		window.addEventListener('keydown', handleInteraction as EventListener);
+		window.addEventListener('mousedown', handleInteraction as EventListener);
+		window.addEventListener('touchstart', handleInteraction as EventListener, { passive: true });
+		
+		return () => {
+			window.removeEventListener('keydown', handleInteraction as EventListener);
+			window.removeEventListener('mousedown', handleInteraction as EventListener);
+			window.removeEventListener('touchstart', handleInteraction as EventListener);
+		};
 	}, [skip]);
 
 	// Phase animation via requestAnimationFrame
