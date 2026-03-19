@@ -1,10 +1,10 @@
 # AnuragOS - Developer Portfolio System
 
-A full-stack developer portfolio with a unique terminal-style interface. Features a Fastify backend with PostgreSQL and a Next.js frontend with an OS-like experience.
+A full-stack developer portfolio with a unique terminal-style interface. Features an Express backend with PostgreSQL and a Next.js frontend with an OS-like experience.
 
 ## 🎯 Project Overview
 
-**Backend**: RESTful API built with Fastify, Prisma ORM, PostgreSQL, Redis, and JWT authentication
+**Backend**: RESTful API built with Express, Prisma ORM, PostgreSQL, Redis, and JWT authentication
 **Frontend**: Terminal-style UI built with Next.js, featuring CLI commands and draggable windows
 
 ## 🏗️ Architecture
@@ -18,7 +18,7 @@ A full-stack developer portfolio with a unique terminal-style interface. Feature
                     REST API (HTTP)
                           │
 ┌─────────────────────────────────────────────────────────┐
-│                  Backend (Fastify)                       │
+│                  Backend (Express)                      │
 │  Auth • Projects • Journey • Blog • Contact • Media     │
 └─────────────────────────────────────────────────────────┘
                           │
@@ -34,7 +34,7 @@ A full-stack developer portfolio with a unique terminal-style interface. Feature
 
 The frontend implements an industry-grade **Circuit Breaker** pattern for maximum reliability:
 
-1.  **Online Mode**: Fetches data from the `Fastify` backend.
+1.  **Online Mode**: Fetches data from the backend API.
 2.  **Failover**: If the backend is unreachable (3 consecutive failures), the system "opens the circuit".
 3.  **Offline Mode**: Instantly serves optimized static data from local files (`client/src/data`) with **zero latency**.
 4.  **Auto-Recovery**: Automatically attempts to reconnect to the backend every 60 seconds (half-open state).
@@ -75,7 +75,7 @@ cd server
 cp .env.example .env
 
 # Edit .env with your values
-# Required: DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, AWS credentials
+# Required: DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, Cloudinary credentials
 
 # Generate Prisma client
 npm run db:generate
@@ -109,14 +109,14 @@ Frontend will run on http://localhost:3000
 ### 4. Access the Application
 
 - **Frontend**: http://localhost:3000
-- **API Docs**: http://localhost:4000/api-docs (development only)
+- **API Docs**: http://localhost:4000/api/v1/docs
 - **Default Admin**: username: `admin`, password: `admin123`
 
 ## 📁 Project Structure
 
 ```
 .
-├── server/                 # Backend (Fastify + Prisma)
+├── server/                 # Backend (Express + Prisma)
 │   ├── prisma/
 │   │   ├── schema.prisma   # Database schema
 │   │   └── seed.ts         # Database seeding
@@ -131,7 +131,7 @@ Frontend will run on http://localhost:3000
 │   │   ├── routes/         # API routes
 │   │   ├── schemas/        # Zod validation schemas
 │   │   ├── types/          # TypeScript types
-│   │   ├── app.ts          # Fastify app setup
+│   │   ├── app.ts          # Express app setup
 │   │   └── server.ts       # Entry point
 │   └── tests/              # Test files
 │
@@ -163,7 +163,7 @@ Frontend will run on http://localhost:3000
 
 - ✅ JWT authentication with refresh tokens
 - ✅ Account lockout after failed attempts
-- ✅ Projects CRUD with soft delete
+- ✅ Projects CRUD with media uploads
 - ✅ Journey timeline management
 - ✅ Blog posts with draft/published workflow
 - ✅ Contact form with HTML sanitization
@@ -172,7 +172,7 @@ Frontend will run on http://localhost:3000
 - ✅ Swagger API documentation
 - 🚧 Audit logging
 - 🚧 Content versioning
-- 🚧 Media management (S3)
+- ✅ Media management (Cloudinary)
 - 🚧 Background jobs (BullMQ)
 - 🚧 Rate limiting
 - 🚧 Caching layer
@@ -229,10 +229,9 @@ REDIS_HOST=localhost
 REDIS_PORT=6379
 JWT_SECRET=your-super-secret-jwt-key-min-32-chars-long
 JWT_REFRESH_SECRET=your-super-secret-refresh-key-min-32-chars-long
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-aws-access-key
-AWS_SECRET_ACCESS_KEY=your-aws-secret-key
-AWS_S3_BUCKET=anuragos-media
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 ```
 
 ### Frontend (.env.local)
@@ -243,28 +242,28 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 
 ## 📚 API Documentation
 
-When running in development mode, access interactive API documentation at:
-http://localhost:4000/api-docs
+Access the API documentation manifest at:
+http://localhost:4000/api/v1/docs
 
 ### Public Endpoints
 
-- `GET /api/health` - Health check
-- `GET /api/about` - About information
-- `GET /api/projects` - List published projects
-- `GET /api/projects/:id` - Get project details
-- `GET /api/journey` - Journey timeline
-- `GET /api/blog` - List blog posts
-- `POST /api/contact` - Submit contact form
+- `GET /api/v1/health` - Health check
+- `GET /api/v1/profile` - Public profile
+- `GET /api/v1/projects` - List published projects
+- `GET /api/v1/projects/:id` - Get project details
+- `GET /api/v1/journey` - Journey timeline
+- `GET /api/v1/blog` - List blog posts
+- `POST /api/v1/contact` - Submit contact form
 
 ### Admin Endpoints (require authentication)
 
-- `POST /api/auth/login` - Admin login
-- `POST /api/auth/refresh` - Refresh access token
-- `POST /api/auth/logout` - Logout
-- `POST /api/admin/projects` - Create project
-- `PUT /api/admin/projects/:id` - Update project
-- `POST /api/admin/projects/:id/publish` - Publish project
-- `DELETE /api/admin/projects/:id` - Delete project
+- `POST /api/v1/auth/login` - Admin login
+- `POST /api/v1/auth/refresh` - Refresh access token
+- `POST /api/v1/auth/logout` - Logout
+- `POST /api/v1/admin/projects` - Create project
+- `PUT /api/v1/admin/projects/:id` - Update project
+- `PATCH /api/v1/admin/projects/:id/status` - Update project status
+- `DELETE /api/v1/admin/projects/:id` - Delete project
 
 ## 🎨 CLI Commands
 
@@ -328,7 +327,7 @@ Anurag Basuri
 
 ## 🙏 Acknowledgments
 
-- Fastify for the backend framework
+- Express for the backend framework
 - Next.js for the frontend framework
 - Prisma for the ORM
 - Radix UI for accessible components

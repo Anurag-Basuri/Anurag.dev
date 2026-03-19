@@ -146,12 +146,12 @@ The frontend connects to the backend API at `http://localhost:4000` by default.
 
 ### API Endpoints Used
 
-- `GET /api/health` - Health check
-- `GET /api/about` - About information
-- `GET /api/projects` - Published projects
-- `GET /api/journey` - Journey timeline
-- `GET /api/blog` - Blog posts
-- `POST /api/contact` - Submit contact form
+- `GET /api/v1/health` - Health check
+- `GET /api/v1/profile` - Public profile
+- `GET /api/v1/projects` - Published projects
+- `GET /api/v1/journey` - Journey timeline
+- `GET /api/v1/blog` - Blog posts
+- `POST /api/v1/contact` - Submit contact form
 
 ## Customization
 
