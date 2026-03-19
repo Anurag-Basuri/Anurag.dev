@@ -3,7 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
-import type { SlugRequest } from '../utils/types';
+import type { IdRequest } from '../utils/types';
 
 // Health check
 async function healthCheck(_req: Request, res: Response): Promise<void> {
@@ -15,7 +15,10 @@ async function healthCheck(_req: Request, res: Response): Promise<void> {
 
 // Get the public profile (singleton)
 async function getPublicProfile(_req: Request, res: Response): Promise<void> {
-	const profile = await prisma.profile.findUnique({ where: { id: 'main' } });
+	const profile = await prisma.profile.findUnique({
+		where: { id: 'main' },
+		include: { socialLinks: true },
+	});
 	if (!profile) throw ApiError.NotFound('Profile');
 
 	ApiResponse.ok(res, profile);
@@ -32,9 +35,9 @@ async function getPublicProjects(_req: Request, res: Response): Promise<void> {
 }
 
 // Get a single project by slug
-async function getPublicProjectBySlug(req: SlugRequest, res: Response): Promise<void> {
-	const { slug } = req.params;
-	const project = await prisma.project.findUnique({ where: { slug } });
+async function getPublicProjectById(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
+	const project = await prisma.project.findUnique({ where: { id } });
 
 	if (!project || !['published', 'completed'].includes(project.status)) {
 		throw ApiError.NotFound('Project');
@@ -47,7 +50,10 @@ async function getPublicProjectBySlug(req: SlugRequest, res: Response): Promise<
 async function getPublicJourney(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.journeyEntry.findMany({
 		orderBy: { order: 'asc' },
-		include: { achievements: { orderBy: { order: 'asc' } } },
+		include: {
+			achievements: { orderBy: { order: 'asc' } },
+			documents: { orderBy: { createdAt: 'desc' } },
+		},
 	});
 
 	ApiResponse.ok(res, items);
@@ -83,9 +89,9 @@ async function getPublicBlogPosts(_req: Request, res: Response): Promise<void> {
 }
 
 // Get a single blog post by slug (published only)
-async function getPublicBlogPostBySlug(req: SlugRequest, res: Response): Promise<void> {
-	const { slug } = req.params;
-	const post = await prisma.blogPost.findUnique({ where: { slug } });
+async function getPublicBlogPostById(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
+	const post = await prisma.blogPost.findUnique({ where: { id } });
 
 	if (!post || post.status !== 'published') {
 		throw ApiError.NotFound('Blog post');
@@ -115,11 +121,11 @@ export {
 	healthCheck,
 	getPublicProfile,
 	getPublicProjects,
-	getPublicProjectBySlug,
+	getPublicProjectById,
 	getPublicJourney,
 	getPublicAchievements,
 	getPublicCertifications,
 	getPublicBlogPosts,
-	getPublicBlogPostBySlug,
+	getPublicBlogPostById,
 	submitContact,
 };

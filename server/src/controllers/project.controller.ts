@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma';
 import { ApiError } from '../utils/ApiError';
 import { ApiResponse } from '../utils/ApiResponse';
 import { logAudit } from '../lib/audit';
+import { uploadFile, deleteFile, deleteFiles, buildDeleteTarget } from '../lib/cloudinary';
 import type { IdRequest } from '../utils/types';
 
 // Controller functions for project management
@@ -17,10 +18,6 @@ async function listProjects(_req: Request, res: Response): Promise<void> {
 async function createProject(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
-
-	const existing = await prisma.project.findUnique({ where: { slug: data.slug } });
-	if (existing) throw ApiError.Conflict(`Project with slug "${data.slug}" already exists`);
-
 	const project = await prisma.project.create({ data });
 
 	await logAudit({
@@ -42,11 +39,6 @@ async function updateProject(req: IdRequest, res: Response): Promise<void> {
 
 	const existing = await prisma.project.findUnique({ where: { id } });
 	if (!existing) throw ApiError.NotFound('Project');
-
-	if (data.slug && data.slug !== existing.slug) {
-		const slugExists = await prisma.project.findUnique({ where: { slug: data.slug } });
-		if (slugExists) throw ApiError.Conflict(`Project with slug "${data.slug}" already exists`);
-	}
 
 	const project = await prisma.project.update({ where: { id }, data });
 
@@ -98,10 +90,152 @@ async function deleteProject(req: IdRequest, res: Response): Promise<void> {
 		action: 'delete',
 		resourceType: 'Project',
 		resourceId: id,
-		changes: { title: existing.title, slug: existing.slug },
+		changes: { title: existing.title },
 	});
 
 	ApiResponse.noContent(res);
 }
 
-export { listProjects, createProject, updateProject, updateProjectStatus, deleteProject };
+// Upload project thumbnail (replaces existing)
+async function uploadProjectThumbnail(req: IdRequest, res: Response): Promise<void> {
+	if (!req.file) throw ApiError.BadRequest('No file provided');
+	const { id } = req.params;
+	const adminId = req.admin!.adminId;
+
+	const existing = await prisma.project.findUnique({ where: { id } });
+	if (!existing) throw ApiError.NotFound('Project');
+
+	const result = await uploadFile(req.file, { folder: 'portfolio/projects/thumbnails' });
+
+	if (existing.thumbnail) {
+		const target = buildDeleteTarget(existing.thumbnail);
+		if (target) await deleteFile(target);
+	}
+
+	const project = await prisma.project.update({
+		where: { id },
+		data: { thumbnail: result.url },
+	});
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Project',
+		resourceId: id,
+		changes: { thumbnail: result.url },
+	});
+
+	ApiResponse.ok(res, project, 'Thumbnail uploaded');
+}
+
+// Append project images
+async function uploadProjectImages(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
+	const adminId = req.admin!.adminId;
+	const files = req.files as Express.Multer.File[] | undefined;
+	if (!files?.length) throw ApiError.BadRequest('No files provided');
+
+	const existing = await prisma.project.findUnique({ where: { id } });
+	if (!existing) throw ApiError.NotFound('Project');
+
+	const uploads = await Promise.all(
+		files.map(file => uploadFile(file, { folder: 'portfolio/projects/images' })),
+	);
+
+	const newUrls = uploads.map(upload => upload.url);
+	const project = await prisma.project.update({
+		where: { id },
+		data: { images: [...existing.images, ...newUrls] },
+	});
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Project',
+		resourceId: id,
+		changes: { imagesAdded: newUrls },
+	});
+
+	ApiResponse.ok(res, project, 'Images uploaded');
+}
+
+// Replace all project images
+async function replaceProjectImages(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
+	const adminId = req.admin!.adminId;
+	const files = req.files as Express.Multer.File[] | undefined;
+	if (!files?.length) throw ApiError.BadRequest('No files provided');
+
+	const existing = await prisma.project.findUnique({ where: { id } });
+	if (!existing) throw ApiError.NotFound('Project');
+
+	const uploads = await Promise.all(
+		files.map(file => uploadFile(file, { folder: 'portfolio/projects/images' })),
+	);
+	const newUrls = uploads.map(upload => upload.url);
+
+	const deleteTargets = existing.images
+		.map(image => buildDeleteTarget(image))
+		.filter((target): target is NonNullable<typeof target> => Boolean(target));
+	if (deleteTargets.length) await deleteFiles(deleteTargets);
+
+	const project = await prisma.project.update({
+		where: { id },
+		data: { images: newUrls },
+	});
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Project',
+		resourceId: id,
+		changes: { imagesReplaced: newUrls },
+	});
+
+	ApiResponse.ok(res, project, 'Images replaced');
+}
+
+// Delete selected project images
+async function deleteProjectImages(req: IdRequest, res: Response): Promise<void> {
+	const { id } = req.params;
+	const { urls } = req.body as { urls: string[] };
+	const adminId = req.admin!.adminId;
+
+	const existing = await prisma.project.findUnique({ where: { id } });
+	if (!existing) throw ApiError.NotFound('Project');
+
+	const toRemove = existing.images.filter(image => urls.includes(image));
+	const remaining = existing.images.filter(image => !urls.includes(image));
+
+	const deleteTargets = toRemove
+		.map(image => buildDeleteTarget(image))
+		.filter((target): target is NonNullable<typeof target> => Boolean(target));
+	if (deleteTargets.length) await deleteFiles(deleteTargets);
+
+	const project = await prisma.project.update({
+		where: { id },
+		data: { images: remaining },
+	});
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Project',
+		resourceId: id,
+		changes: { imagesRemoved: toRemove },
+	});
+
+	ApiResponse.ok(res, project, 'Images deleted');
+}
+
+export {
+	listProjects,
+	createProject,
+	updateProject,
+	updateProjectStatus,
+	deleteProject,
+	uploadProjectThumbnail,
+	uploadProjectImages,
+	replaceProjectImages,
+	deleteProjectImages,
+};
