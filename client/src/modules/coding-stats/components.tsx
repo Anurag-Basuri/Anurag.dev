@@ -15,11 +15,11 @@ import { ANIM_DURATION, DIFF_CONFIG, LEETCODE_MAX, type PlatformConfig } from '.
 export function CodingStatsSkeleton() {
 	return (
 		<div className="p-4 sm:p-6 md:p-12 space-y-6 animate-pulse max-w-7xl mx-auto pb-32">
-			<div className="h-10 bg-white/5 rounded w-56 mb-8" />
+			<div className="h-10 bg-foreground/5 rounded w-56 mb-8" />
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-				<div className="h-[400px] border border-white/5 bg-white/5 rounded-[2.5rem] md:col-span-2 lg:col-span-2 lg:row-span-2" />
+				<div className="h-[400px] border border-border bg-foreground/5 rounded-[2.5rem] md:col-span-2 lg:col-span-2 lg:row-span-2" />
 				{[1, 2, 3].map(i => (
-					<div key={i} className="h-64 rounded-[2.5rem] border border-white/5 bg-white/5" />
+					<div key={i} className="h-64 rounded-[2.5rem] border border-border bg-foreground/5" />
 				))}
 			</div>
 		</div>
@@ -85,8 +85,8 @@ export const CircularProgress = memo(function CircularProgress({
 				/>
 			</svg>
 			<div className="absolute inset-0 flex flex-col items-center justify-center pt-1 z-20">
-				<span className="text-3xl sm:text-4xl font-black text-white tracking-tighter drop-shadow-md">{value}</span>
-				<span className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em] mt-1">
+				<span className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter drop-shadow-md">{value}</span>
+				<span className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1">
 					solved
 				</span>
 			</div>
@@ -114,7 +114,7 @@ export const DifficultyBar = memo(function DifficultyBar({
 		<div className="space-y-2">
 			<div className="flex justify-between items-end text-xs px-1">
 				<span className={cn('font-black uppercase tracking-[0.15em]', config.color)}>{config.label}</span>
-				<span className="text-white font-bold">{count}</span>
+				<span className="text-foreground font-bold">{count}</span>
 			</div>
 			<div className={cn('h-2.5 w-full rounded-full overflow-hidden border border-black/50 shadow-inner', config.container)}>
 				<motion.div
@@ -135,11 +135,11 @@ export const DifficultyBar = memo(function DifficultyBar({
 
 export function StatPill({ label, value }: { label: string; value: string | number }) {
 	return (
-		<div className="flex flex-col justify-center px-4 py-3 rounded-2xl bg-black/40 border border-white/5 shadow-inner transition-colors group-hover:bg-[#0a0a0a]">
-			<div className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">
+		<div className="flex flex-col justify-center px-4 py-3 rounded-2xl bg-background/40 border border-border shadow-inner transition-colors group-hover:bg-card">
+			<div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
 				{label}
 			</div>
-			<div className="text-xl sm:text-2xl font-black text-white tracking-tight">{value}</div>
+			<div className="text-xl sm:text-2xl font-black text-foreground tracking-tight">{value}</div>
 		</div>
 	);
 }
@@ -166,21 +166,21 @@ export const LinkOnlyCard = memo(function LinkOnlyCard({
 			rel="noopener noreferrer"
 			whileHover={cardHover}
 			className={cn(
-				'group relative flex items-center gap-5 p-5 md:p-6 rounded-3xl bg-linear-to-br border border-white/10 backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
+				'group relative flex items-center gap-5 p-5 md:p-6 rounded-3xl bg-linear-to-br border border-border backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
 				config.accentBorder,
 				config.accentBg,
 			)}
 		>
-			<div className={cn('p-4 rounded-3xl bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+			<div className={cn('p-4 rounded-3xl bg-card border border-border shadow-xl', config.accentText)}>
 				<Icon className="w-8 h-8" />
 			</div>
 			<div className="flex-1 min-w-0">
-				<h3 className="text-lg sm:text-xl font-black text-white tracking-tight">{config.name}</h3>
+				<h3 className="text-lg sm:text-xl font-black text-foreground tracking-tight">{config.name}</h3>
 				<p className={cn('text-[10px] font-black uppercase tracking-wider mt-1 truncate', config.accentText)}>
 					@{username}
 				</p>
 			</div>
-			<ExternalLink className="w-5 h-5 text-white/30 group-hover:text-white transition-colors shrink-0 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+			<ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 		</motion.a>
 	);
 });
@@ -211,7 +211,7 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 			viewport={{ once: true }}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br border border-white/10 backdrop-blur-md p-6 sm:p-8 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
+				'group relative rounded-3xl bg-linear-to-br border border-border backdrop-blur-md p-6 sm:p-8 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -222,11 +222,11 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 			{/* Header */}
 			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-10 relative z-10">
 				<div className="flex items-center gap-5">
-					<div className={cn('p-4 rounded-3xl bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+					<div className={cn('p-4 rounded-3xl bg-card border border-border shadow-xl', config.accentText)}>
 						<Icon className="w-10 sm:w-12 h-10 sm:h-12" />
 					</div>
 					<div>
-						<h2 className="text-xl sm:text-3xl font-black text-white tracking-tight mb-1">{config.name}</h2>
+						<h2 className="text-xl sm:text-3xl font-black text-foreground tracking-tight mb-1">{config.name}</h2>
 						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em]', config.accentText)}>
 							@{platform.username}
 						</p>
@@ -236,14 +236,14 @@ export const LeetCodeCard = memo(function LeetCodeCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-black/40 border border-white/10 text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-400 hover:text-white hover:bg-[#0a0a0a] hover:border-amber-500/30 transition-all self-start shadow-inner"
+					className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-background/40 border border-border text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-400 hover:text-foreground hover:bg-card hover:border-amber-500/30 transition-all self-start shadow-inner"
 				>
 					Profile <ExternalLink className="w-3.5 h-3.5" />
 				</a>
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-[#0a0a0a]/40 p-5 sm:p-6 rounded-2xl border border-white/5 w-full">
+			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-card/40 p-5 sm:p-6 rounded-2xl border border-border w-full">
 				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} size={130} />
 				<div className="flex-1 w-full space-y-5">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
@@ -280,7 +280,7 @@ export const GitHubCard = memo(function GitHubCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-white/10 p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-border p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -291,11 +291,11 @@ export const GitHubCard = memo(function GitHubCard({
 			{/* Header */}
 			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
 				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-[1.2rem] bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+					<div className={cn('p-3 rounded-[1.2rem] bg-card border border-border shadow-xl', config.accentText)}>
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">{config.name}</h3>
+						<h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
 						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
@@ -305,7 +305,7 @@ export const GitHubCard = memo(function GitHubCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="p-3 rounded-xl bg-black/40 border border-white/5 text-zinc-400 hover:text-white hover:bg-[#0a0a0a] hover:border-zinc-500/30 transition-all self-start shadow-inner"
+					className="p-3 rounded-xl bg-background/40 border border-border text-zinc-400 hover:text-foreground hover:bg-card hover:border-zinc-500/30 transition-all self-start shadow-inner"
 					aria-label="View GitHub profile"
 				>
 					<ExternalLink className="w-4 h-4" />
@@ -342,7 +342,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-white/10 p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-border p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -352,11 +352,11 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 			{/* Header */}
 			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
 				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-[1.2rem] bg-[#0a0a0a] border border-white/10 shadow-xl', config.accentText)}>
+					<div className={cn('p-3 rounded-[1.2rem] bg-card border border-border shadow-xl', config.accentText)}>
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">{config.name}</h3>
+						<h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
 						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
@@ -366,7 +366,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className={cn('p-3 rounded-xl bg-black/40 border border-white/5 hover:text-white hover:bg-[#0a0a0a] transition-all self-start shadow-inner', config.accentText, `hover:border-${config.accentBg.split('-')[1]}-500/30`)}
+					className={cn('p-3 rounded-xl bg-background/40 border border-border hover:text-foreground hover:bg-card transition-all self-start shadow-inner', config.accentText, `hover:border-${config.accentBg.split('-')[1]}-500/30`)}
 					aria-label={`View ${config.name} profile`}
 				>
 					<ExternalLink className="w-4 h-4" />

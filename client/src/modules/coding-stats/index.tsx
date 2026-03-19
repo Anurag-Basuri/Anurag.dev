@@ -87,10 +87,10 @@ export function CodingStatsModule() {
 				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-6 shadow-inner">
 					<Terminal className="w-8 h-8 text-orange-400" />
 				</div>
-				<p className="text-xl font-bold text-white mb-2 tracking-tight">
+				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">
 					{error ? 'Failed to Sync Telemetry' : 'No Profiles Configured'}
 				</p>
-				<p className="text-sm text-white/50 mb-8 max-w-sm">
+				<p className="text-sm text-muted-foreground mb-8 max-w-sm">
 					{error || "Connect your coding profiles in the admin dashboard to see your stats here."}
 				</p>
 			</div>

@@ -75,6 +75,8 @@ function StarfieldPoints({ count = 2200 }: { count?: number }) {
 export function StarfieldWarp() {
 	const [mounted, setMounted] = useState(false);
 	const [dpr, setDpr] = useState<[number, number]>([1, 1.5]);
+	const themeName = useThemeName();
+	const fogColor = THEMES[themeName].bg;
 
 	useEffect(() => setMounted(true), []);
 	if (!mounted) return null;
@@ -96,7 +98,7 @@ export function StarfieldWarp() {
 				style={{ background: 'transparent' }}
 			>
 				<PerformanceMonitor onDecline={() => setDpr([1, 1])} onIncline={() => setDpr([1, 1.5])} />
-				<fog attach="fog" args={['#000000', 10, 120]} />
+				<fog attach="fog" args={[fogColor, 10, 120]} />
 				<StarfieldPoints />
 			</Canvas>
 		</div>

@@ -22,7 +22,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 						toastOptions={{
 							duration: 3500,
 							className:
-								'!rounded-xl !border !border-white/10 !bg-black/90 !text-white !backdrop-blur-xl !shadow-2xl',
+								'!rounded-xl !border !border-border !bg-background/90 !text-white !backdrop-blur-xl !shadow-2xl',
 						}}
 					/>
 				</ErrorBoundary>

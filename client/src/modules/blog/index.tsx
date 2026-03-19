@@ -77,17 +77,17 @@ function BlogSkeleton() {
 		<div className="p-4 sm:p-6 md:p-12 space-y-8 animate-pulse max-w-7xl mx-auto pb-32">
 			<div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 pb-8">
 				<div className="space-y-4 w-full md:w-auto">
-					<div className="h-6 w-32 bg-white/5 rounded-lg" />
-					<div className="h-12 w-64 bg-white/5 rounded-xl" />
-					<div className="h-5 w-80 bg-white/5 rounded-lg hidden sm:block" />
+					<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
+					<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
+					<div className="h-5 w-80 bg-foreground/5 rounded-lg hidden sm:block" />
 				</div>
-				<div className="h-12 w-full md:w-80 bg-white/5 rounded-2xl" />
+				<div className="h-12 w-full md:w-80 bg-foreground/5 rounded-2xl" />
 			</div>
 
-			<div className="h-[400px] mb-8 bg-white/5 rounded-[2.5rem]" />
+			<div className="h-[400px] mb-8 bg-foreground/5 rounded-[2.5rem]" />
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr">
 				{[1, 2, 3].map(i => (
-					<div key={i} className="h-96 bg-white/5 rounded-[2.5rem]" />
+					<div key={i} className="h-96 bg-foreground/5 rounded-[2.5rem]" />
 				))}
 			</div>
 		</div>
@@ -102,7 +102,7 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 
 	return (
 		<div className="space-y-3">
-			<div className="relative aspect-video rounded-2xl sm:rounded-3xl overflow-hidden border border-white/10 bg-black">
+			<div className="relative aspect-video rounded-2xl sm:rounded-3xl overflow-hidden border border-border bg-black">
 				<Image
 					src={images[current] ?? ''}
 					alt={`Image ${current + 1}`}
@@ -116,19 +116,19 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 					<>
 						<button
 							onClick={() => setCurrent(p => (p - 1 + images.length) % images.length)}
-							className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/80 hover:scale-110 transition-all"
+							className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-background/40 backdrop-blur-md border border-border text-foreground/70 hover:text-foreground hover:bg-background/80 hover:scale-110 transition-all"
 							aria-label="Previous image"
 						>
-							<ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5 text-white" />
+							<ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5 text-foreground" />
 						</button>
 						<button
 							onClick={() => setCurrent(p => (p + 1) % images.length)}
-							className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/80 hover:scale-110 transition-all"
+							className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full bg-background/40 backdrop-blur-md border border-border text-foreground/70 hover:text-foreground hover:bg-background/80 hover:scale-110 transition-all"
 							aria-label="Next image"
 						>
-							<ChevronRight className="w-4 sm:w-5 h-4 sm:h-5 text-white" />
+							<ChevronRight className="w-4 sm:w-5 h-4 sm:h-5 text-foreground" />
 						</button>
-						<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
+						<div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 rounded-full bg-background/40 backdrop-blur-md border border-border">
 							{images.map((_, i) => (
 								<button
 									key={i}
@@ -137,7 +137,7 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 										'h-2 rounded-full transition-all duration-300',
 										i === current
 											? 'bg-indigo-400 w-8'
-											: 'bg-white/40 hover:bg-white/70 w-2',
+											: 'bg-white/40 hover:bg-foreground/70 w-2',
 									)}
 									aria-label={`Go to image ${i + 1}`}
 								/>
@@ -169,11 +169,11 @@ const FeaturedCard = memo(function FeaturedCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
+			className="group relative rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
-			<div className="relative h-64 sm:h-80 md:h-[400px] lg:h-[450px] w-full bg-[#050505]">
+			<div className="relative h-64 sm:h-80 md:h-[400px] lg:h-[450px] w-full bg-card">
 				<UrlThumbnail
 					url={post.coverImage || post.link}
 					title={post.title ?? 'Blog post'}
@@ -189,13 +189,13 @@ const FeaturedCard = memo(function FeaturedCard({
 
 				{/* Badges/Tags over image */}
 				<div className="absolute top-4 left-4 sm:top-6 sm:left-6 flex flex-wrap gap-2 z-20">
-					<span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-indigo-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-500/30">
+					<span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-indigo-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground shadow-lg shadow-indigo-500/30">
 						Latest
 					</span>
 					{tags.slice(0, 2).map(tag => (
 						<span
 							key={tag}
-							className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-white/70 hidden sm:block"
+							className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background/50 backdrop-blur-md border border-border text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-foreground/70 hidden sm:block"
 						>
 							{tag}
 						</span>
@@ -209,7 +209,7 @@ const FeaturedCard = memo(function FeaturedCard({
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
-						className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 sm:p-3 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white/60 hover:text-indigo-400 hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all z-20"
+						className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 sm:p-3 rounded-full bg-background/50 backdrop-blur-md border border-border text-muted-foreground hover:text-indigo-400 hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all z-20"
 						aria-label="Open external link"
 					>
 						<ExternalLink className="w-4 sm:w-5 h-4 sm:h-5 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
@@ -231,11 +231,11 @@ const FeaturedCard = memo(function FeaturedCard({
 							</span>
 						</div>
 
-						<h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-3 sm:mb-5 group-hover:text-indigo-100 transition-colors duration-300 line-clamp-2">
+						<h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground leading-tight tracking-tight mb-3 sm:mb-5 group-hover:text-indigo-100 transition-colors duration-300 line-clamp-2">
 							{post.title ?? 'Untitled'}
 						</h2>
 
-						<p className="text-sm md:text-base text-white/60 line-clamp-2 leading-relaxed font-medium max-w-2xl hidden sm:block">
+						<p className="text-sm md:text-base text-muted-foreground line-clamp-2 leading-relaxed font-medium max-w-2xl hidden sm:block">
 							{post.content ?? ''}
 						</p>
 					</div>
@@ -265,12 +265,12 @@ const PostCard = memo(function PostCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative flex flex-col h-full rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
+			className="group relative flex flex-col h-full rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
 			{/* Thumbnail */}
-			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-white/5 bg-[#050505]">
+			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-border bg-card">
 				<UrlThumbnail
 					url={post.coverImage || post.link}
 					title={post.title ?? 'Blog post'}
@@ -289,7 +289,7 @@ const PostCard = memo(function PostCard({
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
-						className="absolute top-3 right-3 p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-white/50 hover:text-indigo-400 hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all z-20 group/link"
+						className="absolute top-3 right-3 p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border text-muted-foreground hover:text-indigo-400 hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all z-20 group/link"
 						aria-label="Open external link"
 					>
 						<ExternalLink className="w-3.5 h-3.5 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
@@ -305,27 +305,27 @@ const PostCard = memo(function PostCard({
 					<span>{readingTime(post.content)} min</span>
 				</div>
 
-				<h3 className="text-xl font-black text-white leading-tight tracking-tight mb-3 group-hover:text-indigo-100 transition-colors line-clamp-2">
+				<h3 className="text-xl font-black text-foreground leading-tight tracking-tight mb-3 group-hover:text-indigo-100 transition-colors line-clamp-2">
 					{post.title ?? 'Untitled'}
 				</h3>
 
-				<p className="text-sm text-white/60 line-clamp-2 leading-relaxed mb-6 font-medium">
+				<p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-6 font-medium">
 					{post.content ?? ''}
 				</p>
 
 				{/* Tags */}
 				{(tags ?? []).length > 0 && (
-					<div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-white/5">
+					<div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-border">
 						{tags.slice(0, 3).map(tag => (
 							<span
 								key={tag}
-								className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-[#0a0a0a] border border-white/10 text-white/70 shadow-xl group-hover:border-indigo-500/20 group-hover:text-indigo-400 transition-colors"
+								className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-card border border-border text-foreground/70 shadow-xl group-hover:border-indigo-500/20 group-hover:text-indigo-400 transition-colors"
 							>
 								{tag}
 							</span>
 						))}
 						{tags.length > 3 && (
-							<span className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-[#0a0a0a] border border-white/10 text-white/40 shadow-xl">
+							<span className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-card border border-border text-muted-foreground shadow-xl">
 								+{tags.length - 3}
 							</span>
 						)}
@@ -375,7 +375,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				animate="visible"
 				exit="hidden"
 				onClick={onClose}
-				className="absolute inset-0 bg-black/90 backdrop-blur-3xl"
+				className="absolute inset-0 bg-background/90 backdrop-blur-3xl"
 			/>
 
 			{/* Modal Container */}
@@ -384,7 +384,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
-				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-[#050505] border border-white/10 rounded-3xl sm:rounded-[2rem] shadow-2xl flex flex-col z-10 overflow-hidden"
+				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-card border border-border rounded-3xl sm:rounded-[2rem] shadow-2xl flex flex-col z-10 overflow-hidden"
 			>
 				{/* Top Bar with Progress */}
 				<div className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-linear-to-b from-[#050505] to-transparent pointer-events-none">
@@ -414,7 +414,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 					)}
 					<button
 						onClick={onClose}
-						className="p-3 rounded-full bg-black/50 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white backdrop-blur-md transition-all hover:rotate-90 hover:scale-105 shadow-xl"
+						className="p-3 rounded-full bg-background/50 hover:bg-foreground/10 border border-border text-foreground/70 hover:text-foreground backdrop-blur-md transition-all hover:rotate-90 hover:scale-105 shadow-xl"
 						aria-label="Close article"
 					>
 						<X className="w-5 h-5" />
@@ -434,7 +434,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				>
 					<div className="flex flex-col relative pb-32">
 						{/* Massive Hero Cover */}
-						<div className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] shrink-0 bg-[#0a0a0a]">
+						<div className="relative w-full h-[30vh] sm:h-[40vh] md:h-[50vh] shrink-0 bg-card">
 							{post.coverImage ? (
 								<>
 									<Image
@@ -460,17 +460,17 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							{/* Header Meta */}
 							<div className="mb-6 space-y-5">
 								<div className="flex flex-wrap items-center gap-3 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-300">
-									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 shadow-xl backdrop-blur-md">
+									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border shadow-xl backdrop-blur-md">
 										<Calendar className="w-3.5 h-3.5" />
 										{formatDate(post.publishedAt ?? post.createdAt)}
 									</span>
-									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 shadow-xl backdrop-blur-md">
+									<span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border shadow-xl backdrop-blur-md">
 										<Clock className="w-3.5 h-3.5" />
 										{readingTime(post.content)} min read
 									</span>
 								</div>
 
-								<h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-[1.15] tracking-tight drop-shadow-2xl">
+								<h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-foreground leading-[1.15] tracking-tight drop-shadow-2xl">
 									{post.title ?? 'Untitled Article'}
 								</h1>
 								
@@ -489,7 +489,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							</div>
 
 							{/* Main Body */}
-							<article className="prose prose-invert prose-base md:prose-lg max-w-none text-white/80 leading-loose font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-3xl prose-img:border prose-img:border-white/10">
+							<article className="prose prose-invert prose-base md:prose-lg max-w-none text-foreground/80 leading-loose font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-3xl prose-img:border prose-img:border-border">
 								{/* 
 									Since raw markdown isn't processed by a markdown parser here,
 									we maintain the whitespace-pre-wrap but style it beautifully.
@@ -501,7 +501,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 							{/* Image Gallery */}
 							{allImages.length > 1 && (
-								<div className="mt-16 pt-10 border-t border-white/10">
+								<div className="mt-16 pt-10 border-t border-border">
 									<h4 className="text-xs font-black uppercase tracking-[0.2em] text-indigo-500 mb-8 flex items-center gap-3">
 										<BookOpen className="w-4 h-4" />
 										Article Media Gallery
@@ -511,7 +511,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							)}
 
 							{/* Footer Meta */}
-							<div className="mt-16 sm:mt-24 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[10px] font-mono font-bold uppercase tracking-widest text-white/30">
+							<div className="mt-16 sm:mt-24 pt-8 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
 								<span>ID: {post.id}</span>
 								{post.updatedAt && post.updatedAt !== post.createdAt && (
 									<span>Last Updated: {formatDate(post.updatedAt)}</span>
@@ -566,13 +566,13 @@ export function BlogModule() {
 				<div className="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/20 mb-6 shadow-inner shadow-rose-500/20">
 					<BookOpen className="w-8 h-8 text-rose-400" />
 				</div>
-				<p className="text-xl font-bold text-white mb-2 tracking-tight">
+				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">
 					Failed to load articles
 				</p>
-				<p className="text-sm text-white/50 mb-8 max-w-sm">{error}</p>
+				<p className="text-sm text-muted-foreground mb-8 max-w-sm">{error}</p>
 				<button
 					onClick={() => window.location.reload()}
-					className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-wider text-white hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 shadow-lg"
+					className="px-6 py-3 rounded-xl bg-foreground/5 border border-border text-xs font-bold uppercase tracking-wider text-foreground hover:bg-foreground/10 hover:border-white/20 transition-all active:scale-95 shadow-lg"
 				>
 					Try Again
 				</button>
@@ -593,11 +593,11 @@ export function BlogModule() {
 				/>
 
 				{posts.length === 0 ? (
-					<div className="flex flex-col items-center justify-center py-24 mt-4 text-muted-foreground border border-dashed border-white/10 rounded-[2.5rem] bg-[#0a0a0a]/50">
-						<div className="p-4 rounded-full bg-white/5 mb-6 shadow-inner">
+					<div className="flex flex-col items-center justify-center py-24 mt-4 text-muted-foreground border border-dashed border-border rounded-[2.5rem] bg-card/50">
+						<div className="p-4 rounded-full bg-foreground/5 mb-6 shadow-inner">
 							<BookOpen className="w-8 h-8 text-indigo-400/50" />
 						</div>
-						<p className="text-lg font-medium text-white/80 px-4 text-center">
+						<p className="text-lg font-medium text-foreground/80 px-4 text-center">
 							No articles published yet.
 						</p>
 					</div>

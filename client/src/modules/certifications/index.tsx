@@ -17,15 +17,15 @@ function CertificationsSkeleton() {
 	return (
 		<div className="p-6 md:p-12 max-w-6xl mx-auto animate-pulse pb-32">
 			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-32 bg-white/5 rounded-lg" />
-				<div className="h-12 w-64 bg-white/5 rounded-xl" />
-				<div className="h-5 w-80 bg-white/5 rounded-lg" />
+				<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
+				<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
+				<div className="h-5 w-80 bg-foreground/5 rounded-lg" />
 			</div>
 			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-fr">
 				{[1, 2, 3, 4].map(i => (
 					<div
 						key={i}
-						className="h-80 bg-white/5 rounded-[2.5rem]"
+						className="h-80 bg-foreground/5 rounded-[2.5rem]"
 					/>
 				))}
 			</div>
@@ -40,13 +40,13 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
+			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-3xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
 		>
 			{/* Ambient Glow */}
 			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/10 transition-colors duration-500 pointer-events-none" />
 
 			{/* Thumbnail */}
-			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-white/5 bg-[#0a0a0a]">
+			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-border bg-card">
 				<UrlThumbnail
 					url={cert.certificateUrl || cert.credentialUrl}
 					title={`${cert.title} certificate`}
@@ -61,15 +61,15 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 			<div className="p-6 relative z-10 flex flex-col grow -mt-6">
 				{/* Issuer Badge overhanging image */}
 				<div className="flex justify-between items-start mb-6">
-					<div className="flex items-center gap-2 px-3 py-1.5 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-xl w-fit group-hover:scale-105 group-hover:border-cyan-500/30 transition-all duration-500">
+					<div className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-2xl shadow-xl w-fit group-hover:scale-105 group-hover:border-cyan-500/30 transition-all duration-500">
 						<ShieldCheck className="w-4 h-4 text-cyan-400" />
-						<span className="text-[10px] font-black uppercase tracking-widest text-white/90">
+						<span className="text-[10px] font-black uppercase tracking-widest text-foreground/90">
 							{cert.issuer}
 						</span>
 					</div>
 				</div>
 
-				<h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-cyan-400 transition-colors mb-3">
+				<h3 className="text-xl font-black text-foreground tracking-tight leading-tight group-hover:text-cyan-400 transition-colors mb-3">
 					{cert.title}
 				</h3>
 
@@ -86,7 +86,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 						{(cert.skills ?? []).map(skill => (
 							<span
 								key={skill}
-								className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-white/5 text-muted-foreground border border-white/10 group-hover:border-cyan-500/30 group-hover:text-white/90 transition-colors shadow-inner"
+								className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-cyan-500/30 group-hover:text-foreground/90 transition-colors shadow-inner"
 							>
 								{skill}
 							</span>
@@ -95,12 +95,12 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 				)}
 
 				{cert.credentialUrl && (
-					<div className="mt-auto pt-5 border-t border-white/5 flex items-center justify-between">
+					<div className="mt-auto pt-5 border-t border-border flex items-center justify-between">
 						<a
 							href={cert.credentialUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/60 hover:text-cyan-400 transition-colors group/link"
+							className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-cyan-400 transition-colors group/link"
 							aria-label={`Verify credential for ${cert.title}`}
 						>
 							Verify Credential
@@ -142,7 +142,7 @@ export function CertificationModule() {
 				/>
 
 				{certs.length === 0 ? (
-					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
 						No verified credentials found.
 					</div>
 				) : (
