@@ -113,7 +113,7 @@ export function SectionHeader({
 			initial="hidden"
 			whileInView="visible"
 			viewport={{ once: true, margin: '-20px' }}
-			className="relative flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8 pb-4 border-b border-white/5"
+			className="relative flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8 pb-4 border-b border-border"
 		>
 			<div className="relative z-10">
 				<motion.div

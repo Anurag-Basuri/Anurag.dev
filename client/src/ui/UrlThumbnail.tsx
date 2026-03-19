@@ -68,7 +68,7 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 	if (kind === 'image' && url && !imgFailed) {
 		return (
 			<>
-				<div className="absolute inset-0 bg-[#050505] z-0" />
+				<div className="absolute inset-0 bg-card z-0" />
 				<Image
 					src={url}
 					alt={title}
@@ -87,7 +87,7 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		const screenshotSrc = getScreenshotUrl(url);
 		return (
 			<>
-				<div className="absolute inset-0 bg-[#050505] z-0" />
+				<div className="absolute inset-0 bg-card z-0" />
 				<Image
 					src={screenshotSrc}
 					alt={`Preview of ${title}`}
@@ -99,9 +99,9 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 					unoptimized
 				/>
 				{/* Small website badge */}
-				<div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/70 backdrop-blur-md border border-white/10">
-					<Globe className="w-3 h-3 text-white/60" />
-					<span className="text-[8px] font-bold text-white/60 uppercase tracking-wider">Live Preview</span>
+				<div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 px-2 py-1 rounded-md bg-background/70 backdrop-blur-md border border-border">
+					<Globe className="w-3 h-3 text-muted-foreground" />
+					<span className="text-[8px] font-bold text-muted-foreground uppercase tracking-wider">Live Preview</span>
 				</div>
 			</>
 		);
@@ -130,9 +130,9 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 			className={`w-full h-full bg-linear-to-br ${fallbackGradient} via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-3 relative overflow-hidden`}
 		>
 			<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-			<FallbackIcon className="w-10 h-10 text-white/10 group-hover:text-white/20 transition-colors duration-500 relative" />
+			<FallbackIcon className="w-10 h-10 text-white/10 group-hover:text-muted-foreground transition-colors duration-500 relative" />
 			{fallbackLabel && (
-				<span className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/20 relative">
+				<span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground relative">
 					{fallbackLabel}
 				</span>
 			)}

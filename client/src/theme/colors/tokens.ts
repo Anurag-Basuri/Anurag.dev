@@ -50,6 +50,11 @@ export interface ThemePalette {
   shadowLg: string;
   shadowXl: string;
   shadowPremium: string;
+
+  // ── Semantic Status Colors ──
+  success: string;
+  warning: string;
+  info: string;
 }
 
 // ─── Theme Definitions ─────────────────────────────────────────────────────────
@@ -90,6 +95,9 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     shadowLg: '0 12px 20px -4px rgba(0,0,0,0.6)',
     shadowXl: '0 24px 32px -6px rgba(0,0,0,0.7)',
     shadowPremium: '0 0 0 1px rgba(52,211,153,0.06), 0 20px 50px -10px rgba(0,0,0,0.8)',
+    success: '#34d399',
+    warning: '#fbbf24',
+    info: '#22d3ee',
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -126,6 +134,9 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     shadowLg: '0 12px 20px -4px rgba(0,0,0,0.6)',
     shadowXl: '0 24px 32px -6px rgba(0,0,0,0.7)',
     shadowPremium: '0 0 0 1px rgba(245,158,11,0.06), 0 20px 50px -10px rgba(0,0,0,0.8)',
+    success: '#34d399',
+    warning: '#fb923c',
+    info: '#fbbf24',
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -162,6 +173,9 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     shadowLg: '0 10px 15px -3px rgba(0,0,0,0.06)',
     shadowXl: '0 20px 25px -5px rgba(0,0,0,0.06)',
     shadowPremium: '0 0 0 1px rgba(236,72,153,0.08), 0 10px 30px -5px rgba(0,0,0,0.06)',
+    success: '#059669',
+    warning: '#d97706',
+    info: '#0891b2',
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -198,6 +212,9 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     shadowLg: '0 10px 15px -3px rgba(0,0,0,0.05)',
     shadowXl: '0 20px 25px -5px rgba(0,0,0,0.05)',
     shadowPremium: '0 0 0 1px rgba(0,0,0,0.04), 0 10px 30px -5px rgba(0,0,0,0.06)',
+    success: '#16a34a',
+    warning: '#ca8a04',
+    info: '#0284c7',
   },
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -234,6 +251,9 @@ export const THEMES: Record<ThemeName, ThemePalette> = {
     shadowLg: '0 12px 20px -4px rgba(0,0,0,0.6)',
     shadowXl: '0 24px 32px -6px rgba(0,0,0,0.7)',
     shadowPremium: '0 0 0 1px rgba(167,139,250,0.06), 0 20px 50px -10px rgba(0,0,0,0.8)',
+    success: '#a78bfa',
+    warning: '#c084fc',
+    info: '#22d3ee',
   },
 
 } as const;

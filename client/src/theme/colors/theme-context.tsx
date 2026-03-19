@@ -88,6 +88,11 @@ export function ThemeContextProvider({ children }: { children: ReactNode }) {
     s.setProperty('--shadow-xl', theme.shadowXl);
     s.setProperty('--shadow-premium', theme.shadowPremium);
 
+    // ── Semantic status colors ──
+    s.setProperty('--theme-success', theme.success);
+    s.setProperty('--theme-warning', theme.warning);
+    s.setProperty('--theme-info', theme.info);
+
     // ── Data attributes & class toggles ──
     root.dataset.theme = themeName;
     root.classList.toggle('dark', isDark);

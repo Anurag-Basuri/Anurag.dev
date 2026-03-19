@@ -125,17 +125,17 @@ export class ErrorBoundary extends Component<Props, State> {
 
 		return (
 			<div className="flex h-full w-full items-center justify-center p-6">
-				<div className="w-full max-w-sm rounded-2xl border border-white/10 bg-black/80 p-6 text-center shadow-2xl backdrop-blur-xl">
+				<div className="w-full max-w-sm rounded-2xl border border-border bg-background/80 p-6 text-center shadow-2xl backdrop-blur-xl">
 					{/* Icon */}
 					<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-rose-500/10 ring-1 ring-rose-500/20">
 						<AlertTriangle className="h-7 w-7 text-rose-400" />
 					</div>
 
-					<h2 className="mb-1 text-base font-bold text-white">Something went wrong</h2>
+					<h2 className="mb-1 text-base font-bold text-foreground">Something went wrong</h2>
 					{this.props.label && (
-						<p className="mb-1 text-xs font-mono text-white/30">{this.props.label}</p>
+						<p className="mb-1 text-xs font-mono text-muted-foreground">{this.props.label}</p>
 					)}
-					<p className="mb-4 text-sm text-white/50">
+					<p className="mb-4 text-sm text-muted-foreground">
 						This section encountered an error and couldn't render.
 					</p>
 
@@ -148,7 +148,7 @@ export class ErrorBoundary extends Component<Props, State> {
 					{/* Dev debug details */}
 					{isDev && error && (
 						<details className="mb-4 text-left">
-							<summary className="mb-2 flex cursor-pointer items-center gap-1.5 text-xs text-white/30 hover:text-white/60">
+							<summary className="mb-2 flex cursor-pointer items-center gap-1.5 text-xs text-muted-foreground hover:text-muted-foreground">
 								<Bug className="h-3 w-3" />
 								Debug
 							</summary>
