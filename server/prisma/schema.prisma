@@ -21,6 +21,7 @@ model Profile {
   phone    String @default("+91 9876543210")
 
   // Career & Bio
+  Tagline  String? // Short, catchy tagline for portfolio header
   header String? // One-liner headline for portfolio header
   bio    String? @db.Text // Casual personal bio for about section
 
@@ -37,7 +38,7 @@ model Profile {
 
   // Job Preferences
   workPreferences Json? // { remote: bool, hybrid: bool, onsite: bool, relocation: bool }
-  jobTypes        String[] // ["full-time", "part-time", "contract", "freelance", "internship"]
+  Freelancing Boolean @default(false) // Toggle freelance availability
 
   // Media & Links
   avatarUrl String? // Profile picture
@@ -54,9 +55,8 @@ model Profile {
   // Personal
   languages String[] // Spoken/written languages e.g. ["English", "Hindi"]
 
-  // Social & Web
-  socials Json? // [{ platform, url, icon?, handle? }]
-  website String? // Personal site / portfolio URL
+  // Social Links - Stored in a separate table for flexibility and scalability
+  socialLinks SocialLink[]
 
   // Coding Platforms
   github        String?
@@ -65,6 +65,8 @@ model Profile {
   codechef      String?
   gfg           String? 
   kaggle        String?
+  hackerrank    String?
+  stackoverflow String?
   otherProfiles String[]
 
   // SEO / Meta
@@ -79,7 +81,6 @@ model Profile {
 // Project Model - Represents individual projects in portfolio
 model Project {
   id   String @id @default(uuid())
-  slug String @unique
 
   // Core Info
   title       String
@@ -88,12 +89,11 @@ model Project {
 
   // Media & Links
   thumbnail String?
-  images    String[]
+  images    String[] // uploaded images or external URLs
   githubUrl String? // Link to GitHub repo
   liveUrl   String? // Link to live demo or deployed site
 
   status   String  @default("draft") // draft, published, archived, completed
-  featured Boolean @default(false)
 
   stars Int?
   forks Int?
@@ -102,14 +102,14 @@ model Project {
   updatedAt DateTime @updatedAt
 
   @@index([status])
-  @@index([featured])
-  @@index([slug])
 }
 
 // Journey Model - Career, education, and life experience entries
 model JourneyEntry {
   id           String  @id @default(uuid())
-  type         String // work, education, volunteering, research, other
+
+  // Core
+  type         JourneyType
   title        String
   organization String? // School, company, lab, NGO — generic label
   location     String?
@@ -130,7 +130,12 @@ model JourneyEntry {
   board        String? // e.g. "CBSE", "ICSE", "State Board" (school-level)
 
   // Work-specific
-  employmentType String? // full-time, part-time, internship, contract, freelance
+  employmentType EmploymentType?
+  workMode       WorkMode?
+  workType       WorkType?
+  workLocation   String? // Office location or client site
+  offerUrl       String? // Offer letter or appointment letter URL
+  experienceUrl  String? // Experience/relieving letter URL
 
   // Research-specific
   publication String? // Journal / conference name
@@ -144,12 +149,78 @@ model JourneyEntry {
 
   // Relations
   achievements Achievement[]
+  documents    JourneyDocument[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([type])
   @@index([order])
+}
+
+model JourneyDocument {
+  id String @id @default(uuid())
+
+  journeyEntryId String
+  journeyEntry   JourneyEntry @relation(fields: [journeyEntryId], references: [id], onDelete: Cascade)
+
+  title String
+  type  DocumentType
+  url   String // Uploaded file URL or external link
+
+  issuer   String?
+  issuedAt DateTime?
+  notes    String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([journeyEntryId])
+  @@index([type])
+}
+
+enum JourneyType {
+  WORK
+  EDUCATION
+  VOLUNTEERING
+  RESEARCH
+  EDUCATOR
+  OTHER
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT
+  FREELANCE
+  TEMPORARY
+  APPRENTICESHIP
+}
+
+enum WorkMode {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum WorkType {
+  INDIVIDUAL_CONTRIBUTOR
+  LEAD
+  MANAGER
+  CONSULTANT
+  OTHER
+}
+
+enum DocumentType {
+  OFFER_LETTER
+  APPOINTMENT_LETTER
+  EXPERIENCE_LETTER
+  RELIEVING_LETTER
+  PAYSLIP
+  PROMOTION_LETTER
+  CERTIFICATE
+  OTHER
 }
 
 // Achievement Model - Hackathons, awards, competitions, scholarships, etc.
@@ -198,7 +269,7 @@ model Certification {
   credentialId  String? @unique
   credentialUrl String?
 
-  certificateUrl String? // Link to certificate image or PDF
+  certificateUrl String? // Uploadable certificate file or external URL
 
   skills String[]
 
@@ -214,15 +285,14 @@ model Certification {
 // BlogPost Model - For blog posts or articles on portfolio
 model BlogPost {
   id   String @id @default(uuid())
-  slug String @unique
 
   // Core Info
   title   String
   content String   @db.Text
   tags    String[]
 
-  coverImage  String?
-  otherImages String[]
+  coverImage  String? // Uploaded image or external URL
+  otherImages String[] // Uploaded images or external URLs
   link        String? // Link to original post if cross-posted
 
   status      String    @default("draft") // draft, published, archived
@@ -232,7 +302,6 @@ model BlogPost {
   updatedAt DateTime @updatedAt
 
   @@index([status])
-  @@index([slug])
 }
 
 // Contact Messages - For storing messages sent via contact form on portfolio
@@ -250,4 +319,35 @@ model ContactMessage {
 
   @@index([createdAt])
   @@index([isRead])
+}
+
+// SocialLink model (will be used inside profile model to store multiple social links in a separate table)
+model SocialLink {
+  id String @id @default(uuid())
+  platform SocialPlatform
+  url      String
+
+  // For custom entries when platform = OTHER
+  customLabel String?
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([platform])
+  @@index([profileId])
+}
+
+enum SocialPlatform {
+  LINKEDIN
+  GITHUB
+  X
+  REDDIT
+  INSTAGRAM
+  MEDIUM
+  QUORA
+  DEVTO
+  OTHER
 }
