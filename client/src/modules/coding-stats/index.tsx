@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { publicService } from '@/api';
 import type { CodingStats, PlatformStats, Profile } from '@/api/schema';
 
-import { Terminal } from 'lucide-react';
+import { Terminal, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { staggerContainer } from '@/animations/motion';
@@ -14,7 +14,7 @@ import { hasStats } from './utils';
 import {
 	CodingStatsSkeleton,
 	LinkOnlyCard,
-	LeetCodeCard,
+	ProblemSolvingCard,
 	GitHubCard,
 	CompetitiveCard,
 } from './components';
@@ -57,7 +57,9 @@ export function CodingStatsModule() {
 		if (!stats && !profile) return [];
 
 		const entries: Array<{ config: PlatformConfig; platform: PlatformStats | null; hasData: boolean }> = [];
+		const processedUrls = new Set<string>();
 
+		// 1. Process standard platforms (LeetCode, GitHub, etc)
 		for (const cfg of PLATFORMS) {
 			let p = stats ? (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null : null;
 			
@@ -73,6 +75,42 @@ export function CodingStatsModule() {
 
 			if (p && p.username && p.url) {
 				entries.push({ config: cfg, platform: p, hasData: hasStats(p) });
+				processedUrls.add(p.url.toLowerCase());
+			}
+		}
+
+		// 2. Process otherProfiles from Profile to show as LinkOnlyCards
+		if (profile?.otherProfiles && profile.otherProfiles.length > 0) {
+			for (const url of profile.otherProfiles) {
+				const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
+				if (processedUrls.has(cleanUrl.toLowerCase())) continue;
+				
+				let domain = 'Website';
+				try {
+					const urlObj = new URL(cleanUrl);
+					const hostname = urlObj.hostname.replace('www.', '');
+					domain = hostname.split('.')[0] || hostname;
+					domain = domain.charAt(0).toUpperCase() + domain.slice(1);
+				} catch (e) {
+					// Invalid URL string
+				}
+
+				const fallbackUsername = cleanUrl.split('/').pop() || domain;
+
+				entries.push({
+					config: {
+						key: `other-${cleanUrl}`,
+						name: domain,
+						icon: (props) => <Globe {...props} />,
+						accent: '#9ca3af',
+						accentBg: 'from-muted/20 to-transparent hover:border-muted-foreground/50',
+						accentBorder: 'hover:border-border group-hover:shadow-[0_0_40px_-10px_rgba(156,163,175,0.15)] bg-muted/5',
+						accentText: 'text-muted-foreground',
+					},
+					platform: { url: cleanUrl, username: fallbackUsername, stats: {} },
+					hasData: false
+				});
+				processedUrls.add(cleanUrl.toLowerCase());
 			}
 		}
 
@@ -130,13 +168,13 @@ export function CodingStatsModule() {
 							);
 						}
 
-						// LeetCode → large featured card
-						if (config.key === 'leetcode') {
-							return <LeetCodeCard key={config.key} platform={platform} config={config} />;
+						// Problem Solving (LeetCode, GFG) → large featured card
+						if (config.key === 'leetcode' || config.key === 'gfg' || ('easy' in (platform.stats || {}))) {
+							return <ProblemSolvingCard key={config.key} platform={platform} config={config} />;
 						}
 
 						// GitHub → stats grid card
-						if (config.key === 'github') {
+						if (config.key === 'github' || ('stars' in (platform.stats || {}) && !('rating' in (platform.stats || {})))) {
 							return <GitHubCard key={config.key} platform={platform} config={config} />;
 						}
 
@@ -148,3 +186,4 @@ export function CodingStatsModule() {
 		</div>
 	);
 }
+

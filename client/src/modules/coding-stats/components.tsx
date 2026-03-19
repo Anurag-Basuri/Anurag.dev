@@ -186,10 +186,10 @@ export const LinkOnlyCard = memo(function LinkOnlyCard({
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// LEETCODE CARD (large, with circular progress + difficulty bars)
+// PROBLEM SOLVING CARD (large, with circular progress + difficulty bars)
 // ═══════════════════════════════════════════════════════════════════
 
-export const LeetCodeCard = memo(function LeetCodeCard({
+export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 	platform,
 	config,
 }: {
