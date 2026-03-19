@@ -23,6 +23,7 @@ const DOCUMENT_TYPES = new Set([
 ]);
 
 const ALL_ALLOWED_TYPES = new Set([...IMAGE_TYPES, ...VIDEO_TYPES, ...DOCUMENT_TYPES]);
+const MEDIA_TYPES = new Set([...IMAGE_TYPES, ...DOCUMENT_TYPES]);
 
 // Size limits for each category (in bytes)
 const FILE_SIZE_LIMITS = {
@@ -94,4 +95,11 @@ const anyUpload = multer({
 	fileFilter: fileFilter(ALL_ALLOWED_TYPES),
 });
 
-export { imageUpload, videoUpload, documentUpload, anyUpload, getFileCategory };
+// Accept images + documents (no video) — max 10 MB
+const mediaUpload = multer({
+	storage,
+	limits: { fileSize: FILE_SIZE_LIMITS.document },
+	fileFilter: fileFilter(MEDIA_TYPES),
+});
+
+export { imageUpload, videoUpload, documentUpload, anyUpload, mediaUpload, getFileCategory };

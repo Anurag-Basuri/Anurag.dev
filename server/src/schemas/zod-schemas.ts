@@ -30,13 +30,36 @@ const nullableDatetime = z
 	.pipe(z.string().datetime().nullable())
 	.optional();
 
+/** Enum field with case-insensitive input and optional/empty handling */
+const optionalEnum = <T extends [string, ...string[]]>(values: T) =>
+	z
+		.preprocess(v => {
+			if (v === '' || v === null || v === undefined) return undefined;
+			if (typeof v === 'string') return v.trim().toUpperCase();
+			return v;
+		}, z.enum(values))
+		.optional();
+
+/** Enum field with case-insensitive input (required) */
+const requiredEnum = <T extends [string, ...string[]]>(values: T) =>
+	z.preprocess(v => (typeof v === 'string' ? v.trim().toUpperCase() : v), z.enum(values));
+
 // ─── Common Schemas ─────────────────────────────────────────────
 
 export const SocialLinkSchema = z.object({
-	platform: z.string(),
+	platform: requiredEnum([
+		'LINKEDIN',
+		'GITHUB',
+		'X',
+		'REDDIT',
+		'INSTAGRAM',
+		'MEDIUM',
+		'QUORA',
+		'DEVTO',
+		'OTHER',
+	]),
 	url: z.string().url(),
-	icon: z.string().optional(),
-	handle: z.string().optional(),
+	customLabel: nullableStr,
 });
 
 // ─── Profile (singleton) ─────────────────────────────────────────
@@ -51,6 +74,7 @@ export const ProfileSchema = z.object({
 	phone: z.string().optional(),
 
 	// Career & Bio
+	Tagline: nullableStr,
 	header: nullableStr,
 	bio: nullableStr,
 
@@ -73,7 +97,7 @@ export const ProfileSchema = z.object({
 		})
 		.nullable()
 		.optional(),
-	jobTypes: z.array(z.string()).optional(),
+	Freelancing: z.boolean().optional(),
 
 	// Media — URLs are set by file upload endpoints, but can also be set directly
 	avatarUrl: nullableStr,
@@ -91,9 +115,6 @@ export const ProfileSchema = z.object({
 	languages: z.array(z.string()).optional(),
 
 	// Social & Web
-	socials: z.array(SocialLinkSchema).nullable().optional(),
-	website: nullableStr,
-
 	// Coding Platforms — plain string URLs/usernames (matches Prisma String?)
 	github: nullableStr,
 	leetcode: nullableStr,
@@ -101,6 +122,8 @@ export const ProfileSchema = z.object({
 	codechef: nullableStr,
 	gfg: nullableStr,
 	kaggle: nullableStr,
+	hackerrank: nullableStr,
+	stackoverflow: nullableStr,
 	otherProfiles: z.array(z.string()).optional(),
 
 	// SEO / Meta
@@ -114,7 +137,6 @@ export const ProfileSchema = z.object({
 
 export const ProjectSchema = z.object({
 	id: z.string().optional(),
-	slug: z.string().min(2, 'Slug is required'),
 	title: z.string().min(2, 'Title is required'),
 	description: z.string().min(10),
 	techStack: z.array(z.string()),
@@ -125,7 +147,6 @@ export const ProjectSchema = z.object({
 	liveUrl: nullableUrl,
 
 	status: z.enum(['draft', 'published', 'archived', 'completed']).default('draft'),
-	featured: z.boolean().default(false),
 
 	stars: z.number().int().nullable().optional(),
 	forks: z.number().int().nullable().optional(),
@@ -139,7 +160,7 @@ export const ProjectSchema = z.object({
 
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
-	type: z.enum(['work', 'education', 'volunteering', 'research', 'other']),
+	type: requiredEnum(['WORK', 'EDUCATION', 'VOLUNTEERING', 'RESEARCH', 'EDUCATOR', 'OTHER']),
 	title: z.string().min(1),
 	organization: nullableStr,
 	location: nullableStr,
@@ -160,7 +181,20 @@ export const JourneyItemSchema = z.object({
 	board: nullableStr,
 
 	// Work-specific
-	employmentType: nullableStr,
+	employmentType: optionalEnum([
+		'FULL_TIME',
+		'PART_TIME',
+		'INTERNSHIP',
+		'CONTRACT',
+		'FREELANCE',
+		'TEMPORARY',
+		'APPRENTICESHIP',
+	]),
+	workMode: optionalEnum(['ONSITE', 'REMOTE', 'HYBRID']),
+	workType: optionalEnum(['INDIVIDUAL_CONTRIBUTOR', 'LEAD', 'MANAGER', 'CONSULTANT', 'OTHER']),
+	workLocation: nullableStr,
+	offerUrl: nullableUrl,
+	experienceUrl: nullableUrl,
 
 	// Research-specific
 	publication: nullableStr,
@@ -171,6 +205,26 @@ export const JourneyItemSchema = z.object({
 	highlighted: z.boolean().default(false),
 
 	order: z.number().int().default(0),
+});
+
+export const JourneyDocumentSchema = z.object({
+	id: z.string().optional(),
+	journeyEntryId: z.string().min(1),
+	title: z.string().min(1),
+	type: requiredEnum([
+		'OFFER_LETTER',
+		'APPOINTMENT_LETTER',
+		'EXPERIENCE_LETTER',
+		'RELIEVING_LETTER',
+		'PAYSLIP',
+		'PROMOTION_LETTER',
+		'CERTIFICATE',
+		'OTHER',
+	]),
+	url: z.string().url(),
+	issuer: nullableStr,
+	issuedAt: nullableDatetime,
+	notes: nullableStr,
 });
 
 // ─── Achievement ────────────────────────────────────────────────
@@ -231,7 +285,6 @@ export const CertificationSchema = z.object({
 
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
-	slug: z.string().min(3),
 	title: z.string().min(5),
 	content: z.string().min(1),
 	tags: z.array(z.string()),
@@ -252,9 +305,7 @@ export const BlogPostSchema = z.object({
 export const ContactSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
 	email: z.string().email('Invalid email address'),
-	subject: z
-		.string()
-		.transform(v => (v === '' ? 'No Subject' : v)),
+	subject: z.string().transform(v => (v === '' ? 'No Subject' : v)),
 	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
@@ -293,6 +344,27 @@ export const JourneyUpdateSchema = JourneyItemSchema.partial().omit({ id: true }
 export const ReorderSchema = z.object({
 	items: z.array(z.object({ id: z.string(), order: z.number().int().min(0) })),
 });
+
+// Upload helpers
+export const UrlListSchema = z.object({
+	urls: z.array(z.string().url()).min(1),
+});
+
+// Journey documents
+export const JourneyDocumentCreateSchema = JourneyDocumentSchema.omit({
+	id: true,
+	journeyEntryId: true,
+	url: true,
+});
+export const JourneyDocumentUpdateSchema = JourneyDocumentSchema.partial().omit({
+	id: true,
+	journeyEntryId: true,
+	url: true,
+});
+
+// Social links
+export const SocialLinkCreateSchema = SocialLinkSchema.omit({});
+export const SocialLinkUpdateSchema = SocialLinkSchema.partial();
 
 // Achievement
 export const AchievementCreateSchema = AchievementSchema.omit({ id: true });

@@ -39,8 +39,8 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
 	'video/webm': 'webm',
 	'video/quicktime': 'mov',
 	'application/pdf': 'pdf',
-    'application/msword': 'doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+	'application/msword': 'doc',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
 };
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -95,6 +95,43 @@ function cleanupLocalFile(filePath: string): void {
 	}
 }
 
+// Extract Cloudinary public ID from a secure_url.
+// Returns null if the URL doesn't match the expected pattern.
+function extractPublicId(url: string): string | null {
+	try {
+		const parts = new URL(url).pathname.split('/');
+		const uploadIndex = parts.indexOf('upload');
+		if (uploadIndex === -1) return null;
+		const relevant = parts.slice(uploadIndex + 2).join('/');
+		return relevant.replace(/\.[^.]+$/, '');
+	} catch {
+		return null;
+	}
+}
+
+// Extract resource type from a Cloudinary URL (image/raw/video).
+function extractResourceType(url: string): DeleteTarget['resourceType'] | null {
+	try {
+		const parts = new URL(url).pathname.split('/');
+		const uploadIndex = parts.indexOf('upload');
+		if (uploadIndex <= 0) return null;
+		const resourceType = parts[uploadIndex - 1];
+		if (resourceType === 'image' || resourceType === 'raw' || resourceType === 'video') {
+			return resourceType;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+function buildDeleteTarget(url: string): DeleteTarget | null {
+	const publicId = extractPublicId(url);
+	const resourceType = extractResourceType(url);
+	if (!publicId || !resourceType) return null;
+	return { publicId, resourceType };
+}
+
 function toUploadResult(response: UploadApiResponse): UploadResult {
 	return {
 		url: response.secure_url,
@@ -122,7 +159,9 @@ async function uploadFile(file: UploadedFile, options: UploadOptions = {}): Prom
 	} catch (err) {
 		cleanupLocalFile(file.path);
 		const message = err instanceof Error ? err.message : String(err);
-		throw ApiError.InternalServerError(`Failed to upload "${file.originalname ?? file.path}": ${message}`);
+		throw ApiError.InternalServerError(
+			`Failed to upload "${file.originalname ?? file.path}": ${message}`,
+		);
 	}
 }
 
@@ -165,7 +204,9 @@ async function deleteFile(target: DeleteTarget): Promise<void> {
 		});
 
 		if (result.result !== 'ok' && result.result !== 'not found') {
-			throw ApiError.InternalServerError(`Cloudinary deletion failed for "${target.publicId}": ${result.result}`);
+			throw ApiError.InternalServerError(
+				`Cloudinary deletion failed for "${target.publicId}": ${result.result}`,
+			);
 		}
 	} catch (err) {
 		if (err instanceof Error && 'statusCode' in err) throw err; // Re-throw AppError
@@ -200,5 +241,14 @@ async function deleteFiles(targets: DeleteTarget[]): Promise<void> {
 }
 
 // Exports
-export { verifyConnection, uploadFile, uploadResume, deleteFile, deleteFiles };
+export {
+	verifyConnection,
+	uploadFile,
+	uploadResume,
+	deleteFile,
+	deleteFiles,
+	extractPublicId,
+	extractResourceType,
+	buildDeleteTarget,
+};
 export type { UploadedFile, UploadResult, DeleteTarget, UploadOptions };

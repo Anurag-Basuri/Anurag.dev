@@ -236,7 +236,7 @@ model Achievement {
   rank        String? // "1st Place", "Top 10", "Gold Medal"
 
   date     DateTime?
-  proofUrl String? // Certificate / proof link
+  proofUrl String? // Uploaded certificate or external link as proof of achievement
   url      String? // Related external link
 
   tags String[] // Skills / topics
