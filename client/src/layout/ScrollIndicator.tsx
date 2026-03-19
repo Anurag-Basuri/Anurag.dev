@@ -29,7 +29,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 				aria-label="Section navigation"
 			>
 				{/* Connecting line */}
-				<div className="absolute top-1 bottom-1 w-px bg-white/5 pointer-events-none" />
+				<div className="absolute top-1 bottom-1 w-px bg-foreground/5 pointer-events-none" />
 
 				{/* Progress fill */}
 				<motion.div
@@ -59,7 +59,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 												? 'w-2.5 h-2.5 bg-primary'
 												: isPast
 													? 'w-1.5 h-1.5 bg-primary/40 hover:bg-primary/70 hover:scale-150'
-													: 'w-1.5 h-1.5 bg-white/15 hover:bg-white/40 hover:scale-150',
+													: 'w-1.5 h-1.5 bg-foreground/15 hover:bg-foreground/40 hover:scale-150',
 										)}
 										aria-label={`Scroll to ${section.label}`}
 										aria-current={isActive ? 'true' : undefined}
@@ -82,7 +82,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 								</TooltipTrigger>
 								<TooltipContent
 									side="left"
-									className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-black/90 backdrop-blur-xl border-white/10"
+									className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-popover/90 backdrop-blur-xl border-border"
 								>
 									{section.label}
 								</TooltipContent>

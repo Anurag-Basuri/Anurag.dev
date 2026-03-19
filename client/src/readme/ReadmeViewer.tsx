@@ -62,9 +62,7 @@ export function ReadmeViewer({
 				<div className="h-full w-full flex gap-0 lg:gap-0">
 					{/* ─── Main Scroll Body ─── */}
 					<div className="flex-1 min-w-0 relative">
-						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent pr-3 sm:pr-6 pb-12 p-4 sm:p-6 lg:p-8"
-							style={{ scrollbarColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent) transparent' }}
-						>
+						<div className="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-track-transparent pr-3 sm:pr-6 pb-12 p-4 sm:p-6 lg:p-8">
 							<div className="max-w-4xl mx-auto">
 								<MarkdownRenderer content={content} onNavigate={scrollToId} />
 							</div>
@@ -72,13 +70,11 @@ export function ReadmeViewer({
 					</div>
 
 					{/* ─── Table of Contents Sidebar ─── */}
-					<aside className="hidden lg:flex w-60 shrink-0 border-l border-white/6">
-						<div className="w-full p-5 pt-6 overflow-y-auto max-h-full scrollbar-thin scrollbar-track-transparent"
-							style={{ scrollbarColor: 'color-mix(in oklch, var(--theme-primary) 15%, transparent) transparent' }}
-						>
+					<aside className="hidden lg:flex w-60 shrink-0 border-l border-border">
+						<div className="w-full p-5 pt-6 overflow-y-auto max-h-full scrollbar-thin scrollbar-track-transparent">
 							<p
 								className="text-[10px] font-bold uppercase tracking-[0.2em] mb-5 flex items-center gap-2 font-mono"
-								style={{ color: 'color-mix(in oklch, var(--theme-primary) 75%, white 25%)' }}
+								style={{ color: 'var(--theme-primary)' }}
 							>
 								<span
 									className="w-1 h-3 rounded-full"
@@ -92,7 +88,7 @@ export function ReadmeViewer({
 										key={item.id}
 										href={`#${item.id}`}
 										onClick={(e) => handleTocClick(e, item.id)}
-										className="block text-[12px] text-white/70 hover:text-white transition-colors py-1 font-mono truncate"
+										className="block text-[12px] text-muted-foreground hover:text-foreground transition-colors py-1 font-mono truncate"
 										style={{
 											paddingLeft:
 												item.depth === 1
@@ -103,7 +99,7 @@ export function ReadmeViewer({
 										}}
 									>
 										{item.depth > 1 && (
-											<span className="text-white/10 mr-1 select-none">
+											<span className="opacity-30 mr-1 select-none">
 												{item.depth === 2 ? '├' : '└'}
 											</span>
 										)}

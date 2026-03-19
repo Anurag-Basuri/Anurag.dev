@@ -35,10 +35,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 
 							<div className="flex-1 flex min-h-0 w-full overflow-hidden p-2 md:p-3 gap-2">
 								{/* Sidebar */}
-								<aside className="hidden md:flex rounded-xl bg-transparent border border-white/10 w-64 lg:w-72 shrink-0 overflow-hidden relative">
+								<aside className="hidden md:flex rounded-xl bg-transparent border border-border w-64 lg:w-72 shrink-0 overflow-hidden relative">
 									<ErrorBoundary label="Sidebar">
 										<Suspense
-											fallback={<div className="h-full w-full animate-pulse bg-white/5" />}
+											fallback={<div className="h-full w-full animate-pulse bg-foreground/5" />}
 										>
 											<Sidebar />
 										</Suspense>
@@ -46,10 +46,10 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 								</aside>
 
 								{/* Main content */}
-								<main className="rounded-xl bg-transparent border border-white/10 flex-1 min-h-0 overflow-hidden relative">
+								<main className="rounded-xl bg-transparent border border-border flex-1 min-h-0 overflow-hidden relative">
 									<ErrorBoundary label="Main Content">
 										<Suspense
-											fallback={<div className="h-full w-full animate-pulse bg-white/5" />}
+											fallback={<div className="h-full w-full animate-pulse bg-foreground/5" />}
 										>
 											{children}
 										</Suspense>

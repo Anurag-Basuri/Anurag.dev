@@ -49,6 +49,9 @@ export function ThemeContextProvider({ children }: { children: ReactNode }) {
     root.style.setProperty('--theme-muted', theme.muted);
     root.dataset.theme = themeName;
 
+    // Toggle .dark class to activate CSS variable definitions in globals.css
+    root.classList.toggle('dark', isDark);
+
     // Set color-scheme for browser chrome
     root.style.colorScheme = isDark ? 'dark' : 'light';
 

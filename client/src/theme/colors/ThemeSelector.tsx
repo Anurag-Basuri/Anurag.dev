@@ -40,7 +40,7 @@ export function ThemeSelector() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen(v => !v)}
-        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-md transition-colors hover:bg-white/10 focus:outline-none"
+        className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-foreground/5 backdrop-blur-md transition-colors hover:bg-accent focus:outline-none"
         aria-label="Change theme"
       >
         <Palette className="h-4 w-4 text-(--theme-primary)" />
@@ -53,9 +53,9 @@ export function ThemeSelector() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 6, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-xl border border-white/10 bg-black/90 p-2 shadow-2xl backdrop-blur-2xl"
+              className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-xl border border-border bg-popover/95 p-2 shadow-2xl backdrop-blur-2xl"
             >
-              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-white/30">
+              <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 Theme
               </p>
 
@@ -69,8 +69,8 @@ export function ThemeSelector() {
                     onClick={() => { setTheme(t.name); setOpen(false); }}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all ${
                       isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/60 hover:bg-white/5 hover:text-white'
+                        ? 'bg-accent text-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                     }`}
                   >
                     {/* Color swatch */}
