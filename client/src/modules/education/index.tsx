@@ -15,17 +15,17 @@ function EducationSkeleton() {
 	return (
 		<div className="p-6 md:p-12 max-w-5xl mx-auto animate-pulse pb-32">
 			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-32 bg-white/5 rounded-lg" />
-				<div className="h-12 w-72 bg-white/5 rounded-xl" />
-				<div className="h-5 w-96 bg-white/5 rounded-lg" />
+				<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
+				<div className="h-12 w-72 bg-foreground/5 rounded-xl" />
+				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
 			</div>
 			<div className="max-w-4xl mx-auto space-y-12 mt-16 relative">
-				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-white/10" />
+				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
 				{[1, 2, 3].map(i => (
 					<div key={i} className="flex items-start gap-8 relative z-10">
-						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-white/10 border-4 border-[#0a0a0a]" />
+						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-foreground/10 border-4 border-card" />
 						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-48 bg-white/5 rounded-4xl" />
+							<div className="h-48 bg-foreground/5 rounded-4xl" />
 						</div>
 					</div>
 				))}
@@ -53,7 +53,7 @@ const EducationCard = memo(function EducationCard({
 		>
 			{/* Timeline Node */}
 			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
-				<div className="w-4 h-4 rounded-full bg-[#0a0a0a] border-4 border-violet-500/50 group-hover:border-violet-400 group-hover:bg-violet-400 group-hover:scale-150 transition-all duration-500 shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]" />
+				<div className="w-4 h-4 rounded-full bg-card border-4 border-violet-500/50 group-hover:border-violet-400 group-hover:bg-violet-400 group-hover:scale-150 transition-all duration-500 shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]" />
 			</div>
 
 			{/* Content Card Wrapper */}
@@ -66,7 +66,7 @@ const EducationCard = memo(function EducationCard({
 				{/* Connector Line to Node (Desktop Only) */}
 				<div
 					className={cn(
-						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-white/10 group-hover:bg-violet-500/50 transition-colors duration-500',
+						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-foreground/10 group-hover:bg-violet-500/50 transition-colors duration-500',
 						isEven ? 'right-8' : 'left-8',
 					)}
 				/>
@@ -74,8 +74,8 @@ const EducationCard = memo(function EducationCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-6 sm:p-8 rounded-3xl bg-linear-to-bl from-white/5 to-transparent border border-white/10 backdrop-blur-sm overflow-hidden text-left',
-						'hover:border-white/20',
+						'relative p-6 sm:p-8 rounded-3xl bg-linear-to-bl from-white/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
+						'hover:border-foreground/20',
 					)}
 				>
 					<div className="absolute inset-0 bg-linear-to-bl from-violet-500/0 to-transparent group-hover:from-violet-500/5 transition-colors duration-500" />
@@ -83,7 +83,7 @@ const EducationCard = memo(function EducationCard({
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Header row: Title + Grade (if any) */}
 						<div className="flex items-start justify-between gap-4 mb-2">
-							<h3 className="text-lg sm:text-xl font-black tracking-tight text-white line-clamp-2">
+							<h3 className="text-lg sm:text-xl font-black tracking-tight text-foreground line-clamp-2">
 								{entry.title}
 							</h3>
 							{entry.grade && (
@@ -117,7 +117,7 @@ const EducationCard = memo(function EducationCard({
 								</span>
 							)}
 							{entry.board && (
-								<span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/5 border border-white/10">
+								<span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-foreground/5 border border-border">
 									<Award className="w-3 h-3" />
 									{entry.board}
 								</span>
@@ -126,18 +126,18 @@ const EducationCard = memo(function EducationCard({
 
 						{/* Description */}
 						{entry.description && (
-							<p className="text-white/70 leading-relaxed text-sm font-medium mb-4 whitespace-pre-wrap">
+							<p className="text-foreground/70 leading-relaxed text-sm font-medium mb-4 whitespace-pre-wrap">
 								{entry.description}
 							</p>
 						)}
 
 						{/* Skills Tags */}
 						{(entry.skills ?? []).length > 0 && (
-							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-white/5">
+							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-border">
 								{(entry.skills ?? []).map(skill => (
 									<span
 										key={skill}
-										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-white/5 text-muted-foreground border border-white/10 group-hover:border-violet-500/20 transition-colors"
+										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-violet-500/20 transition-colors"
 									>
 										{skill}
 									</span>
@@ -190,7 +190,7 @@ export function EducationModule() {
 				/>
 
 				{educationEntries.length === 0 ? (
-					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-white/10 rounded-2xl bg-[#0a0a0a]/50">
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
 						No education data found.
 					</div>
 				) : (
