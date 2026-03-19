@@ -8,12 +8,12 @@ import {
 	healthCheck,
 	getPublicProfile,
 	getPublicProjects,
-	getPublicProjectBySlug,
+	getPublicProjectById,
 	getPublicJourney,
 	getPublicAchievements,
 	getPublicCertifications,
 	getPublicBlogPosts,
-	getPublicBlogPostBySlug,
+	getPublicBlogPostById,
 	submitContact,
 } from '../controllers/public.controller';
 import { getCodingStats } from '../controllers/coding-stats.controller';
@@ -31,7 +31,7 @@ router.get('/profile', cache5min, asyncHandler(getPublicProfile));
 
 // Projects
 router.get('/projects', cache5min, asyncHandler(getPublicProjects));
-router.get('/projects/:slug', cache5min, asyncHandler(getPublicProjectBySlug));
+router.get('/projects/:id', cache5min, asyncHandler(getPublicProjectById));
 
 // Journey
 router.get('/journey', cache5min, asyncHandler(getPublicJourney));
@@ -44,7 +44,7 @@ router.get('/certifications', cache5min, asyncHandler(getPublicCertifications));
 
 // Blog
 router.get('/blog', cache5min, asyncHandler(getPublicBlogPosts));
-router.get('/blog/:slug', cache5min, asyncHandler(getPublicBlogPostBySlug));
+router.get('/blog/:id', cache5min, asyncHandler(getPublicBlogPostById));
 
 // Coding Stats (aggregated from external platforms)
 router.get('/coding-stats', cache5min, asyncHandler(getCodingStats));
