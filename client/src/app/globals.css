@@ -3,139 +3,27 @@
 
 /* =========================
    CSS Variables for Theming
+   =========================
+   All theme-specific variables (--background, --foreground, --card, --border, etc.)
+   are injected at runtime by theme-context.tsx from tokens.ts.
+   Only non-theme defaults are declared here.
    ========================= */
 :root {
-	/* Light Mode - "Warm Paper" - High-Trust, Eye-Friendly */
-	--background: oklch(0.985 0.006 60); /* Warm off-white, paper-like */
-	--foreground: oklch(0.15 0.02 260); /* Deep slate for readability */
-
-	/* Card: Elevated surface */
-	--card: oklch(0.995 0.003 60);
-	--card-foreground: oklch(0.15 0.02 260);
-
-	--popover: oklch(0.995 0.003 60);
-	--popover-foreground: oklch(0.15 0.02 260);
-
-	/* Primary: Deep Indigo - Trustworthy & Premium */
-	--primary: oklch(0.5 0.18 270);
-	--primary-foreground: oklch(0.99 0 0);
-
-	/* Secondary: Warm Slate */
-	--secondary: oklch(0.94 0.008 60);
-	--secondary-foreground: oklch(0.15 0.02 260);
-
-	/* Muted: Subtle warm dividers */
-	--muted: oklch(0.94 0.008 60);
-	--muted-foreground: oklch(0.45 0.02 260);
-
-	/* Accent: Interactive states */
-	--accent: oklch(0.92 0.01 60);
-	--accent-foreground: oklch(0.15 0.02 260);
-
-	/* Functional Status Colors */
-	--destructive: oklch(0.55 0.22 25);
-	--destructive-foreground: oklch(0.99 0 0);
-
-	/* Borders & Inputs */
-	--border: oklch(0.88 0.01 60);
-	--input: oklch(0.92 0.01 60);
-	--ring: oklch(0.5 0.18 270);
-
 	--radius: 0.5rem;
 
-	/* Sidebar - Distinct navigation area */
-	--sidebar: oklch(0.97 0.006 60);
-	--sidebar-foreground: oklch(0.35 0.02 260);
-	--sidebar-primary: var(--primary);
-	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.93 0.01 60);
-	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.9 0.01 60);
-	--sidebar-ring: var(--ring);
+	/* Functional status colors (same across all themes) */
+	--destructive: #ef4444;
+	--destructive-foreground: #ffffff;
 
-	/* Terminal: Higher contrast for readability */
-	--terminal-bg: oklch(0.97 0.005 60);
-	--terminal-text: oklch(0.18 0.02 260);
-	--terminal-cursor: var(--primary);
-
-	--panel-overlay: oklch(0.99 0.003 60 / 0.88);
-	--panel-overlay-hover: oklch(0.97 0.005 60 / 0.92);
-
-	/* Professional Shadows (Tailwind-style) */
-	--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-	--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
-	--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.06);
-	--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.06);
-	--shadow-premium: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 10px 30px -5px rgba(0, 0, 0, 0.08);
-}
-
-.dark {
-	/* Dark Mode - "Deep Obsidian" - Premium, High-Contrast */
-	--background: oklch(0.1 0.02 265); /* Deep, rich obsidian */
-	--foreground: oklch(0.96 0.005 60); /* Warm off-white text */
-
-	/* Card: Elevated surface */
-	--card: oklch(0.14 0.02 265);
-	--card-foreground: var(--foreground);
-
-	--popover: oklch(0.14 0.02 265);
-	--popover-foreground: var(--foreground);
-
-	/* Primary: Neon Indigo - High visibility accent */
-	--primary: oklch(0.7 0.2 270);
-	--primary-foreground: oklch(0.12 0 0);
-
-	/* Secondary: Deep muted surface */
-	--secondary: oklch(0.18 0.02 265);
-	--secondary-foreground: oklch(0.96 0.005 60);
-
-	/* Muted */
-	--muted: oklch(0.18 0.02 265);
-	--muted-foreground: oklch(0.62 0.02 260);
-
-	/* Accent: Interactive hover states */
-	--accent: oklch(0.2 0.025 265);
-	--accent-foreground: oklch(0.96 0.005 60);
-
-	--destructive: oklch(0.55 0.2 25);
-	--destructive-foreground: oklch(0.98 0 0);
-
-	/* Borders: Subtle definition */
-	--border: oklch(0.22 0.02 265);
-	--input: oklch(0.2 0.02 265);
-	--ring: oklch(0.7 0.2 270);
-
-	/* Sidebar: Slightly deeper to recede */
-	--sidebar: oklch(0.09 0.02 265);
-	--sidebar-foreground: oklch(0.68 0.02 260);
-	--sidebar-primary: var(--primary);
-	--sidebar-primary-foreground: var(--primary-foreground);
-	--sidebar-accent: oklch(0.16 0.02 265);
-	--sidebar-accent-foreground: var(--foreground);
-	--sidebar-border: oklch(0.18 0.02 265);
-	--sidebar-ring: var(--ring);
-
-	/* Terminal: Dark coding environment */
-	--terminal-bg: oklch(0.08 0.015 265);
-	--terminal-text: oklch(0.88 0.01 60);
-	--terminal-cursor: var(--primary);
-
-	--panel-overlay: oklch(0.09 0.02 265 / 0.88);
-	--panel-overlay-hover: oklch(0.13 0.02 265 / 0.92);
-
-	/* Shadows: Deep ambient occlusion */
-	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-	--shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.6);
-	--shadow-lg: 0 12px 20px -4px rgba(0, 0, 0, 0.6);
-	--shadow-xl: 0 24px 32px -6px rgba(0, 0, 0, 0.7);
-	--shadow-premium: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+	/* Panel overlays (computed from theme bg at runtime) */
+	--panel-overlay: rgba(0, 0, 0, 0.3);
+	--panel-overlay-hover: rgba(0, 0, 0, 0.4);
 }
 
 /* ================
     Color Aliases (Tailwind v4 tokens)
     ================ */
-:root,
-.dark {
+:root {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 
