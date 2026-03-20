@@ -5,6 +5,7 @@ import { useAtom } from 'jotai';
 import { useState, useRef, useEffect } from 'react';
 import { Check, ImageOff, Sparkles, Stars, Grid3X3 } from 'lucide-react';
 import { backgroundModeAtom, type BackgroundMode } from './background';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/ui/tooltip';
 
 const BACKGROUNDS: Array<{
 	id: BackgroundMode;
@@ -35,16 +36,21 @@ export function BackgroundSelector() {
 	}, [open]);
 
 	return (
-		<div className="relative" ref={containerRef}>
-			<motion.button
-				whileHover={{ scale: 1.08 }}
-				whileTap={{ scale: 0.92 }}
-				onClick={() => setOpen(v => !v)}
-				className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-foreground/5 backdrop-blur-md transition-colors hover:bg-accent focus:outline-none"
-				aria-label="Change background"
-			>
-				<Stars className="h-4 w-4 text-(--theme-secondary)" />
-			</motion.button>
+		<div className="relative shrink-0" ref={containerRef}>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<motion.button
+						whileHover={{ scale: 1.08 }}
+						whileTap={{ scale: 0.92 }}
+						onClick={() => setOpen(v => !v)}
+						className="relative flex h-8 w-8 items-center justify-center rounded-lg border border-border/40 bg-background/20 backdrop-blur-3xl transition-colors hover:bg-accent focus:outline-none shrink-0"
+						aria-label="Change background"
+					>
+						<Stars className="h-4 w-4 text-(--theme-secondary)" />
+					</motion.button>
+				</TooltipTrigger>
+				<TooltipContent side="bottom" sideOffset={12}>Visual Output</TooltipContent>
+			</Tooltip>
 
 			<AnimatePresence>
 				{open && (
@@ -53,7 +59,7 @@ export function BackgroundSelector() {
 							animate={{ opacity: 1, y: 0, scale: 1 }}
 							exit={{ opacity: 0, y: 6, scale: 0.95 }}
 							transition={{ duration: 0.15 }}
-							className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-xl border border-border bg-popover/95 p-2 shadow-2xl backdrop-blur-2xl"
+							className="absolute right-0 top-10 z-50 w-56 overflow-hidden rounded-xl border border-border/40 bg-background/30 p-2 shadow-[0_16px_40px_rgba(0,0,0,0.6)] backdrop-blur-3xl"
 						>
 							<p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
 								Background
@@ -68,10 +74,10 @@ export function BackgroundSelector() {
 											setMode(b.id);
 											setOpen(false);
 										}}
-										className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all ${
+										className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all duration-300 ease-out active:scale-[0.98] ${
 											isActive
 												? 'bg-accent text-foreground'
-												: 'text-muted-foreground hover:bg-accent hover:text-foreground'
+												: 'text-muted-foreground hover:bg-primary/10 hover:text-primary hover:scale-[1.02]'
 										}`}
 									>
 										<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-foreground/5 border border-border">
