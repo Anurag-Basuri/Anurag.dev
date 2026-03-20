@@ -4,7 +4,6 @@ export const FALLBACK_BLOG_POSTS: BlogPost[] = [
 	{
 		id: 'fb-blog-1',
 		title: 'Building an OS-Themed Portfolio with Next.js',
-		slug: 'os-themed-portfolio-nextjs',
 		content: 'Full article content here...',
 		coverImage: '/blog/os-portfolio-cover.png',
 		tags: ['Next.js', 'Portfolio', 'Web Design', 'TypeScript'],
@@ -17,7 +16,6 @@ export const FALLBACK_BLOG_POSTS: BlogPost[] = [
 	{
 		id: 'fb-blog-2',
 		title: 'The Complete Guide to API Versioning',
-		slug: 'complete-guide-api-versioning',
 		content: 'Full article content here...',
 		coverImage: '/blog/api-versioning-cover.png',
 		tags: ['API', 'Backend', 'Best Practices'],

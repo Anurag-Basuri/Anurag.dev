@@ -90,7 +90,6 @@ export const profileSchema = z.object({
 
 export const projectSchema = z.object({
 	id: z.string(),
-	slug: z.string(),
 
 	title: z.string(),
 	description: z.string(),
@@ -102,7 +101,6 @@ export const projectSchema = z.object({
 	liveUrl: z.string().nullish(),
 
 	status: z.string(),
-	featured: z.boolean(),
 
 	stars: z.number().nullish(),
 	forks: z.number().nullish(),
@@ -136,6 +134,21 @@ export const achievementSchema = z.object({
 
 	journeyEntryId: z.string().nullish(),
 
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
+
+// ─── Journey Document (Prisma: JourneyDocument) ──────────────
+
+export const journeyDocumentSchema = z.object({
+	id: z.string(),
+	journeyEntryId: z.string(),
+	title: z.string(),
+	type: z.string(),
+	url: z.string(),
+	issuer: z.string().nullish(),
+	issuedAt: z.string().nullish(),
+	notes: z.string().nullish(),
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
@@ -182,8 +195,9 @@ export const journeyEntrySchema = z.object({
 
 	order: z.number().int(),
 
-	// Nested relation (populated by API)
+	// Nested relations (populated by API)
 	achievements: z.array(achievementSchema).optional(),
+	documents: z.array(journeyDocumentSchema).optional(),
 
 	createdAt: z.string(),
 	updatedAt: z.string(),
@@ -216,7 +230,6 @@ export const certificationSchema = z.object({
 
 export const blogPostSchema = z.object({
 	id: z.string(),
-	slug: z.string(),
 
 	title: z.string(),
 	content: z.string(),
@@ -256,6 +269,7 @@ export type SocialLink = z.infer<typeof socialLinkSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type Project = z.infer<typeof projectSchema>;
 export type Achievement = z.infer<typeof achievementSchema>;
+export type JourneyDocument = z.infer<typeof journeyDocumentSchema>;
 export type JourneyEntry = z.infer<typeof journeyEntrySchema>;
 export type Certification = z.infer<typeof certificationSchema>;
 export type BlogPost = z.infer<typeof blogPostSchema>;

@@ -11,7 +11,6 @@ import type { BlogPost } from '@/api/schema';
 
 const EMPTY = {
 	title: '',
-	slug: '',
 	content: '',
 	tags: [] as string[],
 	coverImage: '',
@@ -41,7 +40,6 @@ export default function BlogPage() {
 	function openEdit(post: BlogPost) {
 		setForm({
 			title: post.title,
-			slug: post.slug,
 			content: post.content,
 			tags: post.tags,
 			coverImage: post.coverImage || '',
@@ -89,16 +87,14 @@ export default function BlogPage() {
 	const columns = [
 		{ key: 'title', label: 'Title' },
 		{
-			key: 'slug',
-			label: 'Slug',
-			render: (p: BlogPost) => (
-				<span className="font-mono text-xs text-zinc-500">{p.slug}</span>
-			),
-		},
-		{
 			key: 'status',
 			label: 'Status',
 			render: (p: BlogPost) => <StatusBadge status={p.status} />,
+		},
+		{
+			key: 'tags',
+			label: 'Tags',
+			render: (p: BlogPost) => p.tags.slice(0, 3).join(', ') || '—',
 		},
 		{
 			key: 'publishedAt',
@@ -146,13 +142,6 @@ export default function BlogPage() {
 					label="Title"
 					name="title"
 					value={form.title}
-					onChange={updateField}
-					required
-				/>
-				<FormField
-					label="Slug"
-					name="slug"
-					value={form.slug}
 					onChange={updateField}
 					required
 				/>

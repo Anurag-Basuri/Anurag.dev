@@ -11,7 +11,6 @@ import type { Project } from '@/api/schema';
 
 const EMPTY_PROJECT = {
 	title: '',
-	slug: '',
 	description: '',
 	techStack: [] as string[],
 	thumbnail: '',
@@ -19,7 +18,6 @@ const EMPTY_PROJECT = {
 	githubUrl: '',
 	liveUrl: '',
 	status: 'draft',
-	featured: false,
 	stars: 0,
 	forks: 0,
 };
@@ -45,7 +43,6 @@ export default function ProjectsPage() {
 	function openEdit(project: Project) {
 		setForm({
 			title: project.title,
-			slug: project.slug,
 			description: project.description,
 			techStack: project.techStack,
 			thumbnail: project.thumbnail || '',
@@ -53,7 +50,6 @@ export default function ProjectsPage() {
 			githubUrl: project.githubUrl || '',
 			liveUrl: project.liveUrl || '',
 			status: project.status,
-			featured: project.featured,
 			stars: project.stars ?? 0,
 			forks: project.forks ?? 0,
 		});
@@ -98,18 +94,11 @@ export default function ProjectsPage() {
 	const columns = [
 		{ key: 'title', label: 'Title' },
 		{
-			key: 'slug',
-			label: 'Slug',
-			render: (p: Project) => (
-				<span className="font-mono text-xs text-zinc-500">{p.slug}</span>
-			),
-		},
-		{
 			key: 'status',
 			label: 'Status',
 			render: (p: Project) => <StatusBadge status={p.status} />,
 		},
-		{ key: 'featured', label: 'Featured', render: (p: Project) => (p.featured ? '⭐' : '—') },
+		{ key: 'techStack', label: 'Tech', render: (p: Project) => p.techStack.slice(0, 3).join(', ') || '—' },
 	];
 
 	return (
@@ -152,13 +141,6 @@ export default function ProjectsPage() {
 					label="Title"
 					name="title"
 					value={form.title}
-					onChange={updateField}
-					required
-				/>
-				<FormField
-					label="Slug"
-					name="slug"
-					value={form.slug}
 					onChange={updateField}
 					required
 				/>
@@ -233,13 +215,6 @@ export default function ProjectsPage() {
 						{ label: 'Completed', value: 'completed' },
 						{ label: 'Archived', value: 'archived' },
 					]}
-				/>
-				<FormField
-					label="Featured"
-					name="featured"
-					type="checkbox"
-					value={form.featured}
-					onChange={updateField}
 				/>
 			</FormModal>
 		</div>

@@ -2,10 +2,12 @@ import { apiClient } from '../client';
 import type {
 	Project,
 	JourneyEntry,
+	JourneyDocument,
 	Achievement,
 	Certification,
 	BlogPost,
 	AboutData,
+	SocialLink,
 	ContactMessage,
 } from '@/api/schema';
 
@@ -38,6 +40,23 @@ async function uploadResume(file: File): Promise<AboutData> {
 	return apiClient.upload<AboutData>('/admin/profile/resume', formData);
 }
 
+// Social Links
+async function getSocialLinks(): Promise<SocialLink[]> {
+	return apiClient.get<SocialLink[]>('/admin/profile/social-links', true);
+}
+
+async function createSocialLink(data: { platform: string; url: string; customLabel?: string }): Promise<SocialLink> {
+	return apiClient.post<SocialLink>('/admin/profile/social-links', data, true);
+}
+
+async function updateSocialLink(id: string, data: Partial<SocialLink>): Promise<SocialLink> {
+	return apiClient.put<SocialLink>(`/admin/profile/social-links/${id}`, data);
+}
+
+async function deleteSocialLink(id: string): Promise<void> {
+	await apiClient.del(`/admin/profile/social-links/${id}`);
+}
+
 // Projects
 async function getProjects(): Promise<Project[]> {
 	return apiClient.get<Project[]>('/admin/projects', true);
@@ -61,6 +80,18 @@ async function deleteProject(id: string): Promise<void> {
 	await apiClient.del(`/admin/projects/${id}`);
 }
 
+async function uploadProjectThumbnail(id: string, file: File): Promise<Project> {
+	const formData = new FormData();
+	formData.append('thumbnail', file);
+	return apiClient.upload<Project>(`/admin/projects/${id}/thumbnail`, formData);
+}
+
+async function uploadProjectImages(id: string, files: File[]): Promise<Project> {
+	const formData = new FormData();
+	files.forEach(f => formData.append('images', f));
+	return apiClient.upload<Project>(`/admin/projects/${id}/images`, formData);
+}
+
 // Journey
 async function getJourney(): Promise<JourneyEntry[]> {
 	return apiClient.get<JourneyEntry[]>('/admin/journey', true);
@@ -80,6 +111,36 @@ async function reorderJourney(items: { id: string; order: number }[]): Promise<n
 
 async function deleteJourney(id: string): Promise<void> {
 	await apiClient.del(`/admin/journey/${id}`);
+}
+
+// Journey Documents
+async function getJourneyDocuments(entryId: string): Promise<JourneyDocument[]> {
+	return apiClient.get<JourneyDocument[]>(`/admin/journey/${entryId}/documents`, true);
+}
+
+async function uploadJourneyDocument(
+	entryId: string,
+	file: File,
+	data: { title: string; type: string; issuer?: string; notes?: string },
+): Promise<JourneyDocument> {
+	const formData = new FormData();
+	formData.append('document', file);
+	Object.entries(data).forEach(([k, v]) => {
+		if (v) formData.append(k, v);
+	});
+	return apiClient.upload<JourneyDocument>(`/admin/journey/${entryId}/documents`, formData);
+}
+
+async function updateJourneyDocument(
+	entryId: string,
+	docId: string,
+	data: Partial<JourneyDocument>,
+): Promise<JourneyDocument> {
+	return apiClient.put<JourneyDocument>(`/admin/journey/${entryId}/documents/${docId}`, data);
+}
+
+async function deleteJourneyDocument(entryId: string, docId: string): Promise<void> {
+	await apiClient.del(`/admin/journey/${entryId}/documents/${docId}`);
 }
 
 // Achievements
@@ -165,16 +226,26 @@ export const adminService = {
 	uploadAvatar,
 	uploadCover,
 	uploadResume,
+	getSocialLinks,
+	createSocialLink,
+	updateSocialLink,
+	deleteSocialLink,
 	getProjects,
 	createProject,
 	updateProject,
 	updateProjectStatus,
 	deleteProject,
+	uploadProjectThumbnail,
+	uploadProjectImages,
 	getJourney,
 	createJourney,
 	updateJourney,
 	reorderJourney,
 	deleteJourney,
+	getJourneyDocuments,
+	uploadJourneyDocument,
+	updateJourneyDocument,
+	deleteJourneyDocument,
 	getAchievements,
 	createAchievement,
 	updateAchievement,

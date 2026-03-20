@@ -4,7 +4,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 	{
 		id: 'fb-proj-1',
 		title: 'AnuragOS',
-		slug: 'anuragos-portfolio',
 		description:
 			'A terminal-style personal portfolio website with a fully functional file system and window manager.',
 		techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Jotai'],
@@ -13,7 +12,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 		githubUrl: 'https://github.com/Anurag-Basuri/personal_portfolio',
 		liveUrl: 'https://anurag.dev',
 		status: 'completed',
-		featured: true,
 		stars: 120,
 		forks: 45,
 		createdAt: '2024-01-01T00:00:00.000Z',
@@ -22,7 +20,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 	{
 		id: 'fb-proj-2',
 		title: 'StreamFlow',
-		slug: 'streamflow',
 		description:
 			'A real-time video streaming platform with adaptive bitrate streaming, chat, and social features.',
 		techStack: ['React', 'Node.js', 'WebRTC', 'Redis', 'PostgreSQL'],
@@ -31,7 +28,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 		githubUrl: 'https://github.com/Anurag-Basuri/streamflow',
 		liveUrl: null,
 		status: 'published',
-		featured: true,
 		stars: 85,
 		forks: 20,
 		createdAt: '2024-03-15T00:00:00.000Z',
@@ -40,7 +36,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 	{
 		id: 'fb-proj-3',
 		title: 'AI Lab',
-		slug: 'ai-lab-experiments',
 		description:
 			'Experimental AI playground for testing LLM interactions and agent functionalities.',
 		techStack: ['Python', 'LangChain', 'OpenAI', 'React', 'FastAPI'],
@@ -49,7 +44,6 @@ export const FALLBACK_PROJECTS: Project[] = [
 		githubUrl: null,
 		liveUrl: null,
 		status: 'published',
-		featured: false,
 		stars: null,
 		forks: null,
 		createdAt: '2024-05-01T00:00:00.000Z',

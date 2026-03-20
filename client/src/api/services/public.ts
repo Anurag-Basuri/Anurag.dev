@@ -30,12 +30,12 @@ async function getProjects() {
 	return withFallback(() => apiClient.get<Project[]>('/projects'), FALLBACK_PROJECTS, 'projects');
 }
 
-async function getProjectBySlug(slug: string) {
-	const fallbackProject = FALLBACK_PROJECTS.find(p => p.slug === slug) || FALLBACK_PROJECTS[0];
+async function getProjectById(id: string) {
+	const fallbackProject = FALLBACK_PROJECTS.find(p => p.id === id) || FALLBACK_PROJECTS[0];
 	return withFallback(
-		() => apiClient.get<Project>(`/projects/${slug}`),
+		() => apiClient.get<Project>(`/projects/${id}`),
 		fallbackProject,
-		`project:${slug}`,
+		`project:${id}`,
 	);
 }
 
@@ -67,12 +67,12 @@ async function getBlogPosts() {
 	return withFallback(() => apiClient.get<BlogPost[]>('/blog'), FALLBACK_BLOG_POSTS, 'blog');
 }
 
-async function getBlogPostBySlug(slug: string) {
-	const fallbackPost = FALLBACK_BLOG_POSTS.find(p => p.slug === slug) || FALLBACK_BLOG_POSTS[0];
+async function getBlogPostById(id: string) {
+	const fallbackPost = FALLBACK_BLOG_POSTS.find(p => p.id === id) || FALLBACK_BLOG_POSTS[0];
 	return withFallback(
-		() => apiClient.get<BlogPost>(`/blog/${slug}`),
+		() => apiClient.get<BlogPost>(`/blog/${id}`),
 		fallbackPost,
-		`blog:${slug}`,
+		`blog:${id}`,
 	);
 }
 
@@ -103,12 +103,12 @@ async function getReadme() {
 export const publicService = {
 	getProfile,
 	getProjects,
-	getProjectBySlug,
+	getProjectById,
 	getJourney,
 	getAchievements,
 	getCertifications,
 	getBlogPosts,
-	getBlogPostBySlug,
+	getBlogPostById,
 	getCodingStats,
 	submitContact,
 	getReadme,
