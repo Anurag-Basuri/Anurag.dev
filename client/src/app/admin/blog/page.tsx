@@ -17,7 +17,7 @@ const EMPTY = {
 	coverImage: '',
 	otherImages: [] as string[],
 	link: '',
-	status: 'draft',
+	status: 'DRAFT',
 };
 
 export default function BlogPage() {
@@ -187,9 +187,9 @@ export default function BlogPage() {
 					value={form.status}
 					onChange={updateField}
 					options={[
-						{ label: 'Draft', value: 'draft' },
-						{ label: 'Published', value: 'published' },
-						{ label: 'Archived', value: 'archived' },
+						{ label: 'Draft', value: 'DRAFT' },
+						{ label: 'Published', value: 'PUBLISHED' },
+						{ label: 'Archived', value: 'ARCHIVED' },
 					]}
 				/>
 			</FormModal>

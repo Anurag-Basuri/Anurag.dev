@@ -26,6 +26,22 @@ const EMPLOYMENT_TYPES = [
 	{ label: 'Freelance', value: 'FREELANCE' },
 ];
 
+const WORK_MODES = [
+	{ label: '— None —', value: '' },
+	{ label: 'Onsite', value: 'ONSITE' },
+	{ label: 'Remote', value: 'REMOTE' },
+	{ label: 'Hybrid', value: 'HYBRID' },
+];
+
+const WORK_TYPES = [
+	{ label: '— None —', value: '' },
+	{ label: 'Individual Contributor', value: 'INDIVIDUAL_CONTRIBUTOR' },
+	{ label: 'Team Lead', value: 'LEAD' },
+	{ label: 'Manager', value: 'MANAGER' },
+	{ label: 'Consultant', value: 'CONSULTANT' },
+	{ label: 'Other', value: 'OTHER' },
+];
+
 interface JourneyForm {
 	type: string;
 	title: string;
@@ -45,6 +61,8 @@ interface JourneyForm {
 	grade: string;
 	board: string;
 	employmentType: string;
+	workMode: string;
+	workType: string;
 	publication: string;
 	doi: string;
 	icon: string;
@@ -69,6 +87,8 @@ const EMPTY: JourneyForm = {
 	grade: '',
 	board: '',
 	employmentType: '',
+	workMode: '',
+	workType: '',
 	publication: '',
 	doi: '',
 	icon: '',
@@ -98,6 +118,8 @@ function cleanPayload(form: JourneyForm): Record<string, unknown> {
 	}
 	if (form.type !== 'WORK') {
 		payload.employmentType = '';
+		payload.workMode = '';
+		payload.workType = '';
 	}
 	if (form.type !== 'RESEARCH') {
 		payload.publication = '';
@@ -161,6 +183,8 @@ export default function JourneyPage() {
 			grade: entry.grade || '',
 			board: entry.board || '',
 			employmentType: entry.employmentType || '',
+			workMode: entry.workMode || '',
+			workType: entry.workType || '',
 			publication: entry.publication || '',
 			doi: entry.doi || '',
 			icon: entry.icon || '',
@@ -484,6 +508,24 @@ export default function JourneyPage() {
 							onChange={updateField}
 							options={EMPLOYMENT_TYPES}
 						/>
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								label="Work Mode"
+								name="workMode"
+								type="select"
+								value={form.workMode}
+								onChange={updateField}
+								options={WORK_MODES}
+							/>
+							<FormField
+								label="Work Type / Role"
+								name="workType"
+								type="select"
+								value={form.workType}
+								onChange={updateField}
+								options={WORK_TYPES}
+							/>
+						</div>
 					</>
 				)}
 

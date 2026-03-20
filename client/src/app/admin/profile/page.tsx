@@ -16,6 +16,24 @@ interface SocialEntry {
 	handle?: string;
 }
 
+const SOCIAL_PLATFORMS = [
+	{ label: 'GitHub', value: 'GITHUB' },
+	{ label: 'LinkedIn', value: 'LINKEDIN' },
+	{ label: 'Twitter/X', value: 'X' },
+	{ label: 'Reddit', value: 'REDDIT' },
+	{ label: 'Instagram', value: 'INSTAGRAM' },
+	{ label: 'Medium', value: 'MEDIUM' },
+	{ label: 'Quora', value: 'QUORA' },
+	{ label: 'Dev.to', value: 'DEVTO' },
+	{ label: 'Facebook', value: 'FACEBOOK' },
+	{ label: 'YouTube', value: 'YOUTUBE' },
+	{ label: 'Discord', value: 'DISCORD' },
+	{ label: 'Telegram', value: 'TELEGRAM' },
+	{ label: 'WhatsApp', value: 'WHATSAPP' },
+	{ label: 'Personal Website', value: 'PERSONAL_WEBSITE' },
+	{ label: 'Other', value: 'OTHER' },
+];
+
 function SocialsEditor({
 	value,
 	onChange,
@@ -50,13 +68,18 @@ function SocialsEditor({
 			</div>
 			{value.map((entry, i) => (
 				<div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-start">
-					<input
-						type="text"
+					<select
 						value={entry.platform}
 						onChange={e => updateEntry(i, 'platform', e.target.value)}
-						placeholder="Platform"
-						className="px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white text-sm placeholder-zinc-600 outline-none focus:ring-2 focus:ring-blue-500/40"
-					/>
+						className="px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white text-sm outline-none focus:ring-2 focus:ring-blue-500/40"
+					>
+						<option value="" disabled>Select Platform</option>
+						{SOCIAL_PLATFORMS.map(p => (
+							<option key={p.value} value={p.value}>
+								{p.label}
+							</option>
+						))}
+					</select>
 					<input
 						type="url"
 						value={entry.url}

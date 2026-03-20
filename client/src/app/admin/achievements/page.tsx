@@ -9,17 +9,18 @@ import { FormField, TagField } from '../components/FormField';
 import type { Achievement } from '@/api/schema';
 
 const CATEGORIES = [
-	{ label: 'Hackathon', value: 'hackathon' },
-	{ label: 'Competition', value: 'competition' },
-	{ label: 'Award', value: 'award' },
-	{ label: 'Open Source', value: 'opensource' },
-	{ label: 'Publication', value: 'publication' },
-	{ label: 'Scholarship', value: 'scholarship' },
+	{ label: 'Hackathon', value: 'HACKATHON' },
+	{ label: 'Competition', value: 'COMPETITION' },
+	{ label: 'Award', value: 'AWARD' },
+	{ label: 'Open Source', value: 'OPEN_SOURCE' },
+	{ label: 'Publication', value: 'PUBLICATION' },
+	{ label: 'Scholarship', value: 'SCHOLARSHIP' },
+	{ label: 'Other', value: 'OTHER' },
 ];
 
 const EMPTY = {
 	title: '',
-	category: 'hackathon',
+	category: 'HACKATHON',
 	issuer: '',
 	event: '',
 	description: '',
