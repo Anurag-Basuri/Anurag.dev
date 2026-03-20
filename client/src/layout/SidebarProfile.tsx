@@ -9,10 +9,12 @@ import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 
 const SOCIAL_ICONS: Record<string, React.ElementType<{ className?: string }>> = {
-	GitHub: Github,
-	Twitter: Twitter,
-	LinkedIn: Linkedin,
-	Website: Globe,
+	GITHUB: Github,
+	TWITTER: Twitter,
+	X: Twitter,
+	LINKEDIN: Linkedin,
+	WEBSITE: Globe,
+	OTHER: Globe,
 };
 
 // ============================================================================
@@ -42,7 +44,7 @@ const SocialButton = memo(function SocialButton({ href, icon: Icon, label }: Soc
 			)}
 			title={label}
 		>
-			<Icon className={cn(PANEL_TOKENS.icons.md, 'transition-transform group-hover:scale-110')} />
+			<Icon className={cn(PANEL_TOKENS.icons.md, 'transition-transform duration-300 group-hover:scale-125')} />
 		</a>
 	);
 });
@@ -66,7 +68,7 @@ export const SidebarProfile = memo(function SidebarProfile() {
 				<div className="flex items-center gap-2 sm:gap-3 mb-3">
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-border/40 ring-1 ring-emerald-400/20">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-border/60 ring-2 ring-emerald-400/20 shadow-sm">
 							{profile?.avatarUrl ? (
 								<img 
 									src={profile.avatarUrl} 
@@ -96,18 +98,18 @@ export const SidebarProfile = memo(function SidebarProfile() {
 
 					{/* Info */}
 					<div className="min-w-0 flex-1">
-						<h3 className="font-semibold text-xs sm:text-sm text-foreground truncate leading-tight">
+						<h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight">
 							{profile?.name || 'Anurag Basuri'}
 						</h3>
-						<p className="text-[9px] sm:text-[10px] text-muted-foreground font-mono truncate">
-							{profile?.header ? profile.header.split(',')[0] : 'Full Stack Engineer'}
+						<p className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate mt-0.5">
+							{profile?.Tagline || 'Software Engineer'}
 						</p>
 					</div>
 				</div>
 
 				{/* Social Links */}
-				<div className="grid gap-1.5 relative z-10" onClick={e => e.stopPropagation()}>
-					<div className="flex flex-wrap gap-1.5 justify-start">
+				<div className="grid gap-2 relative z-10 mt-2" onClick={e => e.stopPropagation()}>
+					<div className="flex flex-wrap gap-2 justify-start">
 						{(profile?.socialLinks ?? []).length > 0 ? (
 							(profile?.socialLinks ?? []).map(social => {
 								const Icon = SOCIAL_ICONS[social.platform] || Globe;
