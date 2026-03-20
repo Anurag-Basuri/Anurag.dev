@@ -7,6 +7,7 @@ import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
 import { StatusBadge } from '../components/StatusBadge';
+import { FileUploadField } from '../components/FileUploadField';
 import type { BlogPost } from '@/api/schema';
 
 const EMPTY = {
@@ -162,6 +163,19 @@ export default function BlogPage() {
 					value={form.coverImage}
 					onChange={updateField}
 				/>
+				{modal.editing && (
+					<div className="mb-4">
+						<FileUploadField
+							label="Upload Cover Image (Optional)"
+							currentUrl={form.coverImage}
+							onUpload={async file => {
+								const updated = await adminService.uploadBlogCover(modal.editing!.id, file);
+								setForm(prev => ({ ...prev, coverImage: updated.coverImage || '' }));
+								refetch();
+							}}
+						/>
+					</div>
+				)}
 				<FormField
 					label="External Link"
 					name="link"

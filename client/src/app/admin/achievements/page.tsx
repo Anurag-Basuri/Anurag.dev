@@ -6,6 +6,7 @@ import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
+import { FileUploadField } from '../components/FileUploadField';
 import type { Achievement } from '@/api/schema';
 
 const CATEGORIES = [
@@ -219,6 +220,20 @@ export default function AchievementsPage() {
 					onChange={updateField}
 					placeholder="Certificate / proof link"
 				/>
+				{modal.editing && (
+					<div className="mb-4">
+						<FileUploadField
+							label="Upload Proof File (Optional)"
+							currentUrl={form.proofUrl}
+							accept=".pdf,.png,.jpg,.jpeg"
+							onUpload={async file => {
+								const updated = await adminService.uploadAchievementProof(modal.editing!.id, file);
+								setForm(prev => ({ ...prev, proofUrl: updated.proofUrl || '' }));
+								refetch();
+							}}
+						/>
+					</div>
+				)}
 				<FormField
 					label="URL"
 					name="url"

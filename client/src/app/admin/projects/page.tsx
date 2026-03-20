@@ -7,6 +7,7 @@ import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
 import { StatusBadge } from '../components/StatusBadge';
+import { FileUploadField } from '../components/FileUploadField';
 import type { Project } from '@/api/schema';
 
 const EMPTY_PROJECT = {
@@ -166,6 +167,19 @@ export default function ProjectsPage() {
 					value={form.thumbnail}
 					onChange={updateField}
 				/>
+				{modal.editing && (
+					<div className="mb-4">
+						<FileUploadField
+							label="Upload Thumbnail File (Optional)"
+							currentUrl={form.thumbnail}
+							onUpload={async file => {
+								const updated = await adminService.uploadProjectThumbnail(modal.editing!.id, file);
+								setForm(prev => ({ ...prev, thumbnail: updated.thumbnail || '' }));
+								refetch();
+							}}
+						/>
+					</div>
+				)}
 				<TagField
 					label="Image URLs"
 					name="images"

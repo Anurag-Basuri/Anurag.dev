@@ -6,6 +6,7 @@ import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
+import { FileUploadField } from '../components/FileUploadField';
 import type { Certification } from '@/api/schema';
 
 const EMPTY = {
@@ -178,6 +179,20 @@ export default function CertificationsPage() {
 					value={form.certificateUrl}
 					onChange={updateField}
 				/>
+				{modal.editing && (
+					<div className="mb-4">
+						<FileUploadField
+							label="Upload Certificate File (Optional)"
+							currentUrl={form.certificateUrl}
+							accept=".pdf,.png,.jpg,.jpeg"
+							onUpload={async file => {
+								const updated = await adminService.uploadCertificateFile(modal.editing!.id, file);
+								setForm(prev => ({ ...prev, certificateUrl: updated.certificateUrl || '' }));
+								refetch();
+							}}
+						/>
+					</div>
+				)}
 				<TagField label="Skills" name="skills" value={form.skills} onChange={updateField} />
 				<FormField
 					label="Start Date"
