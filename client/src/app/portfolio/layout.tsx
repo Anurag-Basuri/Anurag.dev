@@ -10,9 +10,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Power, Maximize2 } from 'lucide-react';
 import { BootGuard } from '@/boot/components/BootGuard';
 
-const Sidebar = dynamic(() => import('@/layout/Sidebar').then(m => m.Sidebar), {
+const ResizableSidebar = dynamic(() => import('@/layout/ResizableSidebar').then(m => m.ResizableSidebar), {
 	ssr: false,
-	loading: () => <div className="w-64 lg:w-72 shrink-0 animate-pulse bg-muted/10 rounded-xl" />,
+	loading: () => <div className="hidden md:flex rounded-xl bg-transparent border border-border shrink-0 overflow-hidden relative w-[280px] h-full animate-pulse bg-foreground/5" />,
 });
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
@@ -34,16 +34,12 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 							<TopBar />
 
 							<div className="flex-1 flex min-h-0 w-full overflow-hidden p-2 md:p-3 gap-2">
-								{/* Sidebar */}
-								<aside className="hidden md:flex rounded-xl bg-transparent border border-border w-64 lg:w-72 shrink-0 overflow-hidden relative">
-									<ErrorBoundary label="Sidebar">
-										<Suspense
-											fallback={<div className="h-full w-full animate-pulse bg-foreground/5" />}
-										>
-											<Sidebar />
-										</Suspense>
-									</ErrorBoundary>
-								</aside>
+								{/* Sidebar wrapper handles its own <aside> layer */}
+								<Suspense
+									fallback={<div className="hidden md:flex rounded-xl bg-transparent border border-border shrink-0 overflow-hidden relative w-[280px] h-full animate-pulse bg-foreground/5" />}
+								>
+									<ResizableSidebar />
+								</Suspense>
 
 								{/* Main content */}
 								<main className="rounded-xl bg-transparent border border-border flex-1 min-h-0 overflow-hidden relative">

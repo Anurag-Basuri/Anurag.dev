@@ -2,6 +2,7 @@
 
 import React, { memo, useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Linkedin, Github, Mail, Twitter, Globe, Instagram, Youtube, Facebook, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/theme/colors/tokens';
@@ -60,7 +61,7 @@ const SocialButton = memo(function SocialButton({ href, icon: Icon, label }: Soc
 // Sidebar Profile Component
 // ============================================================================
 
-export const SidebarProfile = memo(function SidebarProfile() {
+export const SidebarProfile = memo(function SidebarProfile({ isCollapsed }: { isCollapsed?: boolean }) {
 	const [profile, setProfile] = useState<Profile | null>(null);
 
 	useEffect(() => {
@@ -70,12 +71,12 @@ export const SidebarProfile = memo(function SidebarProfile() {
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">
 			{/* Profile Section */}
-			<div className="p-2 sm:p-3 border-b border-sidebar-border/20 bg-transparent">
+			<div className={cn("p-2 sm:p-3 border-b border-sidebar-border/20 bg-transparent flex flex-col transition-all duration-300", isCollapsed ? "items-center" : "")}>
 				{/* Avatar + Info Row */}
-				<div className="flex items-center gap-2 sm:gap-3 mb-3">
+				<div className={cn("flex items-center w-full transition-all duration-300", isCollapsed ? "justify-center mb-0" : "gap-2 sm:gap-3 mb-3")}>
 					{/* Avatar */}
-					<div className="relative shrink-0">
-						<div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-border/60 ring-2 ring-emerald-400/20 shadow-sm">
+					<div className={cn("relative shrink-0 transition-all duration-500", isCollapsed ? "w-12 h-12 mb-2 mt-2" : "w-10 h-10 sm:w-12 sm:h-12")}>
+						<div className="w-full h-full rounded-full overflow-hidden border border-border/60 ring-2 ring-emerald-400/20 shadow-sm">
 							{profile?.avatarUrl ? (
 								<img 
 									src={profile.avatarUrl} 
@@ -104,40 +105,59 @@ export const SidebarProfile = memo(function SidebarProfile() {
 					</div>
 
 					{/* Info */}
-					<div className="min-w-0 flex-1">
-						<h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight">
-							{profile?.name || 'Anurag Basuri'}
-						</h3>
-						<p className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate mt-0.5">
-							{profile?.Tagline || 'Software Engineer'}
-						</p>
-					</div>
+					<AnimatePresence>
+						{!isCollapsed && (
+							<motion.div 
+								initial={{ width: 0, opacity: 0 }}
+								animate={{ width: 'auto', opacity: 1 }}
+								exit={{ width: 0, opacity: 0, overflow: 'hidden' }}
+								className="min-w-0 flex-1 whitespace-nowrap overflow-hidden"
+							>
+								<h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight">
+									{profile?.name || 'Anurag Basuri'}
+								</h3>
+								<p className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate mt-0.5">
+									{profile?.Tagline || 'Software Engineer'}
+								</p>
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 
 				{/* Social Links */}
-				<div className="grid gap-2 relative z-10 mt-2" onClick={e => e.stopPropagation()}>
-					<div className="flex flex-wrap gap-2 justify-start">
-						{(profile?.socialLinks ?? []).length > 0 ? (
-							(profile?.socialLinks ?? []).map((social, index) => {
-								const Icon = SOCIAL_ICONS[social.platform] || Globe;
-								return (
-									<SocialButton
-										key={social.id || `${social.platform}-${index}`}
-										href={social.url}
-										icon={Icon}
-										label={social.customLabel || social.platform}
-									/>
-								);
-							})
-						) : (
-							<>
-								<SocialButton href="https://linkedin.com" icon={Linkedin} label="LinkedIn" />
-								<SocialButton href="https://github.com" icon={Github} label="GitHub" />
-								<SocialButton href="mailto:contact@example.com" icon={Mail} label="Email" />
-							</>
-						)}
-					</div>
-				</div>
+				<AnimatePresence>
+					{!isCollapsed && (
+						<motion.div 
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: 'auto' }}
+							exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+							className="grid gap-2 relative z-10 w-full" 
+							onClick={e => e.stopPropagation()}
+						>
+							<div className="flex flex-wrap gap-2 justify-start mt-2">
+								{(profile?.socialLinks ?? []).length > 0 ? (
+									(profile?.socialLinks ?? []).map((social, index) => {
+										const Icon = SOCIAL_ICONS[social.platform] || Globe;
+										return (
+											<SocialButton
+												key={social.id || `${social.platform}-${index}`}
+												href={social.url}
+												icon={Icon}
+												label={social.customLabel || social.platform}
+											/>
+										);
+									})
+								) : (
+									<>
+										<SocialButton href="https://linkedin.com" icon={Linkedin} label="LinkedIn" />
+										<SocialButton href="https://github.com" icon={Github} label="GitHub" />
+										<SocialButton href="mailto:contact@example.com" icon={Mail} label="Email" />
+									</>
+								)}
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</div>
 	);

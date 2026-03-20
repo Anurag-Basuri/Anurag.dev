@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { SectionConfig } from '@/lib/sections';
 import {
@@ -22,6 +22,7 @@ interface TableOfContentsProps {
 	items: SectionConfig[];
 	activeSectionId: string | null;
 	onSelect: (item: SectionConfig) => void;
+	isCollapsed?: boolean;
 }
 
 const SECTION_THEMES: Record<
@@ -59,7 +60,7 @@ const getSectionIcon = (id: string, className: string, isActive: boolean) => {
 	}
 };
 
-export function TableOfContents({ items, activeSectionId, onSelect }: TableOfContentsProps) {
+export function TableOfContents({ items, activeSectionId, onSelect, isCollapsed }: TableOfContentsProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	// Sync active section to scroll view in the sidebar
@@ -73,7 +74,7 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 	}, [activeSectionId]);
 
 	return (
-		<div ref={containerRef} className="flex flex-col gap-1.5 w-full relative p-2">
+		<div ref={containerRef} className={cn("flex flex-col w-full relative", isCollapsed ? "h-full justify-between gap-1 py-4 px-1" : "gap-1.5 p-2")}>
 			{items.map(item => {
 				const isActive = activeSectionId === item.id || activeSectionId === item.moduleId;
 				const theme = SECTION_THEMES[item.id] || DEFAULT_THEME;
@@ -83,8 +84,10 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 						key={item.id}
 						data-section-id={item.id}
 						onClick={() => onSelect(item)}
+						title={isCollapsed ? item.file : undefined}
 						className={cn(
-							'relative flex items-center gap-4 w-full px-4 py-3 text-left rounded-xl transition-all duration-300 overflow-hidden group',
+							'relative flex items-center w-full rounded-xl transition-all duration-300 overflow-hidden group',
+							isCollapsed ? 'justify-center p-2.5' : 'gap-4 px-4 py-3 text-left',
 							isActive
 								? cn('font-bold shadow-sm', theme.activeText)
 								: cn('text-muted-foreground font-medium', theme.hoverBg, 'hover:scale-[1.02]')
@@ -100,7 +103,7 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 						)}
 
 						{/* Small glow line on the left for active */}
-						{isActive && (
+						{!isCollapsed && isActive && (
 							<motion.div
 								layoutId="active-toc-line"
 								className={cn('absolute left-0 top-[20%] bottom-[20%] w-[4px] rounded-r-full', theme.activeGlow)}
@@ -120,19 +123,39 @@ export function TableOfContents({ items, activeSectionId, onSelect }: TableOfCon
 						</div>
 
 						{/* File Name (Creative Label) */}
-						<span className={cn('truncate text-[13px] tracking-wider uppercase mt-0.5 transition-colors', isActive ? theme.activeText : 'group-hover:text-foreground')}>
-							{item.file}
-						</span>
+						<AnimatePresence>
+							{!isCollapsed && (
+								<motion.span
+									initial={{ opacity: 0, width: 0 }}
+									animate={{ opacity: 1, width: 'auto' }}
+									exit={{ opacity: 0, width: 0, overflow: 'hidden' }}
+									className={cn('truncate text-[13px] tracking-wider uppercase mt-0.5 transition-colors', isActive ? theme.activeText : 'group-hover:text-foreground')}
+								>
+									{item.file}
+								</motion.span>
+							)}
+						</AnimatePresence>
 
 						{/* Arrow on hover/active */}
-						<ChevronRight
-							className={cn(
-								'w-4 h-4 ml-auto transition-all duration-300',
-								isActive
-									? cn('opacity-100 translate-x-0', theme.activeText)
-									: 'opacity-0 -translate-x-4 group-hover:opacity-40 group-hover:translate-x-0 group-hover:text-foreground',
+						<AnimatePresence>
+							{!isCollapsed && (
+								<motion.div
+									initial={{ opacity: 0, width: 0 }}
+									animate={{ opacity: 1, width: 'auto' }}
+									exit={{ opacity: 0, width: 0, overflow: 'hidden' }}
+									className="ml-auto flex items-center"
+								>
+									<ChevronRight
+										className={cn(
+											'w-4 h-4 transition-all duration-300',
+											isActive
+												? cn('opacity-100 translate-x-0', theme.activeText)
+												: 'opacity-0 -translate-x-4 group-hover:opacity-40 group-hover:translate-x-0 group-hover:text-foreground',
+										)}
+									/>
+								</motion.div>
 							)}
-						/>
+						</AnimatePresence>
 					</button>
 				);
 			})}
