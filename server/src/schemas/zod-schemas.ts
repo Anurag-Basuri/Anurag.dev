@@ -64,7 +64,7 @@ export const SocialLinkSchema = z.object({
 		'PERSONAL_WEBSITE',
 		'OTHER',
 	]),
-	url: z.string().url(),
+	url: z.string().url('Must be a valid URL'),
 	customLabel: nullableStr,
 });
 
@@ -74,9 +74,9 @@ export const SocialLinkSchema = z.object({
 
 export const ProfileSchema = z.object({
 	// Personal Info
-	name: z.string().min(1),
+	name: z.string().min(1, 'Name is required'),
 	pronouns: z.string().optional(),
-	email: z.string().email().optional(),
+	email: z.string().email('Must be a valid email address').optional(),
 	phone: z.string().optional(),
 
 	// Career & Bio
@@ -145,9 +145,9 @@ export const ProfileSchema = z.object({
 
 export const ProjectSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(2, 'Title is required'),
-	description: z.string().min(10),
-	techStack: z.array(z.string()),
+	title: z.string().min(2, 'Title must be at least 2 characters'),
+	description: z.string().min(10, 'Description must be at least 10 characters'),
+	techStack: z.array(z.string(), { required_error: 'Tech stack is required' }),
 
 	thumbnail: nullableStr,
 	images: z.array(z.string()).optional(),
@@ -169,16 +169,16 @@ export const ProjectSchema = z.object({
 export const JourneyItemSchema = z.object({
 	id: z.string().optional(),
 	type: requiredEnum(['WORK', 'EDUCATION', 'VOLUNTEERING', 'RESEARCH', 'EDUCATOR', 'OTHER']),
-	title: z.string().min(1),
+	title: z.string().min(1, 'Title is required'),
 	organization: nullableStr,
 	location: nullableStr,
 
-	date: z.string().min(1),
+	date: z.string().min(1, 'Date is required'),
 	startDate: nullableDatetime,
 	endDate: nullableDatetime,
 	isCurrent: z.boolean().default(false),
 
-	description: z.string().min(1),
+	description: z.string().min(1, 'Description is required'),
 	skills: z.array(z.string()).optional(),
 	url: nullableUrl,
 
@@ -217,8 +217,8 @@ export const JourneyItemSchema = z.object({
 
 export const JourneyDocumentSchema = z.object({
 	id: z.string().optional(),
-	journeyEntryId: z.string().min(1),
-	title: z.string().min(1),
+	journeyEntryId: z.string().min(1, 'Journey entry ID is required'),
+	title: z.string().min(1, 'Document title is required'),
 	type: requiredEnum([
 		'OFFER_LETTER',
 		'APPOINTMENT_LETTER',
@@ -229,7 +229,7 @@ export const JourneyDocumentSchema = z.object({
 		'CERTIFICATE',
 		'OTHER',
 	]),
-	url: z.string().url(),
+	url: z.string().url('Document URL must be valid'),
 	issuer: nullableStr,
 	issuedAt: nullableDatetime,
 	notes: nullableStr,
@@ -240,7 +240,7 @@ export const JourneyDocumentSchema = z.object({
 
 export const AchievementSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(1),
+	title: z.string().min(1, 'Achievement title is required'),
 	category: z.enum([
 		'hackathon',
 		'competition',
@@ -274,8 +274,8 @@ export const AchievementSchema = z.object({
 
 export const CertificationSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(1),
-	issuer: z.string().min(1),
+	title: z.string().min(1, 'Certification title is required'),
+	issuer: z.string().min(1, 'Issuer is required'),
 
 	description: nullableStr,
 	credentialId: nullableStr,
@@ -294,9 +294,9 @@ export const CertificationSchema = z.object({
 
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
-	title: z.string().min(5),
-	content: z.string().min(1),
-	tags: z.array(z.string()),
+	title: z.string().min(5, 'Blog title must be at least 5 characters'),
+	content: z.string().min(1, 'Content is required'),
+	tags: z.array(z.string(), { required_error: 'Tags are required' }),
 
 	coverImage: nullableStr,
 	otherImages: z.array(z.string()).optional(),

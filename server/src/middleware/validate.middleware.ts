@@ -2,7 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { ApiError } from '../utils/ApiError';
 
-// Middleware to validate request bodies against a Zod schema
+// ─── Shared helper ──────────────────────────────────────────────
+
+function zodToApiError(err: ZodError, label: 'body' | 'params' | 'query'): ApiError {
+	return ApiError.ValidationError(err, label);
+}
+
+// ─── Body validation ────────────────────────────────────────────
+
 export function validate(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -10,11 +17,7 @@ export function validate(schema: ZodSchema) {
 			next();
 		} catch (err) {
 			if (err instanceof ZodError) {
-				const details = err.errors.map(e => ({
-					field: e.path.join('.'),
-					message: e.message,
-				}));
-				next(new ApiError(400, 'Validation failed', { details }));
+				next(zodToApiError(err, 'body'));
 				return;
 			}
 			next(err);
@@ -22,7 +25,8 @@ export function validate(schema: ZodSchema) {
 	};
 }
 
-// Optional: validate route parameters as well
+// ─── Route params validation ────────────────────────────────────
+
 export function validateParams(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -30,11 +34,7 @@ export function validateParams(schema: ZodSchema) {
 			next();
 		} catch (err) {
 			if (err instanceof ZodError) {
-				const details = err.errors.map(e => ({
-					field: e.path.join('.'),
-					message: e.message,
-				}));
-				next(new ApiError(400, 'Invalid parameters', { details }));
+				next(zodToApiError(err, 'params'));
 				return;
 			}
 			next(err);
@@ -42,7 +42,8 @@ export function validateParams(schema: ZodSchema) {
 	};
 }
 
-// Optional: validate query parameters as well
+// ─── Query params validation ────────────────────────────────────
+
 export function validateQuery(schema: ZodSchema) {
 	return (req: Request, _res: Response, next: NextFunction) => {
 		try {
@@ -50,11 +51,7 @@ export function validateQuery(schema: ZodSchema) {
 			next();
 		} catch (err) {
 			if (err instanceof ZodError) {
-				const details = err.errors.map(e => ({
-					field: e.path.join('.'),
-					message: e.message,
-				}));
-				next(new ApiError(400, 'Invalid query parameters', { details }));
+				next(zodToApiError(err, 'query'));
 				return;
 			}
 			next(err);
