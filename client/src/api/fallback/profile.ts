@@ -23,7 +23,7 @@ When I'm not pushing commits, you can find me exploring new AI technologies, rea
 	noticePeriod: 'Immediate',
 
 	workPreferences: { remote: true, hybrid: true, onsite: false, relocation: false },
-	jobTypes: ['full-time', 'internship'],
+	Freelancing: true,
 
 	avatarUrl: '/logo.png',
 	coverUrl: '/about-cover.jpg',
@@ -40,12 +40,13 @@ When I'm not pushing commits, you can find me exploring new AI technologies, rea
 
 	languages: ['English', 'Hindi'],
 
-	socials: [
-		{ platform: 'GitHub', url: 'https://github.com/Anurag-Basuri' },
-		{ platform: 'LinkedIn', url: 'https://linkedin.com/in/anuragbasuri' },
-		{ platform: 'Twitter', url: 'https://twitter.com/AnuragBasuri' },
+	socialLinks: [
+		{ id: 'fb-sl-1', platform: 'GITHUB', url: 'https://github.com/Anurag-Basuri' },
+		{ id: 'fb-sl-2', platform: 'LINKEDIN', url: 'https://linkedin.com/in/anuragbasuri' },
+		{ id: 'fb-sl-3', platform: 'X', url: 'https://twitter.com/AnuragBasuri' },
 	],
-	website: null,
+
+
 
 	github: 'https://github.com/Anurag-Basuri',
 	leetcode: 'https://leetcode.com/u/Anurag_Basuri',
