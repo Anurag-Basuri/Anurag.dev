@@ -18,7 +18,7 @@ const EMPTY_PROJECT = {
 	images: [] as string[],
 	githubUrl: '',
 	liveUrl: '',
-	status: 'DRAFT',
+	status: 'draft',
 	featured: false,
 	stars: 0,
 	forks: 0,
@@ -228,10 +228,10 @@ export default function ProjectsPage() {
 					value={form.status}
 					onChange={updateField}
 					options={[
-						{ label: 'Draft', value: 'DRAFT' },
-						{ label: 'Published', value: 'PUBLISHED' },
-						{ label: 'Completed', value: 'COMPLETED' },
-						{ label: 'Archived', value: 'ARCHIVED' },
+						{ label: 'Draft', value: 'draft' },
+						{ label: 'Published', value: 'published' },
+						{ label: 'Completed', value: 'completed' },
+						{ label: 'Archived', value: 'archived' },
 					]}
 				/>
 				<FormField
