@@ -2,7 +2,7 @@
 
 import React, { memo, useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Linkedin, Github, Mail, Twitter, Globe } from 'lucide-react';
+import { Linkedin, Github, Mail, Twitter, Globe, Instagram, Youtube, Facebook, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/theme/colors/tokens';
 import { publicService } from '@/api';
@@ -10,9 +10,16 @@ import type { Profile } from '@/api/schema';
 
 const SOCIAL_ICONS: Record<string, React.ElementType<{ className?: string }>> = {
 	GITHUB: Github,
+	LINKEDIN: Linkedin,
 	TWITTER: Twitter,
 	X: Twitter,
-	LINKEDIN: Linkedin,
+	REDDIT: MessageCircle,
+	INSTAGRAM: Instagram,
+	FACEBOOK: Facebook,
+	YOUTUBE: Youtube,
+	DISCORD: MessageCircle,
+	TELEGRAM: MessageCircle,
+	WHATSAPP: MessageCircle,
 	WEBSITE: Globe,
 	OTHER: Globe,
 };
@@ -111,14 +118,14 @@ export const SidebarProfile = memo(function SidebarProfile() {
 				<div className="grid gap-2 relative z-10 mt-2" onClick={e => e.stopPropagation()}>
 					<div className="flex flex-wrap gap-2 justify-start">
 						{(profile?.socialLinks ?? []).length > 0 ? (
-							(profile?.socialLinks ?? []).map(social => {
+							(profile?.socialLinks ?? []).map((social, index) => {
 								const Icon = SOCIAL_ICONS[social.platform] || Globe;
 								return (
 									<SocialButton
-										key={social.platform}
+										key={social.id || `${social.platform}-${index}`}
 										href={social.url}
 										icon={Icon}
-										label={social.platform}
+										label={social.customLabel || social.platform}
 									/>
 								);
 							})

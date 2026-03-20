@@ -130,6 +130,8 @@ export const ProfileSchema = z.object({
 	seoTitle: nullableStr,
 	seoDesc: nullableStr,
 	seoKeywords: z.array(z.string()).optional(),
+
+	socialLinks: z.array(SocialLinkSchema).optional(),
 });
 
 // ─── Project ────────────────────────────────────────────────────

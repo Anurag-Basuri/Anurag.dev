@@ -16,6 +16,10 @@ import {
 	Copy,
 	Check,
 	MessageSquare,
+	Instagram,
+	Youtube,
+	Facebook,
+	Globe,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -23,9 +27,19 @@ import { toast } from 'react-hot-toast';
 import { SectionHeader } from '@/ui/SectionHeader';
 
 const SOCIAL_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
-	GitHub: Github,
-	Twitter: Twitter,
-	LinkedIn: Linkedin,
+	GITHUB: Github,
+	LINKEDIN: Linkedin,
+	TWITTER: Twitter,
+	X: Twitter,
+	REDDIT: MessageSquare,
+	INSTAGRAM: Instagram,
+	FACEBOOK: Facebook,
+	YOUTUBE: Youtube,
+	DISCORD: MessageSquare,
+	TELEGRAM: MessageSquare,
+	WHATSAPP: MessageSquare,
+	WEBSITE: Globe,
+	OTHER: Globe,
 };
 
 function ContactSkeleton() {
@@ -218,16 +232,16 @@ export function ContactModule() {
 								Social Protocols
 							</h3>
 							<div className="flex flex-wrap justify-center sm:justify-start gap-4">
-								{(about?.socialLinks ?? []).map(social => {
-									const Icon = SOCIAL_ICONS[social.platform] || Mail;
+								{(about?.socialLinks ?? []).map((social, index) => {
+									const Icon = SOCIAL_ICONS[social.platform] || Globe;
 									return (
 										<a
-											key={social.platform}
+											key={social.id || `${social.platform}-${index}`}
 											href={social.url}
 											target="_blank"
 											rel="noopener noreferrer"
 											className="p-4 sm:p-5 flex items-center justify-center rounded-3xl bg-card border border-border hover:bg-card hover:border-white/30 transition-all duration-300 text-muted-foreground hover:text-foreground group hover:scale-110 active:scale-95 shadow-xl"
-											aria-label={`Visit ${social.platform} profile`}
+											aria-label={`Visit ${social.customLabel || social.platform} profile`}
 										>
 											<Icon className="w-6 sm:w-7 h-6 sm:h-7 transition-colors duration-300" />
 										</a>

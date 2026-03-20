@@ -37,22 +37,41 @@ async function getProfile(_req: Request, res: Response): Promise<void> {
 }
 
 async function updateProfile(req: Request, res: Response): Promise<void> {
-	const data = req.body;
+	const { socialLinks, ...profileData } = req.body;
 	const adminId = req.admin!.adminId;
 
-	const profile = await prisma.profile.upsert({
+	let profile = await prisma.profile.upsert({
 		where: { id: SINGLETON_ID },
-		create: { id: SINGLETON_ID, ...data },
-		update: data,
+		create: { id: SINGLETON_ID, ...profileData },
+		update: profileData,
 		include: { socialLinks: true },
 	});
+
+	if (socialLinks && Array.isArray(socialLinks)) {
+		await prisma.socialLink.deleteMany({ where: { profileId: SINGLETON_ID } });
+
+		const toCreate = socialLinks.map((link: any) => ({
+			...normalizeSocialLinkInput(link),
+			url: link.url,
+			profileId: SINGLETON_ID,
+		}));
+
+		if (toCreate.length > 0) {
+			await prisma.socialLink.createMany({ data: toCreate });
+		}
+
+		profile = (await prisma.profile.findUnique({
+			where: { id: SINGLETON_ID },
+			include: { socialLinks: true },
+		})) as any;
+	}
 
 	await logAudit({
 		adminId,
 		action: 'update',
 		resourceType: 'Profile',
 		resourceId: SINGLETON_ID,
-		changes: data,
+		changes: req.body,
 	});
 
 	ApiResponse.ok(res, profile, 'Profile updated');
