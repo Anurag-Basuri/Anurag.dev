@@ -28,7 +28,7 @@ export function TerminalFrame({
 			/>
 
 			{/* ─── Title Bar ─── */}
-			<div className="shrink-0 flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-border relative z-10">
+			<div className="shrink-0 flex items-center justify-between px-3 sm:px-4 py-1.5 sm:py-2 border-b border-border relative z-10">
 				{/* Left: nav + title */}
 				<div className="flex items-center gap-3">
 					<Link
@@ -71,7 +71,7 @@ export function TerminalFrame({
 
 			{/* ─── Status Bar ─── */}
 			{meta && (
-				<div className="shrink-0 flex items-center justify-between px-4 sm:px-5 py-1.5 border-t border-border relative z-10">
+				<div className="shrink-0 flex items-center justify-between px-3 sm:px-4 py-1 border-t border-border relative z-10">
 					<div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
 						<span style={{ color: 'var(--theme-primary)' }}>●</span>
 						<span>UTF-8</span>

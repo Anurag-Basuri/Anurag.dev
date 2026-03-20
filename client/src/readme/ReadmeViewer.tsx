@@ -57,7 +57,7 @@ export function ReadmeViewer({
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col p-2 sm:p-4 pt-4 pb-4 bg-transparent">
+		<div className="w-full h-full flex flex-col p-1 sm:p-2 bg-transparent">
 			<TerminalFrame meta={docMeta}>
 				<div className="h-full w-full flex gap-0 lg:gap-0">
 					{/* ─── Main Scroll Body ─── */}
