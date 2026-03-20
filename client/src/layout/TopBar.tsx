@@ -4,7 +4,7 @@ import { useSetAtom } from 'jotai';
 import { windowStateAtom, bootCompleteAtom } from '@/boot/atoms';
 import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
-import { Maximize2, TerminalSquare } from 'lucide-react';
+import { Maximize2, TerminalSquare, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -65,6 +65,16 @@ export function TopBar() {
 				>
 					<div className="absolute inset-0 blur rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }} />
 					<TerminalSquare className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative z-10" strokeWidth={2.5} />
+				</Link>
+
+				<Link
+					href="/resume"
+					className="transition-colors flex items-center justify-center group relative"
+					style={{ color: 'var(--theme-primary)' }}
+					aria-label="Interactive Resume"
+				>
+					<div className="absolute inset-0 blur rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }} />
+					<FileText className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative z-10" strokeWidth={2.5} />
 				</Link>
 
 				<div className="w-px h-3.5 bg-border hidden sm:block" />

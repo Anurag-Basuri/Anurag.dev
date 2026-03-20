@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, MapPin, Briefcase, ChevronRight, ExternalLink, Code2 } from 'lucide-react';
+import { User, MapPin, Briefcase, ChevronRight, ExternalLink, Code2, FileText } from 'lucide-react';
+import Link from 'next/link';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
@@ -166,14 +167,12 @@ export function ProfileModule() {
 							</button>
 
 							{profile.resumeUrl && (
-								<a
-									href={profile.resumeUrl}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex items-center gap-2 bg-foreground/5 hover:bg-foreground/10 text-foreground px-6 py-3 rounded-2xl font-semibold transition-all border border-border active:scale-95"
+								<Link
+									href="/resume"
+									className="group flex items-center gap-2 bg-foreground/5 hover:bg-foreground/10 text-foreground px-6 py-3 rounded-2xl font-semibold transition-all border border-border active:scale-95"
 								>
-									Resume <ExternalLink className="w-4 h-4" />
-								</a>
+									Resume <FileText className="w-4 h-4 group-hover:scale-110 transition-transform" />
+								</Link>
 							)}
 						</motion.div>
 					</div>
