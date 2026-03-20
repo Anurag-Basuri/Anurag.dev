@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { TerminalFrame } from '@/ui/TerminalFrame';
 import { Download, ExternalLink, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,8 +13,21 @@ export function ResumeViewer({
 	resumeUrl: string;
 	profileName: string;
 }) {
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		const checkMobile = () => setIsMobile(window.innerWidth < 768);
+		checkMobile(); // Check immediately on mount
+		window.addEventListener('resize', checkMobile);
+		return () => window.removeEventListener('resize', checkMobile);
+	}, []);
+
 	const isGoogleDocView = resumeUrl.endsWith('.doc') || resumeUrl.endsWith('.docx') || resumeUrl.includes('docs.google');
-	const embedUrl = isGoogleDocView 
+	
+	// Mobile browsers forcefully download PDFs in iframes. Route them through GDocs viewer to ensure rendering.
+	const forceDocsViewer = isGoogleDocView || isMobile;
+
+	const embedUrl = forceDocsViewer 
 		? `https://docs.google.com/viewer?url=${encodeURIComponent(resumeUrl)}&embedded=true` 
 		: resumeUrl;
 

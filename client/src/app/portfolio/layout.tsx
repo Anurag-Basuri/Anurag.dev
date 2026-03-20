@@ -1,11 +1,12 @@
 'use client';
 
-import { Suspense, type ReactNode } from 'react';
+import { Suspense, useEffect, type ReactNode } from 'react';
 import { ErrorBoundary } from '@/ui/ErrorBoundary';
 import { TopBar } from '@/layout/TopBar';
 import dynamic from 'next/dynamic';
 import { useAtom } from 'jotai';
 import { windowStateAtom } from '@/boot/atoms';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Power, Maximize2 } from 'lucide-react';
 import { BootGuard } from '@/boot/components/BootGuard';
@@ -17,6 +18,28 @@ const ResizableSidebar = dynamic(() => import('@/layout/ResizableSidebar').then(
 
 export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	const [windowState, setWindowState] = useAtom(windowStateAtom);
+	const searchParams = useSearchParams();
+
+	// Handle ?window=minimized from cross-page yellow dot click
+	useEffect(() => {
+		if (searchParams.get('window') === 'minimized') {
+			setWindowState('minimized');
+			// Clean up URL without triggering a reload
+			const url = new URL(window.location.href);
+			url.searchParams.delete('window');
+			window.history.replaceState({}, '', url.toString());
+		}
+	}, [searchParams, setWindowState]);
+
+	// Handle #contact hash from cross-page Contact button click
+	useEffect(() => {
+		if (window.location.hash === '#contact') {
+			window.history.replaceState({}, '', window.location.pathname);
+			window.dispatchEvent(
+				new CustomEvent('scroll-to-section', { detail: { sectionId: 'contact' } }),
+			);
+		}
+	}, []);
 
 	return (
 		<BootGuard>

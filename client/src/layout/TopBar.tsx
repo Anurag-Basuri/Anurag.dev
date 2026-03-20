@@ -9,6 +9,25 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/ui/t
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+// Perfectly-round window control dots at every screen size
+function Dot({ color, onClick, label, children }: {
+	color: string;
+	onClick: () => void;
+	label: string;
+	children?: React.ReactNode;
+}) {
+	return (
+		<button
+			onClick={onClick}
+			aria-label={label}
+			className="group/dot relative flex items-center justify-center shrink-0 flex-none rounded-full border border-foreground/10 transition-colors"
+			style={{ width: 12, height: 12, minWidth: 12, minHeight: 12, backgroundColor: color }}
+		>
+			{children}
+		</button>
+	);
+}
+
 export function TopBar() {
 	const setWindowState = useSetAtom(windowStateAtom);
 	const setBootComplete = useSetAtom(bootCompleteAtom);
@@ -23,66 +42,79 @@ export function TopBar() {
 		}
 	};
 
+	// Yellow: minimize window, but navigate home first if on a sub-page
+	const handleMinimize = () => {
+		if (!isPortfolioShell) {
+			window.location.href = '/portfolio?window=minimized';
+			return;
+		}
+		setWindowState('minimized');
+	};
+
+	// Contact button: scroll if on portfolio, otherwise navigate there
+	const goToContact = () => {
+		if (isPortfolioShell) {
+			window.dispatchEvent(
+				new CustomEvent('scroll-to-section', { detail: { sectionId: 'contact' } }),
+			);
+		} else {
+			window.location.href = '/portfolio#contact';
+		}
+	};
+
 	return (
 		<TooltipProvider delayDuration={300}>
-			<header className="h-10 w-full flex items-center justify-between px-2 sm:px-4 shrink-0 z-30 relative">
+			<header className="h-10 w-full flex items-center justify-between px-3 sm:px-4 shrink-0 z-30 relative">
 				{/* Dedicated blur plane prevents stacking context trapping for nested dropdowns */}
 				<div className="absolute inset-0 bg-background/30 backdrop-blur-xl border-b border-border -z-10 pointer-events-none" />
 
-				{/* Left: window controls + title */}
-				<div className="flex items-center gap-2 sm:gap-4 shrink-0 overflow-hidden">
-					<div className="flex gap-2 items-center group shrink-0">
-						{isPortfolioShell && (
-							<>
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<button
-											onClick={() => setBootComplete(false)}
-											className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors flex items-center justify-center border border-foreground/10 shrink-0"
-											aria-label="Restart Boot"
-										/>
-									</TooltipTrigger>
-									<TooltipContent side="bottom" sideOffset={12}>Restart System</TooltipContent>
-								</Tooltip>
-
-								<Tooltip>
-									<TooltipTrigger asChild>
-										<button
-											onClick={() => setWindowState('minimized')}
-											className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors flex items-center justify-center border border-foreground/10 shrink-0"
-											aria-label="Minimize"
-										/>
-									</TooltipTrigger>
-									<TooltipContent side="bottom" sideOffset={12}>Minimize App</TooltipContent>
-								</Tooltip>
-							</>
-						)}
+				{/* Left: window controls — title hidden on small screens */}
+				<div className="flex items-center gap-2 sm:gap-3 shrink-0">
+					{/* Mac-style dots — always visible on every page */}
+					<div className="flex items-center gap-[6px]">
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<button
-									onClick={toggleFullscreen}
-									className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors flex items-center justify-center border border-foreground/10 relative overflow-hidden group/fs shrink-0"
-									aria-label="Fullscreen"
-								>
-									<Maximize2 className="w-[8px] h-[8px] sm:w-2 sm:h-2 text-green-900 opacity-0 group-hover/fs:opacity-100 transition-opacity absolute" />
-								</button>
+								<Dot color="rgb(239 68 68 / 0.85)" onClick={() => setBootComplete(false)} label="Restart" />
+							</TooltipTrigger>
+							<TooltipContent side="bottom" sideOffset={12}>Restart to Portfolio</TooltipContent>
+						</Tooltip>
+
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Dot color="rgb(234 179 8 / 0.85)" onClick={handleMinimize} label="Minimize" />
+							</TooltipTrigger>
+							<TooltipContent side="bottom" sideOffset={12}>Minimize App</TooltipContent>
+						</Tooltip>
+
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Dot color="rgb(34 197 94 / 0.85)" onClick={toggleFullscreen} label="Fullscreen">
+									<Maximize2
+										className="opacity-0 group-hover/dot:opacity-100 transition-opacity absolute"
+										style={{ width: 7, height: 7, color: 'rgba(0,80,0,0.9)' }}
+									/>
+								</Dot>
 							</TooltipTrigger>
 							<TooltipContent side="bottom" sideOffset={12}>Toggle Fullscreen</TooltipContent>
 						</Tooltip>
 					</div>
-					<div className="h-4 w-px bg-border hidden sm:block shrink-0" />
-					<Link href="/portfolio" className="text-xs sm:text-sm font-bold tracking-wider uppercase text-foreground/80 hidden sm:block leading-none truncate hover:opacity-80 transition-opacity cursor-pointer">
-						Anurag<span className="text-primary">.dev</span>
-					</Link>
+
+					{/* Title — visible only on md+ */}
+					<div className="hidden md:flex items-center gap-3 ml-1">
+						<div className="h-4 w-px bg-border shrink-0" />
+						<Link href="/portfolio" className="text-sm font-bold tracking-wider uppercase text-foreground/80 leading-none hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap">
+							Anurag<span className="text-primary">.dev</span>
+						</Link>
+					</div>
 				</div>
 
-				{/* Right: nav actions + theme selector */}
-				<div className="flex items-center gap-3 sm:gap-4 shrink-0">
+				{/* Right: nav actions + selectors */}
+				<div className="flex items-center gap-2 sm:gap-3 shrink-0">
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Link
 								href="/readme"
-								className="transition-colors flex items-center justify-center group relative shrink-0"
+								className="transition-colors flex items-center justify-center group relative shrink-0 p-1"
 								style={{ color: 'var(--theme-primary)' }}
 								aria-label="System Diagnostics"
 							>
@@ -97,7 +129,7 @@ export function TopBar() {
 						<TooltipTrigger asChild>
 							<Link
 								href="/resume"
-								className="transition-colors flex items-center justify-center group relative shrink-0"
+								className="transition-colors flex items-center justify-center group relative shrink-0 p-1"
 								style={{ color: 'var(--theme-primary)' }}
 								aria-label="Interactive Resume"
 							>
@@ -113,14 +145,8 @@ export function TopBar() {
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<button
-								onClick={() => {
-									window.dispatchEvent(
-										new CustomEvent('scroll-to-section', {
-											detail: { sectionId: 'contact' },
-										}),
-									);
-								}}
-								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0"
+								onClick={goToContact}
+								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0 whitespace-nowrap"
 							>
 								Contact
 							</button>
@@ -135,3 +161,5 @@ export function TopBar() {
 		</TooltipProvider>
 	);
 }
+
+
