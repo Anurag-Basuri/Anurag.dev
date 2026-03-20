@@ -25,12 +25,6 @@ const SOCIAL_PLATFORMS = [
 	{ label: 'Medium', value: 'MEDIUM' },
 	{ label: 'Quora', value: 'QUORA' },
 	{ label: 'Dev.to', value: 'DEVTO' },
-	{ label: 'Facebook', value: 'FACEBOOK' },
-	{ label: 'YouTube', value: 'YOUTUBE' },
-	{ label: 'Discord', value: 'DISCORD' },
-	{ label: 'Telegram', value: 'TELEGRAM' },
-	{ label: 'WhatsApp', value: 'WHATSAPP' },
-	{ label: 'Personal Website', value: 'PERSONAL_WEBSITE' },
 	{ label: 'Other', value: 'OTHER' },
 ];
 

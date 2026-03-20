@@ -92,6 +92,16 @@ async function uploadProjectImages(id: string, files: File[]): Promise<Project> 
 	return apiClient.upload<Project>(`/admin/projects/${id}/images`, formData);
 }
 
+async function replaceProjectImages(id: string, files: File[]): Promise<Project> {
+	const formData = new FormData();
+	files.forEach(f => formData.append('images', f));
+	return apiClient.uploadPut<Project>(`/admin/projects/${id}/images`, formData);
+}
+
+async function deleteProjectImages(id: string, urls: string[]): Promise<void> {
+	await apiClient.del(`/admin/projects/${id}/images`, { urls });
+}
+
 // Journey
 async function getJourney(): Promise<JourneyEntry[]> {
 	return apiClient.get<JourneyEntry[]>('/admin/journey', true);
@@ -164,6 +174,16 @@ async function deleteAchievement(id: string): Promise<void> {
 	await apiClient.del(`/admin/achievements/${id}`);
 }
 
+async function uploadAchievementProof(id: string, file: File): Promise<Achievement> {
+	const formData = new FormData();
+	formData.append('proof', file);
+	return apiClient.upload<Achievement>(`/admin/achievements/${id}/proof`, formData);
+}
+
+async function deleteAchievementProof(id: string): Promise<void> {
+	await apiClient.del(`/admin/achievements/${id}/proof`);
+}
+
 // Certifications
 async function getCertifications(): Promise<Certification[]> {
 	return apiClient.get<Certification[]>('/admin/certifications', true);
@@ -182,6 +202,16 @@ async function updateCertification(
 
 async function deleteCertification(id: string): Promise<void> {
 	await apiClient.del(`/admin/certifications/${id}`);
+}
+
+async function uploadCertificateFile(id: string, file: File): Promise<Certification> {
+	const formData = new FormData();
+	formData.append('certificate', file);
+	return apiClient.upload<Certification>(`/admin/certifications/${id}/certificate`, formData);
+}
+
+async function deleteCertificateFile(id: string): Promise<void> {
+	await apiClient.del(`/admin/certifications/${id}/certificate`);
 }
 
 // Blog
@@ -205,6 +235,18 @@ async function updateBlogPostStatus(id: string, status: BlogPost['status']): Pro
 
 async function deleteBlogPost(id: string): Promise<void> {
 	await apiClient.del(`/admin/blog/${id}`);
+}
+
+async function uploadBlogCover(id: string, file: File): Promise<BlogPost> {
+	const formData = new FormData();
+	formData.append('cover', file);
+	return apiClient.upload<BlogPost>(`/admin/blog/${id}/cover`, formData);
+}
+
+async function uploadBlogImages(id: string, files: File[]): Promise<BlogPost> {
+	const formData = new FormData();
+	files.forEach(f => formData.append('images', f));
+	return apiClient.upload<BlogPost>(`/admin/blog/${id}/images`, formData);
 }
 
 // Messages
@@ -237,6 +279,8 @@ export const adminService = {
 	deleteProject,
 	uploadProjectThumbnail,
 	uploadProjectImages,
+	replaceProjectImages,
+	deleteProjectImages,
 	getJourney,
 	createJourney,
 	updateJourney,
@@ -251,15 +295,21 @@ export const adminService = {
 	updateAchievement,
 	reorderAchievements,
 	deleteAchievement,
+	uploadAchievementProof,
+	deleteAchievementProof,
 	getCertifications,
 	createCertification,
 	updateCertification,
 	deleteCertification,
+	uploadCertificateFile,
+	deleteCertificateFile,
 	getBlogPosts,
 	createBlogPost,
 	updateBlogPost,
 	updateBlogPostStatus,
 	deleteBlogPost,
+	uploadBlogCover,
+	uploadBlogImages,
 	getMessages,
 	getMessage,
 	deleteMessage,

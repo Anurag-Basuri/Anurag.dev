@@ -164,8 +164,12 @@ export const apiClient = {
 	patch: <T>(endpoint: string, body: unknown, auth = true) =>
 		request<T>('PATCH', endpoint, { body, auth }),
 
-	del: <T = void>(endpoint: string, auth = true) => request<T>('DELETE', endpoint, { auth }),
+	del: <T = void>(endpoint: string, body?: unknown, auth = true) =>
+		request<T>('DELETE', endpoint, { body, auth }),
 
 	upload: <T>(endpoint: string, formData: FormData, auth = true) =>
 		request<T>('POST', endpoint, { body: formData, auth, isFormData: true, timeout: 30000 }),
+
+	uploadPut: <T>(endpoint: string, formData: FormData, auth = true) =>
+		request<T>('PUT', endpoint, { body: formData, auth, isFormData: true, timeout: 30000 }),
 };
