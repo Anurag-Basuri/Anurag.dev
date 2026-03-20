@@ -230,6 +230,7 @@ export default function ProfilePage() {
 				pronouns: profile.pronouns,
 				email: profile.email,
 				phone: profile.phone,
+				Tagline: profile.Tagline || '',
 				header: profile.header || '',
 				bio: profile.bio || '',
 				Currentlocation: profile.Currentlocation || '',
@@ -243,7 +244,7 @@ export default function ProfilePage() {
 					onsite: false,
 					relocation: false,
 				},
-				jobTypes: profile.jobTypes || [],
+				Freelancing: profile.Freelancing || false,
 				avatarUrl: profile.avatarUrl || '',
 				coverUrl: profile.coverUrl || '',
 				resumeUrl: profile.resumeUrl || '',
@@ -251,14 +252,15 @@ export default function ProfilePage() {
 				projectsCount: profile.projectsCount,
 				skills: profile.skills || {},
 				languages: profile.languages || [],
-				socials: profile.socials || [],
-				website: profile.website || '',
+				socialLinks: profile.socialLinks || [],
 				github: profile.github || '',
 				leetcode: profile.leetcode || '',
 				codeforces: profile.codeforces || '',
 				codechef: profile.codechef || '',
 				gfg: profile.gfg || '',
 				kaggle: profile.kaggle || '',
+				hackerrank: profile.hackerrank || '',
+				stackoverflow: profile.stackoverflow || '',
 				otherProfiles: profile.otherProfiles || [],
 				seoTitle: profile.seoTitle || '',
 				seoDesc: profile.seoDesc || '',
@@ -368,6 +370,13 @@ export default function ProfilePage() {
 					</h2>
 					<div className="space-y-4">
 						<FormField
+							label="Tagline"
+							name="Tagline"
+							value={(form.Tagline as string) || ''}
+							onChange={updateField}
+							placeholder="Short catchy tagline"
+						/>
+						<FormField
 							label="Header"
 							name="header"
 							value={(form.header as string) || ''}
@@ -439,12 +448,12 @@ export default function ProfilePage() {
 							value={(form.workPreferences as WorkPrefs) || {}}
 							onChange={v => updateField('workPreferences', v)}
 						/>
-						<TagField
-							label="Job Types"
-							name="jobTypes"
-							value={(form.jobTypes as string[]) || []}
+						<FormField
+							label="Freelancing Available"
+							name="Freelancing"
+							type="checkbox"
+							value={(form.Freelancing as boolean) ?? false}
 							onChange={updateField}
-							placeholder="full-time, internship, contract"
 						/>
 					</div>
 				</section>
@@ -478,13 +487,6 @@ export default function ProfilePage() {
 							onSuccess={refetch}
 							accept=".pdf,.doc,.docx"
 							maxSizeMB={10}
-						/>
-						<FormField
-							label="Website"
-							name="website"
-							type="url"
-							value={(form.website as string) || ''}
-							onChange={updateField}
 						/>
 					</div>
 				</section>
@@ -543,8 +545,8 @@ export default function ProfilePage() {
 						Social Links
 					</h2>
 					<SocialsEditor
-						value={(form.socials as SocialEntry[]) || []}
-						onChange={v => updateField('socials', v)}
+						value={(form.socialLinks as SocialEntry[]) || []}
+						onChange={v => updateField('socialLinks', v)}
 					/>
 				</section>
 
@@ -594,6 +596,20 @@ export default function ProfilePage() {
 							name="kaggle"
 							type="url"
 							value={(form.kaggle as string) || ''}
+							onChange={updateField}
+						/>
+						<FormField
+							label="HackerRank"
+							name="hackerrank"
+							type="url"
+							value={(form.hackerrank as string) || ''}
+							onChange={updateField}
+						/>
+						<FormField
+							label="StackOverflow"
+							name="stackoverflow"
+							type="url"
+							value={(form.stackoverflow as string) || ''}
 							onChange={updateField}
 						/>
 					</div>

@@ -10,10 +10,13 @@ export const workPreferencesSchema = z.object({
 });
 
 export const socialLinkSchema = z.object({
+	id: z.string(),
 	platform: z.string(),
 	url: z.string(),
-	icon: z.string().optional(),
-	handle: z.string().optional(),
+	customLabel: z.string().nullish(),
+	profileId: z.string().nullish(),
+	createdAt: z.string().nullish(),
+	updatedAt: z.string().nullish(),
 });
 
 // ─── Profile (Prisma: Profile) ───────────────────────────────
@@ -28,6 +31,7 @@ export const profileSchema = z.object({
 	phone: z.string(),
 
 	// Career & Bio
+	Tagline: z.string().nullish(),
 	header: z.string().nullish(),
 	bio: z.string().nullish(),
 
@@ -42,7 +46,7 @@ export const profileSchema = z.object({
 
 	// Job Preferences
 	workPreferences: workPreferencesSchema.nullish(),
-	jobTypes: z.array(z.string()),
+	Freelancing: z.boolean(),
 
 	// Media & Links
 	avatarUrl: z.string().nullish(),
@@ -60,8 +64,7 @@ export const profileSchema = z.object({
 	languages: z.array(z.string()),
 
 	// Social & Web
-	socials: z.array(socialLinkSchema).nullish(),
-	website: z.string().nullish(),
+	socialLinks: z.array(socialLinkSchema).nullish(),
 
 	// Coding Platforms
 	github: z.string().nullish(),
@@ -70,6 +73,8 @@ export const profileSchema = z.object({
 	codechef: z.string().nullish(),
 	gfg: z.string().nullish(),
 	kaggle: z.string().nullish(),
+	hackerrank: z.string().nullish(),
+	stackoverflow: z.string().nullish(),
 	otherProfiles: z.array(z.string()),
 
 	// SEO / Meta

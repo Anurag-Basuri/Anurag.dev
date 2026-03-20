@@ -108,8 +108,8 @@ export const SidebarProfile = memo(function SidebarProfile() {
 				{/* Social Links */}
 				<div className="grid gap-1.5 relative z-10" onClick={e => e.stopPropagation()}>
 					<div className="flex flex-wrap gap-1.5 justify-start">
-						{(profile?.socials ?? []).length > 0 ? (
-							(profile?.socials ?? []).map(social => {
+						{(profile?.socialLinks ?? []).length > 0 ? (
+							(profile?.socialLinks ?? []).map(social => {
 								const Icon = SOCIAL_ICONS[social.platform] || Globe;
 								return (
 									<SocialButton

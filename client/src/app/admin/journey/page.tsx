@@ -9,20 +9,21 @@ import { FormField, TagField } from '../components/FormField';
 import type { JourneyEntry } from '@/api/schema';
 
 const TYPES = [
-	{ label: 'Work', value: 'work' },
-	{ label: 'Education', value: 'education' },
-	{ label: 'Volunteering', value: 'volunteering' },
-	{ label: 'Research', value: 'research' },
-	{ label: 'Other', value: 'other' },
+	{ label: 'Work', value: 'WORK' },
+	{ label: 'Education', value: 'EDUCATION' },
+	{ label: 'Volunteering', value: 'VOLUNTEERING' },
+	{ label: 'Research', value: 'RESEARCH' },
+	{ label: 'Educator', value: 'EDUCATOR' },
+	{ label: 'Other', value: 'OTHER' },
 ];
 
 const EMPLOYMENT_TYPES = [
 	{ label: '— None —', value: '' },
-	{ label: 'Full-time', value: 'full-time' },
-	{ label: 'Part-time', value: 'part-time' },
-	{ label: 'Internship', value: 'internship' },
-	{ label: 'Contract', value: 'contract' },
-	{ label: 'Freelance', value: 'freelance' },
+	{ label: 'Full-time', value: 'FULL_TIME' },
+	{ label: 'Part-time', value: 'PART_TIME' },
+	{ label: 'Internship', value: 'INTERNSHIP' },
+	{ label: 'Contract', value: 'CONTRACT' },
+	{ label: 'Freelance', value: 'FREELANCE' },
 ];
 
 interface JourneyForm {
@@ -50,7 +51,7 @@ interface JourneyForm {
 }
 
 const EMPTY: JourneyForm = {
-	type: 'work',
+	type: 'WORK',
 	title: '',
 	organization: '',
 	location: '',
@@ -89,16 +90,16 @@ function buildDisplayDate(startDate: string, endDate: string, isCurrent: boolean
 function cleanPayload(form: JourneyForm): Record<string, unknown> {
 	const payload: Record<string, unknown> = { ...form };
 
-	if (form.type !== 'education') {
+	if (form.type !== 'EDUCATION') {
 		payload.degree = '';
 		payload.fieldOfStudy = '';
 		payload.grade = '';
 		payload.board = '';
 	}
-	if (form.type !== 'work') {
+	if (form.type !== 'WORK') {
 		payload.employmentType = '';
 	}
-	if (form.type !== 'research') {
+	if (form.type !== 'RESEARCH') {
 		payload.publication = '';
 		payload.doi = '';
 	}
@@ -226,11 +227,11 @@ export default function JourneyPage() {
 				render: (e: JourneyEntry) => (
 					<span
 						className={`capitalize text-xs font-medium px-2 py-0.5 rounded ${
-							e.type === 'work'
+							e.type === 'WORK'
 								? 'bg-blue-500/10 text-blue-400'
-								: e.type === 'education'
+								: e.type === 'EDUCATION'
 									? 'bg-emerald-500/10 text-emerald-400'
-									: e.type === 'research'
+									: e.type === 'RESEARCH'
 										? 'bg-purple-500/10 text-purple-400'
 										: 'bg-zinc-500/10 text-zinc-400'
 						}`}
@@ -317,9 +318,9 @@ export default function JourneyPage() {
 					onChange={updateField}
 					required
 					placeholder={
-						form.type === 'work'
+						form.type === 'WORK'
 							? 'e.g. Software Engineer'
-							: form.type === 'education'
+							: form.type === 'EDUCATION'
 								? 'e.g. B.Tech Computer Science'
 								: 'Title of the entry'
 					}
@@ -332,9 +333,9 @@ export default function JourneyPage() {
 						value={form.organization}
 						onChange={updateField}
 						placeholder={
-							form.type === 'work'
+							form.type === 'WORK'
 								? 'Company name'
-								: form.type === 'education'
+								: form.type === 'EDUCATION'
 									? 'School / University'
 									: 'Organization'
 						}
@@ -433,7 +434,7 @@ export default function JourneyPage() {
 				</div>
 
 				{/* ── Education-specific ── */}
-				{form.type === 'education' && (
+				{form.type === 'EDUCATION' && (
 					<>
 						<SectionDivider label="Education Details" />
 						<div className="grid grid-cols-2 gap-4">
@@ -472,7 +473,7 @@ export default function JourneyPage() {
 				)}
 
 				{/* ── Work-specific ── */}
-				{form.type === 'work' && (
+				{form.type === 'WORK' && (
 					<>
 						<SectionDivider label="Work Details" />
 						<FormField
@@ -487,7 +488,7 @@ export default function JourneyPage() {
 				)}
 
 				{/* ── Research-specific ── */}
-				{form.type === 'research' && (
+				{form.type === 'RESEARCH' && (
 					<>
 						<SectionDivider label="Research Details" />
 						<div className="grid grid-cols-2 gap-4">

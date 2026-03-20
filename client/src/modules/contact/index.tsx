@@ -218,7 +218,7 @@ export function ContactModule() {
 								Social Protocols
 							</h3>
 							<div className="flex flex-wrap justify-center sm:justify-start gap-4">
-								{(about?.socials ?? []).map(social => {
+								{(about?.socialLinks ?? []).map(social => {
 									const Icon = SOCIAL_ICONS[social.platform] || Mail;
 									return (
 										<a

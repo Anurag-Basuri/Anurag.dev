@@ -169,7 +169,7 @@ export function ExperienceModule() {
 
 	const workEntries = useMemo(() => {
 		return entries
-			.filter(entry => entry.type === 'work')
+			.filter(entry => entry.type.toUpperCase() === 'WORK')
 			.sort((a, b) => {
 				const dateA = new Date(a.startDate || 0).getTime();
 				const dateB = new Date(b.startDate || 0).getTime();
