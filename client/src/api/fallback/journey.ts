@@ -3,7 +3,7 @@ import type { JourneyEntry } from '@/api/schema';
 export const FALLBACK_JOURNEY: JourneyEntry[] = [
 	{
 		id: 'fb-j-1',
-		type: 'education',
+		type: 'EDUCATION',
 		title: 'B.Tech in Computer Science & Engineering',
 		organization: 'Lovely Professional University',
 		location: 'India',
@@ -44,7 +44,7 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 	},
 	{
 		id: 'fb-j-2',
-		type: 'education',
+		type: 'EDUCATION',
 		title: 'Higher Secondary (XII)',
 		organization: 'DAV Public School',
 		location: 'Jamshedpur, Jharkhand',
@@ -66,7 +66,7 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 	},
 	{
 		id: 'fb-j-3',
-		type: 'work',
+		type: 'WORK',
 		title: 'Full Stack Developer Intern',
 		organization: 'Tech Startup',
 		location: 'Remote',
@@ -77,7 +77,7 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		description:
 			'Building scalable web applications using React, Node.js, and PostgreSQL. Working on microservices architecture and CI/CD pipelines.',
 		skills: ['React', 'Node.js', 'PostgreSQL', 'Docker', 'AWS'],
-		employmentType: 'internship',
+		employmentType: 'INTERNSHIP',
 		highlighted: true,
 		order: 2,
 		createdAt: '2024-01-01T00:00:00.000Z',

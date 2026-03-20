@@ -168,6 +168,9 @@ export const journeyEntrySchema = z.object({
 	employmentType: z.string().nullish(),
 	workMode: z.string().nullish(),
 	workType: z.string().nullish(),
+	workLocation: z.string().nullish(),
+	offerUrl: z.string().nullish(),
+	experienceUrl: z.string().nullish(),
 
 	// Research-specific
 	publication: z.string().nullish(),

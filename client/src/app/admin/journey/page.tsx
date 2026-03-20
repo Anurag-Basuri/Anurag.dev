@@ -63,6 +63,9 @@ interface JourneyForm {
 	employmentType: string;
 	workMode: string;
 	workType: string;
+	workLocation: string;
+	offerUrl: string;
+	experienceUrl: string;
 	publication: string;
 	doi: string;
 	icon: string;
@@ -89,6 +92,9 @@ const EMPTY: JourneyForm = {
 	employmentType: '',
 	workMode: '',
 	workType: '',
+	workLocation: '',
+	offerUrl: '',
+	experienceUrl: '',
 	publication: '',
 	doi: '',
 	icon: '',
@@ -120,6 +126,9 @@ function cleanPayload(form: JourneyForm): Record<string, unknown> {
 		payload.employmentType = '';
 		payload.workMode = '';
 		payload.workType = '';
+		payload.workLocation = '';
+		payload.offerUrl = '';
+		payload.experienceUrl = '';
 	}
 	if (form.type !== 'RESEARCH') {
 		payload.publication = '';
@@ -185,6 +194,9 @@ export default function JourneyPage() {
 			employmentType: entry.employmentType || '',
 			workMode: entry.workMode || '',
 			workType: entry.workType || '',
+			workLocation: entry.workLocation || '',
+			offerUrl: entry.offerUrl || '',
+			experienceUrl: entry.experienceUrl || '',
 			publication: entry.publication || '',
 			doi: entry.doi || '',
 			icon: entry.icon || '',
@@ -500,14 +512,23 @@ export default function JourneyPage() {
 				{form.type === 'WORK' && (
 					<>
 						<SectionDivider label="Work Details" />
-						<FormField
-							label="Employment Type"
-							name="employmentType"
-							type="select"
-							value={form.employmentType}
-							onChange={updateField}
-							options={EMPLOYMENT_TYPES}
-						/>
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								label="Employment Type"
+								name="employmentType"
+								type="select"
+								value={form.employmentType}
+								onChange={updateField}
+								options={EMPLOYMENT_TYPES}
+							/>
+							<FormField
+								label="Work Location Map"
+								name="workLocation"
+								value={form.workLocation}
+								onChange={updateField}
+								placeholder="e.g. Remote, Bangalore"
+							/>
+						</div>
 						<div className="grid grid-cols-2 gap-4">
 							<FormField
 								label="Work Mode"
@@ -524,6 +545,24 @@ export default function JourneyPage() {
 								value={form.workType}
 								onChange={updateField}
 								options={WORK_TYPES}
+							/>
+						</div>
+						<div className="grid grid-cols-2 gap-4">
+							<FormField
+								label="Offer Letter URL"
+								name="offerUrl"
+								type="url"
+								value={form.offerUrl}
+								onChange={updateField}
+								placeholder="https://..."
+							/>
+							<FormField
+								label="Experience Certificate URL"
+								name="experienceUrl"
+								type="url"
+								value={form.experienceUrl}
+								onChange={updateField}
+								placeholder="https://..."
 							/>
 						</div>
 					</>
