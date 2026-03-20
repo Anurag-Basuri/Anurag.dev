@@ -131,7 +131,7 @@ async function getJourneyDocuments(entryId: string): Promise<JourneyDocument[]> 
 async function uploadJourneyDocument(
 	entryId: string,
 	file: File,
-	data: { title: string; type: string; issuer?: string; notes?: string },
+	data: { title: string; type: string; issuer?: string; issuedAt?: string; notes?: string },
 ): Promise<JourneyDocument> {
 	const formData = new FormData();
 	formData.append('document', file);

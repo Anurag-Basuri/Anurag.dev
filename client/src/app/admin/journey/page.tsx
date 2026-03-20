@@ -6,7 +6,8 @@ import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
-import type { JourneyEntry } from '@/api/schema';
+import { FileUploadField } from '../components/FileUploadField';
+import type { JourneyEntry, JourneyDocument } from '@/api/schema';
 
 const TYPES = [
 	{ label: 'Work', value: 'WORK' },
@@ -138,6 +139,19 @@ function cleanPayload(form: JourneyForm): Record<string, unknown> {
 	return payload;
 }
 
+const DOC_TYPES = [
+	{ label: 'Offer Letter', value: 'OFFER_LETTER' },
+	{ label: 'Appointment Letter', value: 'APPOINTMENT_LETTER' },
+	{ label: 'Experience Letter', value: 'EXPERIENCE_LETTER' },
+	{ label: 'Relieving Letter', value: 'RELIEVING_LETTER' },
+	{ label: 'Payslip', value: 'PAYSLIP' },
+	{ label: 'Promotion Letter', value: 'PROMOTION_LETTER' },
+	{ label: 'Certificate', value: 'CERTIFICATE' },
+	{ label: 'Other', value: 'OTHER' },
+];
+
+const EMPTY_DOC = { title: '', type: 'OFFER_LETTER', issuer: '', issuedAt: '', notes: '' };
+
 // ─── Section divider ────────────────────────────────────────────
 
 function SectionDivider({ label }: { label: string }) {
@@ -163,11 +177,15 @@ export default function JourneyPage() {
 		editing: null,
 	});
 	const [form, setForm] = useState<JourneyForm>(EMPTY);
+	const [documents, setDocuments] = useState<JourneyDocument[]>([]);
+	const [newDocForm, setNewDocForm] = useState(EMPTY_DOC);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	function openCreate() {
 		setForm(EMPTY);
+		setDocuments([]);
+		setNewDocForm(EMPTY_DOC);
 		setModal({ open: true, editing: null });
 		setError(null);
 	}
@@ -201,6 +219,8 @@ export default function JourneyPage() {
 			doi: entry.doi || '',
 			icon: entry.icon || '',
 		});
+		setDocuments(entry.documents || []);
+		setNewDocForm(EMPTY_DOC);
 		setModal({ open: true, editing: entry });
 		setError(null);
 	}
@@ -600,6 +620,116 @@ export default function JourneyPage() {
 					value={form.highlighted}
 					onChange={updateField}
 				/>
+
+				{/* ── Journey Documents ── */}
+				{modal.editing && (
+					<>
+						<SectionDivider label="Attached Documents" />
+						<div className="space-y-3 mb-6">
+							{documents.map(doc => (
+								<div key={doc.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-800 bg-zinc-900/30">
+									<div>
+										<p className="font-medium text-sm text-zinc-200">
+											{doc.title} <span className="text-[10px] uppercase font-bold text-zinc-500 ml-2 py-0.5 px-1.5 bg-zinc-800 rounded">{doc.type.replace('_', ' ')}</span>
+										</p>
+										{doc.issuer && <p className="text-xs text-zinc-400 mt-1">Issued by: {doc.issuer}</p>}
+									</div>
+									<div className="flex items-center gap-3">
+										<a href={doc.url} target="_blank" rel="noreferrer" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">View</a>
+										<button
+											type="button"
+											onClick={async () => {
+												if (!confirm(`Delete document "${doc.title}"?`)) return;
+												try {
+													await adminService.deleteJourneyDocument(modal.editing!.id, doc.id);
+													setDocuments(prev => prev.filter(d => d.id !== doc.id));
+													refetch();
+												} catch (err) {
+													alert(err instanceof Error ? err.message : 'Delete failed');
+												}
+											}}
+											className="text-xs text-red-500 hover:text-red-400 transition-colors"
+										>
+											Delete
+										</button>
+									</div>
+								</div>
+							))}
+							{documents.length === 0 && (
+								<p className="text-xs text-zinc-500 italic">No documents attached.</p>
+							)}
+						</div>
+
+						<div className="p-4 rounded-lg border border-dashed border-zinc-700 bg-zinc-900/10 space-y-4">
+							<h3 className="text-sm font-semibold text-zinc-300">Upload New Document</h3>
+							<div className="grid grid-cols-2 gap-4">
+								<FormField 
+									label="Document Title *" 
+									name="title" 
+									value={newDocForm.title} 
+									onChange={(n, v) => setNewDocForm(p => ({ ...p, [n]: v as string }))} 
+								/>
+								<FormField 
+									label="Document Type *" 
+									name="type" 
+									type="select" 
+									options={DOC_TYPES} 
+									value={newDocForm.type} 
+									onChange={(n, v) => setNewDocForm(p => ({ ...p, [n]: v as string }))} 
+								/>
+							</div>
+							<div className="grid grid-cols-2 gap-4">
+								<FormField 
+									label="Issuer" 
+									name="issuer" 
+									value={newDocForm.issuer} 
+									onChange={(n, v) => setNewDocForm(p => ({ ...p, [n]: v as string }))} 
+								/>
+								<FormField 
+									label="Issued Date" 
+									name="issuedAt" 
+									type="date"
+									value={newDocForm.issuedAt} 
+									onChange={(n, v) => setNewDocForm(p => ({ ...p, [n]: v as string }))} 
+								/>
+							</div>
+							<FormField 
+								label="Notes" 
+								name="notes" 
+								type="textarea"
+								value={newDocForm.notes} 
+								onChange={(n, v) => setNewDocForm(p => ({ ...p, [n]: v as string }))} 
+								rows={2}
+							/>
+							<div className="pt-2">
+								<FileUploadField
+									label="Select Document File (PDF, PNG, JPG) *"
+									accept=".pdf,.png,.jpg,.jpeg"
+									maxSizeMB={5}
+									onUpload={async file => {
+										if (!newDocForm.title.trim()) throw new Error('Document title is required');
+										// Form the payload
+										const payload = {
+											title: newDocForm.title,
+											type: newDocForm.type,
+											issuer: newDocForm.issuer || undefined,
+											notes: newDocForm.notes || undefined,
+											// only pass issuedAt if it's not empty, and format as ISO string 
+											// wait, adminService takes strings, lets pass strings. Wait, Prisma expects DateTime for issuedAt
+										};
+										
+										// Zod and Prisma expect string for backend payload 
+										// Let's pass what we have
+										const res = await adminService.uploadJourneyDocument(modal.editing!.id, file, { ...payload, issuedAt: newDocForm.issuedAt ? new Date(newDocForm.issuedAt).toISOString() : undefined });
+										setDocuments(prev => [res, ...prev]);
+										setNewDocForm(EMPTY_DOC);
+										refetch();
+									}}
+								/>
+							</div>
+						</div>
+					</>
+				)}
 			</FormModal>
 		</div>
 	);
