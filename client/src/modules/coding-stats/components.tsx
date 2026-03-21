@@ -211,7 +211,7 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 			viewport={{ once: true }}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br border border-border backdrop-blur-md p-6 sm:p-8 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
+				'group relative rounded-3xl bg-linear-to-br border border-border backdrop-blur-md p-5 sm:p-6 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
 				config.accentBg,
 				config.accentBorder,
 			)}

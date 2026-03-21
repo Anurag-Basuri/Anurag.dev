@@ -22,9 +22,8 @@ export function ScrollSection({ id, children, className = '' }: ScrollSectionPro
 	return (
 		<section
 			id={`section-${id}`}
-			className={`w-full min-h-full relative ${className}`}
+			className={`w-full relative ${className}`}
 			style={{ 
-				scrollSnapAlign: 'start',
 				'--theme-primary': theme.hex,
 				'--primary': theme.hex,
 			} as React.CSSProperties}
@@ -40,11 +39,11 @@ export function ScrollSection({ id, children, className = '' }: ScrollSectionPro
 			<motion.div
 				ref={ref}
 				className="w-full relative z-10"
-				initial={{ opacity: 0, y: 40, scale: 0.96, filter: 'blur(10px)' }}
+				initial={{ opacity: 0, y: 20, scale: 0.98, filter: 'blur(8px)' }}
 				animate={
 					isInView
 						? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
-						: { opacity: 0, y: 40, scale: 0.96, filter: 'blur(10px)' }
+						: { opacity: 0, y: 20, scale: 0.98, filter: 'blur(8px)' }
 				}
 				transition={{
 					duration: 0.8,

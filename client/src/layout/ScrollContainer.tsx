@@ -69,8 +69,6 @@ export function ScrollContainer({ initialSection }: ScrollContainerProps) {
 				ref={containerRef}
 				className="h-full w-full overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-thin"
 				style={{
-					scrollSnapType: 'y proximity',
-					scrollBehavior: 'smooth',
 					scrollbarWidth: 'thin',
 					scrollbarColor: 'rgba(255,255,255,0.08) transparent',
 				}}
