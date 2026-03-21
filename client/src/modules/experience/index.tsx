@@ -187,7 +187,7 @@ export function ExperienceModule() {
 					label="Work History"
 					title="Professional Experience"
 					description="My career journey, roles, and impact across companies and startups."
-					accent="sky"
+					sectionId="experience"
 				/>
 
 				{workEntries.length === 0 ? (

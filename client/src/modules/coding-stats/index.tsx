@@ -143,7 +143,7 @@ export function CodingStatsModule() {
 					label="Telemetry"
 					title="Coding Profiles"
 					description="Live performance metrics and activity across competitive programming, problem solving, and open source platforms."
-					accent="orange"
+					sectionId="coding_stats"
 				/>
 
 				<motion.div

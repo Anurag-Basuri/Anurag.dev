@@ -186,7 +186,7 @@ export function EducationModule() {
 					label="Academic Path"
 					title="Education"
 					description="Academic background, degrees, and institutions."
-					accent="violet"
+					sectionId="education"
 				/>
 
 				{educationEntries.length === 0 ? (

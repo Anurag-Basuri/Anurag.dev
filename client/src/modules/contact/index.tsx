@@ -149,7 +149,7 @@ export function ContactModule() {
 					label="Connect"
 					title="Get In Touch"
 					description="I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions."
-					accent="teal"
+					sectionId="contact"
 				/>
 
 				<div className="flex flex-col lg:flex-row gap-8 lg:gap-12 mt-8 md:mt-12">

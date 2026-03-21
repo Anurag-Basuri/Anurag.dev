@@ -138,7 +138,7 @@ export function CertificationModule() {
 					icon={ShieldCheck}
 					title="Verified Attributes"
 					description="Professional certifications and credentials verifying core competencies."
-					accent="cyan"
+					sectionId="certifications"
 				/>
 
 				{certs.length === 0 ? (

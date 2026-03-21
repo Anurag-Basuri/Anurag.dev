@@ -32,13 +32,11 @@ const nullableDatetime = z
 
 /** Enum field with case-insensitive input and optional/empty handling */
 const optionalEnum = <T extends [string, ...string[]]>(values: T) =>
-	z
-		.preprocess(v => {
-			if (v === '' || v === null || v === undefined) return undefined;
-			if (typeof v === 'string') return v.trim().toUpperCase();
-			return v;
-		}, z.enum(values))
-		.optional();
+	z.preprocess(v => {
+		if (v === '' || v === null || v === undefined) return null;
+		if (typeof v === 'string') return v.trim().toUpperCase();
+		return v;
+	}, z.enum(values).nullable().optional());
 
 /** Enum field with case-insensitive input (required) */
 const requiredEnum = <T extends [string, ...string[]]>(values: T) =>

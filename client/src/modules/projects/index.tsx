@@ -79,7 +79,7 @@ export function ProjectsModule() {
 					label="Portfolio"
 					title="Projects & Work"
 					description="A collection of my recent work, open-source projects, and technical experiments."
-					accent="amber"
+					sectionId="projects"
 				/>
 
 				{/* Grid */}
