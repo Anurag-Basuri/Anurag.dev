@@ -20,7 +20,7 @@ function AchievementsSkeleton() {
 				<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
 				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
 			</div>
-			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 auto-rows-fr">
+			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 auto-rows-fr">
 				{[1, 2, 3, 4, 5, 6].map(i => (
 					<div
 						key={i}
@@ -86,7 +86,7 @@ const AchievementCard = memo(function AchievementCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-4xl overflow-hidden transition-all duration-500 shadow-2xl',
+				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl',
 				details.color,
 			)}
 		>
@@ -132,7 +132,7 @@ const AchievementCard = memo(function AchievementCard({
 				)}
 
 				{achievement.description && (
-					<p className="text-sm text-muted-foreground leading-relaxed mb-6 grow line-clamp-3 font-medium">
+					<p className="text-xs text-muted-foreground leading-snug leading-relaxed mb-6 grow line-clamp-3 font-medium">
 						{achievement.description}
 					</p>
 				)}
@@ -192,7 +192,7 @@ export function AchievementsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={Trophy}
 					label="Triumphs"
@@ -202,7 +202,7 @@ export function AchievementsModule() {
 				/>
 
 				{achievements.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-border rounded-3xl bg-card/50">
+					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-border rounded-xl bg-card/50">
 						No achievements recorded yet.
 					</div>
 				) : (
@@ -211,7 +211,7 @@ export function AchievementsModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-20px' }}
-						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr"
+						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 auto-rows-fr"
 					>
 						{achievements.map(achievement => (
 							<AchievementCard

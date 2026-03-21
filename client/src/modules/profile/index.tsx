@@ -24,9 +24,9 @@ function ProfileSkeleton() {
 		<div className="w-full animate-pulse">
 			{/* Cover */}
 			<div className="h-48 sm:h-64 md:h-80 w-full bg-foreground/5" />
-			<div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-24">
+			<div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-12 pb-12">
 				{/* Avatar */}
-				<div className="w-32 h-32 md:w-40 md:h-40 bg-foreground/10 rounded-3xl -mt-16 md:-mt-20 border-4 border-background" />
+				<div className="w-32 h-32 md:w-40 md:h-40 bg-foreground/10 rounded-xl -mt-16 md:-mt-20 border-4 border-background" />
 				{/* Info */}
 				<div className="mt-6 space-y-4">
 					<div className="h-10 w-64 bg-foreground/5 rounded-xl" />
@@ -35,9 +35,9 @@ function ProfileSkeleton() {
 				{/* Stats */}
 				<div className="mt-8 h-20 w-full bg-foreground/5 rounded-2xl" />
 				{/* Bento */}
-				<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-					<div className="md:col-span-2 h-64 bg-foreground/5 rounded-3xl" />
-					<div className="h-64 bg-foreground/5 rounded-3xl" />
+				<div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div className="md:col-span-2 h-64 bg-foreground/5 rounded-xl" />
+					<div className="h-64 bg-foreground/5 rounded-xl" />
 				</div>
 			</div>
 		</div>
@@ -69,7 +69,7 @@ export function ProfileModule() {
 			<div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
 			{/* Consistent Section Header ABOVE the Hero Cover */}
-			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 md:pt-8 relative z-20">
+			<div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-6 md:pt-8 relative z-20">
 				<SectionHeader
 					icon={User}
 					label="Overview"
@@ -98,7 +98,7 @@ export function ProfileModule() {
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
 			</motion.div>
 
-			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pb-16 sm:pb-24 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
+			<div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pb-16 sm:pb-12 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
@@ -106,7 +106,7 @@ export function ProfileModule() {
 					className="flex flex-col"
 				>
 					{/* Header Row: Avatar + Name + Actions */}
-					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
+					<div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pt-2">
 						{/* Avatar & Title */}
 						<div className="flex flex-col gap-4">
 							<motion.div
@@ -208,7 +208,7 @@ export function ProfileModule() {
 						].map((stat, i) => (
 							<div
 								key={i}
-								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-3xl bg-foreground/5 border border-border hover:bg-accent transition-colors"
+								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-xl bg-foreground/5 border border-border hover:bg-accent transition-colors"
 							>
 								<div className="p-3 rounded-2xl border" style={{ background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)', borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }}>
 									<stat.icon className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />
@@ -226,13 +226,13 @@ export function ProfileModule() {
 					</motion.div>
 
 					{/* Bio & Skills Bento Grid */}
-					<div className="mt-8 flex flex-col gap-6">
+					<div className="mt-8 flex flex-col gap-4">
 						{/* Bio Card */}
 						{profile.bio && (
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-5 sm:p-6 rounded-3xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm relative overflow-hidden group"
+								className="w-full p-3 sm:p-4 rounded-xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -251,7 +251,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-5 sm:p-6 rounded-3xl bg-card border border-border relative overflow-hidden group"
+								className="w-full p-3 sm:p-4 rounded-xl bg-card border border-border relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-bl from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -264,7 +264,7 @@ export function ProfileModule() {
 										initial="hidden"
 										whileInView="visible"
 										viewport={{ once: true }}
-										className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+										className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
 									>
 										{Object.entries(profile.skills).map(([category, items]) => (
 											<div key={category}>

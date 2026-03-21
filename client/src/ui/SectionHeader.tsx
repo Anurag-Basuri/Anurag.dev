@@ -48,9 +48,9 @@ export function SectionHeader({
 			initial="hidden"
 			whileInView="visible"
 			viewport={{ once: true, margin: '-20px' }}
-			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-4 md:pt-6 pb-4 mb-6 sm:mb-8 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 shadow-sm"
+			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-3 pb-3 mb-4 sm:mb-6 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 shadow-sm"
 		>
-			<div className="relative z-10">
+			<div className="relative z-10 w-full max-w-2xl">
 				<motion.div
 					initial={{ opacity: 0, x: -20 }}
 					whileInView={{ opacity: 1, x: 0 }}
@@ -67,12 +67,12 @@ export function SectionHeader({
 					<span>{label}</span>
 				</motion.div>
 
-				<h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-1.5 tracking-tight">
+				<h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground to-white leading-tight mb-1 tracking-tight" style={{ backgroundImage: `linear-gradient(to right, var(--theme-primary), white)` }}>
 					{title}
 				</h1>
 
 				{description && (
-					<p className="text-xs text-muted-foreground/80 max-w-lg leading-relaxed font-medium">
+					<p className="text-xs text-muted-foreground/80 leading-snug font-medium">
 						{description}
 					</p>
 				)}

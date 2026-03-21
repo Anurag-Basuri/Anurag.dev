@@ -32,7 +32,7 @@ function ProjectsSkeleton() {
 				</div>
 				<div className="h-10 w-64 bg-foreground/5 rounded-2xl hidden md:block" />
 			</div>
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
 				{[1, 2, 3, 4, 5, 6].map(i => (
 					<div key={i} className="h-96 bg-foreground/5 rounded-[2.5rem]" />
 				))}
@@ -73,7 +73,7 @@ export function ProjectsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={Briefcase}
 					label="Portfolio"
@@ -94,7 +94,7 @@ export function ProjectsModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12"
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-4 lg:gap-8 mt-8 md:mt-12"
 					>
 						<AnimatePresence mode="popLayout">
 							{projects.map(project => (
@@ -106,7 +106,7 @@ export function ProjectsModule() {
 									animate="visible"
 									exit="hidden"
 									whileHover={cardHover}
-									className="group cursor-pointer h-full flex flex-col bg-linear-to-br from-foreground/5 to-transparent backdrop-blur-sm border border-border rounded-3xl overflow-hidden transition-all duration-500 hover:border-(--theme-primary)/40 relative shadow-2xl"
+									className="group cursor-pointer h-full flex flex-col bg-linear-to-br from-foreground/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-500 hover:border-(--theme-primary)/40 relative shadow-2xl"
 									onClick={() => setSelectedProject(project)}
 								>
 									<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/10 transition-colors duration-500 pointer-events-none" />
@@ -130,7 +130,7 @@ export function ProjectsModule() {
 									</div>
 
 									{/* Content Area */}
-									<div className="p-5 sm:p-6 flex flex-col grow relative z-10 -mt-6">
+									<div className="p-3 sm:p-4 flex flex-col grow relative z-10 -mt-6">
 										{/* Tech Stack Pills (Floating over image edge) */}
 										<div className="flex flex-wrap gap-2 mb-6">
 											{(project.techStack ?? []).slice(0, 3).map(tech => (
@@ -148,11 +148,11 @@ export function ProjectsModule() {
 											)}
 										</div>
 
-										<h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight mb-2 group-hover:text-(--theme-primary) transition-colors line-clamp-2">
+										<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight mb-2 group-hover:text-(--theme-primary) transition-colors line-clamp-2">
 											{project.title}
 										</h3>
 										
-										<p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed font-medium mb-6">
+										<p className="text-xs text-muted-foreground leading-snug line-clamp-2 leading-relaxed font-medium mb-6">
 											{project.description}
 										</p>
 
@@ -201,7 +201,7 @@ export function ProjectsModule() {
 								initial="hidden"
 								animate="visible"
 								exit="hidden"
-								className="relative w-full max-w-4xl bg-card border border-border rounded-3xl shadow-3xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] md:max-h-[600px] z-10"
+								className="relative w-full max-w-4xl bg-card border border-border rounded-xl shadow-3xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] md:max-h-[600px] z-10"
 								style={{ boxShadow: '0 0 60px -15px color-mix(in oklch, var(--theme-primary) 10%, transparent)' }}
 							>
 								{/* Close Button */}
@@ -257,7 +257,7 @@ export function ProjectsModule() {
 								{/* Right Side: Content */}
 								<div className="flex-1 w-full relative bg-card">
 									<ScrollArea className="h-full">
-										<div className="p-6 sm:p-8 md:p-12 space-y-10 sm:space-y-12 pb-24">
+										<div className="p-6 sm:p-8 md:p-12 space-y-10 sm:space-y-6 pb-12">
 											{/* Description Section */}
 											<div className="space-y-4">
 												<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>

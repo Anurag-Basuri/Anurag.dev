@@ -142,7 +142,7 @@ export function ContactModule() {
 			{/* Very subtle ambient spotlight behind contact module to signify "end of page" */}
 			<div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}
@@ -159,18 +159,18 @@ export function ContactModule() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 						transition={{ duration: 0.5 }}
-						className="flex-1 space-y-6 sm:space-y-8"
+						className="flex-1 space-y-6 sm:space-y-4"
 					>
 						<div className="space-y-6">
 							{/* Email Card (Teal Accent) */}
-							<div className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
+							<div className="relative p-3 sm:p-4 rounded-xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/10 transition-colors duration-700 pointer-events-none" />
-								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
-									<div className="p-4 sm:p-5 rounded-3xl bg-card border border-border text-teal-400 group-hover:scale-110 group-hover:bg-teal-500/10 group-hover:border-teal-500/30 transition-all duration-500 shadow-xl shrink-0">
+								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 text-center sm:text-left">
+									<div className="p-3 sm:p-4 rounded-xl bg-card border border-border text-teal-400 group-hover:scale-110 group-hover:bg-teal-500/10 group-hover:border-teal-500/30 transition-all duration-500 shadow-xl shrink-0">
 										<Mail className="w-8 h-8" />
 									</div>
 									<div className="flex-1 w-full max-w-[16rem] sm:max-w-none mx-auto sm:mx-0">
-										<h3 className="text-xl sm:text-2xl text-foreground font-black mb-3 sm:mb-2 tracking-tight">
+										<h3 className="text-base sm:text-lg text-foreground font-black mb-3 sm:mb-2 tracking-tight">
 											Email Me
 										</h3>
 										<div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 bg-card p-3 sm:p-2 sm:pl-4 rounded-2xl border border-border shadow-inner">
@@ -196,17 +196,17 @@ export function ContactModule() {
 							</div>
 
 							{/* Location Card (Purple Accent) */}
-							<div className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
+							<div className="relative p-3 sm:p-4 rounded-xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-transparent to-transparent group-hover:from-purple-500/10 transition-colors duration-700 pointer-events-none" />
 								{/* Faint map background icon */}
 								<MapPin className="absolute right-[-10%] top-[-20%] w-64 h-64 text-white/5 group-hover:text-purple-500/5 transition-colors duration-700 -rotate-12 pointer-events-none" />
 								
-								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
-									<div className="p-4 sm:p-5 rounded-3xl bg-card border border-border text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all duration-500 shadow-xl shrink-0">
+								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 text-center sm:text-left">
+									<div className="p-3 sm:p-4 rounded-xl bg-card border border-border text-purple-400 group-hover:scale-110 group-hover:bg-purple-500/10 group-hover:border-purple-500/30 transition-all duration-500 shadow-xl shrink-0">
 										<MapPin className="w-8 h-8" />
 									</div>
 									<div className="mt-1">
-										<h3 className="text-xl sm:text-2xl text-foreground font-black mb-2 tracking-tight">
+										<h3 className="text-base sm:text-lg text-foreground font-black mb-2 tracking-tight">
 											Location
 										</h3>
 										<p className="text-muted-foreground font-medium text-base sm:text-lg">
@@ -240,7 +240,7 @@ export function ContactModule() {
 											href={social.url}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="p-4 sm:p-5 flex items-center justify-center rounded-3xl bg-card border border-border hover:bg-card hover:border-white/30 transition-all duration-300 text-muted-foreground hover:text-foreground group hover:scale-110 active:scale-95 shadow-xl"
+											className="p-3 sm:p-4 flex items-center justify-center rounded-xl bg-card border border-border hover:bg-card hover:border-white/30 transition-all duration-300 text-muted-foreground hover:text-foreground group hover:scale-110 active:scale-95 shadow-xl"
 											aria-label={`Visit ${social.customLabel || social.platform} profile`}
 										>
 											<Icon className="w-6 sm:w-7 h-6 sm:h-7 transition-colors duration-300" />
@@ -261,9 +261,9 @@ export function ContactModule() {
 					>
 						<form
 							onSubmit={handleSubmit}
-							className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl shadow-2xl flex flex-col gap-5 sm:gap-6 group hover:border-teal-500/20 transition-colors duration-500"
+							className="relative p-3 sm:p-4 rounded-xl bg-card/80 border border-border backdrop-blur-xl shadow-2xl flex flex-col gap-3 sm:gap-4 group hover:border-teal-500/20 transition-colors duration-500"
 						>
-							<div className="absolute inset-0 bg-linear-to-tl from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/5 transition-colors duration-700 pointer-events-none rounded-3xl" />
+							<div className="absolute inset-0 bg-linear-to-tl from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/5 transition-colors duration-700 pointer-events-none rounded-xl" />
 
 							<h2 className="text-2xl sm:text-3xl font-black text-foreground mb-2 tracking-tight relative z-10 flex items-center gap-3">
 								<span className="w-2 h-8 rounded-full bg-teal-500 shadow-[0_0_15px_rgba(20,184,166,0.5)]" />
@@ -272,7 +272,7 @@ export function ContactModule() {
 							<p className="text-muted-foreground text-sm mb-8 font-medium ml-5 relative z-10">Send a direct message. I'll get back to you soon.</p>
 
 							<div className="space-y-6 relative z-10">
-								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div className="space-y-2.5">
 										<label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">
 											Name

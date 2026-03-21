@@ -19,13 +19,13 @@ function ExperienceSkeleton() {
 				<div className="h-12 w-72 bg-foreground/5 rounded-xl" />
 				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
 			</div>
-			<div className="max-w-4xl mx-auto space-y-12 mt-16 relative">
+			<div className="max-w-4xl mx-auto space-y-6 mt-16 relative">
 				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
 				{[1, 2, 3].map(i => (
 					<div key={i} className="flex items-start gap-8 relative z-10">
 						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-foreground/10 border-4 border-card" />
 						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-48 bg-foreground/5 rounded-4xl" />
+							<div className="h-48 bg-foreground/5 rounded-2xl" />
 						</div>
 					</div>
 				))}
@@ -80,7 +80,7 @@ const JobCard = memo(function JobCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-5 sm:p-6 rounded-3xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
+						'relative p-3 sm:p-4 rounded-xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
 						job.highlighted
 							? 'border-(--theme-primary)/30 bg-(--theme-primary)/5'
 							: 'hover:border-foreground/20',
@@ -95,7 +95,7 @@ const JobCard = memo(function JobCard({
 
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Header */}
-						<h3 className="text-lg sm:text-xl font-black tracking-tight text-foreground mb-2 relative inline-flex items-center gap-2">
+						<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground mb-2 relative inline-flex items-center gap-2">
 							{job.title}
 							{job.highlighted && (
 								<Star className="w-4 h-4 shrink-0" style={{ color: 'var(--theme-primary)', fill: 'var(--theme-primary)' }} />
@@ -181,7 +181,7 @@ export function ExperienceModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={Briefcase}
 					label="Work History"
@@ -204,7 +204,7 @@ export function ExperienceModule() {
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true, margin: '-20px' }}
-							className="space-y-12 sm:space-y-20 flex flex-col"
+							className="space-y-6 sm:space-y-20 flex flex-col"
 						>
 							{workEntries.map((job, index) => (
 								<JobCard

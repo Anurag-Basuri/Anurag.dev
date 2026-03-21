@@ -21,7 +21,7 @@ function CertificationsSkeleton() {
 				<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
 				<div className="h-5 w-80 bg-foreground/5 rounded-lg" />
 			</div>
-			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 auto-rows-fr">
+			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 auto-rows-fr">
 				{[1, 2, 3, 4].map(i => (
 					<div
 						key={i}
@@ -40,7 +40,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-3xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
+			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
 		>
 			{/* Ambient Glow */}
 			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/10 transition-colors duration-500 pointer-events-none" />
@@ -132,7 +132,7 @@ export function CertificationModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					label="Credentials"
 					icon={ShieldCheck}
@@ -151,7 +151,7 @@ export function CertificationModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12 auto-rows-fr"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-4 lg:gap-8 mt-8 md:mt-12 auto-rows-fr"
 					>
 						{certs.map(cert => (
 							<CertCard key={cert.id} cert={cert} />

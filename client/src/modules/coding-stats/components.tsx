@@ -16,7 +16,7 @@ export function CodingStatsSkeleton() {
 	return (
 		<div className="p-4 sm:p-6 md:p-12 space-y-6 animate-pulse max-w-7xl mx-auto pb-32">
 			<div className="h-10 bg-foreground/5 rounded w-56 mb-8" />
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
 				<div className="h-[400px] border border-border bg-foreground/5 rounded-[2.5rem] md:col-span-2 lg:col-span-2 lg:row-span-2" />
 				{[1, 2, 3].map(i => (
 					<div key={i} className="h-64 rounded-[2.5rem] border border-border bg-foreground/5" />
@@ -139,7 +139,7 @@ export function StatPill({ label, value }: { label: string; value: string | numb
 			<div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
 				{label}
 			</div>
-			<div className="text-xl sm:text-2xl font-black text-foreground tracking-tight">{value}</div>
+			<div className="text-base sm:text-lg font-black text-foreground tracking-tight">{value}</div>
 		</div>
 	);
 }
@@ -166,16 +166,16 @@ export const LinkOnlyCard = memo(function LinkOnlyCard({
 			rel="noopener noreferrer"
 			whileHover={cardHover}
 			className={cn(
-				'group relative flex items-center gap-5 p-5 md:p-6 rounded-3xl bg-linear-to-br border border-border backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
+				'group relative flex items-center gap-5 p-5 md:p-6 rounded-xl bg-linear-to-br border border-border backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
 				config.accentBorder,
 				config.accentBg,
 			)}
 		>
-			<div className={cn('p-4 rounded-3xl bg-card border border-border shadow-xl', config.accentText)}>
+			<div className={cn('p-4 rounded-xl bg-card border border-border shadow-xl', config.accentText)}>
 				<Icon className="w-8 h-8" />
 			</div>
 			<div className="flex-1 min-w-0">
-				<h3 className="text-lg sm:text-xl font-black text-foreground tracking-tight">{config.name}</h3>
+				<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight">{config.name}</h3>
 				<p className={cn('text-[10px] font-black uppercase tracking-wider mt-1 truncate', config.accentText)}>
 					@{username}
 				</p>
@@ -211,7 +211,7 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 			viewport={{ once: true }}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br border border-border backdrop-blur-md p-5 sm:p-6 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
+				'group relative rounded-xl bg-linear-to-br border border-border backdrop-blur-md p-3 sm:p-4 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -220,9 +220,9 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 			<div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] -z-10 pointer-events-none group-hover:bg-amber-500/20 transition-colors duration-700" />
 
 			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 mb-10 relative z-10">
+			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-10 relative z-10">
 				<div className="flex items-center gap-5">
-					<div className={cn('p-4 rounded-3xl bg-card border border-border shadow-xl', config.accentText)}>
+					<div className={cn('p-4 rounded-xl bg-card border border-border shadow-xl', config.accentText)}>
 						<Icon className="w-10 sm:w-12 h-10 sm:h-12" />
 					</div>
 					<div>
@@ -243,7 +243,7 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-card/40 p-5 sm:p-6 rounded-2xl border border-border w-full">
+			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-card/40 p-3 sm:p-4 rounded-2xl border border-border w-full">
 				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} size={130} />
 				<div className="flex-1 w-full space-y-5">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
@@ -280,7 +280,7 @@ export const GitHubCard = memo(function GitHubCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-border p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-3 sm:p-4 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -295,7 +295,7 @@ export const GitHubCard = memo(function GitHubCard({
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
+						<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
 						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
@@ -342,7 +342,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-3xl bg-linear-to-br backdrop-blur-md border border-border p-5 sm:p-6 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-3 sm:p-4 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
@@ -356,7 +356,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 						<Icon className="w-8 h-8" />
 					</div>
 					<div>
-						<h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
+						<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
 						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>

@@ -128,7 +128,7 @@ export function CodingStatsModule() {
 				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">
 					{error ? 'Failed to Sync Telemetry' : 'No Profiles Configured'}
 				</p>
-				<p className="text-sm text-muted-foreground mb-8 max-w-sm">
+				<p className="text-xs text-muted-foreground leading-snug mb-8 max-w-sm">
 					{error || "Connect your coding profiles in the admin dashboard to see your stats here."}
 				</p>
 			</div>
@@ -137,7 +137,7 @@ export function CodingStatsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={Terminal}
 					label="Telemetry"
@@ -151,7 +151,7 @@ export function CodingStatsModule() {
 					initial="hidden"
 					whileInView="visible"
 					viewport={{ once: true, margin: '-20px' }}
-					className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-8 md:mt-12"
+					className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-4 lg:gap-8 mt-8 md:mt-12"
 				>
 					{platformEntries.map(({ config, platform, hasData }) => {
 						if (!platform) return null;

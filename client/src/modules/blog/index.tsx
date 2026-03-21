@@ -74,8 +74,8 @@ function timeAgo(date: string | null | undefined): string {
 
 function BlogSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 space-y-8 animate-pulse max-w-7xl mx-auto pb-32">
-			<div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12 pb-8">
+		<div className="p-4 sm:p-6 md:p-12 space-y-4 animate-pulse max-w-7xl mx-auto pb-32">
+			<div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-12 pb-8">
 				<div className="space-y-4 w-full md:w-auto">
 					<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
 					<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
@@ -85,7 +85,7 @@ function BlogSkeleton() {
 			</div>
 
 			<div className="h-[400px] mb-8 bg-foreground/5 rounded-[2.5rem]" />
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 auto-rows-fr">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 auto-rows-fr">
 				{[1, 2, 3].map(i => (
 					<div key={i} className="h-96 bg-foreground/5 rounded-[2.5rem]" />
 				))}
@@ -102,7 +102,7 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 
 	return (
 		<div className="space-y-3">
-			<div className="relative aspect-video rounded-2xl sm:rounded-3xl overflow-hidden border border-border bg-black">
+			<div className="relative aspect-video rounded-2xl sm:rounded-xl overflow-hidden border border-border bg-black">
 				<Image
 					src={images[current] ?? ''}
 					alt={`Image ${current + 1}`}
@@ -169,7 +169,7 @@ const FeaturedCard = memo(function FeaturedCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
+			className="group relative rounded-xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
@@ -265,7 +265,7 @@ const PostCard = memo(function PostCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative flex flex-col h-full rounded-3xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
+			className="group relative flex flex-col h-full rounded-xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
 
@@ -309,7 +309,7 @@ const PostCard = memo(function PostCard({
 					{post.title ?? 'Untitled'}
 				</h3>
 
-				<p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-6 font-medium">
+				<p className="text-xs text-muted-foreground leading-snug line-clamp-2 leading-relaxed mb-6 font-medium">
 					{post.content ?? ''}
 				</p>
 
@@ -384,7 +384,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
-				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-card border border-border rounded-3xl sm:rounded-4xl shadow-2xl flex flex-col z-10 overflow-hidden"
+				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-card border border-border rounded-xl sm:rounded-2xl shadow-2xl flex flex-col z-10 overflow-hidden"
 			>
 				{/* Top Bar with Progress */}
 				<div className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-linear-to-b from-[#050505] to-transparent pointer-events-none">
@@ -489,7 +489,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							</div>
 
 							{/* Main Body */}
-							<article className="prose prose-invert prose-base md:prose-lg max-w-none text-foreground/80 leading-loose font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-3xl prose-img:border prose-img:border-border">
+							<article className="prose prose-invert prose-base md:prose-lg max-w-none text-foreground/80 leading-loose font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:border prose-img:border-border">
 								{/* 
 									Since raw markdown isn't processed by a markdown parser here,
 									we maintain the whitespace-pre-wrap but style it beautifully.
@@ -569,7 +569,7 @@ export function BlogModule() {
 				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">
 					Failed to load articles
 				</p>
-				<p className="text-sm text-muted-foreground mb-8 max-w-sm">{error}</p>
+				<p className="text-xs text-muted-foreground leading-snug mb-8 max-w-sm">{error}</p>
 				<button
 					onClick={() => window.location.reload()}
 					className="px-6 py-3 rounded-xl bg-foreground/5 border border-border text-xs font-bold uppercase tracking-wider text-foreground hover:bg-foreground/10 hover:border-white/20 transition-all active:scale-95 shadow-lg"
@@ -582,7 +582,7 @@ export function BlogModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				{/* Header */}
 				<SectionHeader
 					label="Insights"
@@ -625,7 +625,7 @@ export function BlogModule() {
 								initial="hidden"
 								whileInView="visible"
 								viewport={{ once: true, margin: '-20px' }}
-								className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 auto-rows-fr"
+								className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-4 lg:gap-8 auto-rows-fr"
 							>
 								{rest.map(post => (
 									<PostCard
