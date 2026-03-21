@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
+import { SectionHeader } from '@/ui/SectionHeader';
 import {
 	fadeInUp,
 	fadeIn,
@@ -67,12 +68,23 @@ export function ProfileModule() {
 			<div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 			<div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
+			{/* Consistent Section Header ABOVE the Hero Cover */}
+			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-8 md:pt-12 relative z-20">
+				<SectionHeader
+					icon={User}
+					label="Overview"
+					title="Creator Profile"
+					description="Personal details, availability, and core competencies."
+					sectionId="profile"
+				/>
+			</div>
+
 			{/* Hero Cover Image Area */}
 			<motion.div
 				variants={fadeIn}
 				initial="hidden"
 				animate="visible"
-				className="relative w-full h-48 sm:h-64 md:h-112 bg-card border-b border-border overflow-hidden"
+				className="relative w-full h-48 sm:h-64 md:h-112 bg-card border-y border-border overflow-hidden mt-6 sm:mt-8"
 			>
 				{profile.coverUrl && (
 					<img 
@@ -86,7 +98,7 @@ export function ProfileModule() {
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
 			</motion.div>
 
-			<div className="max-w-5xl mx-auto px-4 sm:px-5 md:px-8 pb-16 sm:pb-24 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
+			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pb-16 sm:pb-24 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
@@ -94,7 +106,7 @@ export function ProfileModule() {
 					className="flex flex-col"
 				>
 					{/* Header Row: Avatar + Name + Actions */}
-					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pt-2">
 						{/* Avatar & Title */}
 						<div className="flex flex-col gap-4">
 							<motion.div

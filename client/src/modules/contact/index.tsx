@@ -142,7 +142,7 @@ export function ContactModule() {
 			{/* Very subtle ambient spotlight behind contact module to signify "end of page" */}
 			<div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
+			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-16 sm:pb-24 pt-8 md:pt-12">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}

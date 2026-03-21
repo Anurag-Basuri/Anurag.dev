@@ -181,7 +181,7 @@ export function ExperienceModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="p-4 sm:p-5 md:p-8 max-w-5xl mx-auto pb-16 sm:pb-24">
+			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-16 sm:pb-24 pt-8 md:pt-12">
 				<SectionHeader
 					icon={Briefcase}
 					label="Work History"
