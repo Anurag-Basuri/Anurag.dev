@@ -69,7 +69,7 @@ export function ProfileModule() {
 			<div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
 			{/* Consistent Section Header ABOVE the Hero Cover */}
-			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-8 md:pt-12 relative z-20">
+			<div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 pt-6 md:pt-8 relative z-20">
 				<SectionHeader
 					icon={User}
 					label="Overview"
@@ -232,7 +232,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-6 sm:p-8 rounded-3xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm relative overflow-hidden group"
+								className="w-full p-5 sm:p-6 rounded-3xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">
@@ -251,7 +251,7 @@ export function ProfileModule() {
 							<motion.div
 								variants={fadeInUp}
 								whileHover={cardHover}
-								className="w-full p-6 sm:p-8 rounded-3xl bg-card border border-border relative overflow-hidden group"
+								className="w-full p-5 sm:p-6 rounded-3xl bg-card border border-border relative overflow-hidden group"
 							>
 								<div className="absolute inset-0 bg-linear-to-bl from-secondary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 								<div className="relative z-10 flex flex-col h-full">

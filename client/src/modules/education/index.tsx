@@ -74,7 +74,7 @@ const EducationCard = memo(function EducationCard({
 				<motion.div
 					whileHover={cardHover}
 					className={cn(
-						'relative p-6 sm:p-8 rounded-3xl bg-linear-to-bl from-white/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
+						'relative p-5 sm:p-6 rounded-3xl bg-linear-to-bl from-white/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
 						'hover:border-foreground/20',
 					)}
 				>
@@ -180,7 +180,7 @@ export function EducationModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-16 sm:pb-24 pt-8 md:pt-12">
+			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={GraduationCap}
 					label="Academic Path"

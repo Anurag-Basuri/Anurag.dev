@@ -48,7 +48,7 @@ export function SectionHeader({
 			initial="hidden"
 			whileInView="visible"
 			viewport={{ once: true, margin: '-20px' }}
-			className="relative flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-6 sm:mb-8 pb-4 border-b border-border"
+			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-4 md:pt-6 pb-4 mb-6 sm:mb-8 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 shadow-sm"
 		>
 			<div className="relative z-10">
 				<motion.div
@@ -57,22 +57,22 @@ export function SectionHeader({
 					viewport={{ once: true }}
 					transition={{ delay: 0.1 }}
 					className={cn(
-						'flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] mb-2',
+						'flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] mb-1.5',
 						theme.icon,
 					)}
 				>
 					<span className={cn('p-1.5 rounded-lg border backdrop-blur-sm', theme.badge)}>
-						<Icon className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+						<Icon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
 					</span>
 					<span>{label}</span>
 				</motion.div>
 
-				<h1 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-2 tracking-tight">
+				<h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-white/90 to-white/50 leading-tight mb-1.5 tracking-tight">
 					{title}
 				</h1>
 
 				{description && (
-					<p className="text-sm text-muted-foreground/80 max-w-lg leading-relaxed font-medium">
+					<p className="text-xs text-muted-foreground/80 max-w-lg leading-relaxed font-medium">
 						{description}
 					</p>
 				)}

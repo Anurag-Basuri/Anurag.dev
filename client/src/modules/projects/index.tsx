@@ -73,7 +73,7 @@ export function ProjectsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-16 sm:pb-24 pt-8 md:pt-12">
+			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				<SectionHeader
 					icon={Briefcase}
 					label="Portfolio"
@@ -130,7 +130,7 @@ export function ProjectsModule() {
 									</div>
 
 									{/* Content Area */}
-									<div className="p-6 sm:p-8 flex flex-col grow relative z-10 -mt-6">
+									<div className="p-5 sm:p-6 flex flex-col grow relative z-10 -mt-6">
 										{/* Tech Stack Pills (Floating over image edge) */}
 										<div className="flex flex-wrap gap-2 mb-6">
 											{(project.techStack ?? []).slice(0, 3).map(tech => (

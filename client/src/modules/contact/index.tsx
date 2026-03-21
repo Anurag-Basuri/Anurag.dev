@@ -142,7 +142,7 @@ export function ContactModule() {
 			{/* Very subtle ambient spotlight behind contact module to signify "end of page" */}
 			<div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-16 sm:pb-24 pt-8 md:pt-12">
+			<div className="px-4 sm:px-6 md:px-8 max-w-4xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
 				{/* Standardized Header */}
 				<SectionHeader
 					icon={MessageSquare}
@@ -163,7 +163,7 @@ export function ContactModule() {
 					>
 						<div className="space-y-6">
 							{/* Email Card (Teal Accent) */}
-							<div className="relative p-6 sm:p-8 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
+							<div className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-teal-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/10 transition-colors duration-700 pointer-events-none" />
 								<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
 									<div className="p-4 sm:p-5 rounded-3xl bg-card border border-border text-teal-400 group-hover:scale-110 group-hover:bg-teal-500/10 group-hover:border-teal-500/30 transition-all duration-500 shadow-xl shrink-0">
@@ -196,7 +196,7 @@ export function ContactModule() {
 							</div>
 
 							{/* Location Card (Purple Accent) */}
-							<div className="relative p-6 sm:p-8 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
+							<div className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl transition-all duration-500 overflow-hidden group hover:border-purple-500/30 shadow-2xl">
 								<div className="absolute inset-0 bg-linear-to-br from-purple-500/0 via-transparent to-transparent group-hover:from-purple-500/10 transition-colors duration-700 pointer-events-none" />
 								{/* Faint map background icon */}
 								<MapPin className="absolute right-[-10%] top-[-20%] w-64 h-64 text-white/5 group-hover:text-purple-500/5 transition-colors duration-700 -rotate-12 pointer-events-none" />
@@ -261,7 +261,7 @@ export function ContactModule() {
 					>
 						<form
 							onSubmit={handleSubmit}
-							className="relative p-6 sm:p-8 rounded-3xl bg-card/80 border border-border backdrop-blur-xl shadow-2xl flex flex-col gap-5 sm:gap-6 group hover:border-teal-500/20 transition-colors duration-500"
+							className="relative p-5 sm:p-6 rounded-3xl bg-card/80 border border-border backdrop-blur-xl shadow-2xl flex flex-col gap-5 sm:gap-6 group hover:border-teal-500/20 transition-colors duration-500"
 						>
 							<div className="absolute inset-0 bg-linear-to-tl from-teal-500/0 via-transparent to-transparent group-hover:from-teal-500/5 transition-colors duration-700 pointer-events-none rounded-3xl" />
 
