@@ -198,7 +198,7 @@ export function AchievementsModule() {
 					label="Triumphs"
 					title="Achievements"
 					description="Hackathon wins, open-source milestones, and competitive programming ranks."
-					accent="rose"
+					sectionId="achievements"
 				/>
 
 				{achievements.length === 0 ? (

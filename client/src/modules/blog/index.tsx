@@ -384,7 +384,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
-				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-card border border-border rounded-3xl sm:rounded-[2rem] shadow-2xl flex flex-col z-10 overflow-hidden"
+				className="relative w-full max-w-4xl h-[95vh] sm:h-[90vh] bg-card border border-border rounded-3xl sm:rounded-4xl shadow-2xl flex flex-col z-10 overflow-hidden"
 			>
 				{/* Top Bar with Progress */}
 				<div className="absolute top-0 left-0 right-0 h-16 z-50 flex items-center justify-between px-6 bg-linear-to-b from-[#050505] to-transparent pointer-events-none">
@@ -589,7 +589,7 @@ export function BlogModule() {
 					icon={BookOpen}
 					title="Engineering Log"
 					description="Thoughts, tutorials, and deep dives into software engineering, systems design, and technology."
-					accent="indigo"
+					sectionId="blog"
 				/>
 
 				{posts.length === 0 ? (

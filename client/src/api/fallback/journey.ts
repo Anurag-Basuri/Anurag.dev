@@ -65,13 +65,13 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		updatedAt: '2022-03-31T00:00:00.000Z',
 	},
 	{
-		id: 'fb-j-3',
+		id: 'fb-j-4',
 		type: 'WORK',
-		title: 'Full Stack Developer Intern',
-		organization: 'Tech Startup',
-		location: 'Remote',
-		date: '2024 - Present',
-		startDate: '2024-01-01T00:00:00.000Z',
+		title: 'Freelancer',
+		organization: 'Syntax Student Organization',
+		location: 'LPU, Punjab',
+		date: 'Mar - Dec, 2025',
+		startDate: '2025-01-01T00:00:00.000Z',
 		endDate: null,
 		isCurrent: true,
 		description:
@@ -82,6 +82,6 @@ export const FALLBACK_JOURNEY: JourneyEntry[] = [
 		order: 2,
 		createdAt: '2024-01-01T00:00:00.000Z',
 		updatedAt: '2024-06-01T00:00:00.000Z',
-	},
+	}
 ];
 
