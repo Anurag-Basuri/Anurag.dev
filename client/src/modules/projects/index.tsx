@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
 	Layers,
@@ -9,14 +9,12 @@ import {
 	Folder,
 	Layout,
 	X,
-	ArrowUpRight,
 	Briefcase,
 } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Project } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
-import { ScrollArea } from '@/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, scaleIn, fadeIn, cardHover } from '@/animations/motion';
 
@@ -44,7 +42,6 @@ export function ProjectsModule() {
 	const [projects, setProjects] = useState<Project[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-
 	const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 	useEffect(() => {
@@ -63,7 +60,6 @@ export function ProjectsModule() {
 	}, []);
 
 	if (loading) return <ProjectsSkeleton />;
-
 	if (error) {
 		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
 	}
@@ -79,7 +75,6 @@ export function ProjectsModule() {
 					sectionId="projects"
 				/>
 
-				{/* Grid */}
 				{projects.length === 0 && !loading ? (
 					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
 						No projects found.
@@ -108,13 +103,13 @@ export function ProjectsModule() {
 								>
 									<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/8 transition-colors duration-300 pointer-events-none" />
 
-									{/* Thumbnail — edge-to-edge */}
+									{/* Thumbnail */}
 									<div className="relative aspect-video overflow-hidden">
 										<UrlThumbnail url={project.thumbnail || project.liveUrl} title={project.title} fallbackIcon={Folder} />
 										<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 									</div>
 
-									{/* Content — compact */}
+									{/* Content */}
 									<div className="p-3 flex flex-col grow relative z-10">
 										<div className="flex flex-wrap gap-1.5 mb-2">
 											{(project.techStack ?? []).slice(0, 3).map(tech => (
@@ -140,7 +135,7 @@ export function ProjectsModule() {
 											{project.description}
 										</p>
 
-										{/* Footer Links */}
+										{/* Footer */}
 										<div className="flex items-center gap-2 mt-auto pt-2.5 border-t border-border">
 											{project.liveUrl && (
 												<button
@@ -171,127 +166,156 @@ export function ProjectsModule() {
 				{/* Detail Modal */}
 				<AnimatePresence>
 					{selectedProject && (
-						<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-8">
-							{/* Frosted Glass Backdrop */}
-							<motion.div
-								variants={fadeIn}
-								initial="hidden"
-								animate="visible"
-								exit="hidden"
-								onClick={() => setSelectedProject(null)}
-								className="absolute inset-0 bg-black/60 backdrop-blur-3xl"
-							/>
-
-							{/* Modal Container — vertical stack */}
-							<motion.div
-								variants={scaleIn}
-								initial="hidden"
-								animate="visible"
-								exit="hidden"
-								className="relative w-full h-full sm:h-auto sm:max-h-[90vh] max-w-3xl bg-card/95 backdrop-blur-xl border-0 sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col z-10 overflow-hidden"
-								style={{ boxShadow: '0 0 80px -20px color-mix(in oklch, var(--theme-primary) 15%, transparent)' }}
-							>
-								{/* Top Action Bar — above the image */}
-								<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/5 bg-black/20 shrink-0">
-									<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-										<Folder className="w-3.5 h-3.5" />
-										<span>Project Details</span>
-									</div>
-									<button
-										onClick={() => setSelectedProject(null)}
-										className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-muted-foreground hover:text-foreground transition-all hover:rotate-90 hover:scale-110"
-										aria-label="Close modal"
-									>
-										<X className="w-4 h-4" />
-									</button>
-								</div>
-
-								{/* Scrollable Body */}
-								<ScrollArea className="flex-1 min-h-0">
-									<div className="flex flex-col">
-										{/* Clean Image Section — no overlays */}
-										<div className="relative w-full bg-black/40 flex items-center justify-center overflow-hidden" style={{ maxHeight: '40vh' }}>
-											<div className="relative w-full aspect-video">
-												<UrlThumbnail url={selectedProject.thumbnail || selectedProject.liveUrl} title={selectedProject.title} fallbackIcon={Folder} />
-											</div>
-										</div>
-
-										{/* Content Section */}
-										<div className="p-5 sm:p-8 space-y-6">
-											{/* Title */}
-											<h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
-												{selectedProject.title}
-											</h2>
-
-											{/* Description */}
-											<div className="space-y-3">
-												<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
-													<Layout className="w-3.5 h-3.5" />
-													<span>About</span>
-												</div>
-												<p className="text-sm sm:text-base text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">
-													{selectedProject.description}
-												</p>
-											</div>
-
-											{/* Tech Stack */}
-											{(selectedProject.techStack ?? []).length > 0 && (
-												<div className="space-y-3">
-													<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
-														<Layers className="w-3.5 h-3.5" />
-														<span>Technologies</span>
-													</div>
-													<div className="flex flex-wrap gap-2">
-														{(selectedProject.techStack ?? []).map(tech => (
-															<span
-																key={tech}
-																className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-foreground/80 transition-colors hover:border-white/20"
-															>
-																{tech}
-															</span>
-														))}
-													</div>
-												</div>
-											)}
-
-											{/* Action Buttons */}
-											<div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
-												{selectedProject.liveUrl && (
-													<a
-														href={selectedProject.liveUrl}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
-														style={{
-															background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
-															color: 'var(--theme-primary)',
-															border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
-														}}
-													>
-														<ExternalLink className="w-4 h-4" />
-														Visit Site
-													</a>
-												)}
-												{selectedProject.githubUrl && (
-													<a
-														href={selectedProject.githubUrl}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 text-foreground border border-white/10 hover:border-white/20 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
-													>
-														<Github className="w-4 h-4" />
-														Source Code
-													</a>
-												)}
-											</div>
-										</div>
-									</div>
-								</ScrollArea>
-							</motion.div>
-						</div>
+						<ProjectDetailModal
+							project={selectedProject}
+							onClose={() => setSelectedProject(null)}
+						/>
 					)}
 				</AnimatePresence>
 			</div>
+		</div>
+	);
+}
+
+// ─── Project Detail Modal ───────────────────────────────────────
+
+function ProjectDetailModal({
+	project,
+	onClose,
+}: {
+	project: Project;
+	onClose: () => void;
+}) {
+	// Body scroll lock
+	useEffect(() => {
+		const prev = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		return () => { document.body.style.overflow = prev; };
+	}, []);
+
+	// Escape to close
+	useEffect(() => {
+		const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+		window.addEventListener('keydown', handler);
+		return () => window.removeEventListener('keydown', handler);
+	}, [onClose]);
+
+	return (
+		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-8">
+			{/* Backdrop — fixed, never scrolls */}
+			<motion.div
+				variants={fadeIn}
+				initial="hidden"
+				animate="visible"
+				exit="hidden"
+				onClick={onClose}
+				className="absolute inset-0 backdrop-blur-2xl"
+				style={{ background: 'color-mix(in oklch, color-mix(in oklch, var(--background) 88%, var(--theme-primary)) 75%, transparent)' }}
+			/>
+
+			{/* Modal */}
+			<motion.div
+				variants={scaleIn}
+				initial="hidden"
+				animate="visible"
+				exit="hidden"
+				className={cn(
+					'relative z-10 flex flex-col overflow-hidden',
+					'w-full h-full sm:h-auto sm:max-h-[90vh] max-w-3xl',
+					'bg-card backdrop-blur-xl',
+					'border-0 sm:border sm:border-border sm:rounded-2xl',
+					'shadow-2xl',
+				)}
+				style={{ boxShadow: '0 0 80px -20px color-mix(in oklch, var(--theme-primary) 15%, transparent)' }}
+			>
+				{/* Sticky Header */}
+				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card backdrop-blur-md shrink-0">
+					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+						<Folder className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)' }} />
+						<span>Project Details</span>
+					</div>
+					<button
+						onClick={onClose}
+						className="p-2 rounded-full bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all hover:rotate-90 hover:scale-110"
+						aria-label="Close modal"
+					>
+						<X className="w-4 h-4" />
+					</button>
+				</div>
+
+				{/* Scrollable Body — native scroll, backdrop stays fixed */}
+				<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+					{/* Clean Image */}
+					<div className="relative w-full bg-muted overflow-hidden" style={{ maxHeight: '40vh' }}>
+						<div className="relative w-full aspect-video">
+							<UrlThumbnail url={project.thumbnail || project.liveUrl} title={project.title} fallbackIcon={Folder} />
+						</div>
+					</div>
+
+					{/* Content */}
+					<div className="p-5 sm:p-8 space-y-6 pb-10">
+						<h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
+							{project.title}
+						</h2>
+
+						<div className="space-y-3">
+							<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+								<Layout className="w-3.5 h-3.5" />
+								<span>About</span>
+							</div>
+							<p className="text-sm sm:text-base text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">
+								{project.description}
+							</p>
+						</div>
+
+						{(project.techStack ?? []).length > 0 && (
+							<div className="space-y-3">
+								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+									<Layers className="w-3.5 h-3.5" />
+									<span>Technologies</span>
+								</div>
+								<div className="flex flex-wrap gap-2">
+									{(project.techStack ?? []).map(tech => (
+										<span key={tech} className="px-3 py-1.5 rounded-lg bg-muted border border-border text-xs font-bold text-foreground/80 hover:bg-accent transition-colors">
+											{tech}
+										</span>
+									))}
+								</div>
+							</div>
+						)}
+
+						<div className="flex flex-wrap gap-3 pt-4 border-t border-border">
+							{project.liveUrl && (
+								<a
+									href={project.liveUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
+									style={{
+										background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+										color: 'var(--theme-primary)',
+										border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+									}}
+								>
+									<ExternalLink className="w-4 h-4" />
+									Visit Site
+								</a>
+							)}
+							{project.githubUrl && (
+								<a
+									href={project.githubUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center justify-center gap-2 px-5 py-2.5 bg-muted hover:bg-accent text-foreground border border-border text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
+								>
+									<Github className="w-4 h-4" />
+									Source Code
+								</a>
+							)}
+						</div>
+					</div>
+				</div>
+			</motion.div>
 		</div>
 	);
 }
