@@ -295,8 +295,12 @@ export const platformStatsSchema = z.object({
 			globalRank: z.union([z.string(), z.number()]).optional(),
 			stars: z.number().optional(),
 			followers: z.number().optional(),
+			following: z.number().optional(),
 			prs: z.number().optional(),
 			issues: z.number().optional(),
+			repos: z.number().optional(),
+			gists: z.number().optional(),
+			commits: z.number().optional(),
 		})
 		.optional(),
 });

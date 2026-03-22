@@ -132,7 +132,7 @@ const AchievementCard = memo(function AchievementCard({
 				)}
 
 				{achievement.description && (
-					<p className="text-xs text-muted-foreground leading-snug leading-relaxed mb-6 grow line-clamp-3 font-medium">
+					<p className="text-xs text-muted-foreground leading-snug mb-6 grow line-clamp-3 font-medium">
 						{achievement.description}
 					</p>
 				)}

@@ -17,8 +17,12 @@ interface PlatformStats {
 		globalRank?: string | number;
 		stars?: number;
 		followers?: number;
+		following?: number;
 		prs?: number;
 		issues?: number;
+		repos?: number;
+		gists?: number;
+		commits?: number;
 	};
 }
 
@@ -79,7 +83,7 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 
 		if (!userRes.ok) return base;
 
-		const user = (await userRes.json()) as { followers?: number };
+		const user = (await userRes.json()) as { followers?: number; following?: number; public_repos?: number; public_gists?: number };
 		let totalStars = 0;
 
 		if (reposRes.ok) {
@@ -87,16 +91,20 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 			totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
 		}
 
-		// Optionally fetch PR and issue counts if we have a token (uses search API)
+		// Optionally fetch PR, issue, and commit counts if we have a token (uses search API)
 		let prs = 0;
 		let issues = 0;
+		let commits = 0;
 		if (env.GITHUB_TOKEN) {
-			const [prRes, issueRes] = await Promise.all([
+			const [prRes, issueRes, commitRes] = await Promise.all([
 				fetch(`https://api.github.com/search/issues?q=author:${username}+type:pr`, {
 					headers,
 				}),
 				fetch(`https://api.github.com/search/issues?q=author:${username}+type:issue`, {
 					headers,
+				}),
+				fetch(`https://api.github.com/search/commits?q=author:${username}`, {
+					headers: { ...headers, Accept: 'application/vnd.github.cloak-preview+json' },
 				}),
 			]);
 			if (prRes.ok) {
@@ -107,6 +115,10 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 				const issueData = (await issueRes.json()) as { total_count?: number };
 				issues = issueData.total_count || 0;
 			}
+			if (commitRes.ok) {
+				const commitData = (await commitRes.json()) as { total_count?: number };
+				commits = commitData.total_count || 0;
+			}
 		}
 
 		return {
@@ -115,8 +127,12 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 			stats: {
 				stars: totalStars,
 				followers: user.followers || 0,
+				following: user.following || 0,
+				repos: user.public_repos || 0,
+				gists: user.public_gists || 0,
 				prs,
 				issues,
+				commits,
 			},
 		};
 	} catch {

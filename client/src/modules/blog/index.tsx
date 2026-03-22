@@ -309,7 +309,7 @@ const PostCard = memo(function PostCard({
 					{post.title ?? 'Untitled'}
 				</h3>
 
-				<p className="text-xs text-muted-foreground leading-snug line-clamp-2 leading-relaxed mb-6 font-medium">
+				<p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-6 font-medium">
 					{post.content ?? ''}
 				</p>
 

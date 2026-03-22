@@ -14,12 +14,17 @@ import { ANIM_DURATION, DIFF_CONFIG, LEETCODE_MAX, type PlatformConfig } from '.
 
 export function CodingStatsSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 space-y-6 animate-pulse max-w-7xl mx-auto pb-32">
-			<div className="h-10 bg-foreground/5 rounded w-56 mb-8" />
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-				<div className="h-[400px] border border-border bg-foreground/5 rounded-[2.5rem] md:col-span-2 lg:col-span-2 lg:row-span-2" />
+		<div className="p-4 sm:p-6 md:p-12 space-y-4 animate-pulse max-w-7xl mx-auto pb-16">
+			<div className="h-8 bg-foreground/5 rounded w-48 mb-6" />
+			<div className="h-[280px] border border-border bg-foreground/5 rounded-xl" />
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				{[1, 2].map(i => (
+					<div key={i} className="h-48 rounded-xl border border-border bg-foreground/5" />
+				))}
+			</div>
+			<div className="flex flex-wrap gap-3 mt-4">
 				{[1, 2, 3].map(i => (
-					<div key={i} className="h-64 rounded-[2.5rem] border border-border bg-foreground/5" />
+					<div key={i} className="h-10 w-36 rounded-lg border border-border bg-foreground/5" />
 				))}
 			</div>
 		</div>
@@ -34,8 +39,8 @@ export const CircularProgress = memo(function CircularProgress({
 	value,
 	max,
 	color,
-	size = 150,
-	strokeWidth = 10,
+	size = 120,
+	strokeWidth = 8,
 }: {
 	value: number;
 	max: number;
@@ -58,7 +63,7 @@ export const CircularProgress = memo(function CircularProgress({
 			aria-valuemin={0}
 			aria-valuemax={max}
 		>
-			<div className="absolute inset-0 rounded-full shadow-[inset_0_0_30px_rgba(0,0,0,0.5)] z-10 pointer-events-none" />
+			<div className="absolute inset-0 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] z-10 pointer-events-none" />
 
 			<svg width={size} height={size} className="transform -rotate-90">
 				<circle
@@ -84,9 +89,9 @@ export const CircularProgress = memo(function CircularProgress({
 					transition={{ duration: shouldReduceMotion ? 0 : ANIM_DURATION, ease: 'easeOut' }}
 				/>
 			</svg>
-			<div className="absolute inset-0 flex flex-col items-center justify-center pt-1 z-20">
-				<span className="text-3xl sm:text-4xl font-black text-foreground tracking-tighter drop-shadow-md">{value}</span>
-				<span className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1">
+			<div className="absolute inset-0 flex flex-col items-center justify-center pt-0.5 z-20">
+				<span className="text-2xl sm:text-3xl font-black text-foreground tracking-tighter drop-shadow-md">{value}</span>
+				<span className="text-[8px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-0.5">
 					solved
 				</span>
 			</div>
@@ -111,18 +116,18 @@ export const DifficultyBar = memo(function DifficultyBar({
 	const pct = total > 0 ? (count / total) * 100 : 0;
 
 	return (
-		<div className="space-y-2">
-			<div className="flex justify-between items-end text-xs px-1">
+		<div className="space-y-1">
+			<div className="flex justify-between items-end text-[10px] px-0.5">
 				<span className={cn('font-black uppercase tracking-[0.15em]', config.color)}>{config.label}</span>
 				<span className="text-foreground font-bold">{count}</span>
 			</div>
-			<div className={cn('h-2.5 w-full rounded-full overflow-hidden border border-black/50 shadow-inner', config.container)}>
+			<div className={cn('h-2 w-full rounded-full overflow-hidden border border-black/50 shadow-inner', config.container)}>
 				<motion.div
 					initial={{ width: 0 }}
 					whileInView={{ width: `${pct}%` }}
 					viewport={{ once: true }}
 					transition={{ duration: shouldReduceMotion ? 0 : 1.2, ease: [0.25, 1, 0.5, 1] }}
-					className={cn('h-full rounded-full shadow-[0_0_10px_currentColor]', config.bg)}
+					className={cn('h-full rounded-full shadow-[0_0_8px_currentColor]', config.bg)}
 				/>
 			</div>
 		</div>
@@ -135,20 +140,20 @@ export const DifficultyBar = memo(function DifficultyBar({
 
 export function StatPill({ label, value }: { label: string; value: string | number }) {
 	return (
-		<div className="flex flex-col justify-center px-4 py-3 rounded-2xl bg-background/40 border border-border shadow-inner transition-colors group-hover:bg-card">
-			<div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">
+		<div className="flex flex-col justify-center px-3 py-2 rounded-lg bg-background/40 border border-border shadow-inner transition-colors group-hover:bg-card">
+			<div className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-0.5">
 				{label}
 			</div>
-			<div className="text-base sm:text-lg font-black text-foreground tracking-tight">{value}</div>
+			<div className="text-sm sm:text-base font-black text-foreground tracking-tight">{value}</div>
 		</div>
 	);
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// LINK-ONLY CARD (fallback when no stats available)
+// LINK-ONLY PILL (compact pill for platforms without stats)
 // ═══════════════════════════════════════════════════════════════════
 
-export const LinkOnlyCard = memo(function LinkOnlyCard({
+export const LinkOnlyPill = memo(function LinkOnlyPill({
 	config,
 	url,
 	username,
@@ -164,29 +169,28 @@ export const LinkOnlyCard = memo(function LinkOnlyCard({
 			href={url}
 			target="_blank"
 			rel="noopener noreferrer"
-			whileHover={cardHover}
 			className={cn(
-				'group relative flex items-center gap-5 p-5 md:p-6 rounded-xl bg-linear-to-br border border-border backdrop-blur-md overflow-hidden transition-all duration-500 shadow-xl cursor-pointer',
+				'group inline-flex items-center gap-2.5 px-3 py-2 rounded-lg bg-linear-to-br border border-border backdrop-blur-md overflow-hidden transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer',
 				config.accentBorder,
 				config.accentBg,
 			)}
 		>
-			<div className={cn('p-4 rounded-xl bg-card border border-border shadow-xl', config.accentText)}>
-				<Icon className="w-8 h-8" />
+			<div className={cn('shrink-0', config.accentText)}>
+				<Icon className="w-4 h-4" />
 			</div>
-			<div className="flex-1 min-w-0">
-				<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight">{config.name}</h3>
-				<p className={cn('text-[10px] font-black uppercase tracking-wider mt-1 truncate', config.accentText)}>
+			<div className="flex items-center gap-1.5 min-w-0">
+				<span className="text-xs font-bold text-foreground truncate">{config.name}</span>
+				<span className={cn('text-[9px] font-bold truncate hidden sm:inline', config.accentText)}>
 					@{username}
-				</p>
+				</span>
 			</div>
-			<ExternalLink className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+			<ExternalLink className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-colors shrink-0 opacity-0 group-hover:opacity-100" />
 		</motion.a>
 	);
 });
 
 // ═══════════════════════════════════════════════════════════════════
-// PROBLEM SOLVING CARD (large, with circular progress + difficulty bars)
+// PROBLEM SOLVING CARD (hero, with circular progress + difficulty bars)
 // ═══════════════════════════════════════════════════════════════════
 
 export const ProblemSolvingCard = memo(function ProblemSolvingCard({
@@ -211,23 +215,23 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 			viewport={{ once: true }}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-xl bg-linear-to-br border border-border backdrop-blur-md p-3 sm:p-4 overflow-hidden transition-all duration-500 md:col-span-2 lg:col-span-2 shadow-2xl',
+				'group relative rounded-xl bg-linear-to-br border border-border backdrop-blur-md p-4 sm:p-5 overflow-hidden transition-all duration-500 shadow-2xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
 		>
 			{/* Ambient glow */}
-			<div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] -z-10 pointer-events-none group-hover:bg-amber-500/20 transition-colors duration-700" />
+			<div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-[60px] -z-10 pointer-events-none group-hover:opacity-80 transition-opacity duration-700 opacity-50" style={{ background: `${config.accent}15` }} />
 
 			{/* Header */}
-			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-10 relative z-10">
-				<div className="flex items-center gap-5">
-					<div className={cn('p-4 rounded-xl bg-card border border-border shadow-xl', config.accentText)}>
-						<Icon className="w-10 sm:w-12 h-10 sm:h-12" />
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 relative z-10">
+				<div className="flex items-center gap-3">
+					<div className={cn('p-2.5 rounded-lg bg-card border border-border shadow-lg', config.accentText)}>
+						<Icon className="w-6 sm:w-7 h-6 sm:h-7" />
 					</div>
 					<div>
-						<h2 className="text-xl sm:text-3xl font-black text-foreground tracking-tight mb-1">{config.name}</h2>
-						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em]', config.accentText)}>
+						<h2 className="text-lg sm:text-xl font-black text-foreground tracking-tight">{config.name}</h2>
+						<p className={cn('text-[9px] font-black uppercase tracking-[0.15em]', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -236,22 +240,23 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-background/40 border border-border text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-400 hover:text-foreground hover:bg-card hover:border-amber-500/30 transition-all self-start shadow-inner"
+					className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background/40 border border-border text-[10px] font-black uppercase tracking-wider hover:text-foreground hover:bg-card transition-all self-start shadow-inner"
+					style={{ color: config.accent }}
 				>
-					Profile <ExternalLink className="w-3.5 h-3.5" />
+					Profile <ExternalLink className="w-3 h-3" />
 				</a>
 			</div>
 
 			{/* Stats body */}
-			<div className="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10 bg-card/40 p-3 sm:p-4 rounded-2xl border border-border w-full">
-				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} size={130} />
-				<div className="flex-1 w-full space-y-5">
+			<div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 relative z-10 bg-card/40 p-3 sm:p-4 rounded-lg border border-border w-full">
+				<CircularProgress value={solved} max={LEETCODE_MAX} color={config.accent} size={110} strokeWidth={7} />
+				<div className="flex-1 w-full space-y-3">
 					<DifficultyBar count={easy} total={solved} config={DIFF_CONFIG.easy} />
 					<DifficultyBar count={medium} total={solved} config={DIFF_CONFIG.medium} />
 					<DifficultyBar count={hard} total={solved} config={DIFF_CONFIG.hard} />
 				</div>
 				{(s?.globalRank || s?.rating) && (
-					<div className="flex flex-row md:flex-col gap-4 w-full md:w-40 justify-center">
+					<div className="flex flex-row sm:flex-col gap-3 w-full sm:w-32 justify-center">
 						{s?.globalRank && <StatPill label="Global Rank" value={s.globalRank} />}
 						{s?.rating && <StatPill label="Rating" value={Math.round(s.rating)} />}
 					</div>
@@ -280,23 +285,23 @@ export const GitHubCard = memo(function GitHubCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-3 sm:p-4 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-4 sm:p-5 overflow-hidden transition-all duration-500 shadow-xl md:col-span-2',
 				config.accentBg,
 				config.accentBorder,
 			)}
 		>
 			{/* Ambient glow */}
-			<div className="absolute top-0 right-0 w-32 h-32 bg-zinc-500/10 rounded-full blur-[50px] -z-10 pointer-events-none group-hover:bg-zinc-500/20 transition-colors duration-700" />
+			<div className="absolute top-0 right-0 w-24 h-24 bg-zinc-500/10 rounded-full blur-2xl -z-10 pointer-events-none group-hover:bg-zinc-500/20 transition-colors duration-700" />
 
 			{/* Header */}
-			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
-				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-[1.2rem] bg-card border border-border shadow-xl', config.accentText)}>
-						<Icon className="w-8 h-8" />
+			<div className="flex items-center justify-between gap-3 mb-4 relative z-10">
+				<div className="flex items-center gap-3">
+					<div className={cn('p-2 rounded-lg bg-card border border-border shadow-lg', config.accentText)}>
+						<Icon className="w-5 h-5" />
 					</div>
 					<div>
-						<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
-						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
+						<h3 className="text-sm sm:text-base font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
+						<p className={cn('text-[9px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -305,19 +310,23 @@ export const GitHubCard = memo(function GitHubCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="p-3 rounded-xl bg-background/40 border border-border text-zinc-400 hover:text-foreground hover:bg-card hover:border-zinc-500/30 transition-all self-start shadow-inner"
+					className="p-2 rounded-lg bg-background/40 border border-border text-zinc-400 hover:text-foreground hover:bg-card hover:border-zinc-500/30 transition-all self-start shadow-inner"
 					aria-label="View GitHub profile"
 				>
-					<ExternalLink className="w-4 h-4" />
+					<ExternalLink className="w-3.5 h-3.5" />
 				</a>
 			</div>
 
 			{/* Stats */}
-			<div className="grid grid-cols-2 gap-3 relative z-10">
+			<div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative z-10">
+				<StatPill label="Repos" value={s?.repos ?? 0} />
 				<StatPill label="Stars" value={s?.stars ?? 0} />
 				<StatPill label="Followers" value={s?.followers ?? 0} />
-				<StatPill label="PRs" value={s?.prs ?? 0} />
-				<StatPill label="Issues" value={s?.issues ?? 0} />
+				<StatPill label="Following" value={s?.following ?? 0} />
+				{(s?.commits != null && s.commits > 0) && <StatPill label="Commits" value={s.commits} />}
+				{(s?.prs != null && s.prs > 0) && <StatPill label="PRs" value={s.prs} />}
+				{(s?.issues != null && s.issues > 0) && <StatPill label="Issues" value={s.issues} />}
+				{(s?.gists != null && s.gists > 0) && <StatPill label="Gists" value={s.gists} />}
 			</div>
 		</motion.div>
 	);
@@ -342,22 +351,22 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-3 sm:p-4 overflow-hidden transition-all duration-500 shadow-xl',
+				'group relative rounded-xl bg-linear-to-br backdrop-blur-md border border-border p-4 sm:p-5 overflow-hidden transition-all duration-500 shadow-xl',
 				config.accentBg,
 				config.accentBorder,
 			)}
 		>
-			<div className="absolute top-0 right-0 w-32 h-32 bg-current/5 rounded-full blur-[50px] -z-10 pointer-events-none transition-colors duration-700" style={{ color: config.accent }} />
+			<div className="absolute top-0 right-0 w-24 h-24 bg-current/5 rounded-full blur-2xl -z-10 pointer-events-none transition-colors duration-700" style={{ color: config.accent }} />
 
 			{/* Header */}
-			<div className="flex items-center justify-between gap-4 mb-8 relative z-10">
-				<div className="flex items-center gap-4">
-					<div className={cn('p-3 rounded-[1.2rem] bg-card border border-border shadow-xl', config.accentText)}>
-						<Icon className="w-8 h-8" />
+			<div className="flex items-center justify-between gap-3 mb-4 relative z-10">
+				<div className="flex items-center gap-3">
+					<div className={cn('p-2 rounded-lg bg-card border border-border shadow-lg', config.accentText)}>
+						<Icon className="w-5 h-5" />
 					</div>
 					<div>
-						<h3 className="text-base sm:text-lg font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
-						<p className={cn('text-[9px] sm:text-[10px] font-black uppercase tracking-wider', config.accentText)}>
+						<h3 className="text-sm sm:text-base font-black text-foreground tracking-tight leading-tight">{config.name}</h3>
+						<p className={cn('text-[9px] font-black uppercase tracking-wider', config.accentText)}>
 							@{platform.username}
 						</p>
 					</div>
@@ -366,15 +375,15 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 					href={platform.url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className={cn('p-3 rounded-xl bg-background/40 border border-border hover:text-foreground hover:bg-card transition-all self-start shadow-inner', config.accentText, `hover:border-${config.accentBg.split('-')[1]}-500/30`)}
+					className={cn('p-2 rounded-lg bg-background/40 border border-border hover:text-foreground hover:bg-card transition-all self-start shadow-inner', config.accentText)}
 					aria-label={`View ${config.name} profile`}
 				>
-					<ExternalLink className="w-4 h-4" />
+					<ExternalLink className="w-3.5 h-3.5" />
 				</a>
 			</div>
 
 			{/* Stats */}
-			<div className="grid grid-cols-2 gap-3 relative z-10">
+			<div className="grid grid-cols-2 gap-2.5 relative z-10">
 				<StatPill label="Rating" value={s?.rating ?? 'N/A'} />
 				<StatPill label="Max Rating" value={s?.maxRating ?? 'N/A'} />
 				{s?.globalRank != null && <StatPill label="Global Rank" value={s.globalRank} />}

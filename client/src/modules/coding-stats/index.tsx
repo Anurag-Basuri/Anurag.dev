@@ -4,16 +4,16 @@ import { useEffect, useState, useMemo } from 'react';
 import { publicService } from '@/api';
 import type { CodingStats, PlatformStats, Profile } from '@/api/schema';
 
-import { Terminal, Globe } from 'lucide-react';
+import { Terminal, Globe, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SectionHeader } from '@/ui/SectionHeader';
-import { staggerContainer } from '@/animations/motion';
+import { staggerContainer, staggerItem } from '@/animations/motion';
 
 import { PLATFORMS, type PlatformConfig } from './constants';
 import { hasStats } from './utils';
 import {
 	CodingStatsSkeleton,
-	LinkOnlyCard,
+	LinkOnlyPill,
 	ProblemSolvingCard,
 	GitHubCard,
 	CompetitiveCard,
@@ -52,14 +52,16 @@ export function CodingStatsModule() {
 		return () => { cancelled = true; };
 	}, []);
 
-	// Determine which platforms have data
-	const platformEntries = useMemo(() => {
-		if (!stats && !profile) return [];
+	// Categorize platforms
+	const { heroCards, standardCards, linkOnlyCards } = useMemo(() => {
+		if (!stats && !profile) return { heroCards: [], standardCards: [], linkOnlyCards: [] };
 
-		const entries: Array<{ config: PlatformConfig; platform: PlatformStats | null; hasData: boolean }> = [];
+		const hero: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
+		const standard: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
+		const linkOnly: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
 		const processedUrls = new Set<string>();
 
-		// 1. Process standard platforms (LeetCode, GitHub, etc)
+		// 1. Process standard platforms
 		for (const cfg of PLATFORMS) {
 			let p = stats ? (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null : null;
 			
@@ -74,12 +76,29 @@ export function CodingStatsModule() {
 			}
 
 			if (p && p.username && p.url) {
-				entries.push({ config: cfg, platform: p, hasData: hasStats(p) });
+				const hasData = hasStats(p);
 				processedUrls.add(p.url.toLowerCase());
+
+				if (hasData) {
+					// LeetCode → hero card
+					if (cfg.key === 'leetcode' || cfg.key === 'gfg' || ('easy' in (p.stats || {}))) {
+						hero.push({ config: cfg, platform: p });
+					}
+					// GitHub → standard (wide card)
+					else if (cfg.key === 'github' || ('stars' in (p.stats || {}) && !('rating' in (p.stats || {})))) {
+						standard.push({ config: cfg, platform: p });
+					}
+					// Codeforces → standard (competitive card)
+					else {
+						standard.push({ config: cfg, platform: p });
+					}
+				} else {
+					linkOnly.push({ config: cfg, platform: p });
+				}
 			}
 		}
 
-		// 2. Process otherProfiles from Profile to show as LinkOnlyCards
+		// 2. Process otherProfiles from Profile
 		if (profile?.otherProfiles && profile.otherProfiles.length > 0) {
 			for (const url of profile.otherProfiles) {
 				const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
@@ -91,13 +110,13 @@ export function CodingStatsModule() {
 					const hostname = urlObj.hostname.replace('www.', '');
 					domain = hostname.split('.')[0] || hostname;
 					domain = domain.charAt(0).toUpperCase() + domain.slice(1);
-				} catch (e) {
+				} catch {
 					// Invalid URL string
 				}
 
 				const fallbackUsername = cleanUrl.split('/').pop() || domain;
 
-				entries.push({
+				linkOnly.push({
 					config: {
 						key: `other-${cleanUrl}`,
 						name: domain,
@@ -108,18 +127,19 @@ export function CodingStatsModule() {
 						accentText: 'text-muted-foreground',
 					},
 					platform: { url: cleanUrl, username: fallbackUsername, stats: {} },
-					hasData: false
 				});
 				processedUrls.add(cleanUrl.toLowerCase());
 			}
 		}
 
-		return entries;
+		return { heroCards: hero, standardCards: standard, linkOnlyCards: linkOnly };
 	}, [stats, profile]);
 
 	if (loading) return <CodingStatsSkeleton />;
 
-	if (error || platformEntries.length === 0) {
+	const totalEntries = heroCards.length + standardCards.length + linkOnlyCards.length;
+
+	if (error || totalEntries === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-32 text-center max-w-7xl mx-auto">
 				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-6 shadow-inner">
@@ -146,44 +166,67 @@ export function CodingStatsModule() {
 					sectionId="coding_stats"
 				/>
 
-				<motion.div
-					variants={staggerContainer}
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, margin: '-20px' }}
-					className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-4 lg:gap-8 mt-8 md:mt-12"
-				>
-					{platformEntries.map(({ config, platform, hasData }) => {
-						if (!platform) return null;
+				{/* ─── Hero Cards (LeetCode / Problem-Solving) ─── */}
+				{heroCards.length > 0 && (
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: '-20px' }}
+						className="grid grid-cols-1 gap-4 mt-6"
+					>
+						{heroCards.map(({ config, platform }) => (
+							<ProblemSolvingCard key={config.key} platform={platform} config={config} />
+						))}
+					</motion.div>
+				)}
 
-						// No stats available → show link-only card
-						if (!hasData) {
-							return (
-								<LinkOnlyCard
+				{/* ─── Standard Cards (GitHub, Codeforces) ─── */}
+				{standardCards.length > 0 && (
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: '-20px' }}
+						className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
+					>
+						{standardCards.map(({ config, platform }) => {
+							if (config.key === 'github' || ('stars' in (platform.stats || {}) && !('rating' in (platform.stats || {})))) {
+								return <GitHubCard key={config.key} platform={platform} config={config} />;
+							}
+							return <CompetitiveCard key={config.key} platform={platform} config={config} />;
+						})}
+					</motion.div>
+				)}
+
+				{/* ─── Link-Only Profiles (compact pill row) ─── */}
+				{linkOnlyCards.length > 0 && (
+					<div className="mt-6">
+						<div className="flex items-center gap-2 mb-3">
+							<ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+							<span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+								More Profiles
+							</span>
+						</div>
+						<motion.div
+							variants={staggerContainer}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: '-20px' }}
+							className="flex flex-wrap gap-3"
+						>
+							{linkOnlyCards.map(({ config, platform }) => (
+								<LinkOnlyPill
 									key={config.key}
 									config={config}
 									url={platform.url}
 									username={platform.username}
 								/>
-							);
-						}
-
-						// Problem Solving (LeetCode, GFG) → large featured card
-						if (config.key === 'leetcode' || config.key === 'gfg' || ('easy' in (platform.stats || {}))) {
-							return <ProblemSolvingCard key={config.key} platform={platform} config={config} />;
-						}
-
-						// GitHub → stats grid card
-						if (config.key === 'github' || ('stars' in (platform.stats || {}) && !('rating' in (platform.stats || {})))) {
-							return <GitHubCard key={config.key} platform={platform} config={config} />;
-						}
-
-						// Codeforces / CodeChef / others → competitive rating card
-						return <CompetitiveCard key={config.key} platform={platform} config={config} />;
-					})}
-				</motion.div>
+							))}
+						</motion.div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
 }
-

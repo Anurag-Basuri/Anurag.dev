@@ -52,6 +52,22 @@ function KaggleIcon({ className }: { className?: string }) {
 	);
 }
 
+function HackerRankIcon({ className }: { className?: string }) {
+	return (
+		<svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+			<path d="M12 0c1.285 0 9.75 4.886 10.392 6 .645 1.115.645 10.885 0 12S13.287 24 12 24s-9.75-4.886-10.395-6c-.641-1.115-.641-10.885 0-12C2.25 4.886 10.715 0 12 0zm2.295 6.799c-.141 0-.258.115-.258.258v3.875H9.963V7.057c0-.143-.117-.258-.258-.258h-1.32c-.141 0-.258.115-.258.258v9.886c0 .143.117.258.258.258h1.32c.141 0 .258-.115.258-.258v-3.875h4.074v3.875c0 .143.115.258.258.258h1.32c.143 0 .258-.115.258-.258V7.057c0-.143-.115-.258-.258-.258h-1.32z" />
+		</svg>
+	);
+}
+
+function StackOverflowIcon({ className }: { className?: string }) {
+	return (
+		<svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+			<path d="M15.725 0l-1.72 1.277 6.39 8.588 1.72-1.277L15.725 0zm-3.94 3.418l-1.369 1.644 8.225 6.85 1.369-1.644-8.225-6.85zm-3.15 4.465l-.905 1.94 9.702 4.517.905-1.94-9.702-4.517zm-1.85 4.86l-.44 2.093 10.473 2.201.44-2.092-10.473-2.203zM1.89 15.47V24h19.19v-8.53h-2.133v6.397H4.021v-6.396H1.89zm4.265 2.133v2.13h10.66v-2.13H6.154z" />
+		</svg>
+	);
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // PLATFORM CONFIGURATIONS
 // ═══════════════════════════════════════════════════════════════════
@@ -120,6 +136,24 @@ export const PLATFORMS: PlatformConfig[] = [
 		accentBg: 'from-sky-500/20 to-sky-500/0 hover:border-sky-500/50',
 		accentBorder: 'hover:border-sky-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(14,165,233,0.15)] bg-sky-500/5',
 		accentText: 'text-sky-400',
+	},
+	{
+		key: 'hackerrank',
+		name: 'HackerRank',
+		icon: HackerRankIcon,
+		accent: '#00ea64',
+		accentBg: 'from-green-500/20 to-green-500/0 hover:border-green-500/50',
+		accentBorder: 'hover:border-green-500/30 group-hover:shadow-[0_0_40px_-10px_rgba(0,234,100,0.15)] bg-green-500/5',
+		accentText: 'text-green-400',
+	},
+	{
+		key: 'stackoverflow',
+		name: 'Stack Overflow',
+		icon: StackOverflowIcon,
+		accent: '#f48024',
+		accentBg: 'from-orange-400/20 to-orange-400/0 hover:border-orange-400/50',
+		accentBorder: 'hover:border-orange-400/30 group-hover:shadow-[0_0_40px_-10px_rgba(244,128,36,0.15)] bg-orange-400/5',
+		accentText: 'text-orange-300',
 	},
 ];
 

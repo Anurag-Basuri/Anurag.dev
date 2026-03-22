@@ -152,7 +152,7 @@ export function ProjectsModule() {
 											{project.title}
 										</h3>
 										
-										<p className="text-xs text-muted-foreground leading-snug line-clamp-2 leading-relaxed font-medium mb-6">
+										<p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed font-medium mb-6">
 											{project.description}
 										</p>
 
