@@ -14,18 +14,14 @@ import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
 
 function AchievementsSkeleton() {
 	return (
-		<div className="p-6 md:p-12 max-w-6xl mx-auto animate-pulse pb-32">
-			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-28 bg-foreground/5 rounded-lg" />
-				<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
-				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
+		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-16">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 auto-rows-fr">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 				{[1, 2, 3, 4, 5, 6].map(i => (
-					<div
-						key={i}
-						className="h-96 bg-foreground/5 rounded-[2.5rem]"
-					/>
+					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
 				))}
 			</div>
 		</div>
@@ -86,14 +82,14 @@ const AchievementCard = memo(function AchievementCard({
 			variants={staggerItem}
 			whileHover={cardHover}
 			className={cn(
-				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-2xl overflow-hidden transition-all duration-500 shadow-2xl',
+				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 shadow-lg',
 				details.color,
 			)}
 		>
-			<div className={`absolute inset-0 bg-linear-to-br from-${details.accent}-500/0 to-transparent group-hover:from-${details.accent}-500/10 transition-colors duration-500 pointer-events-none`} />
+			<div className={`absolute inset-0 bg-linear-to-br from-${details.accent}-500/0 to-transparent group-hover:from-${details.accent}-500/8 transition-colors duration-300 pointer-events-none`} />
 
-			{/* Thumbnail */}
-			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-border bg-card">
+			{/* Thumbnail — edge-to-edge */}
+			<div className="relative aspect-video overflow-hidden bg-card">
 				<UrlThumbnail
 					url={achievement.proofUrl || achievement.url}
 					title={achievement.title}
@@ -101,52 +97,49 @@ const AchievementCard = memo(function AchievementCard({
 					fallbackLabel={achievement.issuer || undefined}
 					fallbackGradient={details.gradient}
 				/>
-				
-				{/* Inner shadow */}
-				<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
 			</div>
 
-			<div className="p-6 relative z-10 flex flex-col grow -mt-6">
-				<div className="flex justify-between items-start mb-6">
-					<div className="p-3 rounded-2xl bg-card border border-border shadow-xl group-hover:scale-110 transition-transform duration-500">
+			<div className="p-3 relative z-10 flex flex-col grow">
+				<div className="flex justify-between items-center mb-2">
+					<div className="p-1.5 rounded-lg bg-card border border-border shadow-md">
 						{details.icon}
 					</div>
-
 					{achievement.featured && (
-						<div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-widest shadow-inner relative z-20">
-							<Sparkles className="w-3 h-3" />
+						<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-widest">
+							<Sparkles className="w-2.5 h-2.5" />
 							Featured
 						</div>
 					)}
 				</div>
 
-				<h3 className="text-xl font-black text-foreground tracking-tight mb-2 leading-tight group-hover:text-foreground/90 transition-colors">
+				<h3 className="text-sm font-black text-foreground tracking-tight mb-1 leading-tight group-hover:text-foreground/90 transition-colors line-clamp-2">
 					{achievement.title}
 				</h3>
 
 				{achievement.issuer && (
-					<p className={`text-xs font-bold uppercase tracking-wider text-${details.accent}-400 mb-4 flex items-center gap-2`}>
-						<span className={`w-4 h-[2px] bg-${details.accent}-400/50 rounded-full`} />
+					<p className={`text-[9px] font-bold uppercase tracking-wider text-${details.accent}-400 mb-2 flex items-center gap-1.5`}>
+						<span className={`w-3 h-[1.5px] bg-${details.accent}-400/50 rounded-full`} />
 						{achievement.issuer}
 					</p>
 				)}
 
 				{achievement.description && (
-					<p className="text-xs text-muted-foreground leading-snug mb-6 grow line-clamp-3 font-medium">
+					<p className="text-[10px] text-muted-foreground leading-snug mb-3 grow line-clamp-2 font-medium">
 						{achievement.description}
 					</p>
 				)}
 
-				<div className="mt-auto space-y-5">
+				<div className="mt-auto space-y-2.5">
 					{(achievement.rank || achievement.event) && (
-						<div className="flex flex-wrap gap-2">
+						<div className="flex flex-wrap gap-1.5">
 							{achievement.rank && (
-								<span className="px-3 py-1.5 rounded-xl bg-foreground/5 border border-border text-[10px] font-black uppercase text-foreground shadow-inner">
+								<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-foreground">
 									{achievement.rank}
 								</span>
 							)}
 							{achievement.event && (
-								<span className="px-3 py-1.5 rounded-xl bg-foreground/5 border border-border text-[10px] font-black uppercase text-muted-foreground shadow-inner">
+								<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-muted-foreground">
 									{achievement.event}
 								</span>
 							)}
@@ -154,16 +147,16 @@ const AchievementCard = memo(function AchievementCard({
 					)}
 
 					{link && (
-						<div className="pt-5 border-t border-border flex items-center justify-between">
+						<div className="pt-2.5 border-t border-border">
 							<a
 								href={link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-${details.accent}-400 transition-colors group/link`}
+								className={`flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-${details.accent}-400 transition-colors group/link`}
 								aria-label={`View certificate for ${achievement.title}`}
 							>
 								View Details
-								<ExternalLink className="w-3.5 h-3.5 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+								<ExternalLink className="w-3 h-3 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
 							</a>
 						</div>
 					)}
@@ -211,7 +204,7 @@ export function AchievementsModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-20px' }}
-						className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 auto-rows-fr"
+						className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
 					>
 						{achievements.map(achievement => (
 							<AchievementCard

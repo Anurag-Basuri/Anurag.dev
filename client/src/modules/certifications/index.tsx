@@ -15,18 +15,14 @@ import { cn } from '@/lib/utils';
 
 function CertificationsSkeleton() {
 	return (
-		<div className="p-6 md:p-12 max-w-6xl mx-auto animate-pulse pb-32">
-			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
-				<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
-				<div className="h-5 w-80 bg-foreground/5 rounded-lg" />
+		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-16">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 auto-rows-fr">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 				{[1, 2, 3, 4].map(i => (
-					<div
-						key={i}
-						className="h-80 bg-foreground/5 rounded-[2.5rem]"
-					/>
+					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
 				))}
 			</div>
 		</div>
@@ -40,13 +36,12 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-500 hover:border-cyan-500/40 shadow-2xl"
+			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-cyan-500/40 shadow-lg"
 		>
-			{/* Ambient Glow */}
-			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/10 transition-colors duration-500 pointer-events-none" />
+			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/8 transition-colors duration-300 pointer-events-none" />
 
-			{/* Thumbnail */}
-			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-border bg-card">
+			{/* Thumbnail — edge-to-edge */}
+			<div className="relative aspect-video overflow-hidden bg-card">
 				<UrlThumbnail
 					url={cert.certificateUrl || cert.credentialUrl}
 					title={`${cert.title} certificate`}
@@ -54,39 +49,33 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 					fallbackLabel={cert.issuer}
 					fallbackGradient="from-cyan-950/60"
 				/>
-				{/* Inner shadow */}
-				<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
 			</div>
 
-			<div className="p-6 relative z-10 flex flex-col grow -mt-6">
-				{/* Issuer Badge overhanging image */}
-				<div className="flex justify-between items-start mb-6">
-					<div className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-2xl shadow-xl w-fit group-hover:scale-105 group-hover:border-cyan-500/30 transition-all duration-500">
-						<ShieldCheck className="w-4 h-4 text-cyan-400" />
-						<span className="text-[10px] font-black uppercase tracking-widest text-foreground/90">
-							{cert.issuer}
-						</span>
-					</div>
-				</div>
-
-				<h3 className="text-xl font-black text-foreground tracking-tight leading-tight group-hover:text-cyan-400 transition-colors mb-3">
-					{cert.title}
-				</h3>
-
-				<div className="flex items-center gap-2 text-xs font-bold font-mono text-cyan-400/80 mb-5">
-					<Activity className="w-3.5 h-3.5" />
-					<span>
-						Issued:{' '}
-						{new Date(cert.startDate ?? cert.createdAt).getFullYear()}
+			<div className="p-3 relative z-10 flex flex-col grow">
+				{/* Issuer Badge */}
+				<div className="flex items-center gap-1.5 mb-2">
+					<ShieldCheck className="w-3 h-3 text-cyan-400" />
+					<span className="text-[9px] font-black uppercase tracking-widest text-foreground/80">
+						{cert.issuer}
 					</span>
 				</div>
 
+				<h3 className="text-sm font-black text-foreground tracking-tight leading-tight group-hover:text-cyan-400 transition-colors mb-1.5 line-clamp-2">
+					{cert.title}
+				</h3>
+
+				<div className="flex items-center gap-1.5 text-[9px] font-bold font-mono text-cyan-400/70 mb-2.5">
+					<Activity className="w-3 h-3" />
+					<span>Issued: {new Date(cert.startDate ?? cert.createdAt).getFullYear()}</span>
+				</div>
+
 				{(cert.skills ?? []).length > 0 && (
-					<div className="flex flex-wrap gap-2 mb-6 grow content-start">
-						{(cert.skills ?? []).map(skill => (
+					<div className="flex flex-wrap gap-1.5 mb-2.5 grow content-start">
+						{(cert.skills ?? []).slice(0, 4).map(skill => (
 							<span
 								key={skill}
-								className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-cyan-500/30 group-hover:text-foreground/90 transition-colors shadow-inner"
+								className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded-md bg-foreground/5 text-muted-foreground border border-border group-hover:border-cyan-500/30 group-hover:text-foreground/90 transition-colors"
 							>
 								{skill}
 							</span>
@@ -95,16 +84,16 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 				)}
 
 				{cert.credentialUrl && (
-					<div className="mt-auto pt-5 border-t border-border flex items-center justify-between">
+					<div className="mt-auto pt-2.5 border-t border-border">
 						<a
 							href={cert.credentialUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-cyan-400 transition-colors group/link"
+							className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-cyan-400 transition-colors group/link"
 							aria-label={`Verify credential for ${cert.title}`}
 						>
-							Verify Credential
-							<ExternalLink className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1 group-hover/link:-translate-y-1" />
+							Verify
+							<ExternalLink className="w-3 h-3 transition-transform group-hover/link:translate-x-0.5" />
 						</a>
 					</div>
 				)}
@@ -151,7 +140,7 @@ export function CertificationModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-4 lg:gap-8 mt-8 md:mt-12 auto-rows-fr"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6"
 					>
 						{certs.map(cert => (
 							<CertCard key={cert.id} cert={cert} />

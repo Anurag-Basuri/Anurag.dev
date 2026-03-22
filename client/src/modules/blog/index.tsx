@@ -74,20 +74,14 @@ function timeAgo(date: string | null | undefined): string {
 
 function BlogSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 space-y-4 animate-pulse max-w-7xl mx-auto pb-32">
-			<div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-12 pb-8">
-				<div className="space-y-4 w-full md:w-auto">
-					<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
-					<div className="h-12 w-64 bg-foreground/5 rounded-xl" />
-					<div className="h-5 w-80 bg-foreground/5 rounded-lg hidden sm:block" />
-				</div>
-				<div className="h-12 w-full md:w-80 bg-foreground/5 rounded-2xl" />
+		<div className="p-4 sm:p-6 md:p-12 space-y-4 animate-pulse max-w-7xl mx-auto pb-16">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-
-			<div className="h-[400px] mb-8 bg-foreground/5 rounded-[2.5rem]" />
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 auto-rows-fr">
-				{[1, 2, 3].map(i => (
-					<div key={i} className="h-96 bg-foreground/5 rounded-[2.5rem]" />
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+				{[1, 2, 3, 4, 5, 6].map(i => (
+					<div key={i} className="h-52 bg-foreground/5 rounded-xl" />
 				))}
 			</div>
 		</div>
@@ -150,102 +144,7 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 	);
 });
 
-// ─── Featured Card (latest post, hero-sized) ────────────────────
-
-const FeaturedCard = memo(function FeaturedCard({
-	post,
-	onClick,
-}: {
-	post: BlogPost;
-	onClick: () => void;
-}) {
-	const tags = safeArray(post.tags);
-
-	return (
-		<motion.article
-			variants={staggerItem}
-			onClick={onClick}
-			role="button"
-			tabIndex={0}
-			whileHover={cardHover}
-			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative rounded-xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl mb-8 sm:mb-12"
-		>
-			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
-
-			<div className="relative h-64 sm:h-80 md:h-[400px] lg:h-[450px] w-full bg-card">
-				<UrlThumbnail
-					url={post.coverImage || post.link}
-					title={post.title ?? 'Blog post'}
-					sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1100px"
-					imgClassName="object-cover transition-transform duration-700 group-hover:scale-105"
-					priority
-					fallbackIcon={BookOpen}
-					fallbackGradient="from-indigo-950/60"
-				/>
-
-				{/* Huge Bottom Gradient */}
-				<div className="absolute inset-0 bg-linear-to-t from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent pointer-events-none" />
-
-				{/* Badges/Tags over image */}
-				<div className="absolute top-4 left-4 sm:top-6 sm:left-6 flex flex-wrap gap-2 z-20">
-					<span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-indigo-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-foreground shadow-lg shadow-indigo-500/30">
-						Latest
-					</span>
-					{tags.slice(0, 2).map(tag => (
-						<span
-							key={tag}
-							className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-background/50 backdrop-blur-md border border-border text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-foreground/70 hidden sm:block"
-						>
-							{tag}
-						</span>
-					))}
-				</div>
-
-				{/* Extra interaction hint */}
-				{post.link && (
-					<a
-						href={post.link}
-						target="_blank"
-						rel="noopener noreferrer"
-						onClick={e => e.stopPropagation()}
-						className="absolute top-4 right-4 sm:top-6 sm:right-6 p-2.5 sm:p-3 rounded-full bg-background/50 backdrop-blur-md border border-border text-muted-foreground hover:text-indigo-400 hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-all z-20"
-						aria-label="Open external link"
-					>
-						<ExternalLink className="w-4 sm:w-5 h-4 sm:h-5 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
-					</a>
-				)}
-
-				{/* Content overlay */}
-				<div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10 lg:p-12 z-10 flex flex-col justify-end">
-					<div className="max-w-4xl">
-						<div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-3 sm:mb-4 text-[10px] sm:text-xs text-indigo-300 font-bold uppercase tracking-wider">
-							<span className="flex items-center gap-1.5">
-								<Calendar className="w-3.5 h-3.5" />
-								{formatDate(post.publishedAt ?? post.createdAt)}
-							</span>
-							<span className="w-1.5 h-1.5 rounded-full bg-indigo-500/50 hidden sm:block" />
-							<span className="items-center gap-1.5 hidden sm:flex">
-								<Clock className="w-3.5 h-3.5" />
-								{readingTime(post.content)} min read
-							</span>
-						</div>
-
-						<h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground leading-tight tracking-tight mb-3 sm:mb-5 group-hover:text-indigo-100 transition-colors duration-300 line-clamp-2">
-							{post.title ?? 'Untitled'}
-						</h2>
-
-						<p className="text-sm md:text-base text-muted-foreground line-clamp-2 leading-relaxed font-medium max-w-2xl hidden sm:block">
-							{post.content ?? ''}
-						</p>
-					</div>
-				</div>
-			</div>
-		</motion.article>
-	);
-});
-
-// ─── Post Card (grid item, memoized) ────────────────────────────
+// ─── Post Card (compact, memoized) ──────────────────────────────
 
 const PostCard = memo(function PostCard({
 	post,
@@ -265,12 +164,12 @@ const PostCard = memo(function PostCard({
 			tabIndex={0}
 			whileHover={cardHover}
 			onKeyDown={e => e.key === 'Enter' && onClick()}
-			className="group relative flex flex-col h-full rounded-xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-500 cursor-pointer shadow-2xl focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
+			className="group relative flex flex-col h-full rounded-xl overflow-hidden bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border hover:border-indigo-500/40 transition-all duration-300 cursor-pointer shadow-lg focus-visible:ring-2 focus-visible:ring-primary/50 outline-none"
 		>
-			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/10 transition-colors duration-500 pointer-events-none" />
+			<div className="absolute inset-0 bg-linear-to-br from-indigo-500/0 to-transparent group-hover:from-indigo-500/8 transition-colors duration-300 pointer-events-none" />
 
-			{/* Thumbnail */}
-			<div className="relative aspect-16/10 overflow-hidden mx-3 mt-3 rounded-t-3xl border border-border bg-card">
+			{/* Thumbnail — compact */}
+			<div className="relative aspect-video overflow-hidden bg-card">
 				<UrlThumbnail
 					url={post.coverImage || post.link}
 					title={post.title ?? 'Blog post'}
@@ -278,54 +177,50 @@ const PostCard = memo(function PostCard({
 					fallbackIcon={FileText}
 					fallbackGradient="from-indigo-950/60"
 				/>
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
 
-				{/* Inner shadow */}
-				<div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
-
-				{/* External link mini-icon */}
 				{post.link && (
 					<a
 						href={post.link}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
-						className="absolute top-3 right-3 p-2 rounded-xl bg-background/60 backdrop-blur-md border border-border text-muted-foreground hover:text-indigo-400 hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all z-20 group/link"
+						className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/60 backdrop-blur-md border border-border text-muted-foreground hover:text-indigo-400 hover:border-indigo-500/30 transition-all z-20 group/link"
 						aria-label="Open external link"
 					>
-						<ExternalLink className="w-3.5 h-3.5 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
+						<ExternalLink className="w-3 h-3" />
 					</a>
 				)}
 			</div>
 
-			{/* Content */}
-			<div className="flex flex-col grow p-6 relative z-10 -mt-2">
-				<div className="flex items-center gap-2 sm:gap-3 text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-3">
+			{/* Content — tight */}
+			<div className="flex flex-col grow p-3 relative z-10">
+				<div className="flex items-center gap-2 text-[9px] text-indigo-400 font-bold uppercase tracking-wider mb-1.5">
 					<span>{formatDate(post.publishedAt ?? post.createdAt)}</span>
-					<span className="w-1 h-1 rounded-full bg-indigo-500/50" />
+					<span className="w-0.5 h-0.5 rounded-full bg-indigo-500/50" />
 					<span>{readingTime(post.content)} min</span>
 				</div>
 
-				<h3 className="text-xl font-black text-foreground leading-tight tracking-tight mb-3 group-hover:text-indigo-100 transition-colors line-clamp-2">
+				<h3 className="text-sm font-black text-foreground leading-tight tracking-tight mb-1.5 group-hover:text-indigo-100 transition-colors line-clamp-2">
 					{post.title ?? 'Untitled'}
 				</h3>
 
-				<p className="text-xs text-muted-foreground leading-snug line-clamp-2 mb-6 font-medium">
+				<p className="text-[10px] text-muted-foreground leading-snug line-clamp-2 mb-3 font-medium">
 					{post.content ?? ''}
 				</p>
 
-				{/* Tags */}
-				{(tags ?? []).length > 0 && (
-					<div className="mt-auto flex flex-wrap gap-2 pt-4 border-t border-border">
+				{tags.length > 0 && (
+					<div className="mt-auto flex flex-wrap gap-1.5 pt-2.5 border-t border-border">
 						{tags.slice(0, 3).map(tag => (
 							<span
 								key={tag}
-								className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-card border border-border text-foreground/70 shadow-xl group-hover:border-indigo-500/20 group-hover:text-indigo-400 transition-colors"
+								className="px-2 py-0.5 rounded-md text-[8px] uppercase font-black tracking-widest bg-card border border-border text-foreground/60 group-hover:border-indigo-500/20 group-hover:text-indigo-400 transition-colors"
 							>
 								{tag}
 							</span>
 						))}
 						{tags.length > 3 && (
-							<span className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-widest bg-card border border-border text-muted-foreground shadow-xl">
+							<span className="px-2 py-0.5 rounded-md text-[8px] uppercase font-black tracking-widest bg-card border border-border text-muted-foreground">
 								+{tags.length - 3}
 							</span>
 						)}
@@ -553,8 +448,6 @@ export function BlogModule() {
 		};
 	}, []);
 
-	const [featured, ...rest] = posts;
-
 	const handleSelectPost = useCallback((post: BlogPost) => setSelectedPost(post), []);
 	const handleCloseModal = useCallback(() => setSelectedPost(null), []);
 
@@ -602,41 +495,21 @@ export function BlogModule() {
 						</p>
 					</div>
 				) : (
-					<div className="space-y-4 mt-8">
-						{/* Featured (latest) post */}
-						<motion.div
-							variants={staggerContainer}
-							initial="hidden"
-							whileInView="visible"
-							viewport={{ once: true }}
-						>
-							{featured && (
-								<FeaturedCard
-									post={featured}
-									onClick={() => handleSelectPost(featured)}
-								/>
-							)}
-						</motion.div>
-
-						{/* Grid of remaining posts */}
-						{rest.length > 0 && (
-							<motion.div
-								variants={staggerContainer}
-								initial="hidden"
-								whileInView="visible"
-								viewport={{ once: true, margin: '-20px' }}
-								className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-4 lg:gap-8 auto-rows-fr"
-							>
-								{rest.map(post => (
-									<PostCard
-										key={post.id}
-										post={post}
-										onClick={() => handleSelectPost(post)}
-									/>
-								))}
-							</motion.div>
-						)}
-					</div>
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: '-20px' }}
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6"
+					>
+						{posts.map(post => (
+							<PostCard
+								key={post.id}
+								post={post}
+								onClick={() => handleSelectPost(post)}
+							/>
+						))}
+					</motion.div>
 				)}
 
 				{/* Detail Modal */}
