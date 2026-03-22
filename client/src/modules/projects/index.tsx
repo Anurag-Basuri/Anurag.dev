@@ -111,14 +111,6 @@ export function ProjectsModule() {
 									{/* Thumbnail — edge-to-edge */}
 									<div className="relative aspect-video overflow-hidden">
 										<UrlThumbnail url={project.thumbnail || project.liveUrl} title={project.title} fallbackIcon={Folder} />
-										<div className="absolute top-2 right-2 z-20 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-											{project.liveUrl && (
-												<span className="flex items-center gap-1 px-2 py-1 rounded-md bg-background/60 backdrop-blur-md border border-border text-foreground font-bold text-[8px] uppercase tracking-wider">
-													<ArrowUpRight className="w-3 h-3" />
-													View
-												</span>
-											)}
-										</div>
 										<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 									</div>
 
@@ -179,111 +171,122 @@ export function ProjectsModule() {
 				{/* Detail Modal */}
 				<AnimatePresence>
 					{selectedProject && (
-						<div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-8">
+						<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-8">
+							{/* Frosted Glass Backdrop */}
 							<motion.div
 								variants={fadeIn}
 								initial="hidden"
 								animate="visible"
 								exit="hidden"
 								onClick={() => setSelectedProject(null)}
-								className="absolute inset-0 bg-background/80 backdrop-blur-2xl"
+								className="absolute inset-0 bg-black/60 backdrop-blur-3xl"
 							/>
+
+							{/* Modal Container — vertical stack */}
 							<motion.div
 								variants={scaleIn}
 								initial="hidden"
 								animate="visible"
 								exit="hidden"
-								className="relative w-full max-w-4xl bg-card border border-border rounded-xl shadow-3xl overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] md:max-h-[600px] z-10"
-								style={{ boxShadow: '0 0 60px -15px color-mix(in oklch, var(--theme-primary) 10%, transparent)' }}
+								className="relative w-full h-full sm:h-auto sm:max-h-[90vh] max-w-3xl bg-card/95 backdrop-blur-xl border-0 sm:border border-white/10 sm:rounded-2xl shadow-2xl flex flex-col z-10 overflow-hidden"
+								style={{ boxShadow: '0 0 80px -20px color-mix(in oklch, var(--theme-primary) 15%, transparent)' }}
 							>
-								{/* Close Button */}
-								<button
-									onClick={() => setSelectedProject(null)}
-									className="absolute top-4 right-4 z-50 p-3 rounded-full bg-background/50 backdrop-blur-md border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-all hover:rotate-90 hover:scale-110"
-								>
-									<X className="w-5 h-5" />
-								</button>
-
-								{/* Left Side: Thumbnail */}
-								<div className="relative w-full md:w-5/12 h-64 sm:h-72 md:h-full bg-card shrink-0 overflow-hidden border-b md:border-b-0 md:border-r border-border">
-									<UrlThumbnail url={selectedProject.thumbnail || selectedProject.liveUrl} title={selectedProject.title} fallbackIcon={Folder} />
-									<div className="absolute inset-0 bg-linear-to-t from-card via-card/40 to-transparent" />
-
-									{/* Embedded Mobile Header */}
-									<div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-linear-to-t from-card to-transparent">
-										<h2 className="text-2xl md:text-3xl font-black text-foreground tracking-tight mb-2 leading-tight drop-shadow-lg">
-											{selectedProject.title}
-										</h2>
-										<div className="flex flex-wrap gap-3 mt-6">
-											{selectedProject.liveUrl && (
-												<a
-													href={selectedProject.liveUrl}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="flex items-center justify-center gap-2 px-6 py-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-lg flex-1 md:flex-none"
-													style={{
-														background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
-														color: 'var(--theme-primary)',
-														border: '1px solid color-mix(in oklch, var(--theme-primary) 20%, transparent)',
-													}}
-												>
-													<ExternalLink className="w-4 h-4" />
-													Visit Site
-												</a>
-											)}
-											{selectedProject.githubUrl && (
-												<a
-													href={selectedProject.githubUrl}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="flex items-center justify-center gap-2 px-6 py-3 bg-foreground/5 hover:bg-foreground/10 text-foreground border border-border text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-lg flex-1 md:flex-none"
-												>
-													<Github className="w-4 h-4" />
-													Source
-												</a>
-											)}
-										</div>
+								{/* Top Action Bar — above the image */}
+								<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/5 bg-black/20 shrink-0">
+									<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+										<Folder className="w-3.5 h-3.5" />
+										<span>Project Details</span>
 									</div>
+									<button
+										onClick={() => setSelectedProject(null)}
+										className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-muted-foreground hover:text-foreground transition-all hover:rotate-90 hover:scale-110"
+										aria-label="Close modal"
+									>
+										<X className="w-4 h-4" />
+									</button>
 								</div>
 
-								{/* Right Side: Content */}
-								<div className="flex-1 w-full relative bg-card">
-									<ScrollArea className="h-full">
-										<div className="p-6 sm:p-8 md:p-12 space-y-10 sm:space-y-6 pb-12">
-											{/* Description Section */}
-											<div className="space-y-4">
+								{/* Scrollable Body */}
+								<ScrollArea className="flex-1 min-h-0">
+									<div className="flex flex-col">
+										{/* Clean Image Section — no overlays */}
+										<div className="relative w-full bg-black/40 flex items-center justify-center overflow-hidden" style={{ maxHeight: '40vh' }}>
+											<div className="relative w-full aspect-video">
+												<UrlThumbnail url={selectedProject.thumbnail || selectedProject.liveUrl} title={selectedProject.title} fallbackIcon={Folder} />
+											</div>
+										</div>
+
+										{/* Content Section */}
+										<div className="p-5 sm:p-8 space-y-6">
+											{/* Title */}
+											<h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
+												{selectedProject.title}
+											</h2>
+
+											{/* Description */}
+											<div className="space-y-3">
 												<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
-													<Layout className="w-4 h-4" />
-													<span>About Project</span>
+													<Layout className="w-3.5 h-3.5" />
+													<span>About</span>
 												</div>
-												<p className="text-sm sm:text-base md:text-lg text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">
+												<p className="text-sm sm:text-base text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">
 													{selectedProject.description}
 												</p>
 											</div>
 
-											{/* Tech Stack Section */}
-											<div className="space-y-4">
-												<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
-													<Layers className="w-4 h-4" />
-													<span>Technologies</span>
+											{/* Tech Stack */}
+											{(selectedProject.techStack ?? []).length > 0 && (
+												<div className="space-y-3">
+													<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+														<Layers className="w-3.5 h-3.5" />
+														<span>Technologies</span>
+													</div>
+													<div className="flex flex-wrap gap-2">
+														{(selectedProject.techStack ?? []).map(tech => (
+															<span
+																key={tech}
+																className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-xs font-bold text-foreground/80 transition-colors hover:border-white/20"
+															>
+																{tech}
+															</span>
+														))}
+													</div>
 												</div>
-												<div className="flex flex-wrap gap-2 sm:gap-2.5">
-													{(selectedProject.techStack ?? []).map(tech => (
-														<span
-															key={tech}
-															className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-muted border border-border text-xs sm:text-sm font-bold text-foreground/80 transition-colors shadow-inner"
-														>
-															{tech}
-														</span>
-													))}
-												</div>
+											)}
+
+											{/* Action Buttons */}
+											<div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+												{selectedProject.liveUrl && (
+													<a
+														href={selectedProject.liveUrl}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
+														style={{
+															background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+															color: 'var(--theme-primary)',
+															border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+														}}
+													>
+														<ExternalLink className="w-4 h-4" />
+														Visit Site
+													</a>
+												)}
+												{selectedProject.githubUrl && (
+													<a
+														href={selectedProject.githubUrl}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 text-foreground border border-white/10 hover:border-white/20 text-xs font-bold uppercase tracking-wider rounded-xl transition-all flex-1 sm:flex-none hover:scale-[1.02] active:scale-[0.98]"
+													>
+														<Github className="w-4 h-4" />
+														Source Code
+													</a>
+												)}
 											</div>
 										</div>
-									</ScrollArea>
-
-									{/* Fade out bottom for scroll indication */}
-									<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-card via-card/90 to-transparent pointer-events-none" />
-								</div>
+									</div>
+								</ScrollArea>
 							</motion.div>
 						</div>
 					)}

@@ -98,11 +98,6 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 					priority={priority}
 					unoptimized
 				/>
-				{/* Small website badge */}
-				<div className="absolute bottom-2 right-2 z-10 flex items-center gap-1.5 px-2 py-1 rounded-md bg-background/70 backdrop-blur-md border border-border">
-					<Globe className="w-3 h-3 text-muted-foreground" />
-					<span className="text-[8px] font-bold text-muted-foreground uppercase tracking-wider">Live Preview</span>
-				</div>
 			</>
 		);
 	}
