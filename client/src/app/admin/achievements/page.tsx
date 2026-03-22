@@ -124,6 +124,14 @@ export default function AchievementsPage() {
 		},
 		{ key: 'issuer', label: 'Issuer', render: (a: Achievement) => a.issuer || '—' },
 		{
+			key: 'journeyEntry',
+			label: 'Journey',
+			render: (a: Achievement & { journeyEntry?: { title: string } }) =>
+				a.journeyEntry ? (
+					<span className="text-xs text-blue-400">{a.journeyEntry.title}</span>
+				) : '—',
+		},
+		{
 			key: 'featured',
 			label: 'Featured',
 			render: (a: Achievement) => (a.featured ? '⭐' : '—'),
@@ -221,7 +229,7 @@ export default function AchievementsPage() {
 					placeholder="Certificate / proof link"
 				/>
 				{modal.editing && (
-					<div className="mb-4">
+					<div className="mb-4 space-y-2">
 						<FileUploadField
 							label="Upload Proof File (Optional)"
 							currentUrl={form.proofUrl}
@@ -232,6 +240,20 @@ export default function AchievementsPage() {
 								refetch();
 							}}
 						/>
+						{form.proofUrl && (
+							<button
+								type="button"
+								onClick={async () => {
+									if (!confirm('Delete the uploaded proof file?')) return;
+									await adminService.deleteAchievementProof(modal.editing!.id);
+									setForm(prev => ({ ...prev, proofUrl: '' }));
+									refetch();
+								}}
+								className="text-xs text-red-400 hover:text-red-300 underline"
+							>
+								Delete uploaded proof
+							</button>
+						)}
 					</div>
 				)}
 				<FormField

@@ -180,19 +180,33 @@ export default function CertificationsPage() {
 					onChange={updateField}
 				/>
 				{modal.editing && (
-					<div className="mb-4">
-						<FileUploadField
-							label="Upload Certificate File (Optional)"
-							currentUrl={form.certificateUrl}
-							accept=".pdf,.png,.jpg,.jpeg"
-							onUpload={async file => {
-								const updated = await adminService.uploadCertificateFile(modal.editing!.id, file);
-								setForm(prev => ({ ...prev, certificateUrl: updated.certificateUrl || '' }));
+				<div className="mb-4 space-y-2">
+					<FileUploadField
+						label="Upload Certificate File (Optional)"
+						currentUrl={form.certificateUrl}
+						accept=".pdf,.png,.jpg,.jpeg"
+						onUpload={async file => {
+							const updated = await adminService.uploadCertificateFile(modal.editing!.id, file);
+							setForm(prev => ({ ...prev, certificateUrl: updated.certificateUrl || '' }));
+							refetch();
+						}}
+					/>
+					{form.certificateUrl && (
+						<button
+							type="button"
+							onClick={async () => {
+								if (!confirm('Delete the uploaded certificate file?')) return;
+								await adminService.deleteCertificateFile(modal.editing!.id);
+								setForm(prev => ({ ...prev, certificateUrl: '' }));
 								refetch();
 							}}
-						/>
-					</div>
-				)}
+							className="text-xs text-red-400 hover:text-red-300 underline"
+						>
+							Delete uploaded certificate
+						</button>
+					)}
+				</div>
+			)}
 				<TagField label="Skills" name="skills" value={form.skills} onChange={updateField} />
 				<FormField
 					label="Start Date"

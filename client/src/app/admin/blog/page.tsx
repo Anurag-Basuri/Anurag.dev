@@ -18,6 +18,7 @@ const EMPTY = {
 	otherImages: [] as string[],
 	link: '',
 	status: 'draft',
+	publishedAt: '',
 };
 
 export default function BlogPage() {
@@ -47,6 +48,7 @@ export default function BlogPage() {
 			otherImages: post.otherImages,
 			link: post.link || '',
 			status: post.status,
+			publishedAt: post.publishedAt ? post.publishedAt.slice(0, 10) : '',
 		});
 		setModal({ open: true, editing: post });
 		setError(null);
@@ -181,6 +183,33 @@ export default function BlogPage() {
 					name="link"
 					type="url"
 					value={form.link}
+					onChange={updateField}
+				/>
+				<TagField
+					label="Other Image URLs"
+					name="otherImages"
+					value={form.otherImages}
+					onChange={updateField}
+					placeholder="Paste image URLs"
+				/>
+				{modal.editing && (
+					<div className="mb-4">
+						<FileUploadField
+							label="Upload Additional Images"
+							currentUrl={undefined}
+							onUpload={async file => {
+								const updated = await adminService.uploadBlogImages(modal.editing!.id, [file]);
+								setForm(prev => ({ ...prev, otherImages: updated.otherImages }));
+								refetch();
+							}}
+						/>
+					</div>
+				)}
+				<FormField
+					label="Published At"
+					name="publishedAt"
+					type="date"
+					value={form.publishedAt}
 					onChange={updateField}
 				/>
 				<FormField

@@ -187,6 +187,41 @@ export default function ProjectsPage() {
 					onChange={updateField}
 					placeholder="Paste image URLs"
 				/>
+				{modal.editing && (
+					<div className="mb-4 space-y-3">
+						<FileUploadField
+							label="Upload Project Images"
+							currentUrl={undefined}
+							onUpload={async file => {
+								const updated = await adminService.uploadProjectImages(modal.editing!.id, [file]);
+								setForm(prev => ({ ...prev, images: updated.images }));
+								refetch();
+							}}
+						/>
+						{form.images.length > 0 && (
+							<div className="space-y-1">
+								<p className="text-xs text-zinc-500 font-medium">Current images ({form.images.length}):</p>
+								{form.images.map((url, i) => (
+									<div key={i} className="flex items-center gap-2 text-xs bg-zinc-800/50 rounded px-2 py-1">
+										<span className="flex-1 truncate text-zinc-400">{url.split('/').pop()}</span>
+										<button
+											type="button"
+											onClick={async () => {
+												if (!confirm('Delete this image?')) return;
+												await adminService.deleteProjectImages(modal.editing!.id, [url]);
+												setForm(prev => ({ ...prev, images: prev.images.filter(u => u !== url) }));
+												refetch();
+											}}
+											className="text-red-400 hover:text-red-300 shrink-0"
+										>
+											×
+										</button>
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				)}
 				<FormField
 					label="GitHub URL"
 					name="githubUrl"
