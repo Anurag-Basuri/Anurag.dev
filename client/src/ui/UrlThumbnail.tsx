@@ -82,8 +82,8 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		);
 	}
 
-	// ── Website URL → use screenshot service ────────────────────
-	if (kind === 'website' && url && !imgFailed) {
+	// ── Website & PDF URL → try screenshot service first ────────
+	if ((kind === 'website' || kind === 'pdf') && url && !imgFailed) {
 		const screenshotSrc = getScreenshotUrl(url);
 		return (
 			<>
@@ -102,7 +102,7 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		);
 	}
 
-	// ── PDF → styled placeholder ────────────────────────────────
+	// ── PDF Fallback → styled placeholder (if screenshot failed) 
 	if (kind === 'pdf') {
 		return (
 			<div className="w-full h-full bg-linear-to-br from-rose-950/60 via-[#0a0a0a] to-[#050505] flex flex-col items-center justify-center gap-2 relative overflow-hidden">

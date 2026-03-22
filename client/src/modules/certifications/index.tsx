@@ -36,9 +36,9 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-cyan-500/40 shadow-lg"
+			className="group relative flex flex-col h-full bg-linear-to-br from-foreground/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-(--theme-primary)/40 shadow-lg"
 		>
-			<div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-transparent group-hover:from-cyan-500/8 transition-colors duration-300 pointer-events-none" />
+			<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/8 transition-colors duration-300 pointer-events-none" />
 
 			{/* Thumbnail — edge-to-edge */}
 			<div className="relative aspect-video overflow-hidden bg-card">
@@ -46,26 +46,24 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 					url={cert.certificateUrl || cert.credentialUrl}
 					title={`${cert.title} certificate`}
 					fallbackIcon={Award}
-					fallbackLabel={cert.issuer}
-					fallbackGradient="from-cyan-950/60"
 				/>
-				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 			</div>
 
 			<div className="p-3 relative z-10 flex flex-col grow">
 				{/* Issuer Badge */}
 				<div className="flex items-center gap-1.5 mb-2">
-					<ShieldCheck className="w-3 h-3 text-cyan-400" />
+					<ShieldCheck className="w-3 h-3" style={{ color: 'var(--theme-primary)' }} />
 					<span className="text-[9px] font-black uppercase tracking-widest text-foreground/80">
 						{cert.issuer}
 					</span>
 				</div>
 
-				<h3 className="text-sm font-black text-foreground tracking-tight leading-tight group-hover:text-cyan-400 transition-colors mb-1.5 line-clamp-2">
+				<h3 className="text-sm font-black text-foreground tracking-tight leading-tight group-hover:text-(--theme-primary) transition-colors mb-1.5 line-clamp-2">
 					{cert.title}
 				</h3>
 
-				<div className="flex items-center gap-1.5 text-[9px] font-bold font-mono text-cyan-400/70 mb-2.5">
+				<div className="flex items-center gap-1.5 text-[9px] font-bold font-mono mb-2.5" style={{ color: 'color-mix(in oklch, var(--theme-primary) 70%, transparent)' }}>
 					<Activity className="w-3 h-3" />
 					<span>Issued: {new Date(cert.startDate ?? cert.createdAt).getFullYear()}</span>
 				</div>
@@ -75,7 +73,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 						{(cert.skills ?? []).slice(0, 4).map(skill => (
 							<span
 								key={skill}
-								className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded-md bg-foreground/5 text-muted-foreground border border-border group-hover:border-cyan-500/30 group-hover:text-foreground/90 transition-colors"
+								className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded-md bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/30 group-hover:text-foreground/90 transition-colors"
 							>
 								{skill}
 							</span>
@@ -89,7 +87,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 							href={cert.credentialUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-cyan-400 transition-colors group/link"
+							className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-(--theme-primary) transition-colors group/link"
 							aria-label={`Verify credential for ${cert.title}`}
 						>
 							Verify

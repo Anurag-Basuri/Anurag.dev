@@ -33,37 +33,13 @@ function AchievementsSkeleton() {
 const getCategoryDetails = (category: string) => {
 	switch (category.toLowerCase()) {
 		case 'hackathon':
-			return {
-				icon: <Target className="w-5 h-5 text-rose-400" />,
-				color: 'from-rose-500/20 to-rose-500/0 border-rose-500/30 group-hover:border-rose-500/50 shadow-rose-500/10',
-				accent: 'rose',
-				gradient: 'from-rose-950/60',
-				fallback: Target,
-			};
+			return { icon: <Target className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Target };
 		case 'competition':
-			return {
-				icon: <Medal className="w-5 h-5 text-amber-400" />,
-				color: 'from-amber-500/20 to-amber-500/0 border-amber-500/30 group-hover:border-amber-500/50 shadow-amber-500/10',
-				accent: 'amber',
-				gradient: 'from-amber-950/60',
-				fallback: Medal,
-			};
+			return { icon: <Medal className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Medal };
 		case 'opensource':
-			return {
-				icon: <Star className="w-5 h-5 text-emerald-400" />,
-				color: 'from-emerald-500/20 to-emerald-500/0 border-emerald-500/30 group-hover:border-emerald-500/50 shadow-emerald-500/10',
-				accent: 'emerald',
-				gradient: 'from-emerald-950/60',
-				fallback: Star,
-			};
+			return { icon: <Star className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Star };
 		default:
-			return {
-				icon: <Award className="w-5 h-5 text-blue-400" />,
-				color: 'from-blue-500/20 to-blue-500/0 border-blue-500/30 group-hover:border-blue-500/50 shadow-blue-500/10',
-				accent: 'blue',
-				gradient: 'from-blue-950/60',
-				fallback: Award,
-			};
+			return { icon: <Award className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Award };
 	}
 };
 
@@ -81,12 +57,9 @@ const AchievementCard = memo(function AchievementCard({
 		<motion.div
 			variants={staggerItem}
 			whileHover={cardHover}
-			className={cn(
-				'relative group flex flex-col h-full bg-linear-to-br from-white/5 to-transparent backdrop-blur-sm border rounded-xl overflow-hidden transition-all duration-300 shadow-lg',
-				details.color,
-			)}
+			className="group relative flex flex-col h-full bg-linear-to-br from-foreground/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-(--theme-primary)/40 shadow-lg"
 		>
-			<div className={`absolute inset-0 bg-linear-to-br from-${details.accent}-500/0 to-transparent group-hover:from-${details.accent}-500/8 transition-colors duration-300 pointer-events-none`} />
+			<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/8 transition-colors duration-300 pointer-events-none" />
 
 			{/* Thumbnail — edge-to-edge */}
 			<div className="relative aspect-video overflow-hidden bg-card">
@@ -95,9 +68,8 @@ const AchievementCard = memo(function AchievementCard({
 					title={achievement.title}
 					fallbackIcon={details.fallback}
 					fallbackLabel={achievement.issuer || undefined}
-					fallbackGradient={details.gradient}
 				/>
-				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 			</div>
 
 			<div className="p-3 relative z-10 flex flex-col grow">
@@ -106,7 +78,14 @@ const AchievementCard = memo(function AchievementCard({
 						{details.icon}
 					</div>
 					{achievement.featured && (
-						<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-black uppercase tracking-widest">
+						<div 
+							className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest"
+							style={{
+								background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
+								color: 'var(--theme-primary)',
+								borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)'
+							}}
+						>
 							<Sparkles className="w-2.5 h-2.5" />
 							Featured
 						</div>
@@ -118,8 +97,8 @@ const AchievementCard = memo(function AchievementCard({
 				</h3>
 
 				{achievement.issuer && (
-					<p className={`text-[9px] font-bold uppercase tracking-wider text-${details.accent}-400 mb-2 flex items-center gap-1.5`}>
-						<span className={`w-3 h-[1.5px] bg-${details.accent}-400/50 rounded-full`} />
+					<p className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
+						<span className="w-3 h-[1.5px] rounded-full" style={{ background: 'var(--theme-primary)', opacity: 0.5 }} />
 						{achievement.issuer}
 					</p>
 				)}
@@ -152,7 +131,7 @@ const AchievementCard = memo(function AchievementCard({
 								href={link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className={`flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-${details.accent}-400 transition-colors group/link`}
+								className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-(--theme-primary) transition-colors group/link"
 								aria-label={`View certificate for ${achievement.title}`}
 							>
 								View Details
