@@ -28,7 +28,7 @@ async function getPublicProfile(_req: Request, res: Response): Promise<void> {
 async function getPublicProjects(_req: Request, res: Response): Promise<void> {
 	const projects = await prisma.project.findMany({
 		where: { status: { in: ['published', 'completed'] } },
-		orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 
 	ApiResponse.ok(res, projects);
@@ -72,7 +72,7 @@ async function getPublicAchievements(_req: Request, res: Response): Promise<void
 // List all certifications
 async function getPublicCertifications(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.certification.findMany({
-		orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 
 	ApiResponse.ok(res, items);
@@ -82,7 +82,7 @@ async function getPublicCertifications(_req: Request, res: Response): Promise<vo
 async function getPublicBlogPosts(_req: Request, res: Response): Promise<void> {
 	const posts = await prisma.blogPost.findMany({
 		where: { status: 'published' },
-		orderBy: [{ order: 'asc' }, { publishedAt: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 
 	ApiResponse.ok(res, posts);

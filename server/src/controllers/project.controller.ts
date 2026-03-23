@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // Controller functions for project management
 async function listProjects(_req: Request, res: Response): Promise<void> {
 	const projects = await prisma.project.findMany({
-		orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 	ApiResponse.ok(res, projects);
 }

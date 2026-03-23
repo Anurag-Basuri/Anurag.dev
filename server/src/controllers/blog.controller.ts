@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // List all blog posts (admin)
 async function listPosts(_req: Request, res: Response): Promise<void> {
 	const posts = await prisma.blogPost.findMany({
-		orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 	ApiResponse.ok(res, posts);
 }

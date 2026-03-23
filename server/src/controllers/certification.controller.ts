@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // List all certifications
 async function listCertifications(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.certification.findMany({
-		orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
+		orderBy: { order: 'asc' },
 	});
 	ApiResponse.ok(res, items);
 }

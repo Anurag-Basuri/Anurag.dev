@@ -167,13 +167,7 @@ export function EducationModule() {
 	}, []);
 
 	const educationEntries = useMemo(() => {
-		return entries
-			.filter(entry => entry.type.toUpperCase() === 'EDUCATION')
-			.sort((a, b) => {
-				const dateA = new Date(a.startDate || 0).getTime();
-				const dateB = new Date(b.startDate || 0).getTime();
-				return dateB - dateA;
-			});
+		return entries.filter(entry => entry.type.toUpperCase() === 'EDUCATION');
 	}, [entries]);
 
 	if (loading) return <EducationSkeleton />;
