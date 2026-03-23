@@ -105,6 +105,8 @@ export const projectSchema = z.object({
 	stars: z.number().nullish(),
 	forks: z.number().nullish(),
 
+	order: z.number().int(),
+
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
@@ -222,6 +224,8 @@ export const certificationSchema = z.object({
 	startDate: z.string().nullish(),
 	endDate: z.string().nullish(),
 
+	order: z.number().int(),
+
 	createdAt: z.string(),
 	updatedAt: z.string(),
 });
@@ -241,6 +245,8 @@ export const blogPostSchema = z.object({
 
 	status: z.string(),
 	publishedAt: z.string().nullish(),
+
+	order: z.number().int(),
 
 	createdAt: z.string(),
 	updatedAt: z.string(),

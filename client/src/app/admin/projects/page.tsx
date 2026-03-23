@@ -22,6 +22,7 @@ const EMPTY_PROJECT = {
 	status: 'draft',
 	stars: 0,
 	forks: 0,
+	order: 0,
 };
 
 export default function ProjectsPage() {
@@ -55,6 +56,7 @@ export default function ProjectsPage() {
 			status: project.status,
 			stars: project.stars ?? 0,
 			forks: project.forks ?? 0,
+			order: project.order,
 		});
 		setModal({ open: true, editing: project });
 		setError(null);

@@ -20,6 +20,7 @@ const EMPTY = {
 	skills: [] as string[],
 	startDate: '',
 	endDate: '',
+	order: 0,
 };
 
 export default function CertificationsPage() {
@@ -52,6 +53,7 @@ export default function CertificationsPage() {
 			skills: item.skills,
 			startDate: item.startDate ? item.startDate.slice(0, 10) : '',
 			endDate: item.endDate ? item.endDate.slice(0, 10) : '',
+			order: item.order,
 		});
 		setModal({ open: true, editing: item });
 		setError(null);

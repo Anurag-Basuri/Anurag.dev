@@ -20,6 +20,7 @@ const EMPTY = {
 	link: '',
 	status: 'draft',
 	publishedAt: '',
+	order: 0,
 };
 
 export default function BlogPage() {
@@ -51,6 +52,7 @@ export default function BlogPage() {
 			link: post.link || '',
 			status: post.status,
 			publishedAt: post.publishedAt ? post.publishedAt.slice(0, 10) : '',
+			order: post.order,
 		});
 		setModal({ open: true, editing: post });
 		setError(null);
