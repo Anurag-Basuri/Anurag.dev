@@ -7,7 +7,7 @@ import type { CodingStats, PlatformStats, Profile } from '@/api/schema';
 import { Terminal, Globe, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SectionHeader } from '@/ui/SectionHeader';
-import { staggerContainer, staggerItem } from '@/animations/motion';
+import { staggerContainer } from '@/animations/motion';
 
 import { PLATFORMS, type PlatformConfig } from './constants';
 import { hasStats } from './utils';
@@ -20,7 +20,7 @@ import {
 } from './components';
 
 // ═══════════════════════════════════════════════════════════════════
-// MAIN MODULE
+// MAIN MODULE (High-Density Bento Box)
 // ═══════════════════════════════════════════════════════════════════
 
 export function CodingStatsModule() {
@@ -52,16 +52,16 @@ export function CodingStatsModule() {
 		return () => { cancelled = true; };
 	}, []);
 
-	// Categorize platforms
-	const { heroCards, standardCards, linkOnlyCards } = useMemo(() => {
-		if (!stats && !profile) return { heroCards: [], standardCards: [], linkOnlyCards: [] };
+	// Categorize platforms into Rich (hero/standard) and LinkOnly 
+	// We'll map them seamlessly into the CSS Grid Bento box
+	const { richCards, linkOnlyCards } = useMemo(() => {
+		if (!stats && !profile) return { richCards: [], linkOnlyCards: [] };
 
-		const hero: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
-		const standard: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
+		const rich: Array<{ config: PlatformConfig; platform: PlatformStats; type: 'hero' | 'github' | 'competitive' }> = [];
 		const linkOnly: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
 		const processedUrls = new Set<string>();
 
-		// 1. Process standard platforms
+		// Process standard platforms
 		for (const cfg of PLATFORMS) {
 			let p = stats ? (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null : null;
 			
@@ -80,17 +80,12 @@ export function CodingStatsModule() {
 				processedUrls.add(p.url.toLowerCase());
 
 				if (hasData) {
-					// LeetCode → hero card
-					if (cfg.key === 'leetcode' || cfg.key === 'gfg' || ('easy' in (p.stats || {}))) {
-						hero.push({ config: cfg, platform: p });
-					}
-					// GitHub → standard (wide card)
-					else if (cfg.key === 'github' || ('stars' in (p.stats || {}) && !('rating' in (p.stats || {})))) {
-						standard.push({ config: cfg, platform: p });
-					}
-					// Codeforces → standard (competitive card)
-					else {
-						standard.push({ config: cfg, platform: p });
+					if (cfg.key === 'github' || ('stars' in (p.stats || {}) && !('rating' in (p.stats || {})))) {
+						rich.push({ config: cfg, platform: p, type: 'github' });
+					} else if (cfg.key === 'leetcode' || cfg.key === 'gfg' || ('easy' in (p.stats || {}))) {
+						rich.push({ config: cfg, platform: p, type: 'hero' });
+					} else {
+						rich.push({ config: cfg, platform: p, type: 'competitive' });
 					}
 				} else {
 					linkOnly.push({ config: cfg, platform: p });
@@ -98,7 +93,7 @@ export function CodingStatsModule() {
 			}
 		}
 
-		// 2. Process otherProfiles from Profile
+		// Process otherProfiles from Profile to generate link-only pills
 		if (profile?.otherProfiles && profile.otherProfiles.length > 0) {
 			for (const url of profile.otherProfiles) {
 				const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
@@ -132,20 +127,20 @@ export function CodingStatsModule() {
 			}
 		}
 
-		return { heroCards: hero, standardCards: standard, linkOnlyCards: linkOnly };
+		return { richCards: rich, linkOnlyCards: linkOnly };
 	}, [stats, profile]);
 
 	if (loading) return <CodingStatsSkeleton />;
 
-	const totalEntries = heroCards.length + standardCards.length + linkOnlyCards.length;
+	const totalEntries = richCards.length + linkOnlyCards.length;
 
 	if (error || totalEntries === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-32 text-center max-w-7xl mx-auto">
-				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-6 shadow-inner">
+				<div className="p-5 rounded-3xl bg-orange-500/10 border border-orange-500/20 mb-5 shadow-inner backdrop-blur-3xl">
 					<Terminal className="w-8 h-8 text-orange-400" />
 				</div>
-				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">
+				<p className="text-xl font-black text-foreground mb-2 tracking-tight">
 					{error ? 'Failed to Sync Telemetry' : 'No Profiles Configured'}
 				</p>
 				<p className="text-xs text-muted-foreground leading-snug mb-8 max-w-sm">
@@ -157,7 +152,7 @@ export function CodingStatsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-3 sm:px-6 md:px-10 max-w-400 mx-auto pb-10 sm:pb-14 pt-6 md:pt-8 overflow-hidden">
 				<SectionHeader
 					icon={Terminal}
 					label="Telemetry"
@@ -166,46 +161,44 @@ export function CodingStatsModule() {
 					sectionId="coding_stats"
 				/>
 
-				{/* ─── Hero Cards (LeetCode / Problem-Solving) ─── */}
-				{heroCards.length > 0 && (
+				{/* ─── Compact Bento Box Grid Layout ─── */}
+				{richCards.length > 0 && (
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-20px' }}
-						className="grid grid-cols-1 gap-4 mt-6"
+						className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 mt-6 md:auto-rows-min"
 					>
-						{heroCards.map(({ config, platform }) => (
-							<ProblemSolvingCard key={config.key} platform={platform} config={config} />
-						))}
-					</motion.div>
-				)}
+						{richCards.map(({ config, platform, type }) => {
+							// Determine grid spanning for smaller scale cards
+							// Hero / GitHub span exactly 2 columns on most screens; Competitive single column
+							const spanClass = 
+								(type === 'github' || type === 'hero') ? 'col-span-1 md:col-span-2' : 
+								'col-span-1';
 
-				{/* ─── Standard Cards (GitHub, Codeforces) ─── */}
-				{standardCards.length > 0 && (
-					<motion.div
-						variants={staggerContainer}
-						initial="hidden"
-						whileInView="visible"
-						viewport={{ once: true, margin: '-20px' }}
-						className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"
-					>
-						{standardCards.map(({ config, platform }) => {
-							if (config.key === 'github' || ('stars' in (platform.stats || {}) && !('rating' in (platform.stats || {})))) {
-								return <GitHubCard key={config.key} platform={platform} config={config} />;
-							}
-							return <CompetitiveCard key={config.key} platform={platform} config={config} />;
+							return (
+								<div key={config.key} className={spanClass}>
+									{type === 'hero' ? (
+										<ProblemSolvingCard platform={platform} config={config} />
+									) : type === 'github' ? (
+										<GitHubCard platform={platform} config={config} />
+									) : (
+										<CompetitiveCard platform={platform} config={config} />
+									)}
+								</div>
+							);
 						})}
 					</motion.div>
 				)}
 
 				{/* ─── Link-Only Profiles (compact pill row) ─── */}
 				{linkOnlyCards.length > 0 && (
-					<div className="mt-6">
-						<div className="flex items-center gap-2 mb-3">
+					<div className="mt-8">
+						<div className="flex items-center gap-2 mb-3 px-2">
 							<ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-							<span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-								More Profiles
+							<span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+								Additional Profiles
 							</span>
 						</div>
 						<motion.div
@@ -213,7 +206,7 @@ export function CodingStatsModule() {
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true, margin: '-20px' }}
-							className="flex flex-wrap gap-3"
+							className="flex flex-wrap gap-2.5 sm:gap-3"
 						>
 							{linkOnlyCards.map(({ config, platform }) => (
 								<LinkOnlyPill
