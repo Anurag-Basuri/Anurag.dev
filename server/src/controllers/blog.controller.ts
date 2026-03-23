@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // List all blog posts (admin)
 async function listPosts(_req: Request, res: Response): Promise<void> {
 	const posts = await prisma.blogPost.findMany({
-		orderBy: { createdAt: 'desc' },
+		orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
 	});
 	ApiResponse.ok(res, posts);
 }
@@ -239,6 +239,33 @@ async function deleteBlogImages(req: IdRequest, res: Response): Promise<void> {
 	ApiResponse.ok(res, post, 'Images deleted');
 }
 
+// Bulk reorder blog posts
+async function reorderPosts(req: Request, res: Response): Promise<void> {
+	const { items } = req.body as { items: { id: string; order: number }[] };
+	const adminId = req.admin!.adminId;
+
+	if (!Array.isArray(items)) throw ApiError.BadRequest('Invalid payload format');
+
+	await prisma.$transaction(
+		items.map(item =>
+			prisma.blogPost.update({
+				where: { id: item.id },
+				data: { order: item.order },
+			})
+		)
+	);
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'BlogPost',
+		resourceId: 'bulk-reorder',
+		changes: { reorderedParams: items.length },
+	});
+
+	ApiResponse.ok(res, null, 'Posts reordered successfully');
+}
+
 export {
 	listPosts,
 	createPost,
@@ -249,4 +276,5 @@ export {
 	uploadBlogImages,
 	replaceBlogImages,
 	deleteBlogImages,
+	reorderPosts,
 };

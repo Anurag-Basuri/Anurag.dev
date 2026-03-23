@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // List all certifications
 async function listCertifications(_req: Request, res: Response): Promise<void> {
 	const items = await prisma.certification.findMany({
-		orderBy: { startDate: 'desc' },
+		orderBy: [{ order: 'asc' }, { startDate: 'desc' }],
 	});
 	ApiResponse.ok(res, items);
 }
@@ -135,6 +135,33 @@ async function deleteCertificationFile(req: IdRequest, res: Response): Promise<v
 	ApiResponse.ok(res, cert, 'Certificate deleted');
 }
 
+// Bulk reorder certifications
+async function reorderCertifications(req: Request, res: Response): Promise<void> {
+	const { items } = req.body as { items: { id: string; order: number }[] };
+	const adminId = req.admin!.adminId;
+
+	if (!Array.isArray(items)) throw ApiError.BadRequest('Invalid payload format');
+
+	await prisma.$transaction(
+		items.map(item =>
+			prisma.certification.update({
+				where: { id: item.id },
+				data: { order: item.order },
+			})
+		)
+	);
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Certification',
+		resourceId: 'bulk-reorder',
+		changes: { reorderedParams: items.length },
+	});
+
+	ApiResponse.ok(res, null, 'Certifications reordered successfully');
+}
+
 export {
 	listCertifications,
 	createCertification,
@@ -142,4 +169,5 @@ export {
 	deleteCertification,
 	uploadCertificationFile,
 	deleteCertificationFile,
+	reorderCertifications,
 };

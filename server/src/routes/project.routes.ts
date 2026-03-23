@@ -17,6 +17,7 @@ import {
 	uploadProjectImages,
 	replaceProjectImages,
 	deleteProjectImages,
+	reorderProjects,
 } from '../controllers/project.controller';
 import { imageUpload } from '../middleware/multer.middleware';
 
@@ -25,6 +26,8 @@ const router = Router();
 router.get('/projects', asyncHandler(listProjects));
 
 router.post('/projects', validate(ProjectCreateSchema), asyncHandler(createProject));
+
+router.put('/projects/reorder', asyncHandler(reorderProjects));
 
 router.put('/projects/:id', validate(ProjectUpdateSchema), asyncHandler(updateProject));
 

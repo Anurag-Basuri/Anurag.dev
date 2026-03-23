@@ -9,6 +9,7 @@ import {
 	deleteCertification,
 	uploadCertificationFile,
 	deleteCertificationFile,
+	reorderCertifications,
 } from '../controllers/certification.controller';
 import { mediaUpload } from '../middleware/multer.middleware';
 
@@ -21,6 +22,8 @@ router.post(
 	validate(CertificationCreateSchema),
 	asyncHandler(createCertification),
 );
+
+router.put('/certifications/reorder', asyncHandler(reorderCertifications));
 
 router.put(
 	'/certifications/:id',

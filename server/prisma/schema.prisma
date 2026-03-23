@@ -94,6 +94,7 @@ model Project {
   liveUrl   String? // Link to live demo or deployed site
 
   status   String  @default("draft") // draft, published, archived, completed
+  order    Int     @default(0)
 
   stars Int?
   forks Int?
@@ -102,6 +103,7 @@ model Project {
   updatedAt DateTime @updatedAt
 
   @@index([status])
+  @@index([order])
 }
 
 // Journey Model - Career, education, and life experience entries
@@ -276,10 +278,13 @@ model Certification {
   startDate DateTime?
   endDate   DateTime?
 
+  order Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([issuer])
+  @@index([order])
 }
 
 // BlogPost Model - For blog posts or articles on portfolio
@@ -298,10 +303,13 @@ model BlogPost {
   status      String    @default("draft") // draft, published, archived
   publishedAt DateTime?
 
+  order Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status])
+  @@index([order])
 }
 
 // Contact Messages - For storing messages sent via contact form on portfolio

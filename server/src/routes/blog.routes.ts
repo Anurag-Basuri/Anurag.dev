@@ -17,6 +17,7 @@ import {
 	uploadBlogImages,
 	replaceBlogImages,
 	deleteBlogImages,
+	reorderPosts,
 } from '../controllers/blog.controller';
 import { imageUpload } from '../middleware/multer.middleware';
 
@@ -25,6 +26,8 @@ const router = Router();
 router.get('/blog', asyncHandler(listPosts));
 
 router.post('/blog', validate(BlogCreateSchema), asyncHandler(createPost));
+
+router.put('/blog/reorder', asyncHandler(reorderPosts));
 
 router.put('/blog/:id', validate(BlogUpdateSchema), asyncHandler(updatePost));
 

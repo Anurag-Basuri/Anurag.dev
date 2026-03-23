@@ -9,7 +9,7 @@ import type { IdRequest } from '../utils/types';
 // Controller functions for project management
 async function listProjects(_req: Request, res: Response): Promise<void> {
 	const projects = await prisma.project.findMany({
-		orderBy: { createdAt: 'desc' },
+		orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
 	});
 	ApiResponse.ok(res, projects);
 }
@@ -228,6 +228,33 @@ async function deleteProjectImages(req: IdRequest, res: Response): Promise<void>
 	ApiResponse.ok(res, project, 'Images deleted');
 }
 
+// Bulk reorder projects
+async function reorderProjects(req: Request, res: Response): Promise<void> {
+	const { items } = req.body as { items: { id: string; order: number }[] };
+	const adminId = req.admin!.adminId;
+
+	if (!Array.isArray(items)) throw ApiError.BadRequest('Invalid payload format');
+
+	await prisma.$transaction(
+		items.map(item =>
+			prisma.project.update({
+				where: { id: item.id },
+				data: { order: item.order },
+			})
+		)
+	);
+
+	await logAudit({
+		adminId,
+		action: 'update',
+		resourceType: 'Project',
+		resourceId: 'bulk-reorder',
+		changes: { reorderedParams: items.length },
+	});
+
+	ApiResponse.ok(res, null, 'Projects reordered successfully');
+}
+
 export {
 	listProjects,
 	createProject,
@@ -238,4 +265,5 @@ export {
 	uploadProjectImages,
 	replaceProjectImages,
 	deleteProjectImages,
+	reorderProjects,
 };
