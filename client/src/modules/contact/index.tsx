@@ -26,7 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-hot-toast';
 import { SectionHeader } from '@/ui/SectionHeader';
-import { staggerContainer, staggerItem } from '@/animations/motion';
+import { staggerContainer, staggerItem, fadeInUp } from '@/animations/motion';
 
 const SOCIAL_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
 	GITHUB: Github,
@@ -155,33 +155,34 @@ export function ContactModule() {
 					sectionId="contact"
 				/>
 
-				<div className="flex flex-col lg:flex-row gap-8 lg:gap-14 mt-10 md:mt-16">
+				{/* ─────────────── Desktop Large Screen View ─────────────── */}
+				<div className="hidden lg:flex flex-row gap-14 mt-16">
 					{/* Left Column: Info & Socials */}
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="flex-1 space-y-6 sm:space-y-8"
+						className="flex-1 space-y-8"
 					>
 						{/* Email Card */}
 						<motion.div
 							variants={staggerItem}
-							className="group relative rounded-4xl p-6 sm:p-8 bg-card/30 backdrop-blur-3xl border border-border overflow-hidden hover:border-primary/50 transition-colors duration-500 shadow-2xl"
+							className="group relative rounded-4xl p-8 bg-card/30 backdrop-blur-3xl border border-border overflow-hidden hover:border-primary/50 transition-colors duration-500 shadow-2xl"
 						>
 							<div className="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 							<div className="absolute -right-20 -top-20 w-40 h-40 bg-primary/20 blur-[80px] rounded-full group-hover:bg-primary/40 transition-colors duration-700 pointer-events-none" />
 
-							<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
+							<div className="relative z-10 flex flex-row items-start gap-6">
 								<div className="p-4 rounded-2xl bg-card border border-border text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-transform duration-500 shadow-lg shrink-0">
 									<Mail className="w-8 h-8" />
 								</div>
-								<div className="flex-1 w-full mx-auto sm:mx-0 pt-1">
+								<div className="flex-1 mx-0 pt-1">
 									<h3 className="text-xl text-foreground font-bold mb-3 tracking-tight">
 										Drop an Email
 									</h3>
 									<div className="flex items-center justify-between gap-4 bg-muted/30 p-3 pl-5 rounded-2xl border border-border/50 group-hover:border-primary/30 transition-colors">
-										<span className="text-muted-foreground font-medium text-sm sm:text-base truncate">
+										<span className="text-muted-foreground font-medium text-base truncate">
 											{about?.email || 'hello@example.com'}
 										</span>
 										{about?.email && (
@@ -205,12 +206,12 @@ export function ContactModule() {
 						{/* Location Card */}
 						<motion.div
 							variants={staggerItem}
-							className="group relative rounded-4xl p-6 sm:p-8 bg-card/30 backdrop-blur-3xl border border-border overflow-hidden hover:border-primary/50 transition-colors duration-500 shadow-2xl"
+							className="group relative rounded-4xl p-8 bg-card/30 backdrop-blur-3xl border border-border overflow-hidden hover:border-primary/50 transition-colors duration-500 shadow-2xl"
 						>
 							<div className="absolute inset-0 bg-linear-to-bl from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 							<MapPin className="absolute right-[-5%] top-[-5%] w-48 h-48 text-foreground/[0.02] group-hover:text-primary/5 transition-colors duration-700 -rotate-12 pointer-events-none" />
 
-							<div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6 text-center sm:text-left">
+							<div className="relative z-10 flex flex-row items-start gap-6">
 								<div className="p-4 rounded-2xl bg-card border border-border text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-transform duration-500 shadow-lg shrink-0">
 									<MapPin className="w-8 h-8" />
 								</div>
@@ -236,14 +237,13 @@ export function ContactModule() {
 
 						{/* Social Protocols */}
 						<motion.div variants={staggerItem} className="pt-2">
-							<div className="flex items-center gap-4 mb-6 justify-center sm:justify-start">
-								<div className="h-px bg-border flex-1 max-w-[40px] hidden sm:block" />
-								<h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-center sm:text-left">
+							<div className="flex items-center gap-4 mb-6 justify-start">
+								<h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-left">
 									Find Me Online
 								</h3>
-								<div className="h-px bg-border flex-1 max-w-[40px] hidden sm:block" />
+								<div className="h-px bg-border flex-1 max-w-[40px] block" />
 							</div>
-							<div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4">
+							<div className="flex flex-wrap justify-start gap-4">
 								{(about?.socialLinks ?? []).map((social, index) => {
 									const Icon = SOCIAL_ICONS[social.platform] || Globe;
 									return (
@@ -270,11 +270,11 @@ export function ContactModule() {
 						whileInView={{ opacity: 1, scale: 1, y: 0 }}
 						viewport={{ once: true }}
 						transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
-						className="flex-1 lg:max-w-136 w-full mt-4 lg:mt-0"
+						className="flex-1 max-w-136 w-full"
 					>
 						<form
 							onSubmit={handleSubmit}
-							className="relative p-6 sm:p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-3xl border border-border shadow-2xl flex flex-col gap-6 w-full"
+							className="relative p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-3xl border border-border shadow-2xl flex flex-col gap-6 w-full"
 						>
 							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent rounded-[2.5rem] pointer-events-none" />
 
@@ -289,7 +289,7 @@ export function ContactModule() {
 							</div>
 
 							<div className="space-y-5 relative z-10">
-								<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+								<div className="grid grid-cols-2 gap-5">
 									<div className="space-y-2">
 										<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
 											Your Name
@@ -402,6 +402,180 @@ export function ContactModule() {
 								</AnimatePresence>
 							</div>
 						</form>
+					</motion.div>
+				</div>
+
+				{/* ─────────────── Mobile Small Screen View ─────────────── */}
+				<div className="flex flex-col lg:hidden gap-8 mt-8 w-full max-w-xl mx-auto">
+					
+					{/* Compact Direct Contact Info Row */}
+					<motion.div 
+						variants={fadeInUp}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						className="flex flex-col sm:flex-row gap-3"
+					>
+						{/* Location Pill */}
+						<div className="flex-1 flex items-center gap-3 p-4 rounded-3xl bg-card/30 backdrop-blur-3xl border border-border shadow-md relative overflow-hidden group">
+							<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+							<div className="p-2.5 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+								<MapPin className="w-5 h-5" />
+							</div>
+							<div className="flex-1 min-w-0">
+								<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Location</p>
+								<p className="text-sm font-semibold text-foreground truncate">{about?.Currentlocation || 'Remote'}</p>
+							</div>
+						</div>
+
+						{/* Email Pill */}
+						<div className="flex-1 flex items-center justify-between gap-3 p-4 rounded-3xl bg-card/30 backdrop-blur-3xl border border-border shadow-md relative overflow-hidden group">
+							<div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+							<div className="flex items-center gap-3 flex-1 min-w-0">
+								<div className="p-2.5 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors shrink-0">
+									<Mail className="w-5 h-5" />
+								</div>
+								<div className="flex-1 min-w-0 pr-2">
+									<p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none mb-1">Email</p>
+									<p className="text-sm font-semibold text-foreground truncate">{about?.email || 'hello@example.com'}</p>
+								</div>
+							</div>
+							
+							{about?.email && (
+								<button
+									onClick={copyEmail}
+									className="p-2.5 rounded-xl bg-card border border-border text-muted-foreground hover:text-primary hover:border-primary/50 transition-all shrink-0 z-10 shadow-xs"
+									aria-label="Copy email address"
+								>
+									{copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+								</button>
+							)}
+						</div>
+					</motion.div>
+
+					{/* Simplified Form */}
+					<motion.form
+						variants={fadeInUp}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						className="relative p-6 sm:p-8 rounded-4xl bg-card/30 backdrop-blur-3xl border border-border hover:border-primary/30 shadow-2xl flex flex-col gap-5 transition-colors duration-500 group overflow-hidden"
+						onSubmit={handleSubmit}
+					>
+						<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
+						<div className="space-y-1.5 relative z-10">
+							<label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider ml-1">
+								Name
+							</label>
+							<input
+								type="text"
+								name="name"
+								value={formData.name}
+								onChange={handleChange}
+								required
+								className="w-full bg-background/50 backdrop-blur-xl border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm outline-hidden shadow-inner"
+								placeholder="Your Name"
+							/>
+						</div>
+
+						<div className="space-y-1.5 relative z-10">
+							<label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider ml-1">
+								Email
+							</label>
+							<input
+								type="email"
+								name="email"
+								value={formData.email}
+								onChange={handleChange}
+								required
+								className="w-full bg-background/50 backdrop-blur-xl border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm outline-hidden shadow-inner"
+								placeholder="you@example.com"
+							/>
+						</div>
+
+						<div className="space-y-1.5 relative z-10">
+							<label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider ml-1">
+								Message
+							</label>
+							<textarea
+								name="message"
+								value={formData.message}
+								onChange={handleChange}
+								required
+								rows={4}
+								className="w-full bg-background/50 backdrop-blur-xl border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-primary/50 transition-all resize-none placeholder:text-muted-foreground/50 text-sm outline-hidden shadow-inner"
+								placeholder="How can we collaborate?"
+							/>
+						</div>
+
+						<div className="pt-2 relative z-10">
+							<button
+								type="submit"
+								disabled={loading || success}
+								className={cn(
+									'w-full py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-3 transition-all duration-300 relative overflow-hidden group/mbtn',
+									success
+										? 'bg-emerald-500 text-black cursor-default border-transparent shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+										: 'bg-primary text-primary-foreground hover:bg-primary/90 hover:-translate-y-1 active:scale-95 shadow-[0_0_15px_rgba(var(--theme-primary-rgb),0.3)] hover:shadow-[0_0_25px_rgba(var(--theme-primary-rgb),0.5)]',
+								)}
+							>
+								{loading ? (
+									<span className="animate-pulse flex items-center gap-2">
+										<div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+										Sending...
+									</span>
+								) : success ? (
+									<>
+										<CheckCircle className="w-5 h-5" /> Message Delivered
+									</>
+								) : (
+									<>
+										<span className="relative z-10 transition-transform group-hover/mbtn:-translate-x-1">Send Message</span>
+										<Send className="w-4 h-4 relative z-10 transition-transform group-hover/mbtn:translate-x-1 group-hover/mbtn:-translate-y-1" />
+									</>
+								)}
+							</button>
+						</div>
+
+						<AnimatePresence>
+							{error && (
+								<motion.div
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: 'auto' }}
+									exit={{ opacity: 0, height: 0 }}
+								>
+									<div className="text-rose-400 text-xs font-bold uppercase text-center mt-2">
+										{error}
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</motion.form>
+
+					{/* Simple Social Icons Row */}
+					<motion.div 
+						variants={fadeInUp}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true }}
+						className="flex flex-wrap justify-center gap-3 pt-2"
+					>
+						{(about?.socialLinks ?? []).map((social, index) => {
+							const Icon = SOCIAL_ICONS[social.platform] || Globe;
+							return (
+								<a
+									key={social.id || `${social.platform}-${index}`}
+									href={social.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group relative p-3.5 rounded-2xl bg-card/30 backdrop-blur-3xl border border-border text-muted-foreground hover:text-primary hover:border-primary/50 transition-all shadow-md overflow-hidden"
+									aria-label={`Visit ${social.customLabel || social.platform} profile`}
+								>
+									<div className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+									<Icon className="w-5 h-5 relative z-10" />
+								</a>
+							);
+						})}
 					</motion.div>
 				</div>
 			</div>

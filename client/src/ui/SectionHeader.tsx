@@ -72,7 +72,7 @@ export function SectionHeader({
 				</h1>
 
 				{description && (
-					<p className="text-xs text-muted-foreground/80 leading-snug font-medium">
+					<p className="hidden sm:block text-xs text-muted-foreground/80 leading-snug font-medium">
 						{description}
 					</p>
 				)}
