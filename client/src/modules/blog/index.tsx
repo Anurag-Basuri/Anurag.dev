@@ -127,6 +127,7 @@ const PostCard = memo(function PostCard({
 	onClick: () => void;
 }) {
 	const tags = safeArray(post.tags);
+	const dateStr = formatDate(post.publishedAt ?? post.createdAt);
 
 	return (
 		<motion.article
@@ -141,7 +142,7 @@ const PostCard = memo(function PostCard({
 		>
 			<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-secondary)/8 transition-colors duration-300 pointer-events-none" />
 
-			{/* Thumbnail */}
+			{/* Thumbnail — edge-to-edge */}
 			<div className="relative aspect-video overflow-hidden bg-card">
 				<UrlThumbnail
 					url={post.coverImage || post.link}
@@ -152,36 +153,45 @@ const PostCard = memo(function PostCard({
 				/>
 				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 
+				{/* Direct redirect button on preview image */}
 				{post.link && (
 					<a
 						href={post.link}
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
-						className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/60 backdrop-blur-md border border-border text-muted-foreground hover:text-(--theme-secondary) hover:border-(--theme-secondary)/30 transition-all z-20"
-						aria-label="Open external link"
+						className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg backdrop-blur-md border text-white/90 opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all duration-300 text-[9px] font-bold uppercase tracking-wider hover:scale-105 active:scale-95"
+						style={{
+							background: 'color-mix(in oklch, var(--theme-secondary) 25%, rgba(0,0,0,0.5))',
+							borderColor: 'color-mix(in oklch, var(--theme-secondary) 40%, transparent)',
+						}}
+						aria-label="Open original post"
 					>
 						<ExternalLink className="w-3 h-3" />
+						<span className="hidden sm:inline">Read</span>
 					</a>
 				)}
 			</div>
 
-			{/* Content */}
+			{/* Content — separate from image */}
 			<div className="flex flex-col grow p-3 relative z-10">
-				<div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--theme-secondary)' }}>
-					<span>{formatDate(post.publishedAt ?? post.createdAt)}</span>
-					<span className="w-0.5 h-0.5 rounded-full" style={{ background: 'var(--theme-secondary)' }} />
-					<span>{readingTime(post.content)} min</span>
-				</div>
+				{/* Date */}
+				{dateStr && (
+					<div
+						className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider mb-1.5"
+						style={{ color: 'var(--theme-secondary)' }}
+					>
+						<Calendar className="w-3 h-3" />
+						<span>{dateStr}</span>
+					</div>
+				)}
 
-				<h3 className="text-sm font-black text-foreground leading-tight tracking-tight mb-1.5 group-hover:text-foreground/90 transition-colors line-clamp-2">
+				{/* Title */}
+				<h3 className="text-sm font-black text-foreground leading-tight tracking-tight mb-2 group-hover:text-foreground/90 transition-colors line-clamp-2">
 					{post.title ?? 'Untitled'}
 				</h3>
 
-				<p className="text-[10px] text-muted-foreground leading-snug line-clamp-2 mb-3 font-medium">
-					{post.content ?? ''}
-				</p>
-
+				{/* Tags */}
 				{tags.length > 0 && (
 					<div className="mt-auto flex flex-wrap gap-1.5 pt-2.5 border-t border-border">
 						{tags.slice(0, 3).map(tag => (
@@ -204,7 +214,7 @@ const PostCard = memo(function PostCard({
 	);
 });
 
-// ─── Blog Detail Modal ──────────────────────────────────────────
+// ─── Blog Detail Modal (Desktop) ────────────────────────────────
 
 function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
 	const tags = safeArray(post.tags);
@@ -213,14 +223,12 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 		...safeArray(post.otherImages),
 	];
 
-	// Escape to close
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
 		window.addEventListener('keydown', handler);
 		return () => window.removeEventListener('keydown', handler);
 	}, [onClose]);
 
-	// Body scroll lock
 	useEffect(() => {
 		const prev = document.body.style.overflow;
 		document.body.style.overflow = 'hidden';
@@ -238,28 +246,28 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 	return (
 		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-6 lg:p-8">
-			{/* Backdrop — fixed, never scrolls */}
+			{/* Backdrop */}
 			<motion.div
 				variants={fadeIn}
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
 				onClick={onClose}
-				className="absolute inset-0 backdrop-blur-2xl"
-				style={{ background: 'color-mix(in oklch, color-mix(in oklch, var(--background) 88%, var(--theme-secondary)) 75%, transparent)' }}
+				className="absolute inset-0 backdrop-blur-3xl"
+				style={{ background: 'color-mix(in oklch, var(--background) 96%, var(--theme-secondary))' }}
 			/>
 
-			{/* Modal */}
+			{/* ── Desktop Modal (hidden below sm) ── */}
 			<motion.div
 				variants={scaleIn}
 				initial="hidden"
 				animate="visible"
 				exit="hidden"
 				className={cn(
-					'relative z-10 flex flex-col overflow-hidden',
-					'w-full h-full sm:h-auto sm:max-h-[92vh] max-w-3xl',
+					'relative z-10 hidden sm:flex flex-col overflow-hidden',
+					'w-full sm:max-h-[92vh] max-w-3xl',
 					'bg-card backdrop-blur-xl',
-					'border-0 sm:border sm:border-border sm:rounded-2xl',
+					'border border-border rounded-2xl',
 					'shadow-2xl',
 				)}
 			>
@@ -287,7 +295,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								href={post.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider transition-all"
+								className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
 								style={{
 									background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 									color: 'var(--theme-secondary)',
@@ -295,7 +303,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								}}
 							>
 								<ExternalLink className="w-3 h-3" />
-								<span className="hidden sm:inline">Original</span>
+								<span>Original</span>
 							</a>
 						)}
 						<button
@@ -308,9 +316,9 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 					</div>
 				</div>
 
-				{/* Scrollable Body — native scroll */}
+				{/* Scrollable Body */}
 				<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain" onScroll={handleScroll}>
-					{/* Clean Image — no overlays */}
+					{/* Cover Image */}
 					{(post.coverImage || post.link) && (
 						<div className="relative w-full bg-muted overflow-hidden shrink-0" style={{ maxHeight: '40vh' }}>
 							{post.coverImage ? (
@@ -325,7 +333,6 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 						</div>
 					)}
 
-					{/* No cover fallback */}
 					{!post.coverImage && !post.link && (
 						<div className="w-full h-32 sm:h-40 bg-muted flex items-center justify-center shrink-0">
 							<FileText className="w-16 h-16 text-foreground/5" />
@@ -335,7 +342,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 					{/* Content */}
 					<div className="p-5 sm:p-8 md:p-10 space-y-6 pb-16">
 						{/* Meta badges */}
-						<div className="flex flex-wrap items-center gap-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
+						<div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
 							<span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-border">
 								<Calendar className="w-3 h-3" />
 								{formatDate(post.publishedAt ?? post.createdAt)}
@@ -392,6 +399,132 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								<span>Last Updated: {formatDate(post.updatedAt)}</span>
 							)}
 						</div>
+					</div>
+				</div>
+			</motion.div>
+
+			{/* ── Mobile Bottom Sheet (visible below sm) ── */}
+			<motion.div
+				initial={{ y: '100%' }}
+				animate={{ y: 0 }}
+				exit={{ y: '100%' }}
+				transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+				className={cn(
+					'fixed inset-x-0 bottom-0 z-10 flex flex-col sm:hidden',
+					'max-h-[92vh] bg-card border-t border-border rounded-t-2xl shadow-2xl',
+				)}
+			>
+				{/* Drag handle */}
+				<div className="flex justify-center pt-3 pb-1 shrink-0">
+					<div className="w-10 h-1 rounded-full bg-border" />
+				</div>
+
+				{/* Mobile Header */}
+				<div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
+					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
+						<span>Article</span>
+					</div>
+					<div className="flex items-center gap-2">
+						{post.link && (
+							<a
+								href={post.link}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all active:scale-95"
+								style={{
+									background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
+									color: 'var(--theme-secondary)',
+									border: '1px solid color-mix(in oklch, var(--theme-secondary) 20%, transparent)',
+								}}
+							>
+								<ExternalLink className="w-3 h-3" />
+								Read
+							</a>
+						)}
+						<button
+							onClick={onClose}
+							className="p-1.5 rounded-full bg-muted hover:bg-accent border border-border text-muted-foreground"
+							aria-label="Close"
+						>
+							<X className="w-4 h-4" />
+						</button>
+					</div>
+				</div>
+
+				{/* Mobile Scrollable Body */}
+				<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+					{/* Compact cover */}
+					{(post.coverImage || post.link) && (
+						<div className="relative w-full aspect-video bg-muted overflow-hidden">
+							{post.coverImage ? (
+								<Image src={post.coverImage} alt={post.title ?? ''} fill sizes="100vw" className="object-cover" priority />
+							) : (
+								<UrlThumbnail url={post.link} title={post.title ?? ''} fallbackIcon={FileText} fallbackGradient="from-indigo-950/60" />
+							)}
+						</div>
+					)}
+
+					<div className="p-4 space-y-4 pb-10">
+						{/* Meta */}
+						<div className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
+							<span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted border border-border">
+								<Calendar className="w-3 h-3" />
+								{formatDate(post.publishedAt ?? post.createdAt)}
+							</span>
+							<span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted border border-border">
+								<Clock className="w-3 h-3" />
+								{readingTime(post.content)} min
+							</span>
+						</div>
+
+						<h1 className="text-lg font-black text-foreground leading-tight tracking-tight">
+							{post.title ?? 'Untitled'}
+						</h1>
+
+						{tags.length > 0 && (
+							<div className="flex flex-wrap gap-1.5">
+								{tags.map(tag => (
+									<span
+										key={tag}
+										className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest"
+										style={{
+											background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
+											color: 'var(--theme-secondary)',
+											border: '1px solid color-mix(in oklch, var(--theme-secondary) 20%, transparent)',
+										}}
+									>
+										{tag}
+									</span>
+								))}
+							</div>
+						)}
+
+						<div className="border-t border-border" />
+
+						<article className="prose prose-invert prose-sm max-w-none text-foreground/80 leading-relaxed font-medium">
+							<div className="whitespace-pre-wrap tracking-wide text-sm">
+								{post.content ?? ''}
+							</div>
+						</article>
+
+						{/* Mobile CTA to original post */}
+						{post.link && (
+							<a
+								href={post.link}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95"
+								style={{
+									background: 'color-mix(in oklch, var(--theme-secondary) 12%, transparent)',
+									color: 'var(--theme-secondary)',
+									border: '1px solid color-mix(in oklch, var(--theme-secondary) 25%, transparent)',
+								}}
+							>
+								<ExternalLink className="w-4 h-4" />
+								Read Original Post
+							</a>
+						)}
 					</div>
 				</div>
 			</motion.div>
