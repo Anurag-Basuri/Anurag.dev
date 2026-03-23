@@ -76,6 +76,10 @@ async function updateProjectStatus(id: string, status: Project['status']): Promi
 	return apiClient.patch<Project>(`/admin/projects/${id}/status`, { status });
 }
 
+async function reorderProjects(items: { id: string; order: number }[]): Promise<null> {
+	return apiClient.put<null>('/admin/projects/reorder', { items });
+}
+
 async function deleteProject(id: string): Promise<void> {
 	await apiClient.del(`/admin/projects/${id}`);
 }
@@ -200,6 +204,10 @@ async function updateCertification(
 	return apiClient.put<Certification>(`/admin/certifications/${id}`, data);
 }
 
+async function reorderCertifications(items: { id: string; order: number }[]): Promise<null> {
+	return apiClient.put<null>('/admin/certifications/reorder', { items });
+}
+
 async function deleteCertification(id: string): Promise<void> {
 	await apiClient.del(`/admin/certifications/${id}`);
 }
@@ -231,6 +239,10 @@ async function updateBlogPost(id: string, data: Partial<BlogPost>): Promise<Blog
 
 async function updateBlogPostStatus(id: string, status: BlogPost['status']): Promise<BlogPost> {
 	return apiClient.patch<BlogPost>(`/admin/blog/${id}/status`, { status });
+}
+
+async function reorderBlogPosts(items: { id: string; order: number }[]): Promise<null> {
+	return apiClient.put<null>('/admin/blog/reorder', { items });
 }
 
 async function deleteBlogPost(id: string): Promise<void> {
@@ -276,6 +288,7 @@ export const adminService = {
 	createProject,
 	updateProject,
 	updateProjectStatus,
+	reorderProjects,
 	deleteProject,
 	uploadProjectThumbnail,
 	uploadProjectImages,
@@ -300,6 +313,7 @@ export const adminService = {
 	getCertifications,
 	createCertification,
 	updateCertification,
+	reorderCertifications,
 	deleteCertification,
 	uploadCertificateFile,
 	deleteCertificateFile,
@@ -307,6 +321,7 @@ export const adminService = {
 	createBlogPost,
 	updateBlogPost,
 	updateBlogPostStatus,
+	reorderBlogPosts,
 	deleteBlogPost,
 	uploadBlogCover,
 	uploadBlogImages,

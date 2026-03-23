@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { useApi } from '@/api';
 import { adminService } from '@/api';
 import { DataTable } from '../components/DataTable';
+import { ReorderableList } from '../components/ReorderableList';
 import { FormModal } from '../components/FormModal';
 import { FormField, TagField } from '../components/FormField';
 import { StatusBadge } from '../components/StatusBadge';
@@ -31,6 +32,7 @@ export default function ProjectsPage() {
 		open: false,
 		editing: null,
 	});
+	const [isReordering, setIsReordering] = useState(false);
 	const [form, setForm] = useState(EMPTY_PROJECT);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -106,16 +108,47 @@ export default function ProjectsPage() {
 		<div className="max-w-5xl">
 			<div className="flex items-center justify-between mb-6">
 				<h1 className="text-2xl font-bold">Projects</h1>
-				<button
-					onClick={openCreate}
-					className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
-				>
-					+ New Project
-				</button>
+				<div className="flex gap-3">
+					{!isReordering && projects && projects.length > 1 && (
+						<button
+							onClick={() => setIsReordering(true)}
+							className="px-4 py-2 text-sm rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium transition-colors border border-zinc-700"
+						>
+							Reorder List
+						</button>
+					)}
+					{!isReordering && (
+						<button
+							onClick={openCreate}
+							className="px-4 py-2 text-sm rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
+						>
+							+ New Project
+						</button>
+					)}
+				</div>
 			</div>
 
 			{loading ? (
 				<div className="text-zinc-500">Loading...</div>
+			) : isReordering ? (
+				<ReorderableList
+					items={projects || []}
+					onCancel={() => setIsReordering(false)}
+					onSave={async (payload) => {
+						await adminService.reorderProjects(payload);
+						setIsReordering(false);
+						refetch();
+					}}
+					renderItem={(p) => (
+						<div className="flex items-center justify-between w-full">
+							<div>
+								<div className="font-medium text-white">{p.title}</div>
+								<div className="text-xs text-zinc-500">{p.techStack.slice(0, 3).join(', ')}</div>
+							</div>
+							<StatusBadge status={p.status} />
+						</div>
+					)}
+				/>
 			) : (
 				<DataTable
 					columns={columns}
