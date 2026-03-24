@@ -34,7 +34,7 @@ const envSchema = z.object({
 	// AI Chatbot (optional — chatbot disabled if missing)
 	AI_PROVIDER: z.enum(['gemini', 'openai', 'huggingface', 'groq']).optional().default('huggingface'),
 	HF_TOKEN: z.string().optional(),
-	AI_MODEL: z.string().optional().default('meta-llama/Llama-3.3-70B-Instruct'),
+	AI_MODEL: z.string().optional().default('Qwen/Qwen2.5-72B-Instruct'),
 });
 
 const parsed = envSchema.safeParse(process.env);

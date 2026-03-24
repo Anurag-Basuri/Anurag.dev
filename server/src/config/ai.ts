@@ -16,7 +16,7 @@ export function getAIClient() {
 	return new HfInference(env.HF_TOKEN);
 }
 
-export const AI_MODEL = env.AI_MODEL || 'meta-llama/Llama-3.3-70B-Instruct';
+export const AI_MODEL = env.AI_MODEL || 'Qwen/Qwen2.5-72B-Instruct';
 
 export const SYSTEM_PROMPT = `You are Anurag Basuri's AI assistant embedded on his personal portfolio website.
 
