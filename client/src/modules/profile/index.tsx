@@ -247,7 +247,7 @@ function TypingTagline({ text }: { text: string }) {
 	const { displayed, isDone } = useTypingAnimation(text, 35, 500);
 
 	return (
-		<p className="text-base sm:text-lg md:text-xl font-medium text-muted-foreground max-w-2xl tracking-tight leading-relaxed min-h-[1.75rem]">
+		<p className="text-base sm:text-lg md:text-xl font-medium text-muted-foreground max-w-2xl tracking-tight leading-relaxed min-h-7">
 			{displayed}
 			{!isDone && (
 				<span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
@@ -261,6 +261,7 @@ function TypingTagline({ text }: { text: string }) {
 export function ProfileModule() {
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [lightboxOpen, setLightboxOpen] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -294,6 +295,35 @@ export function ProfileModule() {
 		: [];
 
 	return (
+		<>
+		{/* Lightbox Modal */}
+		<AnimatePresence>
+			{lightboxOpen && profile?.avatarUrl && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
+					onClick={() => setLightboxOpen(false)}
+					onKeyDown={(e) => e.key === 'Escape' && setLightboxOpen(false)}
+					role="dialog"
+					tabIndex={0}
+				>
+					<motion.img
+						initial={{ scale: 0.8, opacity: 0 }}
+						animate={{ scale: 1, opacity: 1 }}
+						exit={{ scale: 0.8, opacity: 0 }}
+						transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+						src={profile.avatarUrl}
+						alt={profile.name}
+						className="max-h-[85vh] max-w-[90vw] object-contain rounded-3xl shadow-2xl cursor-default"
+						onClick={(e) => e.stopPropagation()}
+					/>
+				</motion.div>
+			)}
+		</AnimatePresence>
+
 		<div className="w-full relative min-h-full pb-20">
 			{/* Ambient Background Glows */}
 			<div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
@@ -313,7 +343,8 @@ export function ProfileModule() {
 						{/* Profile Photo — very large */}
 						<motion.div
 							variants={fadeInUp}
-							className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-[2rem] overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group"
+							className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-4xl overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group cursor-pointer"
+							onClick={() => profile.avatarUrl && setLightboxOpen(true)}
 						>
 							{profile.avatarUrl ? (
 								<img
@@ -326,7 +357,7 @@ export function ProfileModule() {
 									<User className="w-28 h-28 text-muted-foreground/50" />
 								</div>
 							)}
-							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none" />
+							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-4xl pointer-events-none" />
 						</motion.div>
 
 						{/* Name + Tagline ONLY — beside the photo, vertically centered */}
@@ -546,7 +577,7 @@ export function ProfileModule() {
 												{items.length}
 											</span>
 										</div>
-										<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+										<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
 											{items.map(skill => {
 												const { icon: SkillIcon, color } =
 													getSkillIcon(skill);
@@ -555,14 +586,14 @@ export function ProfileModule() {
 													<motion.div
 														key={skill}
 														variants={staggerFastItem}
-														className="group relative flex flex-col items-center justify-center p-4 rounded-2xl bg-background border border-border hover:border-border/80 transition-all duration-300 hover:-translate-y-1 shadow-[inset_0_1px_rgba(255,255,255,0.02)]"
+														className="group relative flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border hover:border-border/80 transition-all duration-300 hover:-translate-y-1 shadow-[inset_0_1px_rgba(255,255,255,0.02)]"
 													>
 														<div
-															className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl pointer-events-none blur-md"
+															className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl pointer-events-none blur-md"
 															style={{ backgroundColor: color }}
 														/>
 														<SkillIcon
-															className="w-7 h-7 mb-3 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
+															className="w-5 h-5 mb-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
 															style={{ color }}
 														/>
 														<span className="text-[10px] sm:text-xs font-bold text-center text-foreground/80 group-hover:text-foreground transition-colors line-clamp-1 break-all px-1">
@@ -580,5 +611,6 @@ export function ProfileModule() {
 				</motion.div>
 			</div>
 		</div>
+		</>
 	);
 }
