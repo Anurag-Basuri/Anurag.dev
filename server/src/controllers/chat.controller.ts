@@ -37,9 +37,10 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 			},
 			'Message processed successfully',
 		);
-	} catch (error) {
+	} catch (error: any) {
+		console.error('[chat.controller] AI Error:', error.message || error);
 		// Specific error for rate limiting or AI provider errors
-		if (error instanceof Error && error.message.includes('Quota')) {
+		if (error instanceof Error && (error.message.includes('Quota') || error.message.includes('Resource has been exhausted') || error.message.includes('429'))) {
 			throw ApiError.ServiceUnavailable('AI service is currently overloaded. Please try again later.');
 		}
 		throw error;
