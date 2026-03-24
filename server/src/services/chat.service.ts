@@ -202,6 +202,9 @@ export async function chat(message: string, sessionId: string): Promise<ChatResp
 			break;
 		} catch (error: any) {
 			console.error('[hf.inference] Error:', error);
+			if (error.httpResponse && error.httpResponse.body) {
+				console.error('[hf.inference] inner error details:', JSON.stringify(error.httpResponse.body, null, 2));
+			}
 			throw error;
 		}
 	}
