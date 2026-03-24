@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { PlatformStats } from '@/api/schema';
@@ -250,6 +250,14 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 						{s?.globalRank != null && <StatPill label="Global Rank" value={s.globalRank} />}
 					</div>
 				)}
+
+				{/* Rating History Chart */}
+				{platform.ratingHistory && platform.ratingHistory.length > 1 && (
+					<div className="mt-3 pt-3 border-t border-border">
+						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Contest Rating Trend</div>
+						<RatingChart entries={platform.ratingHistory} accent={config.accent} />
+					</div>
+				)}
 			</div>
 		</motion.div>
 	);
@@ -316,6 +324,14 @@ export const GitHubCard = memo(function GitHubCard({
 						<StatPill key={item.label} label={item.label} value={item.value} accent={item.accent} />
 					))}
 				</div>
+
+				{/* Contribution Heatmap */}
+				{platform.contributionHeatmap && platform.contributionHeatmap.length > 0 && (
+					<div className="mt-4 pt-3 border-t border-border">
+						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Contributions (Last Year)</div>
+						<ContributionHeatmap days={platform.contributionHeatmap} accent={config.accent} />
+					</div>
+				)}
 			</div>
 		</motion.div>
 	);
@@ -383,7 +399,178 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 						))}
 					</div>
 				)}
+
+				{/* Rating History Chart */}
+				{platform.ratingHistory && platform.ratingHistory.length > 1 && (
+					<div className="mt-3 pt-3 border-t border-border">
+						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Rating Trend</div>
+						<RatingChart entries={platform.ratingHistory} accent={config.accent} />
+					</div>
+				)}
 			</div>
 		</motion.div>
+	);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// CONTRIBUTION HEATMAP (Real GitHub data)
+// ═══════════════════════════════════════════════════════════════════
+
+const HEATMAP_COLORS: Record<number, string> = {
+	0: 'var(--foreground-5, rgba(255,255,255,0.05))',
+	1: 'color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+	2: 'color-mix(in oklch, var(--theme-primary) 45%, transparent)',
+	3: 'color-mix(in oklch, var(--theme-primary) 70%, transparent)',
+	4: 'var(--theme-primary)',
+};
+
+const ContributionHeatmap = memo(function ContributionHeatmap({
+	days,
+	accent,
+}: {
+	days: Array<{ date: string; count: number; level: number }>;
+	accent: string;
+}) {
+	const shouldReduceMotion = useReducedMotion();
+
+	// Organize into weeks (columns) × days (rows)
+	const weeks = useMemo(() => {
+		const result: Array<Array<{ date: string; count: number; level: number }>> = [];
+		let currentWeek: typeof result[0] = [];
+
+		for (const day of days) {
+			const d = new Date(day.date);
+			if (d.getDay() === 0 && currentWeek.length > 0) {
+				result.push(currentWeek);
+				currentWeek = [];
+			}
+			currentWeek.push(day);
+		}
+		if (currentWeek.length > 0) result.push(currentWeek);
+		return result;
+	}, [days]);
+
+	const cellSize = 10;
+	const gap = 2;
+	const totalWidth = weeks.length * (cellSize + gap);
+	const totalHeight = 7 * (cellSize + gap);
+
+	return (
+		<div className="w-full overflow-x-auto overflow-y-hidden scrollbar-none">
+			<svg
+				width={totalWidth}
+				height={totalHeight}
+				className="block min-w-full"
+				style={{ minWidth: totalWidth }}
+			>
+				{weeks.map((week, wi) =>
+					week.map((day, di) => (
+						<motion.rect
+							key={day.date}
+							x={wi * (cellSize + gap)}
+							y={di * (cellSize + gap)}
+							width={cellSize}
+							height={cellSize}
+							rx={2}
+							fill={HEATMAP_COLORS[day.level] ?? HEATMAP_COLORS[0]}
+							initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.5 }}
+							whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+							viewport={{ once: true }}
+							transition={{ duration: 0.2, delay: shouldReduceMotion ? 0 : wi * 0.01 }}
+						>
+							<title>{day.date}: {day.count} contribution{day.count !== 1 ? 's' : ''}</title>
+						</motion.rect>
+					))
+				)}
+			</svg>
+		</div>
+	);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// RATING CHART (Real LeetCode / Codeforces data)
+// ═══════════════════════════════════════════════════════════════════
+
+const RatingChart = memo(function RatingChart({
+	entries,
+	accent,
+}: {
+	entries: Array<{ date: string; rating: number; contestName?: string }>;
+	accent: string;
+}) {
+	const shouldReduceMotion = useReducedMotion();
+
+	const { pathStr, areaStr, points, minR, maxR, width, height } = useMemo(() => {
+		const w = 300;
+		const h = 60;
+		const padY = 4;
+
+		const ratings = entries.map(e => e.rating);
+		const mn = Math.min(...ratings);
+		const mx = Math.max(...ratings);
+		const range = mx - mn || 1;
+
+		const pts = entries.map((e, i) => ({
+			x: (i / (entries.length - 1)) * w,
+			y: h - padY - ((e.rating - mn) / range) * (h - padY * 2),
+			rating: e.rating,
+			name: e.contestName,
+		}));
+
+		const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
+		const area = `${line} L ${w},${h} L 0,${h} Z`;
+
+		return { pathStr: line, areaStr: area, points: pts, minR: mn, maxR: mx, width: w, height: h };
+	}, [entries]);
+
+	return (
+		<div className="w-full">
+			<svg width="100%" height={height + 16} viewBox={`0 0 ${width} ${height + 16}`} preserveAspectRatio="none" className="overflow-visible">
+				<defs>
+					<linearGradient id={`rg-${accent}`} x1="0" x2="0" y1="0" y2="1">
+						<stop offset="0%" stopColor={accent} stopOpacity="0.2" />
+						<stop offset="100%" stopColor={accent} stopOpacity="0" />
+					</linearGradient>
+				</defs>
+
+				{/* Area fill */}
+				<motion.path
+					d={areaStr}
+					fill={`url(#rg-${accent})`}
+					initial={{ opacity: 0 }}
+					whileInView={{ opacity: 1 }}
+					transition={{ duration: shouldReduceMotion ? 0 : 0.8 }}
+					viewport={{ once: true }}
+				/>
+
+				{/* Line */}
+				<motion.path
+					d={pathStr}
+					fill="none"
+					stroke={accent}
+					strokeWidth="2"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					initial={{ pathLength: 0 }}
+					whileInView={{ pathLength: 1 }}
+					transition={{ duration: shouldReduceMotion ? 0 : 1.2, ease: 'easeOut' }}
+					viewport={{ once: true }}
+				/>
+
+				{/* End dot */}
+				{points.length > 0 && (
+					<circle
+						cx={points[points.length - 1].x}
+						cy={points[points.length - 1].y}
+						r={3}
+						fill={accent}
+					/>
+				)}
+
+				{/* Min/Max labels */}
+				<text x={0} y={height + 12} fill="currentColor" className="text-muted-foreground" fontSize="8" fontWeight="bold">{minR}</text>
+				<text x={width} y={height + 12} fill="currentColor" className="text-muted-foreground" fontSize="8" fontWeight="bold" textAnchor="end">{maxR}</text>
+			</svg>
+		</div>
 	);
 });

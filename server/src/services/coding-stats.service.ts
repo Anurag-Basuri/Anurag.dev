@@ -3,6 +3,18 @@ import { prisma } from '../lib/prisma';
 
 // ─── Types ──────────────────────────────────────────────────────
 
+interface ContributionDay {
+	date: string;      // YYYY-MM-DD
+	count: number;     // contribution count
+	level: number;     // 0-4 intensity level
+}
+
+interface RatingHistoryEntry {
+	date: string;      // ISO date
+	rating: number;
+	contestName?: string;
+}
+
 interface PlatformStats {
 	username: string;
 	url: string;
@@ -24,6 +36,10 @@ interface PlatformStats {
 		gists?: number;
 		commits?: number;
 	};
+	/** GitHub: 52 weeks of daily contribution data */
+	contributionHeatmap?: ContributionDay[];
+	/** Contest rating history (LeetCode / Codeforces) */
+	ratingHistory?: RatingHistoryEntry[];
 }
 
 interface CodingStatsResult {
@@ -55,7 +71,32 @@ const CODEFORCES_PATTERN = /codeforces\.com\/profile\/([a-zA-Z0-9_.]+)\/?$/;
 const CODECHEF_PATTERN = /codechef\.com\/users\/([a-zA-Z0-9_]+)\/?$/;
 const GFG_PATTERN = /geeksforgeeks\.org\/user\/([a-zA-Z0-9_]+)\/?$/;
 
-// ─── GitHub API ─────────────────────────────────────────────────
+// ─── GitHub API (REST + GraphQL) ────────────────────────────────
+
+const GITHUB_CONTRIBUTIONS_QUERY = `
+query($username: String!) {
+  user(login: $username) {
+    contributionsCollection {
+      contributionCalendar {
+        weeks {
+          contributionDays {
+            date
+            contributionCount
+            contributionLevel
+          }
+        }
+      }
+    }
+  }
+}`;
+
+const CONTRIBUTION_LEVELS: Record<string, number> = {
+	NONE: 0,
+	FIRST_QUARTILE: 1,
+	SECOND_QUARTILE: 2,
+	THIRD_QUARTILE: 3,
+	FOURTH_QUARTILE: 4,
+};
 
 async function fetchGitHub(username: string): Promise<PlatformStats> {
 	const headers: Record<string, string> = {
@@ -72,14 +113,55 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 	};
 
 	try {
-		// Fetch user profile and repos in parallel
-		const [userRes, reposRes] = await Promise.all([
+		// Fetch user profile, repos, and contributions in parallel
+		const fetches: Promise<Response>[] = [
 			fetch(`https://api.github.com/users/${username}`, { headers }),
 			fetch(
 				`https://api.github.com/users/${username}/repos?per_page=100&sort=stars&direction=desc`,
 				{ headers },
 			),
-		]);
+		];
+
+		// GraphQL for contributions (needs token)
+		let contributionsPromise: Promise<ContributionDay[] | null> = Promise.resolve(null);
+		if (env.GITHUB_TOKEN) {
+			contributionsPromise = fetch('https://api.github.com/graphql', {
+				method: 'POST',
+				headers: {
+					...headers,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					query: GITHUB_CONTRIBUTIONS_QUERY,
+					variables: { username },
+				}),
+			})
+				.then(async (res) => {
+					if (!res.ok) return null;
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					const json = (await res.json()) as any;
+					const weeks = json.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
+					if (!weeks) return null;
+
+					const days: ContributionDay[] = [];
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					for (const week of weeks as any[]) {
+						// eslint-disable-next-line @typescript-eslint/no-explicit-any
+						for (const day of week.contributionDays as any[]) {
+							days.push({
+								date: day.date,
+								count: day.contributionCount,
+								level: CONTRIBUTION_LEVELS[day.contributionLevel] ?? 0,
+							});
+						}
+					}
+					return days;
+				})
+				.catch(() => null);
+		}
+
+		const [userRes, reposRes] = await Promise.all(fetches);
+		const contributionHeatmap = await contributionsPromise;
 
 		if (!userRes.ok) return base;
 
@@ -91,7 +173,7 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 			totalStars = repos.reduce((sum, r) => sum + (r.stargazers_count || 0), 0);
 		}
 
-		// Optionally fetch PR, issue, and commit counts if we have a token (uses search API)
+		// Optionally fetch PR, issue, and commit counts if we have a token
 		let prs = 0;
 		let issues = 0;
 		let commits = 0;
@@ -134,6 +216,7 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 				issues,
 				commits,
 			},
+			contributionHeatmap: contributionHeatmap ?? undefined,
 		};
 	} catch {
 		return base;
@@ -159,6 +242,14 @@ query getUserProfile($username: String!) {
   userContestRanking(username: $username) {
     rating
     globalRanking
+  }
+  userContestRankingHistory(username: $username) {
+    attended
+    rating
+    contest {
+      title
+      startTime
+    }
   }
 }`;
 
@@ -198,6 +289,22 @@ async function fetchLeetCode(username: string): Promise<PlatformStats> {
 
 		const contestRanking = json.data?.userContestRanking;
 
+		// Parse rating history — only include contests the user attended
+		const ratingHistory: RatingHistoryEntry[] = [];
+		const historyData = json.data?.userContestRankingHistory;
+		if (Array.isArray(historyData)) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			for (const entry of historyData as any[]) {
+				if (entry.attended && entry.rating > 0) {
+					ratingHistory.push({
+						date: new Date(entry.contest.startTime * 1000).toISOString(),
+						rating: Math.round(entry.rating),
+						contestName: entry.contest.title,
+					});
+				}
+			}
+		}
+
 		return {
 			username,
 			url: `https://leetcode.com/u/${username}`,
@@ -209,6 +316,7 @@ async function fetchLeetCode(username: string): Promise<PlatformStats> {
 				rating: contestRanking ? Math.round(contestRanking.rating) : undefined,
 				globalRank: contestRanking?.globalRanking || undefined,
 			},
+			ratingHistory: ratingHistory.length > 0 ? ratingHistory : undefined,
 		};
 	} catch {
 		return base;
@@ -224,15 +332,36 @@ async function fetchCodeforces(handle: string): Promise<PlatformStats> {
 	};
 
 	try {
-		const res = await fetch(`https://codeforces.com/api/user.info?handles=${handle}`);
+		// Fetch user info and rating history in parallel
+		const [userRes, ratingRes] = await Promise.all([
+			fetch(`https://codeforces.com/api/user.info?handles=${handle}`),
+			fetch(`https://codeforces.com/api/user.rating?handle=${handle}`),
+		]);
 
-		if (!res.ok) return base;
+		if (!userRes.ok) return base;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const json = (await res.json()) as any;
-		if (json.status !== 'OK' || !json.result?.[0]) return base;
+		const userJson = (await userRes.json()) as any;
+		if (userJson.status !== 'OK' || !userJson.result?.[0]) return base;
 
-		const user = json.result[0];
+		const user = userJson.result[0];
+
+		// Parse rating history
+		const ratingHistory: RatingHistoryEntry[] = [];
+		if (ratingRes.ok) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const ratingJson = (await ratingRes.json()) as any;
+			if (ratingJson.status === 'OK' && Array.isArray(ratingJson.result)) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				for (const entry of ratingJson.result as any[]) {
+					ratingHistory.push({
+						date: new Date(entry.ratingUpdateTimeSeconds * 1000).toISOString(),
+						rating: entry.newRating,
+						contestName: entry.contestName,
+					});
+				}
+			}
+		}
 
 		return {
 			username: handle,
@@ -241,6 +370,7 @@ async function fetchCodeforces(handle: string): Promise<PlatformStats> {
 				rating: user.rating,
 				maxRating: user.maxRating,
 			},
+			ratingHistory: ratingHistory.length > 0 ? ratingHistory : undefined,
 		};
 	} catch {
 		return base;

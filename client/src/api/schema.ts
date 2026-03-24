@@ -309,6 +309,18 @@ export const platformStatsSchema = z.object({
 			commits: z.number().optional(),
 		})
 		.optional(),
+	/** GitHub: 52 weeks of daily contribution data */
+	contributionHeatmap: z.array(z.object({
+		date: z.string(),
+		count: z.number(),
+		level: z.number(),
+	})).optional(),
+	/** LeetCode / Codeforces: contest rating history */
+	ratingHistory: z.array(z.object({
+		date: z.string(),
+		rating: z.number(),
+		contestName: z.string().optional(),
+	})).optional(),
 });
 
 export const codingStatsSchema = z.object({
