@@ -309,11 +309,11 @@ export function ProfileModule() {
 					{/* ═══════════════════════════════════════════════════════
 					    HERO — Large Photo + Identity
 					    ═══════════════════════════════════════════════════════ */}
-					<div className="flex flex-col md:flex-row gap-8 md:gap-14 items-center md:items-start">
-						{/* Profile Photo — large and prominent */}
+					<div className="flex flex-col md:flex-row gap-8 md:gap-14 items-center md:items-center">
+						{/* Profile Photo — very large */}
 						<motion.div
 							variants={fadeInUp}
-							className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-[2rem] overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group"
+							className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-[2rem] overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group"
 						>
 							{profile.avatarUrl ? (
 								<img
@@ -323,118 +323,115 @@ export function ProfileModule() {
 								/>
 							) : (
 								<div className="w-full h-full flex items-center justify-center bg-muted">
-									<User className="w-24 h-24 text-muted-foreground/50" />
+									<User className="w-28 h-28 text-muted-foreground/50" />
 								</div>
 							)}
 							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none" />
 						</motion.div>
 
-						{/* Identity Block — right of photo */}
-						<div className="flex-1 flex flex-col min-w-0 text-center md:text-left pt-0 md:pt-4">
-							{/* Name */}
-							<motion.div variants={fadeInUp} className="mb-2">
-								<h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
+						{/* Name + Tagline ONLY — beside the photo, vertically centered */}
+						<div className="flex-1 flex flex-col justify-center min-w-0 text-center md:text-left">
+							<motion.div variants={fadeInUp}>
+								<h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-foreground leading-[1.05]">
 									{profile.name}
 								</h1>
 							</motion.div>
-
-							{/* Header / Role */}
-							{header && (
-								<motion.p
-									variants={fadeInUp}
-									className="text-base sm:text-lg font-semibold text-primary mb-1"
-								>
-									{header}
-								</motion.p>
-							)}
-
-							{/* Typing Tagline */}
-							<motion.div variants={fadeInUp} className="mb-5">
+							<motion.div variants={fadeInUp} className="mt-4">
 								<TypingTagline text={tagline} />
 							</motion.div>
-
-							{/* Status Badges */}
-							<motion.div
-								variants={fadeInUp}
-								className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6"
-							>
-								{profile.pronouns && (
-									<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[10px] font-bold text-muted-foreground tracking-widest uppercase">
-										{profile.pronouns}
-									</span>
-								)}
-								{isAvailable && (
-									<div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
-										<span className="relative flex h-2 w-2">
-											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-											<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-										</span>
-										{profile.noticePeriod
-											? `Available · ${profile.noticePeriod}`
-											: 'Open to Work'}
-									</div>
-								)}
-								{profile.Freelancing && (
-									<div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
-										<Zap className="w-3 h-3" />
-										Freelance Ready
-									</div>
-								)}
-								{activeWorkPrefs.map(pref => (
-									<span
-										key={pref}
-										className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[10px] font-bold text-muted-foreground capitalize tracking-wide"
-									>
-										{pref}
-									</span>
-								))}
-							</motion.div>
-
-							{/* Social + CTAs */}
-							<motion.div
-								variants={fadeInUp}
-								className="flex flex-wrap items-center justify-center md:justify-start gap-3"
-							>
-								{/* CTA Buttons first */}
-								<button
-									onClick={() =>
-										window.dispatchEvent(
-											new CustomEvent('scroll-to-section', {
-												detail: { sectionId: 'contact' },
-											}),
-										)
-									}
-									className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-[0_0_30px_-8px] shadow-primary/40 hover:shadow-primary/60"
-								>
-									Let&apos;s Connect
-									<ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-								</button>
-
-								{profile.resumeUrl && (
-									<Link
-										href="/resume"
-										className="group flex items-center gap-2 bg-card hover:bg-muted text-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-border hover:border-foreground/20 hover:-translate-y-0.5"
-									>
-										Resume
-										<FileText className="w-4 h-4 text-muted-foreground group-hover:scale-110 transition-transform" />
-									</Link>
-								)}
-
-								{/* Divider */}
-								{socialLinks.length > 0 && (
-									<div className="hidden sm:block w-px h-8 bg-border" />
-								)}
-
-								{/* Social Icons */}
-								{socialLinks.length > 0 && (
-									<div className="flex items-center gap-2">
-										{socialLinks.map(social => (
-											<SocialButton key={social.id} social={social} />
-										))}
-									</div>
-								)}
-							</motion.div>
 						</div>
+					</div>
+
+					{/* ═══ DETAILS STRIP (below photo+name) ═══ */}
+					<div className="mt-8 flex flex-col items-center md:items-start gap-5">
+						{/* Header / Role */}
+						{header && (
+							<motion.p
+								variants={fadeInUp}
+								className="text-base sm:text-lg font-semibold text-primary tracking-tight"
+							>
+								{header}
+							</motion.p>
+						)}
+
+						{/* Status Badges */}
+						<motion.div
+							variants={fadeInUp}
+							className="flex flex-wrap items-center justify-center md:justify-start gap-2"
+						>
+							{profile.pronouns && (
+								<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[10px] font-bold text-muted-foreground tracking-widest uppercase">
+									{profile.pronouns}
+								</span>
+							)}
+							{isAvailable && (
+								<div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
+									<span className="relative flex h-2 w-2">
+										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+									</span>
+									{profile.noticePeriod
+										? `Available · ${profile.noticePeriod}`
+										: 'Open to Work'}
+								</div>
+							)}
+							{profile.Freelancing && (
+								<div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
+									<Zap className="w-3 h-3" />
+									Freelance Ready
+								</div>
+							)}
+							{activeWorkPrefs.map(pref => (
+								<span
+									key={pref}
+									className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[10px] font-bold text-muted-foreground capitalize tracking-wide"
+								>
+									{pref}
+								</span>
+							))}
+						</motion.div>
+
+						{/* CTAs + Social */}
+						<motion.div
+							variants={fadeInUp}
+							className="flex flex-wrap items-center justify-center md:justify-start gap-3"
+						>
+							<button
+								onClick={() =>
+									window.dispatchEvent(
+										new CustomEvent('scroll-to-section', {
+											detail: { sectionId: 'contact' },
+										}),
+									)
+								}
+								className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-[0_0_30px_-8px] shadow-primary/40 hover:shadow-primary/60"
+							>
+								Let&apos;s Connect
+								<ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+							</button>
+
+							{profile.resumeUrl && (
+								<Link
+									href="/resume"
+									className="group flex items-center gap-2 bg-card hover:bg-muted text-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-border hover:border-foreground/20 hover:-translate-y-0.5"
+								>
+									Resume
+									<FileText className="w-4 h-4 text-muted-foreground group-hover:scale-110 transition-transform" />
+								</Link>
+							)}
+
+							{socialLinks.length > 0 && (
+								<div className="hidden sm:block w-px h-8 bg-border" />
+							)}
+
+							{socialLinks.length > 0 && (
+								<div className="flex items-center gap-2">
+									{socialLinks.map(social => (
+										<SocialButton key={social.id} social={social} />
+									))}
+								</div>
+							)}
+						</motion.div>
 					</div>
 
 					{/* Subtle separator */}
