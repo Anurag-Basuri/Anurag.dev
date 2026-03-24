@@ -9,6 +9,7 @@ import publicRoutes from './routes/public.routes';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
 import docsRoutes from './routes/docs.routes';
+import chatRoutes from './routes/chat.routes';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(express.static('public'));
 app.use('/api/v1', publicRoutes);
 app.use('/api/v1', docsRoutes);
 app.use('/api/v1', authRoutes);
+app.use('/api/v1', chatRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
 // Invalid Route Handler
