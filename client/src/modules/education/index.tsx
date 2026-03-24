@@ -145,9 +145,9 @@ const EducationCard = memo(function EducationCard({
 						)}
 
 						{/* Skills Tags */}
-						{(entry.skills ?? []).length > 0 && (
+						{(entry.skills ?? []).filter(s => s.trim().length > 0).length > 0 && (
 							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-border">
-								{(entry.skills ?? []).map(skill => (
+								{(entry.skills ?? []).filter(s => s.trim().length > 0).map(skill => (
 									<span
 										key={skill}
 										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/20 transition-colors"
