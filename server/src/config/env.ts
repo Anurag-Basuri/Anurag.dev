@@ -30,6 +30,11 @@ const envSchema = z.object({
 
 	// External APIs (optional)
 	GITHUB_TOKEN: z.string().optional(),
+
+	// AI Chatbot (optional — chatbot disabled if missing)
+	AI_PROVIDER: z.enum(['gemini', 'openai', 'groq']).default('gemini'),
+	AI_API_KEY: z.string().optional(),
+	AI_MODEL: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
