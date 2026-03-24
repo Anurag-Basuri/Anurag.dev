@@ -99,7 +99,7 @@ export const SidebarProfile = memo(function SidebarProfile({ isCollapsed }: { is
 							className={cn(
 								'absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3',
 								profile?.openToWork ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]' : 'bg-primary shadow-[0_0_8px_rgba(52,211,153,0.6)]',
-								'rounded-full border-2 border-background animate-pulse',
+								'rounded-full border-2 border-background',
 							)}
 						/>
 					</div>

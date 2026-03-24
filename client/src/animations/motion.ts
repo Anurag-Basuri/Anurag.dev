@@ -107,8 +107,8 @@ export const hoverGlow   = { scale: 1.02, transition: TRANSITIONS.fast };
 export const tapScale    = { scale: 0.96 };
 
 export const cardHover = {
-  scale: 1.02,
-  y: -4,
+  scale: 1.015,
+  y: -2,
   transition: { duration: 0.2, ease: EASE.out },
 };
 

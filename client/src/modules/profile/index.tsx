@@ -69,7 +69,7 @@ export function ProfileModule() {
 			<div className="absolute top-1/2 left-0 w-[400px] h-[400px] bg-secondary/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
 
 			{/* Consistent Section Header ABOVE the Hero Cover */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-6 md:pt-8 relative z-20">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-4 md:pt-6 relative z-20">
 				<SectionHeader
 					icon={User}
 					label="Overview"
@@ -84,7 +84,7 @@ export function ProfileModule() {
 				variants={fadeIn}
 				initial="hidden"
 				animate="visible"
-				className="relative w-full h-48 sm:h-64 md:h-112 bg-card border-y border-border overflow-hidden mt-6 sm:mt-8"
+				className="relative w-full h-36 sm:h-48 md:h-64 bg-card border-y border-border overflow-hidden mt-4 sm:mt-6"
 			>
 				{profile.coverUrl && (
 					<img 
@@ -98,7 +98,7 @@ export function ProfileModule() {
 				<div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-background to-transparent" />
 			</motion.div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pb-16 sm:pb-12 -mt-16 sm:-mt-20 md:-mt-20 relative z-10">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pb-8 sm:pb-12 -mt-14 sm:-mt-18 md:-mt-18 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
@@ -208,7 +208,7 @@ export function ProfileModule() {
 						].map((stat, i) => (
 							<div
 								key={i}
-								className="flex-1 min-w-[200px] flex items-center gap-4 p-4 rounded-xl bg-foreground/5 border border-border hover:bg-accent transition-colors"
+								className="flex-1 flex items-center gap-4 p-4 rounded-xl bg-foreground/5 border border-border hover:bg-accent transition-colors"
 							>
 								<div className="p-3 rounded-2xl border" style={{ background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)', borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }}>
 									<stat.icon className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />
