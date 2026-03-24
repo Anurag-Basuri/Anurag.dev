@@ -137,13 +137,6 @@ const EducationCard = memo(function EducationCard({
 							)}
 						</div>
 
-						{/* Description */}
-						{entry.description && (
-							<p className="text-foreground/70 leading-relaxed text-sm font-medium mb-4 whitespace-pre-wrap">
-								{entry.description}
-							</p>
-						)}
-
 						{/* Skills Tags */}
 						{(entry.skills ?? []).filter(s => s.trim().length > 0).length > 0 && (
 							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-border">

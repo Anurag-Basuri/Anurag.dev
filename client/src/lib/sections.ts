@@ -47,13 +47,6 @@ export const SECTIONS: SectionConfig[] = [
 		description: 'Featured applications',
 	},
 	{
-		id: 'achievements',
-		moduleId: 'achievements',
-		label: 'Achievements',
-		file: 'Triumphs',
-		description: 'Awards and hackathons',
-	},
-	{
 		id: 'certifications',
 		moduleId: 'certifications',
 		label: 'Certifications',
@@ -66,6 +59,13 @@ export const SECTIONS: SectionConfig[] = [
 		label: 'Blog',
 		file: 'Insights',
 		description: 'Articles and insights',
+	},
+	{
+		id: 'achievements',
+		moduleId: 'achievements',
+		label: 'Achievements',
+		file: 'Triumphs',
+		description: 'Awards and hackathons',
 	},
 	{
 		id: 'coding_stats',

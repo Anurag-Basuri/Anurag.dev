@@ -20,7 +20,7 @@ import {
 } from './components';
 
 // ═══════════════════════════════════════════════════════════════════
-// MAIN MODULE (High-Density Bento Box)
+// MAIN MODULE (Stats Dashboard — Option B)
 // ═══════════════════════════════════════════════════════════════════
 
 export function CodingStatsModule() {
@@ -52,19 +52,18 @@ export function CodingStatsModule() {
 		return () => { cancelled = true; };
 	}, []);
 
-	// Categorize platforms into Rich (hero/standard) and LinkOnly 
-	// We'll map them seamlessly into the CSS Grid Bento box
-	const { richCards, linkOnlyCards } = useMemo(() => {
-		if (!stats && !profile) return { richCards: [], linkOnlyCards: [] };
+	// Categorize platforms into hero (wide), compact (grid), and link-only
+	const { heroCards, compactCards, linkOnlyCards } = useMemo(() => {
+		if (!stats && !profile) return { heroCards: [], compactCards: [], linkOnlyCards: [] };
 
-		const rich: Array<{ config: PlatformConfig; platform: PlatformStats; type: 'hero' | 'github' | 'competitive' }> = [];
+		const heroes: Array<{ config: PlatformConfig; platform: PlatformStats; type: 'hero' | 'github' }> = [];
+		const compact: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
 		const linkOnly: Array<{ config: PlatformConfig; platform: PlatformStats }> = [];
 		const processedUrls = new Set<string>();
 
-		// Process standard platforms
 		for (const cfg of PLATFORMS) {
 			let p = stats ? (stats as unknown as Record<string, PlatformStats | undefined>)[cfg.key] ?? null : null;
-			
+
 			// Inject from profile if fallback needed
 			if (!p && profile) {
 				const profileUrl = (profile as unknown as Record<string, string | null>)[cfg.key];
@@ -80,12 +79,17 @@ export function CodingStatsModule() {
 				processedUrls.add(p.url.toLowerCase());
 
 				if (hasData) {
+					// GitHub gets hero treatment
 					if (cfg.key === 'github' || ('stars' in (p.stats || {}) && !('rating' in (p.stats || {})))) {
-						rich.push({ config: cfg, platform: p, type: 'github' });
-					} else if (cfg.key === 'leetcode' || cfg.key === 'gfg' || ('easy' in (p.stats || {}))) {
-						rich.push({ config: cfg, platform: p, type: 'hero' });
-					} else {
-						rich.push({ config: cfg, platform: p, type: 'competitive' });
+						heroes.push({ config: cfg, platform: p, type: 'github' });
+					}
+					// Problem-solving platforms (LeetCode, GFG) get hero treatment
+					else if (cfg.key === 'leetcode' || cfg.key === 'gfg' || ('easy' in (p.stats || {}))) {
+						heroes.push({ config: cfg, platform: p, type: 'hero' });
+					}
+					// Competitive platforms get compact cards
+					else {
+						compact.push({ config: cfg, platform: p });
 					}
 				} else {
 					linkOnly.push({ config: cfg, platform: p });
@@ -93,12 +97,12 @@ export function CodingStatsModule() {
 			}
 		}
 
-		// Process otherProfiles from Profile to generate link-only pills
+		// Process otherProfiles from Profile for additional link-only pills
 		if (profile?.otherProfiles && profile.otherProfiles.length > 0) {
 			for (const url of profile.otherProfiles) {
 				const cleanUrl = url.endsWith('/') ? url.slice(0, -1) : url;
 				if (processedUrls.has(cleanUrl.toLowerCase())) continue;
-				
+
 				let domain = 'Website';
 				try {
 					const urlObj = new URL(cleanUrl);
@@ -106,7 +110,7 @@ export function CodingStatsModule() {
 					domain = hostname.split('.')[0] || hostname;
 					domain = domain.charAt(0).toUpperCase() + domain.slice(1);
 				} catch {
-					// Invalid URL string
+					// Invalid URL
 				}
 
 				const fallbackUsername = cleanUrl.split('/').pop() || domain;
@@ -117,8 +121,8 @@ export function CodingStatsModule() {
 						name: domain,
 						icon: (props) => <Globe {...props} />,
 						accent: '#9ca3af',
-						accentBg: 'from-muted/20 to-transparent hover:border-muted-foreground/50',
-						accentBorder: 'hover:border-border group-hover:shadow-[0_0_40px_-10px_rgba(156,163,175,0.15)] bg-muted/5',
+						accentBg: '',
+						accentBorder: '',
 						accentText: 'text-muted-foreground',
 					},
 					platform: { url: cleanUrl, username: fallbackUsername, stats: {} },
@@ -127,17 +131,17 @@ export function CodingStatsModule() {
 			}
 		}
 
-		return { richCards: rich, linkOnlyCards: linkOnly };
+		return { heroCards: heroes, compactCards: compact, linkOnlyCards: linkOnly };
 	}, [stats, profile]);
 
 	if (loading) return <CodingStatsSkeleton />;
 
-	const totalEntries = richCards.length + linkOnlyCards.length;
+	const totalEntries = heroCards.length + compactCards.length + linkOnlyCards.length;
 
 	if (error || totalEntries === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-32 text-center max-w-7xl mx-auto">
-				<div className="p-5 rounded-3xl bg-orange-500/10 border border-orange-500/20 mb-5 shadow-inner backdrop-blur-3xl">
+				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-5">
 					<Terminal className="w-8 h-8 text-orange-400" />
 				</div>
 				<p className="text-xl font-black text-foreground mb-2 tracking-tight">
@@ -152,7 +156,7 @@ export function CodingStatsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-3 sm:px-6 md:px-10 max-w-400 mx-auto pb-10 sm:pb-14 pt-6 md:pt-8 overflow-hidden">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Terminal}
 					label="Telemetry"
@@ -161,41 +165,46 @@ export function CodingStatsModule() {
 					sectionId="coding_stats"
 				/>
 
-				{/* ─── Compact Bento Box Grid Layout ─── */}
-				{richCards.length > 0 && (
+				{/* ─── Row 1: Hero Cards (LeetCode, GitHub — 2-col) ─── */}
+				{heroCards.length > 0 && (
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-20px' }}
-						className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 mt-6 md:auto-rows-min"
+						className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6"
 					>
-						{richCards.map(({ config, platform, type }) => {
-							// Determine grid spanning for smaller scale cards
-							// Hero / GitHub span exactly 2 columns on most screens; Competitive single column
-							const spanClass = 
-								(type === 'github' || type === 'hero') ? 'col-span-1 md:col-span-2' : 
-								'col-span-1';
-
-							return (
-								<div key={config.key} className={spanClass}>
-									{type === 'hero' ? (
-										<ProblemSolvingCard platform={platform} config={config} />
-									) : type === 'github' ? (
-										<GitHubCard platform={platform} config={config} />
-									) : (
-										<CompetitiveCard platform={platform} config={config} />
-									)}
-								</div>
-							);
-						})}
+						{heroCards.map(({ config, platform, type }) => (
+							<div key={config.key}>
+								{type === 'hero' ? (
+									<ProblemSolvingCard platform={platform} config={config} />
+								) : (
+									<GitHubCard platform={platform} config={config} />
+								)}
+							</div>
+						))}
 					</motion.div>
 				)}
 
-				{/* ─── Link-Only Profiles (compact pill row) ─── */}
+				{/* ─── Row 2: Compact Cards (Competitive platforms — 3-4 col) ─── */}
+				{compactCards.length > 0 && (
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						whileInView="visible"
+						viewport={{ once: true, margin: '-20px' }}
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-3"
+					>
+						{compactCards.map(({ config, platform }) => (
+							<CompetitiveCard key={config.key} platform={platform} config={config} />
+						))}
+					</motion.div>
+				)}
+
+				{/* ─── Row 3: Link-Only Profiles ─── */}
 				{linkOnlyCards.length > 0 && (
-					<div className="mt-8">
-						<div className="flex items-center gap-2 mb-3 px-2">
+					<div className="mt-6">
+						<div className="flex items-center gap-2 mb-3">
 							<ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
 							<span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 								Additional Profiles
@@ -206,7 +215,7 @@ export function CodingStatsModule() {
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true, margin: '-20px' }}
-							className="flex flex-wrap gap-2.5 sm:gap-3"
+							className="flex flex-wrap gap-2"
 						>
 							{linkOnlyCards.map(({ config, platform }) => (
 								<LinkOnlyPill
