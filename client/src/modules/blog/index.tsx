@@ -253,8 +253,8 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				animate="visible"
 				exit="hidden"
 				onClick={onClose}
-				className="absolute inset-0 backdrop-blur-3xl"
-				style={{ background: 'color-mix(in oklch, var(--background) 96%, var(--theme-secondary))' }}
+				className="absolute inset-0 backdrop-blur-xl"
+				style={{ background: 'color-mix(in oklch, var(--background) 85%, var(--theme-secondary))' }}
 			/>
 
 			{/* ── Desktop Modal (hidden below sm) ── */}
@@ -266,7 +266,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				className={cn(
 					'relative z-10 hidden sm:flex flex-col overflow-hidden',
 					'w-full sm:max-h-[92vh] max-w-3xl',
-					'bg-card backdrop-blur-xl',
+					'bg-card/80 backdrop-blur-2xl',
 					'border border-border rounded-2xl',
 					'shadow-2xl',
 				)}
@@ -284,7 +284,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				</div>
 
 				{/* Sticky Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card backdrop-blur-md shrink-0">
+				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
 					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
 						<span>Article</span>
@@ -411,7 +411,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				transition={{ type: 'spring', damping: 30, stiffness: 300 }}
 				className={cn(
 					'fixed inset-x-0 bottom-0 z-10 flex flex-col sm:hidden',
-					'max-h-[92vh] bg-card border-t border-border rounded-t-2xl shadow-2xl',
+					'max-h-[92vh] bg-card/80 backdrop-blur-2xl border-t border-border rounded-t-2xl shadow-2xl',
 				)}
 			>
 				{/* Drag handle */}

@@ -209,8 +209,8 @@ function ProjectDetailModal({
 				animate="visible"
 				exit="hidden"
 				onClick={onClose}
-				className="absolute inset-0 backdrop-blur-2xl"
-				style={{ background: 'color-mix(in oklch, color-mix(in oklch, var(--background) 88%, var(--theme-primary)) 75%, transparent)' }}
+				className="absolute inset-0 backdrop-blur-xl"
+				style={{ background: 'color-mix(in oklch, var(--background) 85%, var(--theme-primary))' }}
 			/>
 
 			{/* Modal */}
@@ -222,14 +222,14 @@ function ProjectDetailModal({
 				className={cn(
 					'relative z-10 flex flex-col overflow-hidden',
 					'w-full h-full sm:h-auto sm:max-h-[90vh] max-w-3xl',
-					'bg-card backdrop-blur-xl',
+					'bg-card/80 backdrop-blur-2xl',
 					'border-0 sm:border sm:border-border sm:rounded-2xl',
 					'shadow-2xl',
 				)}
 				style={{ boxShadow: '0 0 80px -20px color-mix(in oklch, var(--theme-primary) 15%, transparent)' }}
 			>
 				{/* Sticky Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card backdrop-blur-md shrink-0">
+				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
 					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 						<Folder className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)' }} />
 						<span>Project Details</span>
