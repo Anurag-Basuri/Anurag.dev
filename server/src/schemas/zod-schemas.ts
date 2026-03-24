@@ -4,12 +4,13 @@ import { z } from 'zod';
 // Frontend forms send empty strings for blank optional fields.
 // These helpers coerce '' → null so nullable validators don't reject them.
 
-/** Nullable string field: '' → null */
-const nullableStr = z
-	.string()
-	.transform(v => (v === '' ? null : v))
-	.pipe(z.string().nullable())
-	.optional();
+/** Nullable string field: '' | null → null */
+const nullableStr = z.preprocess(
+	(v) => (v === null || v === undefined ? '' : v),
+	z.string()
+		.transform(v => (v === '' ? null : v))
+		.pipe(z.string().nullable()),
+).optional();
 
 /** Nullable URL field: '' → null, non-empty must be a valid URL */
 const nullableUrl = z
