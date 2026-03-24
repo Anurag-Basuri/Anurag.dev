@@ -15,6 +15,7 @@ import { publicService } from '@/api';
 import type { Project } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
+import { Portal } from '@/ui/Portal';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, scaleIn, fadeIn, cardHover } from '@/animations/motion';
 
@@ -163,15 +164,17 @@ export function ProjectsModule() {
 					</motion.div>
 				)}
 
-				{/* Detail Modal */}
-				<AnimatePresence>
-					{selectedProject && (
-						<ProjectDetailModal
-							project={selectedProject}
-							onClose={() => setSelectedProject(null)}
-						/>
-					)}
-				</AnimatePresence>
+				{/* Detail Modal — rendered via portal to sit above everything */}
+				<Portal>
+					<AnimatePresence>
+						{selectedProject && (
+							<ProjectDetailModal
+								project={selectedProject}
+								onClose={() => setSelectedProject(null)}
+							/>
+						)}
+					</AnimatePresence>
+				</Portal>
 			</div>
 		</div>
 	);
@@ -210,7 +213,7 @@ function ProjectDetailModal({
 				exit="hidden"
 				onClick={onClose}
 				className="absolute inset-0 backdrop-blur-xl"
-				style={{ background: 'color-mix(in oklch, var(--background) 85%, var(--theme-primary))' }}
+				style={{ background: 'color-mix(in oklch, var(--background) 95%, var(--theme-primary))' }}
 			/>
 
 			{/* Modal */}

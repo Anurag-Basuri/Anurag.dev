@@ -70,13 +70,13 @@ function FloatingGeo() {
 
   return (
     <group>
-      <mesh ref={ref} position={[3, 0, -5]} scale={2.2}>
+      <mesh ref={ref} position={[5, 0, -12]} scale={1.6}>
         <icosahedronGeometry args={[1, 1]} />
-        <meshBasicMaterial color={primary} wireframe opacity={0.12} transparent />
+        <meshBasicMaterial color={primary} wireframe opacity={0.06} transparent />
       </mesh>
-      <mesh position={[-3.5, 1, -7]} scale={1.6} rotation={[0.5, 0.3, 0]}>
+      <mesh position={[-4, 1.5, -14]} scale={1.2} rotation={[0.5, 0.3, 0]}>
         <octahedronGeometry args={[1, 0]} />
-        <meshBasicMaterial color={secondary} wireframe opacity={0.08} transparent />
+        <meshBasicMaterial color={secondary} wireframe opacity={0.04} transparent />
       </mesh>
     </group>
   );

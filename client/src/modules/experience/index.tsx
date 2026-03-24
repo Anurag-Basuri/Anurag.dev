@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type { JourneyEntry } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
+import { Portal } from '@/ui/Portal';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, cardHover, scaleIn, fadeIn } from '@/animations/motion';
 import { useJourney } from '@/hooks/useJourney';
@@ -31,6 +32,14 @@ function formatDateRange(job: JourneyEntry): string {
 		return end ? `${start} — ${end}` : start;
 	}
 	return job.date;
+}
+
+/** Format API labels: INDIVIDUAL_CONTRIBUTOR → Individual Contributor */
+function formatLabel(raw: string): string {
+	return raw
+		.replace(/_/g, ' ')
+		.toLowerCase()
+		.replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /** Get display location — prefer workLocation, fallback to location */
@@ -239,7 +248,7 @@ function ExperienceDetailModal({
 				exit="hidden"
 				onClick={onClose}
 				className="absolute inset-0 backdrop-blur-xl"
-				style={{ background: 'color-mix(in oklch, var(--background) 85%, var(--theme-primary))' }}
+				style={{ background: 'color-mix(in oklch, var(--background) 95%, var(--theme-primary))' }}
 			/>
 
 			{/* Modal Panel */}
@@ -339,19 +348,19 @@ function ExperienceDetailModal({
 							{job.employmentType && (
 								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
 									<Clock className="w-4 h-4" />
-									{job.employmentType}
+									{formatLabel(job.employmentType)}
 								</div>
 							)}
 							{job.workType && (
 								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
 									<Briefcase className="w-4 h-4" />
-									{job.workType}
+									{formatLabel(job.workType)}
 								</div>
 							)}
 							{job.workMode && (
 								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
 									<Wifi className="w-4 h-4" />
-									{job.workMode}
+									{formatLabel(job.workMode)}
 								</div>
 							)}
 						</div>
@@ -528,15 +537,17 @@ export function ExperienceModule() {
 					</div>
 				)}
 
-				{/* Detail Modal */}
-				<AnimatePresence>
-					{selectedJob && (
-						<ExperienceDetailModal
-							job={selectedJob}
-							onClose={() => setSelectedJob(null)}
-						/>
-					)}
-				</AnimatePresence>
+				{/* Detail Modal — rendered via portal to sit above everything */}
+				<Portal>
+					<AnimatePresence>
+						{selectedJob && (
+							<ExperienceDetailModal
+								job={selectedJob}
+								onClose={() => setSelectedJob(null)}
+							/>
+						)}
+					</AnimatePresence>
+				</Portal>
 			</div>
 		</div>
 	);

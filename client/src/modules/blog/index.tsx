@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { staggerContainer, staggerItem, fadeIn, scaleIn, cardHover } from '@/animations/motion';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
+import { Portal } from '@/ui/Portal';
 import { cn } from '@/lib/utils';
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -254,7 +255,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				exit="hidden"
 				onClick={onClose}
 				className="absolute inset-0 backdrop-blur-xl"
-				style={{ background: 'color-mix(in oklch, var(--background) 85%, var(--theme-secondary))' }}
+				style={{ background: 'color-mix(in oklch, var(--background) 95%, var(--theme-secondary))' }}
 			/>
 
 			{/* ── Desktop Modal (hidden below sm) ── */}
@@ -621,12 +622,14 @@ export function BlogModule() {
 					</motion.div>
 				)}
 
-				{/* Detail Modal */}
-				<AnimatePresence>
-					{selectedPost && (
-						<BlogDetailModal post={selectedPost} onClose={handleCloseModal} />
-					)}
-				</AnimatePresence>
+				{/* Detail Modal — rendered via portal to sit above everything */}
+				<Portal>
+					<AnimatePresence>
+						{selectedPost && (
+							<BlogDetailModal post={selectedPost} onClose={handleCloseModal} />
+						)}
+					</AnimatePresence>
+				</Portal>
 			</div>
 		</div>
 	);
