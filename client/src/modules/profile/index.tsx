@@ -2,38 +2,68 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, MapPin, Briefcase, ChevronRight, ExternalLink, Code2, FileText, CheckCircle2, Globe, Clock, Target, Layers } from 'lucide-react';
+import { User, MapPin, Briefcase, ChevronRight, FileText, CheckCircle2, Globe, Clock, Layers, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
-import { SectionHeader } from '@/ui/SectionHeader';
 import { getSkillIcon } from '@/lib/skill-icons';
+import { SiGithub, SiX, SiYoutube, SiInstagram, SiFacebook, SiDiscord, SiMedium, SiDevdotto, SiHashnode, SiStackoverflow, SiReddit, SiTwitch, SiDribbble, SiBehance } from 'react-icons/si';
+import { FaLinkedinIn } from 'react-icons/fa6';
 import {
 	fadeInUp,
 	fadeIn,
 	staggerContainer,
 	staggerFast,
 	staggerFastItem,
-	cardHover,
 } from '@/animations/motion';
+
+// ─── Social Platform Icon Map ───────────────────────────────────
+
+const SOCIAL_ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string }> = {
+	GITHUB: { icon: SiGithub, color: '#181717' },
+	LINKEDIN: { icon: FaLinkedinIn, color: '#0A66C2' },
+	X: { icon: SiX, color: '#000000' },
+	TWITTER: { icon: SiX, color: '#000000' },
+	YOUTUBE: { icon: SiYoutube, color: '#FF0000' },
+	INSTAGRAM: { icon: SiInstagram, color: '#E4405F' },
+	FACEBOOK: { icon: SiFacebook, color: '#1877F2' },
+	DISCORD: { icon: SiDiscord, color: '#5865F2' },
+	MEDIUM: { icon: SiMedium, color: '#000000' },
+	DEVTO: { icon: SiDevdotto, color: '#0A0A0A' },
+	HASHNODE: { icon: SiHashnode, color: '#2962FF' },
+	STACKOVERFLOW: { icon: SiStackoverflow, color: '#F58025' },
+	REDDIT: { icon: SiReddit, color: '#FF4500' },
+	TWITCH: { icon: SiTwitch, color: '#9146FF' },
+	DRIBBBLE: { icon: SiDribbble, color: '#EA4C89' },
+	BEHANCE: { icon: SiBehance, color: '#1769FF' },
+};
+
+function getSocialIcon(platform: string) {
+	return SOCIAL_ICONS[platform.toUpperCase()] ?? { icon: ExternalLink, color: '#888888' };
+}
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
 function ProfileSkeleton() {
 	return (
 		<div className="w-full animate-pulse">
-			<div className="h-48 sm:h-64 md:h-[400px] w-full bg-foreground/5" />
+			<div className="h-[220px] sm:h-[300px] md:h-[380px] w-full bg-foreground/5" />
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pb-12">
-				<div className="w-32 h-32 md:w-40 md:h-40 bg-foreground/10 rounded-2xl -mt-16 md:-mt-20 border-4 border-background" />
+				<div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 bg-foreground/10 rounded-3xl -mt-16 md:-mt-20 border-4 border-background" />
 				<div className="mt-6 space-y-4">
 					<div className="h-10 w-64 bg-foreground/5 rounded-xl" />
 					<div className="h-6 w-96 bg-foreground/5 rounded-lg" />
+					<div className="h-8 w-48 bg-foreground/5 rounded-lg" />
 				</div>
-				<div className="mt-8 h-24 w-full bg-foreground/5 rounded-2xl" />
-				<div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-					<div className="md:col-span-1 h-64 bg-foreground/5 rounded-2xl" />
-					<div className="md:col-span-2 h-96 bg-foreground/5 rounded-2xl" />
+				<div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+					<div className="h-24 bg-foreground/5 rounded-2xl" />
+					<div className="h-24 bg-foreground/5 rounded-2xl" />
+					<div className="h-24 bg-foreground/5 rounded-2xl" />
+				</div>
+				<div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+					<div className="lg:col-span-1 h-64 bg-foreground/5 rounded-3xl" />
+					<div className="lg:col-span-2 h-96 bg-foreground/5 rounded-3xl" />
 				</div>
 			</div>
 		</div>
@@ -42,11 +72,11 @@ function ProfileSkeleton() {
 
 // ─── Helper Components ──────────────────────────────────────────
 
-const StatCard = ({ icon: Icon, label, value, colorClass }: any) => (
+const StatCard = ({ icon: Icon, label, value, colorClass }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; colorClass: string }) => (
 	<div className="flex-1 flex flex-col justify-center p-4 sm:p-5 rounded-2xl bg-card/40 backdrop-blur-xl border border-border hover:border-primary/30 transition-all group overflow-hidden relative shadow-sm">
 		<div className={cn("absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-500", colorClass)} />
 		<div className="flex items-center gap-4 relative z-10">
-			<div className={cn("p-3 rounded-xl border bg-background shadow-inner transition-colors", colorClass.replace('bg-', 'text-').replace('from-', 'text-'))}>
+			<div className={cn("p-3 rounded-xl border bg-background shadow-inner transition-colors", colorClass.replace('bg-', 'text-'))}>
 				<Icon className="w-5 h-5" />
 			</div>
 			<div>
@@ -88,6 +118,7 @@ export function ProfileModule() {
 
 	const tagline = profile.Tagline || profile.header || "Digital Creator & Engineer";
 	const isAvailable = profile.openToWork;
+	const socialLinks = profile.socialLinks ?? [];
 
 	return (
 		<div className="w-full relative min-h-full pb-20">
@@ -95,35 +126,25 @@ export function ProfileModule() {
 			<div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
 			<div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
 
-			{/* Section Header */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-4 md:pt-6 relative z-20">
-				<SectionHeader
-					icon={User}
-					label="Overview"
-					title="Creator Profile"
-					description="Personal brand, expertise, and core competencies."
-					sectionId="profile"
-				/>
-			</div>
-
-			{/* Premium Hero Zone */}
+			{/* Hero Cover Banner */}
 			<motion.div
 				variants={fadeIn}
 				initial="hidden"
 				animate="visible"
-				className="relative w-full h-[280px] sm:h-[360px] md:h-[420px] bg-card border-y border-border overflow-hidden mt-6"
+				className="relative w-full h-[220px] sm:h-[300px] md:h-[380px] bg-card border-b border-border overflow-hidden"
 			>
 				{profile.coverUrl && (
-					<img 
-						src={profile.coverUrl} 
-						alt="Cover" 
-						className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-luminosity scale-105" 
+					<img
+						src={profile.coverUrl}
+						alt="Cover"
+						className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity scale-105"
 					/>
 				)}
-				<div className="absolute inset-0 bg-linear-to-b from-transparent via-background/60 to-background" />
+				<div className="absolute inset-0 bg-linear-to-b from-transparent via-background/70 to-background" />
 				<div className="absolute inset-0 bg-[linear-gradient(rgba(128,128,128,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(128,128,128,0.03)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_80%_at_50%_0%,#000_60%,transparent_100%)]" />
 			</motion.div>
 
+			{/* Main Content — bleeds into cover */}
 			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 -mt-24 sm:-mt-28 md:-mt-32 relative z-10">
 				<motion.div
 					variants={staggerContainer}
@@ -131,13 +152,15 @@ export function ProfileModule() {
 					animate="visible"
 					className="flex flex-col"
 				>
-					{/* Header Row: Avatar + Name + Core Roles */}
+					{/* Hero Row: Avatar + Identity + Actions */}
 					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 pt-2">
-						{/* Avatar & Title */}
+
+						{/* Left: Avatar + Name Block */}
 						<div className="flex flex-col gap-5 sm:gap-6">
+							{/* Avatar */}
 							<motion.div
 								variants={fadeInUp}
-								className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-3xl overflow-hidden border-4 border-background bg-card shadow-2xl flex items-center justify-center group"
+								className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-3xl overflow-hidden border-4 border-background bg-card shadow-2xl flex items-center justify-center group"
 							>
 								{profile.avatarUrl ? (
 									<img
@@ -146,32 +169,35 @@ export function ProfileModule() {
 										className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
 									/>
 								) : (
-									<User className="w-16 h-16 text-muted-foreground" />
+									<User className="w-14 h-14 text-muted-foreground" />
 								)}
 								<div className="absolute inset-0 ring-1 ring-inset ring-foreground/10 rounded-3xl pointer-events-none" />
-								
-								{/* Availability Ping on Avatar */}
+
+								{/* Availability Ping */}
 								{isAvailable && (
 									<div className="absolute top-3 right-3 w-4 h-4 bg-emerald-400 rounded-full border-2 border-background shadow-[0_0_15px_rgba(52,211,153,0.6)] animate-pulse" />
 								)}
 							</motion.div>
 
-							<div className="pt-2">
+							{/* Name + Tagline + Social */}
+							<div className="pt-1">
 								<motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-2">
-									<h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-b from-foreground via-foreground to-foreground/60">
+									<h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-b from-foreground via-foreground to-foreground/60">
 										{profile.name}
 									</h1>
 									{profile.pronouns && (
-										<span className="px-3 py-1 rounded-full bg-foreground/5 border border-border text-xs font-bold text-muted-foreground tracking-widest uppercase mt-2">
+										<span className="px-3 py-1 rounded-full bg-foreground/5 border border-border text-xs font-bold text-muted-foreground tracking-widest uppercase">
 											{profile.pronouns}
 										</span>
 									)}
 								</motion.div>
 
 								<motion.div variants={fadeInUp} className="flex flex-col gap-3">
-									<p className="text-lg sm:text-xl md:text-2xl font-bold text-foreground/80 max-w-3xl tracking-tight leading-snug">
+									<p className="text-base sm:text-lg md:text-xl font-bold text-foreground/75 max-w-3xl tracking-tight leading-snug">
 										{tagline}
 									</p>
+
+									{/* Availability Badge */}
 									{isAvailable && (
 										<div className="inline-flex items-center gap-2 text-sm font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg w-fit">
 											<CheckCircle2 className="w-4 h-4" />
@@ -179,12 +205,33 @@ export function ProfileModule() {
 											{profile.Freelancing && ' • Freelance OK'}
 										</div>
 									)}
+
+									{/* Social Links Row */}
+									{socialLinks.length > 0 && (
+										<div className="flex items-center gap-2 mt-1">
+											{socialLinks.map((social) => {
+												const { icon: SocialIcon, color } = getSocialIcon(social.platform);
+												return (
+													<a
+														key={social.id}
+														href={social.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														title={social.customLabel || social.platform}
+														className="w-10 h-10 rounded-full bg-foreground/5 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 hover:scale-110 transition-all duration-200"
+													>
+														<SocialIcon className="w-4 h-4" />
+													</a>
+												);
+											})}
+										</div>
+									)}
 								</motion.div>
 							</div>
 						</div>
 
-						{/* Action Buttons */}
-						<motion.div variants={fadeInUp} className="flex flex-row flex-wrap md:flex-col items-start gap-3 w-full md:w-auto mt-4 md:mt-0 pb-2">
+						{/* Right: Action Buttons */}
+						<motion.div variants={fadeInUp} className="flex flex-row flex-wrap md:flex-col items-start gap-3 w-full md:w-auto mt-2 md:mt-0 pb-2">
 							<button
 								onClick={() =>
 									window.dispatchEvent(
@@ -210,41 +257,35 @@ export function ProfileModule() {
 						</motion.div>
 					</div>
 
-					{/* Expanded Metrics / Stats Bar */}
+					{/* Metrics Bar — 3 cards */}
 					<motion.div
 						variants={fadeInUp}
-						className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
+						className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
 					>
-						<StatCard 
-							icon={MapPin} 
-							label="Location" 
-							value={profile.Currentlocation ?? 'Remote'} 
-							colorClass="bg-blue-500" 
+						<StatCard
+							icon={MapPin}
+							label="Location"
+							value={profile.Currentlocation ?? 'Remote'}
+							colorClass="bg-blue-500"
 						/>
-						<StatCard 
-							icon={Briefcase} 
-							label="Experience" 
-							value={`${profile.experienceYears}+ Years`} 
-							colorClass="bg-purple-500" 
+						<StatCard
+							icon={Briefcase}
+							label="Experience"
+							value={`${profile.experienceYears}+ Years`}
+							colorClass="bg-purple-500"
 						/>
-						<StatCard 
-							icon={Target} 
-							label="Projects" 
-							value={`${profile.projectsCount}+ Shipped`} 
-							colorClass="bg-amber-500" 
-						/>
-						<StatCard 
-							icon={Globe} 
-							label="Languages" 
-							value={profile.languages?.length ? `${profile.languages.length} Spoken` : 'Multilingual'} 
-							colorClass="bg-emerald-500" 
+						<StatCard
+							icon={Globe}
+							label="Languages"
+							value={profile.languages?.length ? `${profile.languages.length} Spoken` : 'Multilingual'}
+							colorClass="bg-emerald-500"
 						/>
 					</motion.div>
 
 					{/* Bio & Skills Layout */}
 					<div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-						
-						{/* Left Column: Bio & Additional Details */}
+
+						{/* Left Column: Bio & Work Preferences */}
 						<div className="lg:col-span-1 space-y-6">
 							{profile.bio && (
 								<motion.div
@@ -261,8 +302,8 @@ export function ProfileModule() {
 								</motion.div>
 							)}
 
-							{/* Work Preferences Box */}
-							{profile.workPreferences && Object.keys(profile.workPreferences).length > 0 && (
+							{/* Work Preferences */}
+							{profile.workPreferences && Object.entries(profile.workPreferences).some(([_, v]) => v === true) && (
 								<motion.div
 									variants={fadeInUp}
 									className="w-full p-6 rounded-3xl bg-card border border-border shadow-sm"
@@ -278,17 +319,17 @@ export function ProfileModule() {
 													{key}
 												</span>
 											))}
-											{profile.Freelancing && (
-												<span className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-bold text-emerald-500">
-													Freelancing
-												</span>
-											)}
+										{profile.Freelancing && (
+											<span className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-bold text-emerald-500">
+												Freelancing
+											</span>
+										)}
 									</div>
 								</motion.div>
 							)}
 						</div>
 
-						{/* Right Column: Premium Skills Grid */}
+						{/* Right Column: Technical Arsenal */}
 						<div className="lg:col-span-2 space-y-6">
 							{profile.skills && Object.keys(profile.skills).length > 0 && (
 								<motion.div
@@ -296,7 +337,7 @@ export function ProfileModule() {
 									className="w-full p-6 sm:p-8 rounded-3xl bg-card/60 backdrop-blur-2xl border border-border shadow-md relative"
 								>
 									<div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
-									
+
 									<div className="flex items-center gap-3 mb-8">
 										<div className="p-2 rounded-xl bg-primary/10 text-primary">
 											<Layers className="w-5 h-5" />
@@ -322,21 +363,20 @@ export function ProfileModule() {
 												<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
 													{items.map(skill => {
 														const { icon: SkillIcon, color } = getSkillIcon(skill);
-														
+
 														return (
 															<motion.div
 																key={skill}
 																variants={staggerFastItem}
 																className="group relative flex flex-col items-center justify-center p-4 rounded-2xl bg-background border border-border hover:border-border/80 transition-all duration-300 hover:-translate-y-1 shadow-[inset_0_1px_rgba(255,255,255,0.02)]"
 															>
-																{/* Subtle background glow on hover derived from brand color */}
-																<div 
+																<div
 																	className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl pointer-events-none blur-md"
 																	style={{ backgroundColor: color }}
 																/>
-																
-																<SkillIcon 
-																	className="w-7 h-7 mb-3 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm" 
+
+																<SkillIcon
+																	className="w-7 h-7 mb-3 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
 																	style={{ color }}
 																/>
 																<span className="text-[10px] sm:text-xs font-bold text-center text-foreground/80 group-hover:text-foreground transition-colors line-clamp-1 break-all px-1">
@@ -352,7 +392,7 @@ export function ProfileModule() {
 								</motion.div>
 							)}
 						</div>
-						
+
 					</div>
 				</motion.div>
 			</div>
