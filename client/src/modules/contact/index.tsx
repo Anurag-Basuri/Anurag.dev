@@ -146,7 +146,7 @@ export function ContactModule() {
 			{/* Ambient Bottom Glow */}
 			<div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-[600px] rounded-[100%] bg-[radial-gradient(ellipse_at_center,var(--theme-primary)_0%,transparent_60%)] opacity-5 blur-[120px] pointer-events-none -z-10" />
 
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-16 sm:pb-24 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-10 sm:pb-16 pt-4 md:pt-6">
 				<SectionHeader
 					icon={MessageSquare}
 					label="Connect"
@@ -156,7 +156,7 @@ export function ContactModule() {
 				/>
 
 				{/* ─────────────── Desktop Large Screen View ─────────────── */}
-				<div className="hidden lg:flex flex-row gap-14 mt-16">
+				<div className="hidden lg:flex flex-row gap-8 lg:gap-10 mt-12">
 					{/* Left Column: Info & Socials */}
 					<motion.div
 						variants={staggerContainer}
@@ -274,9 +274,9 @@ export function ContactModule() {
 					>
 						<form
 							onSubmit={handleSubmit}
-							className="relative p-10 rounded-[2.5rem] bg-card/40 backdrop-blur-3xl border border-border shadow-2xl flex flex-col gap-6 w-full"
+							className="relative p-6 sm:p-8 rounded-2xl bg-card/40 backdrop-blur-3xl border border-border shadow-2xl flex flex-col gap-5 w-full"
 						>
-							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent rounded-[2.5rem] pointer-events-none" />
+							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent rounded-2xl pointer-events-none" />
 
 							<div className="relative z-10 mb-2">
 								<h2 className="text-3xl font-black text-foreground mb-3 tracking-tight flex items-center gap-3">

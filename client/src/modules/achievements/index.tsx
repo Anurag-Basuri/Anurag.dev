@@ -164,7 +164,7 @@ export function AchievementsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Trophy}
 					label="Triumphs"

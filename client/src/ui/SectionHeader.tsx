@@ -48,7 +48,7 @@ export function SectionHeader({
 			initial="hidden"
 			whileInView="visible"
 			viewport={{ once: true, margin: '-20px' }}
-			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-3 pb-3 mb-4 sm:mb-6 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 shadow-sm"
+			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-2 pb-2 mb-3 sm:mb-4 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-2 sm:gap-3 shadow-sm"
 		>
 			<div className="relative z-10 w-full max-w-2xl">
 				<motion.div
@@ -61,13 +61,13 @@ export function SectionHeader({
 						theme.icon,
 					)}
 				>
-					<span className={cn('p-1.5 rounded-lg border backdrop-blur-sm', theme.badge)}>
+					<span className={cn('p-1 rounded-lg border backdrop-blur-sm', theme.badge)}>
 						<Icon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
 					</span>
 					<span>{label}</span>
 				</motion.div>
 
-				<h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground to-white leading-tight mb-1 tracking-tight" style={{ backgroundImage: `linear-gradient(to right, var(--theme-primary), white)` }}>
+				<h1 className="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground to-white leading-tight mb-0.5 tracking-tight" style={{ backgroundImage: `linear-gradient(to right, var(--theme-primary), white)` }}>
 					{title}
 				</h1>
 

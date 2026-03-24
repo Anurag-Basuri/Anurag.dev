@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Briefcase, Building2, MapPin, Calendar, Star } from 'lucide-react';
 import { publicService } from '@/api';
@@ -8,6 +8,7 @@ import type { JourneyEntry } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
+import { useJourney } from '@/hooks/useJourney';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -155,27 +156,13 @@ const JobCard = memo(function JobCard({
 // ─── Main Module ────────────────────────────────────────────────
 
 export function ExperienceModule() {
-	const [entries, setEntries] = useState<JourneyEntry[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		async function fetchJourney() {
-			const { data } = await publicService.getJourney();
-			setEntries(data || []);
-			setLoading(false);
-		}
-		fetchJourney();
-	}, []);
-
-	const workEntries = useMemo(() => {
-		return entries.filter(entry => entry.type.toUpperCase() === 'WORK');
-	}, [entries]);
+	const { entries: workEntries, loading } = useJourney('WORK');
 
 	if (loading) return <ExperienceSkeleton />;
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Briefcase}
 					label="Work History"
@@ -198,7 +185,7 @@ export function ExperienceModule() {
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true, margin: '-20px' }}
-							className="space-y-6 sm:space-y-20 flex flex-col"
+							className="space-y-8 sm:space-y-12 md:space-y-16 flex flex-col"
 						>
 							{workEntries.map((job, index) => (
 								<JobCard

@@ -25,7 +25,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 	return (
 		<TooltipProvider delayDuration={200}>
 			<nav
-				className="fixed right-3 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-center"
+				className="absolute right-1.5 top-1/2 -translate-y-1/2 z-40 hidden sm:flex flex-col items-center"
 				aria-label="Section navigation"
 			>
 				{/* Connecting line */}

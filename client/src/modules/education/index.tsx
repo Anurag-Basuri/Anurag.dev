@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, memo } from 'react';
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { GraduationCap, MapPin, Calendar, Award, BookOpen, Star } from 'lucide-react';
 import { publicService } from '@/api';
@@ -8,6 +8,7 @@ import type { JourneyEntry } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
+import { useJourney } from '@/hooks/useJourney';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -53,7 +54,13 @@ const EducationCard = memo(function EducationCard({
 		>
 			{/* Timeline Node */}
 			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
-				<div className="w-4 h-4 rounded-full bg-card border-4 border-violet-500/50 group-hover:border-violet-400 group-hover:bg-violet-400 group-hover:scale-150 transition-all duration-500 shadow-[0_0_15px_rgba(139,92,246,0)] group-hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]" />
+				<div
+					className="w-4 h-4 rounded-full bg-card border-4 group-hover:scale-150 transition-all duration-500"
+					style={{
+						borderColor: 'color-mix(in oklch, var(--theme-primary) 50%, transparent)',
+						boxShadow: '0 0 0 rgba(0,0,0,0)',
+					}}
+				/>
 			</div>
 
 			{/* Content Card Wrapper */}
@@ -66,7 +73,7 @@ const EducationCard = memo(function EducationCard({
 				{/* Connector Line to Node (Desktop Only) */}
 				<div
 					className={cn(
-						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-foreground/10 group-hover:bg-violet-500/50 transition-colors duration-500',
+						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-border group-hover:bg-(--theme-primary)/50 transition-colors duration-500',
 						isEven ? 'right-8' : 'left-8',
 					)}
 				/>
@@ -78,7 +85,7 @@ const EducationCard = memo(function EducationCard({
 						'hover:border-foreground/20',
 					)}
 				>
-					<div className="absolute inset-0 bg-linear-to-bl from-violet-500/0 to-transparent group-hover:from-violet-500/5 transition-colors duration-500" />
+					<div className="absolute inset-0 bg-linear-to-bl from-transparent to-transparent group-hover:from-(--theme-primary)/5 transition-colors duration-500" />
 
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Header row: Title + Grade (if any) */}
@@ -94,14 +101,20 @@ const EducationCard = memo(function EducationCard({
 						</div>
 
 						{entry.degree && entry.fieldOfStudy && (
-							<p className="text-sm sm:text-base font-medium text-violet-400 mb-4">
+							<p className="text-sm sm:text-base font-medium mb-4" style={{ color: 'var(--theme-primary)' }}>
 								{entry.degree} in {entry.fieldOfStudy}
 							</p>
 						)}
 
 						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-5">
 							{entry.organization && (
-								<span className="flex items-center gap-1.5 text-violet-400 bg-violet-400/10 px-2 py-1 rounded-md">
+								<span
+									className="flex items-center gap-1.5 px-2 py-1 rounded-md"
+									style={{
+										color: 'var(--theme-primary)',
+										background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
+									}}
+								>
 									<BookOpen className="w-3.5 h-3.5" />
 									{entry.organization}
 								</span>
@@ -137,7 +150,7 @@ const EducationCard = memo(function EducationCard({
 								{(entry.skills ?? []).map(skill => (
 									<span
 										key={skill}
-										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-violet-500/20 transition-colors"
+										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/20 transition-colors"
 									>
 										{skill}
 									</span>
@@ -154,27 +167,13 @@ const EducationCard = memo(function EducationCard({
 // ─── Main Module ────────────────────────────────────────────────
 
 export function EducationModule() {
-	const [entries, setEntries] = useState<JourneyEntry[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		async function fetchJourney() {
-			const { data } = await publicService.getJourney();
-			setEntries(data || []);
-			setLoading(false);
-		}
-		fetchJourney();
-	}, []);
-
-	const educationEntries = useMemo(() => {
-		return entries.filter(entry => entry.type.toUpperCase() === 'EDUCATION');
-	}, [entries]);
+	const { entries: educationEntries, loading } = useJourney('EDUCATION');
 
 	if (loading) return <EducationSkeleton />;
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={GraduationCap}
 					label="Academic Path"
@@ -190,14 +189,17 @@ export function EducationModule() {
 				) : (
 					<div className="relative mt-8 md:mt-12 max-w-4xl mx-auto">
 						{/* Timeline Center Line */}
-						<div className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 bg-linear-to-b from-transparent via-violet-500/20 to-transparent" />
+						<div
+							className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2"
+							style={{ background: `linear-gradient(to bottom, transparent, color-mix(in oklch, var(--theme-primary) 20%, transparent), transparent)` }}
+						/>
 
 						<motion.div
 							variants={staggerContainer}
 							initial="hidden"
 							whileInView="visible"
 							viewport={{ once: true, margin: '-20px' }}
-							className="space-y-6 sm:space-y-20 flex flex-col"
+							className="space-y-8 sm:space-y-12 md:space-y-16 flex flex-col"
 						>
 							{educationEntries.map((entry, index) => (
 								<EducationCard
