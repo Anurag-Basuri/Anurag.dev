@@ -1,26 +1,49 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, MapPin, Briefcase, ChevronRight, FileText, CheckCircle2, Globe, Layers, ExternalLink } from 'lucide-react';
+import {
+	User,
+	MapPin,
+	Briefcase,
+	ChevronRight,
+	FileText,
+	CheckCircle2,
+	Globe,
+	Layers,
+	ExternalLink,
+	Zap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { publicService } from '@/api';
 import type { Profile } from '@/api/schema';
 import { cn } from '@/lib/utils';
 import { getSkillIcon } from '@/lib/skill-icons';
-import { SiGithub, SiX, SiYoutube, SiInstagram, SiFacebook, SiDiscord, SiMedium, SiDevdotto, SiHashnode, SiStackoverflow, SiReddit, SiTwitch, SiDribbble, SiBehance } from 'react-icons/si';
-import { FaLinkedinIn } from 'react-icons/fa6';
 import {
-	fadeInUp,
-	fadeIn,
-	staggerContainer,
-	staggerFast,
-	staggerFastItem,
-} from '@/animations/motion';
+	SiGithub,
+	SiX,
+	SiYoutube,
+	SiInstagram,
+	SiFacebook,
+	SiDiscord,
+	SiMedium,
+	SiDevdotto,
+	SiHashnode,
+	SiStackoverflow,
+	SiReddit,
+	SiTwitch,
+	SiDribbble,
+	SiBehance,
+} from 'react-icons/si';
+import { FaLinkedinIn } from 'react-icons/fa6';
+import { fadeInUp, staggerContainer, staggerFast, staggerFastItem } from '@/animations/motion';
 
 // ─── Social Platform Icon Map ───────────────────────────────────
 
-const SOCIAL_ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; label: string; color: string }> = {
+const SOCIAL_ICONS: Record<
+	string,
+	{ icon: React.ComponentType<{ className?: string }>; label: string; color: string }
+> = {
 	GITHUB: { icon: SiGithub, label: 'GitHub', color: '#181717' },
 	LINKEDIN: { icon: FaLinkedinIn, label: 'LinkedIn', color: '#0A66C2' },
 	X: { icon: SiX, label: 'X (Twitter)', color: '#000000' },
@@ -40,12 +63,18 @@ const SOCIAL_ICONS: Record<string, { icon: React.ComponentType<{ className?: str
 };
 
 function getSocialIcon(platform: string) {
-	return SOCIAL_ICONS[platform.toUpperCase()] ?? { icon: ExternalLink, label: platform, color: '#888888' };
+	return (
+		SOCIAL_ICONS[platform.toUpperCase()] ?? {
+			icon: ExternalLink,
+			label: platform,
+			color: '#888888',
+		}
+	);
 }
 
 // ─── Typing Animation Hook ──────────────────────────────────────
 
-function useTypingAnimation(text: string, speed = 40, startDelay = 600) {
+function useTypingAnimation(text: string, speed = 35, startDelay = 500) {
 	const [displayed, setDisplayed] = useState('');
 	const [isDone, setIsDone] = useState(false);
 
@@ -77,28 +106,40 @@ function useTypingAnimation(text: string, speed = 40, startDelay = 600) {
 
 function ProfileSkeleton() {
 	return (
-		<div className="w-full animate-pulse">
-			<div className="h-[220px] sm:h-[300px] md:h-[380px] w-full bg-foreground/5" />
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pb-12">
-				<div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 bg-foreground/10 rounded-3xl -mt-16 md:-mt-20 border-4 border-background" />
-				<div className="mt-6 space-y-4">
-					<div className="h-10 w-64 bg-foreground/5 rounded-xl" />
-					<div className="h-6 w-96 bg-foreground/5 rounded-lg" />
-					<div className="h-5 w-72 bg-foreground/5 rounded-lg" />
+		<div className="w-full animate-pulse px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pt-10 pb-12">
+			<div className="flex flex-col md:flex-row gap-10">
+				<div className="w-44 h-44 md:w-56 md:h-56 bg-foreground/5 rounded-3xl shrink-0" />
+				<div className="flex-1 space-y-4 pt-2">
+					<div className="h-10 w-72 bg-foreground/5 rounded-xl" />
+					<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
+					<div className="h-5 w-64 bg-foreground/5 rounded-lg" />
+					<div className="flex gap-3 mt-4">
+						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
+						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
+						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
+					</div>
 				</div>
-				<div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-					{[1, 2, 3].map(i => <div key={i} className="h-24 bg-foreground/5 rounded-2xl" />)}
-				</div>
-				<div className="mt-8 h-48 bg-foreground/5 rounded-3xl" />
-				<div className="mt-6 h-96 bg-foreground/5 rounded-3xl" />
 			</div>
+			<div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+				{[1, 2, 3].map(i => (
+					<div key={i} className="h-24 bg-foreground/5 rounded-2xl" />
+				))}
+			</div>
+			<div className="mt-8 h-40 bg-foreground/5 rounded-3xl" />
+			<div className="mt-6 h-80 bg-foreground/5 rounded-3xl" />
 		</div>
 	);
 }
 
-// ─── Helper: Stat Card with hover effects ───────────────────────
+// ─── Helper: Stat Card ──────────────────────────────────────────
 
-function StatCard({ icon: Icon, label, value, colorClass, children }: {
+function StatCard({
+	icon: Icon,
+	label,
+	value,
+	colorClass,
+	children,
+}: {
 	icon: React.ComponentType<{ className?: string }>;
 	label: string;
 	value: string;
@@ -113,12 +154,20 @@ function StatCard({ icon: Icon, label, value, colorClass, children }: {
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
 		>
-			<div className={cn("absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500", colorClass)} />
+			<div
+				className={cn(
+					'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500',
+					colorClass,
+				)}
+			/>
 			<div className="flex items-center gap-4 relative z-10">
 				<motion.div
 					animate={hovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
 					transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-					className={cn("p-3 rounded-xl border bg-background shadow-inner transition-colors", colorClass.replace('bg-', 'text-'))}
+					className={cn(
+						'p-3 rounded-xl border bg-background shadow-inner transition-colors',
+						colorClass.replace('bg-', 'text-'),
+					)}
 				>
 					<Icon className="w-5 h-5" />
 				</motion.div>
@@ -132,7 +181,7 @@ function StatCard({ icon: Icon, label, value, colorClass, children }: {
 				</div>
 			</div>
 
-			{/* Hover popover (for languages etc.) */}
+			{/* Hover popover */}
 			<AnimatePresence>
 				{hovered && children && (
 					<motion.div
@@ -152,12 +201,20 @@ function StatCard({ icon: Icon, label, value, colorClass, children }: {
 
 // ─── Helper: Social Button with Tooltip ─────────────────────────
 
-function SocialButton({ social }: { social: { id: string; platform: string; url: string; customLabel?: string | null } }) {
-	const { icon: SocialIcon, label, color } = getSocialIcon(social.platform);
+function SocialButton({
+	social,
+}: {
+	social: { id: string; platform: string; url: string; customLabel?: string | null };
+}) {
+	const { icon: SocialIcon, label } = getSocialIcon(social.platform);
 	const [showTooltip, setShowTooltip] = useState(false);
 
 	return (
-		<div className="relative" onMouseEnter={() => setShowTooltip(true)} onMouseLeave={() => setShowTooltip(false)}>
+		<div
+			className="relative"
+			onMouseEnter={() => setShowTooltip(true)}
+			onMouseLeave={() => setShowTooltip(false)}
+		>
 			<a
 				href={social.url}
 				target="_blank"
@@ -184,6 +241,21 @@ function SocialButton({ social }: { social: { id: string; platform: string; url:
 	);
 }
 
+// ─── Typing Tagline ─────────────────────────────────────────────
+
+function TypingTagline({ text }: { text: string }) {
+	const { displayed, isDone } = useTypingAnimation(text, 35, 500);
+
+	return (
+		<p className="text-base sm:text-lg md:text-xl font-medium text-muted-foreground max-w-2xl tracking-tight leading-relaxed min-h-[1.75rem]">
+			{displayed}
+			{!isDone && (
+				<span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
+			)}
+		</p>
+	);
+}
+
 // ─── Main Module ────────────────────────────────────────────────
 
 export function ProfileModule() {
@@ -197,24 +269,28 @@ export function ProfileModule() {
 				const { data } = await publicService.getProfile();
 				if (!cancelled) setProfile(data);
 			} catch (err) {
-				console.error("Failed to load profile", err);
+				console.error('Failed to load profile', err);
 			} finally {
 				if (!cancelled) setLoading(false);
 			}
 		}
 		fetchProfile();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, []);
 
 	if (loading) return <ProfileSkeleton />;
 	if (!profile) return null;
 
-	const tagline = profile.Tagline || profile.header || "Digital Creator & Engineer";
-	const header = profile.Tagline && profile.header ? profile.header : null; // Show header separately only if tagline exists
+	const tagline = profile.Tagline || profile.header || 'Digital Creator & Engineer';
+	const header = profile.Tagline && profile.header ? profile.header : null;
 	const isAvailable = profile.openToWork;
 	const socialLinks = profile.socialLinks ?? [];
 	const activeWorkPrefs = profile.workPreferences
-		? Object.entries(profile.workPreferences).filter(([_, v]) => v === true).map(([k]) => k)
+		? Object.entries(profile.workPreferences)
+				.filter(([_, v]) => v === true)
+				.map(([k]) => k)
 		: [];
 
 	return (
@@ -223,146 +299,154 @@ export function ProfileModule() {
 			<div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
 			<div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
 
-			{/* Hero Cover Banner */}
-			<motion.div
-				variants={fadeIn}
-				initial="hidden"
-				animate="visible"
-				className="relative w-full h-[220px] sm:h-[300px] md:h-[380px] bg-card border-b border-border overflow-hidden"
-			>
-				{profile.coverUrl && (
-					<img
-						src={profile.coverUrl}
-						alt="Cover"
-						className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity scale-105"
-					/>
-				)}
-				<div className="absolute inset-0 bg-linear-to-b from-transparent via-background/70 to-background" />
-				<div className="absolute inset-0 bg-[linear-gradient(rgba(128,128,128,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(128,128,128,0.03)_1px,transparent_1px)] bg-size-[40px_40px] mask-[radial-gradient(ellipse_80%_80%_at_50%_0%,#000_60%,transparent_100%)]" />
-			</motion.div>
-
-			{/* Main Content — bleeds into cover */}
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 -mt-24 sm:-mt-28 md:-mt-32 relative z-10">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-8 sm:pt-12 relative z-10">
 				<motion.div
 					variants={staggerContainer}
 					initial="hidden"
 					animate="visible"
 					className="flex flex-col"
 				>
-					{/* ═══ HERO ZONE ═══ */}
-					<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8 pt-2">
-						{/* Left: Avatar + Identity */}
-						<div className="flex flex-col gap-5 sm:gap-6">
-							{/* Animated Gradient Border Avatar */}
-							<motion.div variants={fadeInUp} className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44">
-								{/* Rotating gradient ring */}
-								<div className="absolute -inset-[3px] rounded-3xl bg-[conic-gradient(from_var(--angle),var(--theme-primary),var(--theme-secondary),var(--theme-primary))] animate-[spin_6s_linear_infinite] opacity-60 blur-[1px]"
-									style={{ '--angle': '0deg' } as React.CSSProperties}
+					{/* ═══════════════════════════════════════════════════════
+					    HERO — Large Photo + Identity
+					    ═══════════════════════════════════════════════════════ */}
+					<div className="flex flex-col md:flex-row gap-8 md:gap-14 items-center md:items-start">
+						{/* Profile Photo — large and prominent */}
+						<motion.div
+							variants={fadeInUp}
+							className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-[2rem] overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group"
+						>
+							{profile.avatarUrl ? (
+								<img
+									src={profile.avatarUrl}
+									alt={profile.name}
+									className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
 								/>
-								<div className="absolute inset-0 rounded-3xl overflow-hidden border-4 border-background bg-card shadow-2xl flex items-center justify-center group">
-									{profile.avatarUrl ? (
-										<img
-											src={profile.avatarUrl}
-											alt={profile.name}
-											className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-										/>
-									) : (
-										<User className="w-14 h-14 text-muted-foreground" />
-									)}
-									<div className="absolute inset-0 ring-1 ring-inset ring-foreground/10 rounded-3xl pointer-events-none" />
-									{isAvailable && (
-										<div className="absolute top-3 right-3 w-4 h-4 bg-emerald-400 rounded-full border-2 border-background shadow-[0_0_15px_rgba(52,211,153,0.6)] animate-pulse" />
-									)}
+							) : (
+								<div className="w-full h-full flex items-center justify-center bg-muted">
+									<User className="w-24 h-24 text-muted-foreground/50" />
 								</div>
+							)}
+							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2rem] pointer-events-none" />
+						</motion.div>
+
+						{/* Identity Block — right of photo */}
+						<div className="flex-1 flex flex-col min-w-0 text-center md:text-left pt-0 md:pt-4">
+							{/* Name */}
+							<motion.div variants={fadeInUp} className="mb-2">
+								<h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
+									{profile.name}
+								</h1>
 							</motion.div>
 
-							{/* Name + Header + Tagline */}
-							<div className="pt-1">
-								<motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-2">
-									<h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-b from-foreground via-foreground to-foreground/60">
-										{profile.name}
-									</h1>
-									{profile.pronouns && (
-										<span className="px-3 py-1 rounded-full bg-foreground/5 border border-border text-xs font-bold text-muted-foreground tracking-widest uppercase">
-											{profile.pronouns}
-										</span>
-									)}
-								</motion.div>
+							{/* Header / Role */}
+							{header && (
+								<motion.p
+									variants={fadeInUp}
+									className="text-base sm:text-lg font-semibold text-primary mb-1"
+								>
+									{header}
+								</motion.p>
+							)}
 
-								{/* Header (role/title) */}
-								{header && (
-									<motion.p variants={fadeInUp} className="text-sm sm:text-base font-semibold text-primary/80 mb-2 tracking-tight">
-										{header}
-									</motion.p>
+							{/* Typing Tagline */}
+							<motion.div variants={fadeInUp} className="mb-5">
+								<TypingTagline text={tagline} />
+							</motion.div>
+
+							{/* Status Badges */}
+							<motion.div
+								variants={fadeInUp}
+								className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-6"
+							>
+								{profile.pronouns && (
+									<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[10px] font-bold text-muted-foreground tracking-widest uppercase">
+										{profile.pronouns}
+									</span>
+								)}
+								{isAvailable && (
+									<div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
+										<span className="relative flex h-2 w-2">
+											<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+											<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+										</span>
+										{profile.noticePeriod
+											? `Available · ${profile.noticePeriod}`
+											: 'Open to Work'}
+									</div>
+								)}
+								{profile.Freelancing && (
+									<div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
+										<Zap className="w-3 h-3" />
+										Freelance Ready
+									</div>
+								)}
+								{activeWorkPrefs.map(pref => (
+									<span
+										key={pref}
+										className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[10px] font-bold text-muted-foreground capitalize tracking-wide"
+									>
+										{pref}
+									</span>
+								))}
+							</motion.div>
+
+							{/* Social + CTAs */}
+							<motion.div
+								variants={fadeInUp}
+								className="flex flex-wrap items-center justify-center md:justify-start gap-3"
+							>
+								{/* CTA Buttons first */}
+								<button
+									onClick={() =>
+										window.dispatchEvent(
+											new CustomEvent('scroll-to-section', {
+												detail: { sectionId: 'contact' },
+											}),
+										)
+									}
+									className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-[0_0_30px_-8px] shadow-primary/40 hover:shadow-primary/60"
+								>
+									Let&apos;s Connect
+									<ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+								</button>
+
+								{profile.resumeUrl && (
+									<Link
+										href="/resume"
+										className="group flex items-center gap-2 bg-card hover:bg-muted text-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-border hover:border-foreground/20 hover:-translate-y-0.5"
+									>
+										Resume
+										<FileText className="w-4 h-4 text-muted-foreground group-hover:scale-110 transition-transform" />
+									</Link>
 								)}
 
-								<motion.div variants={fadeInUp} className="flex flex-col gap-3">
-									{/* Typing Tagline */}
-									<TypingTagline text={tagline} />
+								{/* Divider */}
+								{socialLinks.length > 0 && (
+									<div className="hidden sm:block w-px h-8 bg-border" />
+								)}
 
-									{/* Availability + Work Preferences Inline */}
-									{isAvailable && (
-										<div className="flex flex-wrap items-center gap-2">
-											<div className="inline-flex items-center gap-2 text-sm font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">
-												<CheckCircle2 className="w-4 h-4" />
-												{profile.noticePeriod ? `Available (${profile.noticePeriod})` : 'Available for Work'}
-											</div>
-											{/* Work preferences as inline chips */}
-											{activeWorkPrefs.map(pref => (
-												<span key={pref} className="px-2.5 py-1 bg-foreground/5 border border-border rounded-lg text-xs font-bold text-foreground/70 capitalize">
-													{pref}
-												</span>
-											))}
-											{profile.Freelancing && (
-												<span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-bold text-emerald-500">
-													Freelance
-												</span>
-											)}
-										</div>
-									)}
-
-									{/* Social Links Row with Tooltips */}
-									{socialLinks.length > 0 && (
-										<div className="flex items-center gap-2 mt-1">
-											{socialLinks.map((social) => (
-												<SocialButton key={social.id} social={social} />
-											))}
-										</div>
-									)}
-								</motion.div>
-							</div>
+								{/* Social Icons */}
+								{socialLinks.length > 0 && (
+									<div className="flex items-center gap-2">
+										{socialLinks.map(social => (
+											<SocialButton key={social.id} social={social} />
+										))}
+									</div>
+								)}
+							</motion.div>
 						</div>
-
-						{/* Right: Action Buttons */}
-						<motion.div variants={fadeInUp} className="flex flex-row flex-wrap md:flex-col items-start gap-3 w-full md:w-auto mt-2 md:mt-0 pb-2">
-							<button
-								onClick={() =>
-									window.dispatchEvent(
-										new CustomEvent('scroll-to-section', {
-											detail: { sectionId: 'contact' },
-										}),
-									)
-								}
-								className="w-full md:w-auto group flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-2xl font-bold transition-all hover:-translate-y-1 shadow-[0_0_40px_-10px] shadow-primary/40 hover:shadow-[0_0_50px_-10px] hover:shadow-primary/60"
-							>
-								Let&apos;s Connect
-								<ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-							</button>
-							{profile.resumeUrl && (
-								<Link
-									href="/resume"
-									className="w-full md:w-auto group flex items-center justify-center gap-2 bg-card hover:bg-muted text-foreground px-8 py-4 rounded-2xl font-bold transition-all border border-border hover:border-foreground/20 hover:-translate-y-1 shadow-sm"
-								>
-									View Resume <FileText className="w-5 h-5 group-hover:scale-110 transition-transform text-muted-foreground" />
-								</Link>
-							)}
-						</motion.div>
 					</div>
+
+					{/* Subtle separator */}
+					<motion.div
+						variants={fadeInUp}
+						className="mt-12 mb-2 h-px bg-linear-to-r from-transparent via-border to-transparent"
+					/>
 
 					{/* ═══ METRICS BAR ═══ */}
 					<motion.div
 						variants={fadeInUp}
-						className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
+						className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
 					>
 						<StatCard
 							icon={MapPin}
@@ -379,10 +463,13 @@ export function ProfileModule() {
 						<StatCard
 							icon={Globe}
 							label="Languages"
-							value={profile.languages?.length ? `${profile.languages.length} Spoken` : 'Multilingual'}
+							value={
+								profile.languages?.length
+									? `${profile.languages.length} Spoken`
+									: 'Multilingual'
+							}
 							colorClass="bg-emerald-500"
 						>
-							{/* Languages Hover Popup */}
 							{profile.languages && profile.languages.length > 0 && (
 								<div className="space-y-2">
 									<p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
@@ -390,7 +477,10 @@ export function ProfileModule() {
 									</p>
 									<div className="flex flex-wrap gap-2">
 										{profile.languages.map(lang => (
-											<span key={lang} className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400">
+											<span
+												key={lang}
+												className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400"
+											>
 												{lang}
 											</span>
 										))}
@@ -400,7 +490,9 @@ export function ProfileModule() {
 						</StatCard>
 					</motion.div>
 
-					{/* ═══ BIO SECTION (Full Width, Standalone) ═══ */}
+					{/* ═══════════════════════════════════════════════════════
+					    BIO SECTION
+					    ═══════════════════════════════════════════════════════ */}
 					{profile.bio && (
 						<motion.div
 							variants={fadeInUp}
@@ -416,7 +508,9 @@ export function ProfileModule() {
 						</motion.div>
 					)}
 
-					{/* ═══ SKILLS SECTION (Full Width, Standalone) ═══ */}
+					{/* ═══════════════════════════════════════════════════════
+					    TECHNICAL ARSENAL
+					    ═══════════════════════════════════════════════════════ */}
 					{profile.skills && Object.keys(profile.skills).length > 0 && (
 						<motion.div
 							variants={fadeInUp}
@@ -429,8 +523,12 @@ export function ProfileModule() {
 									<Layers className="w-5 h-5" />
 								</div>
 								<div>
-									<h2 className="text-lg font-black text-foreground tracking-tight">Technical Arsenal</h2>
-									<p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Frameworks, Tools & Protocols</p>
+									<h2 className="text-lg font-black text-foreground tracking-tight">
+										Technical Arsenal
+									</h2>
+									<p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+										Frameworks, Tools & Protocols
+									</p>
 								</div>
 							</div>
 
@@ -438,7 +536,7 @@ export function ProfileModule() {
 								variants={staggerFast}
 								initial="hidden"
 								whileInView="visible"
-								viewport={{ once: true, margin: "-50px" }}
+								viewport={{ once: true, margin: '-50px' }}
 								className="space-y-8"
 							>
 								{Object.entries(profile.skills).map(([category, items]) => (
@@ -447,14 +545,14 @@ export function ProfileModule() {
 											<h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
 												{category}
 											</h3>
-											{/* Category count badge */}
 											<span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-[10px] font-black">
 												{items.length}
 											</span>
 										</div>
 										<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 											{items.map(skill => {
-												const { icon: SkillIcon, color } = getSkillIcon(skill);
+												const { icon: SkillIcon, color } =
+													getSkillIcon(skill);
 
 												return (
 													<motion.div
@@ -485,20 +583,5 @@ export function ProfileModule() {
 				</motion.div>
 			</div>
 		</div>
-	);
-}
-
-// ─── Typing Tagline Component ───────────────────────────────────
-
-function TypingTagline({ text }: { text: string }) {
-	const { displayed, isDone } = useTypingAnimation(text, 35, 500);
-
-	return (
-		<p className="text-base sm:text-lg md:text-xl font-bold text-foreground/75 max-w-3xl tracking-tight leading-snug min-h-[1.75rem]">
-			{displayed}
-			{!isDone && (
-				<span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
-			)}
-		</p>
 	);
 }
