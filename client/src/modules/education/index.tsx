@@ -12,21 +12,34 @@ import { useJourney } from '@/hooks/useJourney';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
+/** Format a date range from startDate/endDate or fall back to the pre-formatted date string */
+function formatDateRange(entry: JourneyEntry): string {
+	if (entry.startDate) {
+		const start = new Date(entry.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+		const end = entry.isCurrent
+			? 'Present'
+			: entry.endDate
+				? new Date(entry.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+				: '';
+		return end ? `${start} — ${end}` : start;
+	}
+	return entry.date;
+}
+
 function EducationSkeleton() {
 	return (
-		<div className="p-6 md:p-12 max-w-5xl mx-auto animate-pulse pb-32">
-			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
-				<div className="h-12 w-72 bg-foreground/5 rounded-xl" />
-				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-48 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="max-w-4xl mx-auto space-y-6 mt-16 relative">
+			<div className="max-w-4xl mx-auto space-y-6 mt-12 relative">
 				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
 				{[1, 2, 3].map(i => (
 					<div key={i} className="flex items-start gap-8 relative z-10">
 						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-foreground/10 border-4 border-card" />
 						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-48 bg-foreground/5 rounded-2xl" />
+							<div className="h-44 bg-foreground/5 rounded-xl" />
 						</div>
 					</div>
 				))}
@@ -55,10 +68,15 @@ const EducationCard = memo(function EducationCard({
 			{/* Timeline Node */}
 			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
 				<div
-					className="w-4 h-4 rounded-full bg-card border-4 group-hover:scale-150 transition-all duration-500"
+					className={cn(
+						'w-4 h-4 rounded-full bg-card border-4 group-hover:scale-150 transition-all duration-500',
+						entry.isCurrent && 'animate-pulse',
+					)}
 					style={{
-						borderColor: 'color-mix(in oklch, var(--theme-primary) 50%, transparent)',
-						boxShadow: '0 0 0 rgba(0,0,0,0)',
+						borderColor: entry.isCurrent
+							? 'var(--theme-primary)'
+							: 'color-mix(in oklch, var(--theme-primary) 50%, transparent)',
+						boxShadow: entry.isCurrent ? '0 0 12px color-mix(in oklch, var(--theme-primary) 40%, transparent)' : '0 0 0 rgba(0,0,0,0)',
 					}}
 				/>
 			</div>
@@ -88,16 +106,34 @@ const EducationCard = memo(function EducationCard({
 					<div className="absolute inset-0 bg-linear-to-bl from-transparent to-transparent group-hover:from-(--theme-primary)/5 transition-colors duration-500" />
 
 					<div className="relative z-10 flex flex-col h-full">
-						{/* Header row: Title + Grade (if any) */}
-						<div className="flex items-start justify-between gap-4 mb-2">
+						{/* Header row: Title + Badge */}
+						<div className="flex items-start justify-between gap-3 mb-2">
 							<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground line-clamp-2">
 								{entry.title}
 							</h3>
-							{entry.grade && (
-								<div className="shrink-0 px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-xs shadow-inner">
-									{entry.grade}
-								</div>
-							)}
+							<div className="flex items-center gap-2 shrink-0">
+								{entry.isCurrent && (
+									<span
+										className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest"
+										style={{
+											background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+											color: 'var(--theme-primary)',
+											border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+										}}
+									>
+										<span className="relative flex h-1.5 w-1.5">
+											<span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--theme-primary)' }} />
+											<span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: 'var(--theme-primary)' }} />
+										</span>
+										Currently Enrolled
+									</span>
+								)}
+								{entry.grade && (
+									<div className="px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-xs shadow-inner">
+										{entry.grade}
+									</div>
+								)}
+							</div>
 						</div>
 
 						{entry.degree && entry.fieldOfStudy && (
@@ -121,7 +157,7 @@ const EducationCard = memo(function EducationCard({
 							)}
 							<span className="flex items-center gap-1.5">
 								<Calendar className="w-3.5 h-3.5" />
-								{entry.date}
+								{formatDateRange(entry)}
 							</span>
 							{entry.location && (
 								<span className="flex items-center gap-1.5">

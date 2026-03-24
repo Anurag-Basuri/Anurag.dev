@@ -46,19 +46,18 @@ const SOCIAL_ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
 
 function ContactSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-32">
-			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-24 bg-foreground/5 rounded-lg" />
-				<div className="h-12 w-56 bg-foreground/5 rounded-xl" />
-				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-16 pt-6">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-24 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+			<div className="flex flex-col lg:flex-row gap-8 lg:gap-12 mt-8">
 				<div className="flex-1 space-y-6">
-					<div className="h-40 bg-foreground/5 rounded-3xl" />
-					<div className="h-40 bg-foreground/5 rounded-3xl" />
+					<div className="h-36 bg-foreground/5 rounded-2xl" />
+					<div className="h-36 bg-foreground/5 rounded-2xl" />
 				</div>
 				<div className="flex-1 lg:max-w-xl">
-					<div className="h-[500px] bg-foreground/5 rounded-3xl" />
+					<div className="h-[480px] bg-foreground/5 rounded-2xl" />
 				</div>
 			</div>
 		</div>
@@ -490,6 +489,21 @@ export function ContactModule() {
 								required
 								className="w-full bg-background/50 backdrop-blur-xl border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm outline-hidden shadow-inner"
 								placeholder="you@example.com"
+							/>
+						</div>
+
+						<div className="space-y-1.5 relative z-10">
+							<label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider ml-1">
+								Subject
+							</label>
+							<input
+								type="text"
+								name="subject"
+								value={formData.subject}
+								onChange={handleChange}
+								required
+								className="w-full bg-background/50 backdrop-blur-xl border border-border rounded-2xl px-5 py-3.5 text-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm outline-hidden shadow-inner"
+								placeholder="What's this about?"
 							/>
 						</div>
 

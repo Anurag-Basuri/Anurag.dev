@@ -23,12 +23,12 @@ import { staggerContainer, staggerItem, scaleIn, fadeIn, cardHover } from '@/ani
 
 function ProjectsSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-16">
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
 			<div className="space-y-3 mb-8">
 				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
 				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
 				{[1, 2, 3, 4, 5, 6].map(i => (
 					<div key={i} className="h-52 bg-foreground/5 rounded-xl" />
 				))}
@@ -62,7 +62,21 @@ export function ProjectsModule() {
 
 	if (loading) return <ProjectsSkeleton />;
 	if (error) {
-		return <div className="text-center py-24 text-muted-foreground">{error}</div>;
+		return (
+			<div className="flex flex-col items-center justify-center py-32 text-center max-w-7xl mx-auto">
+				<div className="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/20 mb-6">
+					<Layers className="w-8 h-8 text-rose-400" />
+				</div>
+				<p className="text-xl font-bold text-foreground mb-2 tracking-tight">Failed to load projects</p>
+				<p className="text-xs text-muted-foreground leading-snug mb-8 max-w-sm">{error}</p>
+				<button
+					onClick={() => window.location.reload()}
+					className="px-6 py-3 rounded-xl bg-foreground/5 border border-border text-xs font-bold uppercase tracking-wider text-foreground hover:bg-foreground/10 transition-all active:scale-95"
+				>
+					Try Again
+				</button>
+			</div>
+		);
 	}
 
 	return (

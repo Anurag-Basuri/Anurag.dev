@@ -15,12 +15,12 @@ import { cn } from '@/lib/utils';
 
 function CertificationsSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-16">
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
 			<div className="space-y-3 mb-8">
 				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
 				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
 				{[1, 2, 3, 4].map(i => (
 					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
 				))}
@@ -107,12 +107,19 @@ export function CertificationModule() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
+		let cancelled = false;
 		async function fetchCerts() {
-			const { data } = await publicService.getCertifications();
-			setCerts(data || []);
-			setLoading(false);
+			try {
+				const { data } = await publicService.getCertifications();
+				if (!cancelled) setCerts(data || []);
+			} catch (err) {
+				console.error('Failed to load certifications', err);
+			} finally {
+				if (!cancelled) setLoading(false);
+			}
 		}
 		fetchCerts();
+		return () => { cancelled = true; };
 	}, []);
 
 	if (loading) return <CertificationsSkeleton />;

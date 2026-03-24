@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, memo, type ReactNode } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { publicService } from '@/api';
@@ -14,12 +14,12 @@ import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
 
 function AchievementsSkeleton() {
 	return (
-		<div className="p-4 sm:p-6 md:p-12 max-w-7xl mx-auto animate-pulse pb-16">
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
 			<div className="space-y-3 mb-8">
 				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
 				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
 				{[1, 2, 3, 4, 5, 6].map(i => (
 					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
 				))}
@@ -152,12 +152,19 @@ export function AchievementsModule() {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
+		let cancelled = false;
 		async function fetchAchievements() {
-			const { data } = await publicService.getAchievements();
-			setAchievements(data || []);
-			setLoading(false);
+			try {
+				const { data } = await publicService.getAchievements();
+				if (!cancelled) setAchievements(data || []);
+			} catch (err) {
+				console.error('Failed to load achievements', err);
+			} finally {
+				if (!cancelled) setLoading(false);
+			}
 		}
 		fetchAchievements();
+		return () => { cancelled = true; };
 	}, []);
 
 	if (loading) return <AchievementsSkeleton />;
@@ -174,7 +181,7 @@ export function AchievementsModule() {
 				/>
 
 				{achievements.length === 0 ? (
-					<div className="text-center py-20 mt-12 text-muted-foreground border border-dashed border-border rounded-xl bg-card/50">
+					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
 						No achievements recorded yet.
 					</div>
 				) : (
