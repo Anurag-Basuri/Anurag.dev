@@ -1,24 +1,34 @@
 # AnuragOS Frontend
 
-A terminal-style portfolio interface built with Next.js, featuring a unique OS-like experience with a file explorer and CLI.
+A premium personal portfolio and brand platform built with Next.js, featuring a scrollable single-page layout, animated sections, and a personal branding system.
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (React 19)
-- **Styling**: Tailwind CSS
-- **State Management**: Jotai
-- **UI Components**: Radix UI
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
+| Category | Technology |
+|---|---|
+| **Framework** | Next.js 16 (React 19) |
+| **Styling** | Tailwind CSS v4 |
+| **State** | Jotai |
+| **Animations** | Framer Motion |
+| **Icons** | Lucide React, React Icons (Si/Fa6) |
+| **UI Primitives** | Radix UI (Sheet, Tooltip, Scroll Area) |
+| **Theming** | CSS custom properties with multi-theme support |
 
 ## Features
 
-- 🖥️ Terminal-style CLI interface
-- 📁 File explorer navigation
-- 🪟 Draggable, resizable windows
-- 🎨 Dark theme with green terminal aesthetics
-- 📱 Responsive design
-- ⚡ Real-time data from backend API
+- 🎨 **Personal Branding** — Photo-centric hero with typing tagline, availability badges, and freelance status
+- 🛠️ **Smart Skill Icons** — Auto-categorizing skill-to-icon mapping with 3-layer fallback (exact → category → generic)
+- 📸 **Image Lightbox** — Click profile photo for a full-screen view
+- 🌐 **Social Tooltips** — Hover-reveal tooltips on social platform icons
+- 🗺️ **Language Popup** — Hover the Languages stat card to see all spoken languages
+- 📊 **Coding Profiles** — LeetCode, Codeforces, CodeChef, GFG stats integration
+- 📝 **Blog System** — Published blog posts with tags and content preview
+- 🎓 **Journey Timeline** — Experience, education, and milestones in chronological order
+- 🏆 **Achievements & Certifications** — Categorized awards and credentials
+- 📄 **Resume Page** — Dedicated resume viewer route
+- ⚡ **Smooth Scroll Navigation** — Section-based scroll spy with sidebar table-of-contents
+- 📱 **Fully Responsive** — Optimized for mobile, tablet, and desktop
+- 🎭 **Multi-Theme** — Theme switching with CSS custom properties
 
 ## Getting Started
 
@@ -29,173 +39,146 @@ A terminal-style portfolio interface built with Next.js, featuring a unique OS-l
 
 ### Installation
 
-1. **Install dependencies**:
+```bash
+npm install
+cp .env.local.example .env.local   # Edit if backend is on a different port
+npm run dev
+```
 
-    ```bash
-    npm install
-    ```
-
-2. **Configure environment**:
-
-    ```bash
-    cp .env.local.example .env.local
-    # Edit .env.local if backend is on different port
-    ```
-
-3. **Start development server**:
-
-    ```bash
-    npm run dev
-    ```
-
-4. **Open browser**:
-   Navigate to http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Structure
 
 ```
-client/
-├── src/
-│   ├── app/                    # Next.js app directory
-│   │   ├── layout.tsx          # Root layout
-│   │   ├── page.tsx            # Home page
-│   │   └── globals.css         # Global styles
-│   ├── components/
-│   │   ├── core/               # Core UI components
-│   │   │   ├── BootAnimation.tsx
-│   │   │   ├── CLI.tsx         # Terminal interface
-│   │   │   ├── FolderTree.tsx  # File explorer
-│   │   │   ├── MainLayout.tsx  # Main layout
-│   │   │   ├── Window.tsx      # Draggable window
-│   │   │   └── WindowManager.tsx
-│   │   ├── modules/            # Feature modules
-│   │   │   ├── AboutModule.tsx
-│   │   │   ├── ProjectsModule.tsx
-│   │   │   ├── JourneyModule.tsx
-│   │   │   ├── BlogModule.tsx
-│   │   │   └── ContactModule.tsx
-│   │   └── ui/                 # Reusable UI components
-│   ├── lib/
-│   │   ├── api.ts              # Backend API client
-│   │   ├── commands.ts         # CLI command processor
-│   │   ├── data.ts             # File system data
-│   │   └── utils.ts            # Utility functions
-│   └── store/
-│       └── atoms.ts            # Jotai state atoms
-└── public/                     # Static assets
+client/src/
+├── animations/                # Framer Motion variant presets
+│   └── motion.ts              # fadeInUp, stagger, fadeIn, etc.
+├── api/                       # Backend API client
+│   ├── schema.ts              # Zod schemas & TypeScript types
+│   ├── services/              # admin.ts, public.ts
+│   └── fallback/              # Offline fallback data
+├── app/                       # Next.js App Router
+│   ├── layout.tsx             # Root layout
+│   ├── page.tsx               # Home (redirects to /portfolio)
+│   ├── globals.css            # Design tokens & themes
+│   ├── portfolio/             # Main portfolio page
+│   ├── admin/                 # Admin dashboard
+│   ├── resume/                # Resume viewer
+│   ├── readme/                # README page
+│   ├── sitemap.ts             # Dynamic sitemap generation
+│   ├── error.tsx              # Error boundary page
+│   └── not-found.tsx          # 404 page
+├── boot/                      # Boot/splash animation
+├── hooks/                     # Custom React hooks
+│   └── useJourney.ts          # Journey data hook
+├── layout/                    # App shell components
+│   ├── AppProviders.tsx       # Theme + state providers
+│   ├── TopBar.tsx             # Top navigation bar
+│   ├── Sidebar.tsx            # Left sidebar navigation
+│   ├── SidebarProfile.tsx     # Sidebar profile card
+│   ├── ResizableSidebar.tsx   # Drag-to-resize sidebar
+│   ├── ScrollContainer.tsx    # Scroll-based section renderer
+│   ├── ScrollSection.tsx      # Individual scroll section
+│   ├── ScrollIndicator.tsx    # Scroll progress indicator
+│   ├── TableOfContents.tsx    # Right-side TOC navigation
+│   ├── useScrollSpy.ts        # Active section detection
+│   └── useScrollNavigation.ts # Scroll-to-section utility
+├── lib/                       # Core utilities
+│   ├── skill-icons.ts         # 3-layer skill → icon mapping
+│   ├── theme.ts               # Theme definitions
+│   ├── routes.ts              # Route configuration
+│   ├── sections.ts            # Section registry
+│   ├── siteConfig.ts          # Site metadata
+│   ├── moduleRegistry.tsx     # Dynamic module loader
+│   └── utils.ts               # cn() and helpers
+├── modules/                   # Feature modules (each has index.tsx)
+│   ├── profile/               # Personal branding hero + bio + skills
+│   ├── projects/              # Project showcase
+│   ├── blog/                  # Blog posts
+│   ├── experience/            # Work experience timeline
+│   ├── education/             # Education timeline
+│   ├── achievements/          # Awards & competitions
+│   ├── certifications/        # Professional certifications
+│   ├── coding-stats/          # Competitive programming profiles
+│   └── contact/               # Contact form
+├── theme/                     # Theme provider & switching logic
+└── ui/                        # Reusable UI components
+    ├── SectionHeader.tsx       # Consistent section headings
+    ├── TerminalFrame.tsx       # Terminal-style card wrapper
+    ├── WindowControls.tsx      # macOS-style window buttons
+    ├── ErrorBoundary.tsx       # Error boundary component
+    ├── FileIcon.tsx            # File type icon resolver
+    ├── UrlThumbnail.tsx        # URL preview thumbnail
+    ├── Loader.tsx              # Loading spinner
+    ├── Portal.tsx              # React portal helper
+    ├── button.tsx              # Button component
+    ├── scroll-area.tsx         # Radix scroll area
+    ├── sheet.tsx               # Radix sheet/drawer
+    └── tooltip.tsx             # Radix tooltip
 ```
-
-## Available Commands
-
-Type these commands in the CLI:
-
-- `help` - Show available commands
-- `ls` - List directory contents
-- `about` - Open About module
-- `projects` - Open Projects Hub
-- `journey` - Open Journey timeline
-- `blog` - Open Blog posts
-- `contact` - Open Contact form
-- `ai-lab` - Open AI Lab (coming soon)
-- `clear` - Clear terminal
-- `exit` - End session
 
 ## Modules
 
-### About Module
+### Profile Module (`modules/profile/`)
 
-Displays personal information, tagline, and skills fetched from the backend.
+Personal brand landing page featuring:
+- Large profile photo with click-to-view lightbox
+- Name + typing tagline animation beside the photo
+- Role/header line, availability & freelance badges
+- Social links with hover tooltips
+- Stats bar (Location, Experience, Languages with hover popup)
+- Separated Bio and Technical Arsenal (Skills) sections
+- Smart skill icons with brand-colored hover effects
 
-### Projects Module
+### Projects Module (`modules/projects/`)
 
-Shows all published projects with:
+Project showcase with tech stack tags, GitHub/live links, and star/fork counts.
 
-- Project descriptions
-- Tech stack tags
-- GitHub and live links
-- Star/fork counts
+### Blog Module (`modules/blog/`)
 
-### Journey Module
+Published blog posts with tags, content preview, and publication dates.
 
-Timeline view of professional journey with:
+### Experience & Education (`modules/experience/`, `modules/education/`)
 
-- Year-based entries
-- Category badges (education, work, project, achievement)
-- Chronological ordering
+Timeline views of work history and educational background with categorized entries.
 
-### Blog Module
+### Achievements & Certifications (`modules/achievements/`, `modules/certifications/`)
 
-Lists published blog posts with:
+Awards, competitions, and professional certifications.
 
-- Title and publication date
-- Content preview
-- Tags
+### Coding Stats (`modules/coding-stats/`)
 
-### Contact Module
+Competitive programming profile stats from LeetCode, Codeforces, CodeChef, GFG, etc.
 
-Contact form with:
+### Contact Module (`modules/contact/`)
 
-- Name, email, subject, message fields
-- Form validation
-- Success/error feedback
-- Rate limiting protection
+Contact form with validation, error handling, and rate limiting.
+
+## Skill Icons System (`lib/skill-icons.ts`)
+
+A robust 3-layer icon mapping system:
+
+1. **Exact/Alias Match** — Direct mapping for 100+ technologies (React, Python, Docker, etc.)
+2. **Smart Category Fallback** — Keywords like "AI", "cloud", "data" map to semantic Lucide icons
+3. **Generic Hashed Fallback** — Unknown skills get a deterministic icon from a pool
+
+Supports AI/ML tools (LangChain, RAG, VectorDB, MCP, MLOps), cloud platforms, databases, and more.
 
 ## API Integration
 
-The frontend connects to the backend API at `http://localhost:4000` by default.
+Connects to the backend at `NEXT_PUBLIC_API_URL` (default: `http://localhost:4000`).
 
-### API Endpoints Used
+### Public Endpoints
 
-- `GET /api/v1/health` - Health check
-- `GET /api/v1/profile` - Public profile
-- `GET /api/v1/projects` - Published projects
-- `GET /api/v1/journey` - Journey timeline
-- `GET /api/v1/blog` - Blog posts
-- `POST /api/v1/contact` - Submit contact form
-
-## Customization
-
-### Theme Colors
-
-Edit `src/app/globals.css` to customize the color scheme:
-
-```css
-:root {
-	--background: 0 0% 3.9%;
-	--foreground: 0 0% 98%;
-	--primary: 142 76% 36%; /* Green accent */
-	/* ... more colors */
-}
-```
-
-### File System Structure
-
-Edit `src/lib/data.ts` to modify the file explorer structure:
-
-```typescript
-export const initialFileSystem: FileSystemItem[] = [
-  {
-    name: 'your-folder',
-    type: 'folder',
-    id: 'your-folder',
-    children: [...]
-  },
-  // ... more items
-];
-```
-
-### Commands
-
-Add new commands in `src/lib/commands.ts`:
-
-```typescript
-case "your-command":
-  return {
-    type: "open_module",
-    content: "Opening...",
-    moduleId: "your-module"
-  };
-```
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/profile` | Public profile |
+| `GET` | `/api/v1/projects` | Published projects |
+| `GET` | `/api/v1/journey` | Journey timeline |
+| `GET` | `/api/v1/blog` | Blog posts |
+| `GET` | `/api/v1/achievements` | Achievements |
+| `GET` | `/api/v1/certifications` | Certifications |
+| `POST` | `/api/v1/contact` | Submit contact form |
 
 ## Building for Production
 
@@ -206,13 +189,13 @@ npm start
 
 ## Environment Variables
 
-- `NEXT_PUBLIC_API_URL` - Backend API URL (default: http://localhost:4000)
+| Variable | Default | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | Backend API URL |
 
 ## Browser Support
 
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
+Chrome, Edge, Firefox, Safari (latest versions).
 
 ## License
 

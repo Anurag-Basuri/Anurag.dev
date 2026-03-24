@@ -1,225 +1,235 @@
-# AnuragOS - Developer Portfolio System
+# AnuragOS — Developer Portfolio Platform
 
-A full-stack developer portfolio with a unique terminal-style interface. Features an Express backend with PostgreSQL and a Next.js frontend with an OS-like experience.
+A full-stack personal portfolio and brand platform. Express backend with PostgreSQL + Prisma, Next.js frontend with scroll-based navigation, animated sections, and a premium personal branding system.
 
-## 🎯 Project Overview
-
-**Backend**: RESTful API built with Express, Prisma ORM, PostgreSQL, Redis, and JWT authentication
-**Frontend**: Terminal-style UI built with Next.js, featuring CLI commands and draggable windows
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                    │
-│  Terminal UI • File Explorer • Draggable Windows        │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                   Frontend (Next.js 16)                     │
+│  Personal Brand • Scroll Nav • Animated Modules • Admin    │
+└────────────────────────────────────────────────────────────┘
                           │
                     REST API (HTTP)
                           │
-┌─────────────────────────────────────────────────────────┐
-│                  Backend (Express)                      │
-│  Auth • Projects • Journey • Blog • Contact • Media     │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────┐
+│                   Backend (Express)                         │
+│  Auth • Profile • Projects • Journey • Blog • Contact      │
+│  Achievements • Certifications • Coding Stats • Media      │
+└────────────────────────────────────────────────────────────┘
                           │
-        ┌─────────────────┴─────────────────┐
-        │                                   │
-┌───────────────┐                  ┌────────────────┐
-│  PostgreSQL   │                  │     Redis      │
-│   Database    │                  │  Cache/Queue   │
-└───────────────┘                  └────────────────┘
+          ┌───────────────┴───────────────┐
+   ┌──────────────┐              ┌────────────────┐
+   │  PostgreSQL  │              │     Redis      │
+   │   Database   │              │  Cache/Queue   │
+   └──────────────┘              └────────────────┘
 ```
 
-### 🛡️ Hybrid Data Strategy (Circuit Breaker)
+### Hybrid Data Strategy (Circuit Breaker)
 
-The frontend implements an industry-grade **Circuit Breaker** pattern for maximum reliability:
+The frontend implements a **Circuit Breaker** pattern:
 
-1.  **Online Mode**: Fetches data from the backend API.
-2.  **Failover**: If the backend is unreachable (3 consecutive failures), the system "opens the circuit".
-3.  **Offline Mode**: Instantly serves optimized static data from local files (`client/src/data`) with **zero latency**.
-4.  **Auto-Recovery**: Automatically attempts to reconnect to the backend every 60 seconds (half-open state).
+1. **Online** — Fetches from the backend API
+2. **Failover** — After 3 consecutive failures, the circuit opens
+3. **Offline** — Serves static fallback data from `client/src/api/fallback/` with zero latency
+4. **Recovery** — Retries the backend every 60 seconds (half-open state)
 
-This ensures the portfolio **never goes down**, even if the API server crashes or the user loses internet connection.
+The portfolio **never goes down**, even if the API crashes.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - PostgreSQL 14+
 - Redis 6+
-- npm or yarn
 
-### 1. Clone and Install
+### Setup
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd personal-portfolio
-
-# Install backend dependencies
+# Backend
 cd server
 npm install
+cp .env.example .env           # Edit with your DB/Redis/JWT/Cloudinary values
+npm run db:generate
+npm run db:migrate
+npm run db:seed
+npm run dev                    # → http://localhost:4000
 
-# Install frontend dependencies
+# Frontend
 cd ../client
 npm install
-```
-
-### 2. Set Up Backend
-
-```bash
-cd server
-
-# Copy environment file
-cp .env.example .env
-
-# Edit .env with your values
-# Required: DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET, Cloudinary credentials
-
-# Generate Prisma client
-npm run db:generate
-
-# Run database migrations
-npm run db:migrate
-
-# Seed database with sample data
-npm run db:seed
-
-# Start backend server
-npm run dev
-```
-
-Backend will run on http://localhost:4000
-
-### 3. Set Up Frontend
-
-```bash
-cd client
-
-# Copy environment file
 cp .env.local.example .env.local
-
-# Start frontend server
-npm run dev
+npm run dev                    # → http://localhost:3000
 ```
 
-Frontend will run on http://localhost:3000
+**Default Admin**: `admin` / `admin123`
 
-### 4. Access the Application
+## Tech Stack
 
-- **Frontend**: http://localhost:3000
-- **API Docs**: http://localhost:4000/api/v1/docs
-- **Default Admin**: username: `admin`, password: `admin123`
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 16, React 19, Tailwind CSS v4, Framer Motion, Jotai, Radix UI |
+| **Backend** | Express, TypeScript, Prisma ORM, Zod validation |
+| **Database** | PostgreSQL 14+ |
+| **Cache** | Redis 6+ |
+| **Auth** | JWT (access + refresh tokens), bcrypt |
+| **Media** | Cloudinary (image/file uploads) |
+| **Icons** | Lucide React, React Icons (Si/Fa6) |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-.
-├── server/                 # Backend (Express + Prisma)
+personal_portfolio/
+├── server/                        # Backend (Express + Prisma)
 │   ├── prisma/
-│   │   ├── schema.prisma   # Database schema
-│   │   └── seed.ts         # Database seeding
-│   ├── src/
-│   │   ├── config/         # Configuration
-│   │   ├── lib/            # Database & Redis clients
-│   │   ├── middleware/     # Auth, validation, etc.
-│   │   ├── modules/        # Feature modules
-│   │   │   ├── auth/
-│   │   │   ├── projects/
-│   │   │   └── contact/
-│   │   ├── routes/         # API routes
-│   │   ├── schemas/        # Zod validation schemas
-│   │   ├── types/          # TypeScript types
-│   │   ├── app.ts          # Express app setup
-│   │   └── server.ts       # Entry point
-│   └── tests/              # Test files
+│   │   ├── schema.prisma          # Database schema
+│   │   └── seed.ts                # Database seeding
+│   └── src/
+│       ├── controllers/           # Route handlers
+│       │   ├── profile.controller.ts
+│       │   ├── project.controller.ts
+│       │   ├── journey.controller.ts
+│       │   ├── blog.controller.ts
+│       │   ├── achievement.controller.ts
+│       │   ├── certification.controller.ts
+│       │   ├── coding-stats.controller.ts
+│       │   ├── auth.controller.ts
+│       │   ├── messages.controller.ts
+│       │   ├── docs.controller.ts
+│       │   └── public.controller.ts
+│       ├── routes/                # API route definitions
+│       ├── schemas/               # Zod validation schemas
+│       ├── services/              # Business logic
+│       ├── middleware/            # Auth, validation, rate limiting
+│       ├── config/               # Environment & app config
+│       ├── lib/                  # DB & Redis clients
+│       ├── utils/                # ApiError, ApiResponse helpers
+│       ├── app.ts                # Express app setup
+│       └── server.ts             # Entry point
 │
-├── client/                 # Frontend (Next.js)
-│   ├── src/
-│   │   ├── app/            # Next.js app directory
-│   │   ├── components/
-│   │   │   ├── core/       # Core UI components
-│   │   │   ├── modules/    # Feature modules
-│   │   │   └── ui/         # Reusable components
-│   │   ├── lib/
-│   │   │   ├── api.ts      # Backend API client
-│   │   │   ├── commands.ts # CLI commands
-│   │   │   └── data.ts     # File system data
-│   │   └── store/          # State management
-│   └── public/             # Static assets
-│
-└── .kiro/                  # Spec documents
-    └── specs/
-        └── anuragos-backend/
-            ├── requirements.md
-            ├── design.md
-            └── tasks.md
+└── client/                        # Frontend (Next.js)
+    └── src/
+        ├── app/                   # Next.js App Router
+        │   ├── portfolio/         # Main portfolio page
+        │   ├── admin/             # Admin dashboard
+        │   ├── resume/            # Resume viewer
+        │   └── readme/            # README viewer
+        ├── modules/               # Feature modules
+        │   ├── profile/           # Personal brand hero + bio + skills
+        │   ├── projects/          # Project showcase
+        │   ├── blog/              # Blog posts
+        │   ├── experience/        # Work timeline
+        │   ├── education/         # Education timeline
+        │   ├── achievements/      # Awards & competitions
+        │   ├── certifications/    # Professional certs
+        │   ├── coding-stats/      # CP platform profiles
+        │   └── contact/           # Contact form
+        ├── layout/                # App shell (sidebar, topbar, scroll)
+        ├── lib/                   # Utilities, skill-icons, theme, routes
+        ├── ui/                    # Reusable components
+        ├── animations/            # Framer Motion presets
+        ├── api/                   # API client + fallback data
+        ├── hooks/                 # Custom React hooks
+        ├── theme/                 # Theme provider
+        └── boot/                  # Boot/splash animation
 ```
 
-## 🎮 Features
+## Features
 
-### Backend Features
+### Frontend
 
-- ✅ JWT authentication with refresh tokens
+- ✅ **Personal Branding** — Large photo hero, typing tagline, availability & freelance badges
+- ✅ **Smart Skill Icons** — 3-layer fallback icon system (exact → category → generic)
+- ✅ **Image Lightbox** — Click-to-view full profile photo
+- ✅ **Social Tooltips** — Hover-reveal platform labels on social icons
+- ✅ **Language Popup** — Hover Languages stat to see spoken languages
+- ✅ **Scroll Navigation** — Section-based scroll spy with sidebar TOC
+- ✅ **Projects Showcase** — Tech stack tags, GitHub/live links, star/fork counts
+- ✅ **Blog System** — Posts with tags, content preview, published dates
+- ✅ **Journey Timelines** — Experience & education with categorized entries
+- ✅ **Achievements & Certifications** — Awards, competitions, credentials
+- ✅ **Coding Stats** — LeetCode, Codeforces, CodeChef, GFG profiles
+- ✅ **Contact Form** — Validation, sanitization, error feedback
+- ✅ **Multi-Theme** — CSS custom property-based theme switching
+- ✅ **Admin Dashboard** — Full CRUD for all content modules
+- ✅ **Responsive Design** — Mobile, tablet, and desktop optimized
+- ✅ **Circuit Breaker** — Offline fallback with auto-recovery
+
+### Backend
+
+- ✅ JWT auth with refresh token rotation
 - ✅ Account lockout after failed attempts
-- ✅ Projects CRUD with media uploads
-- ✅ Journey timeline management
-- ✅ Blog posts with draft/published workflow
+- ✅ Profile CRUD with social links management
+- ✅ Projects CRUD with media uploads (Cloudinary)
+- ✅ Journey timeline with document attachments
+- ✅ Blog CRUD with draft/published/archived workflow
+- ✅ Achievements & Certifications CRUD
 - ✅ Contact form with HTML sanitization
-- ✅ Prisma ORM with PostgreSQL
-- ✅ Redis for caching and sessions
-- ✅ Swagger API documentation
-- 🚧 Audit logging
-- 🚧 Content versioning
-- ✅ Media management (Cloudinary)
-- 🚧 Background jobs (BullMQ)
-- 🚧 Rate limiting
-- 🚧 Caching layer
+- ✅ Coding platform stats proxy
+- ✅ Zod request validation
+- ✅ Redis caching
+- ✅ Swagger/OpenAPI documentation
+- ✅ Link preview API
 
-### Frontend Features
+## API Endpoints
 
-- ✅ Terminal-style CLI interface
-- ✅ File explorer navigation
-- ✅ Draggable, resizable windows
-- ✅ About module
-- ✅ Projects showcase
-- ✅ Journey timeline
-- ✅ Blog listing
-- ✅ Contact form
-- ✅ Real-time API integration
-- ✅ Dark theme with terminal aesthetics
-- 🚧 AI Lab module
-- 🚧 Admin dashboard
-- ✅ Hybrid Data Layer (Circuit Breaker & Offline Support)
+### Public
 
-## 🔧 Development
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/health` | Health check |
+| `GET` | `/api/v1/profile` | Public profile |
+| `GET` | `/api/v1/projects` | Published projects |
+| `GET` | `/api/v1/projects/:id` | Project details |
+| `GET` | `/api/v1/journey` | Journey timeline |
+| `GET` | `/api/v1/blog` | Published blog posts |
+| `GET` | `/api/v1/blog/:id` | Blog post details |
+| `GET` | `/api/v1/achievements` | Achievements |
+| `GET` | `/api/v1/certifications` | Certifications |
+| `POST` | `/api/v1/contact` | Submit contact form |
+| `GET` | `/api/v1/docs/readme` | Project README |
 
-### Backend Scripts
+### Admin (JWT Required)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/auth/login` | Login |
+| `POST` | `/api/v1/auth/refresh` | Refresh token |
+| `POST` | `/api/v1/auth/logout` | Logout |
+| `PUT` | `/api/v1/admin/profile` | Update profile |
+| `POST/PUT/DELETE` | `/api/v1/admin/projects/:id` | Project CRUD |
+| `POST/PUT/DELETE` | `/api/v1/admin/journey/:id` | Journey CRUD |
+| `POST/PUT/DELETE` | `/api/v1/admin/blog/:id` | Blog CRUD |
+| `POST/PUT/DELETE` | `/api/v1/admin/achievements/:id` | Achievement CRUD |
+| `POST/PUT/DELETE` | `/api/v1/admin/certifications/:id` | Certification CRUD |
+
+## Development Scripts
+
+### Backend (`server/`)
 
 ```bash
-npm run dev          # Start development server
+npm run dev          # Dev server with hot reload
 npm run build        # Build for production
 npm start            # Start production server
-npm test             # Run tests
-npm run db:migrate   # Run database migrations
+npm run db:migrate   # Run Prisma migrations
 npm run db:generate  # Generate Prisma client
 npm run db:studio    # Open Prisma Studio
 npm run db:seed      # Seed database
 ```
 
-### Frontend Scripts
+### Frontend (`client/`)
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm start            # Start production server
-npm run lint         # Run ESLint
+npm run dev          # Dev server
+npm run build        # Production build
+npm start            # Start production
+npm run lint         # ESLint
 ```
 
-## 🔐 Environment Variables
+## Environment Variables
 
-### Backend (.env)
+### Backend (`server/.env`)
 
 ```env
 NODE_ENV=development
@@ -227,107 +237,46 @@ PORT=4000
 DATABASE_URL=postgresql://user:password@localhost:5432/anuragos_db
 REDIS_HOST=localhost
 REDIS_PORT=6379
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars-long
-JWT_REFRESH_SECRET=your-super-secret-refresh-key-min-32-chars-long
+JWT_SECRET=your-jwt-secret-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-secret-min-32-chars
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
 ```
 
-### Frontend (.env.local)
+### Frontend (`client/.env.local`)
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
-## 📚 API Documentation
+## Deployment
 
-Access the API documentation manifest at:
-http://localhost:4000/api/v1/docs
+### Backend
 
-### Public Endpoints
+1. Provision PostgreSQL + Redis
+2. Set environment variables
+3. `npm run db:migrate && npm run build && npm start`
 
-- `GET /api/v1/health` - Health check
-- `GET /api/v1/profile` - Public profile
-- `GET /api/v1/projects` - List published projects
-- `GET /api/v1/projects/:id` - Get project details
-- `GET /api/v1/journey` - Journey timeline
-- `GET /api/v1/blog` - List blog posts
-- `POST /api/v1/contact` - Submit contact form
+### Frontend
 
-### Admin Endpoints (require authentication)
-
-- `POST /api/v1/auth/login` - Admin login
-- `POST /api/v1/auth/refresh` - Refresh access token
-- `POST /api/v1/auth/logout` - Logout
-- `POST /api/v1/admin/projects` - Create project
-- `PUT /api/v1/admin/projects/:id` - Update project
-- `PATCH /api/v1/admin/projects/:id/status` - Update project status
-- `DELETE /api/v1/admin/projects/:id` - Delete project
-
-## 🎨 CLI Commands
-
-Type these commands in the terminal interface:
-
-- `help` - Show available commands
-- `ls` - List directory contents
-- `about` - Open About module
-- `projects` - Open Projects Hub
-- `journey` - Open Journey timeline
-- `blog` - Open Blog posts
-- `contact` - Open Contact form
-- `clear` - Clear terminal
-- `exit` - End session
-
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd server
-npm test
-
-# Frontend tests (when implemented)
-cd client
-npm test
-```
-
-## 🚀 Deployment
-
-### Backend Deployment
-
-1. Set up PostgreSQL and Redis instances
-2. Configure environment variables
-3. Run migrations: `npm run db:migrate`
-4. Build: `npm run build`
-5. Start: `npm start`
-
-### Frontend Deployment
-
-1. Configure `NEXT_PUBLIC_API_URL` to production backend
-2. Build: `npm run build`
+1. Set `NEXT_PUBLIC_API_URL` to production backend
+2. `npm run build`
 3. Deploy to Vercel, Netlify, or any Node.js hosting
 
-## 🔒 Security
+## Security
 
-- JWT tokens with 15-minute expiry
-- Refresh token rotation
-- Account lockout after 3 failed attempts
-- HTML sanitization for user input
-- Rate limiting (to be implemented)
+- JWT tokens (15-min access, rotated refresh)
+- Account lockout after 3 failed login attempts
+- HTML sanitization on all user input
+- Zod validation on all request bodies
 - CORS configuration
 - Environment variable validation
 
-## 📝 License
+## Author
+
+**Anurag Basuri**
+
+## License
 
 Private
-
-## 👤 Author
-
-Anurag Basuri
-
-## 🙏 Acknowledgments
-
-- Express for the backend framework
-- Next.js for the frontend framework
-- Prisma for the ORM
-- Radix UI for accessible components
