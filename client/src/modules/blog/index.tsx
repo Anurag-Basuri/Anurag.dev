@@ -245,7 +245,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 	}, []);
 
 	return (
-		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-6 lg:p-8">
+		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-3 md:p-4 lg:p-6">
 			{/* Backdrop */}
 			<motion.div
 				variants={fadeIn}
@@ -284,7 +284,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				</div>
 
 				{/* Sticky Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
+				<div className="flex items-center justify-between px-4 sm:px-5 py-2 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
 					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
 						<span>Article</span>
@@ -295,7 +295,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								href={post.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
+								className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
 								style={{
 									background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 									color: 'var(--theme-secondary)',
@@ -340,7 +340,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 					)}
 
 					{/* Content */}
-					<div className="p-5 sm:p-8 md:p-10 space-y-6 pb-16">
+					<div className="p-4 sm:p-6 md:p-8 space-y-5 pb-10">
 						{/* Meta badges */}
 						<div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
 							<span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-border">
@@ -415,12 +415,12 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 				)}
 			>
 				{/* Drag handle */}
-				<div className="flex justify-center pt-3 pb-1 shrink-0">
+				<div className="flex justify-center pt-2 pb-0.5 shrink-0">
 					<div className="w-10 h-1 rounded-full bg-border" />
 				</div>
 
 				{/* Mobile Header */}
-				<div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
+				<div className="flex items-center justify-between px-3 py-1.5 border-b border-border shrink-0">
 					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
 						<span>Article</span>
@@ -465,7 +465,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 						</div>
 					)}
 
-					<div className="p-4 space-y-4 pb-10">
+					<div className="p-3 space-y-3 pb-6">
 						{/* Meta */}
 						<div className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
 							<span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted border border-border">
@@ -585,7 +585,7 @@ export function BlogModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					label="Insights"
 					icon={BookOpen}
@@ -609,7 +609,7 @@ export function BlogModule() {
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-20px' }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-4"
 					>
 						{posts.map(post => (
 							<PostCard

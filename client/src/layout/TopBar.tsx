@@ -64,7 +64,7 @@ export function TopBar() {
 
 	return (
 		<TooltipProvider delayDuration={300}>
-			<header className="h-10 w-full flex items-center justify-between px-3 sm:px-4 shrink-0 z-30 relative">
+			<header className="h-8 w-full flex items-center justify-between px-2.5 sm:px-3 shrink-0 z-30 relative">
 				{/* Dedicated blur plane prevents stacking context trapping for nested dropdowns */}
 				<div className="absolute inset-0 bg-background/30 backdrop-blur-xl border-b border-border -z-10 pointer-events-none" />
 

@@ -56,7 +56,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 						>
 							<TopBar />
 
-							<div className="flex-1 flex min-h-0 w-full overflow-hidden p-2 md:p-3 gap-2">
+							<div className="flex-1 flex min-h-0 w-full overflow-hidden p-1.5 md:p-2 gap-1.5">
 								{/* Sidebar wrapper handles its own <aside> layer */}
 								<Suspense
 									fallback={<div className="hidden md:flex rounded-xl bg-transparent border border-border shrink-0 overflow-hidden relative w-[280px] h-full animate-pulse bg-foreground/5" />}

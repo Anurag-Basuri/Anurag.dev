@@ -66,7 +66,7 @@ export function ProjectsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-8 md:px-12 max-w-7xl mx-auto pb-10 sm:pb-14 pt-6 md:pt-8">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Briefcase}
 					label="Portfolio"
@@ -201,7 +201,7 @@ function ProjectDetailModal({
 	}, [onClose]);
 
 	return (
-		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-4 md:p-8">
+		<div className="fixed inset-0 z-100 flex items-center justify-center p-0 sm:p-3 md:p-6">
 			{/* Backdrop — fixed, never scrolls */}
 			<motion.div
 				variants={fadeIn}
@@ -229,14 +229,14 @@ function ProjectDetailModal({
 				style={{ boxShadow: '0 0 80px -20px color-mix(in oklch, var(--theme-primary) 15%, transparent)' }}
 			>
 				{/* Sticky Header */}
-				<div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
+				<div className="flex items-center justify-between px-4 sm:px-5 py-2 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
 					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
 						<Folder className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)' }} />
 						<span>Project Details</span>
 					</div>
 					<button
 						onClick={onClose}
-						className="p-2 rounded-full bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all hover:rotate-90 hover:scale-110"
+						className="p-1.5 rounded-full bg-muted hover:bg-accent border border-border text-muted-foreground hover:text-foreground transition-all hover:rotate-90 hover:scale-110"
 						aria-label="Close modal"
 					>
 						<X className="w-4 h-4" />
@@ -253,7 +253,7 @@ function ProjectDetailModal({
 					</div>
 
 					{/* Content */}
-					<div className="p-5 sm:p-8 space-y-6 pb-10">
+					<div className="p-4 sm:p-6 space-y-5 pb-8">
 						<h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground tracking-tight leading-tight">
 							{project.title}
 						</h2>
