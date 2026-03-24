@@ -21,7 +21,7 @@ export function getAIModel() {
 	}
 
 	const provider = env.AI_PROVIDER ?? 'gemini';
-	const modelName = env.AI_MODEL ?? DEFAULT_MODELS[provider] ?? 'gemini-2.0-flash';
+	const modelName = env.AI_MODEL ?? DEFAULT_MODELS[provider] ?? 'gemini-3-flash-preview';
 
 	if (provider === 'gemini') {
 		const genAI = new GoogleGenerativeAI(env.AI_API_KEY);
