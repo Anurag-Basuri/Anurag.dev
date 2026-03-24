@@ -2,43 +2,64 @@
 
 import { useEffect, useState, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, Building2, MapPin, Calendar, Star, X, Clock, ExternalLink } from 'lucide-react';
+import {
+	Briefcase, Building2, MapPin, Calendar, Star, X, Clock,
+	ExternalLink, Trophy, FileText, Wifi,
+} from 'lucide-react';
 import type { JourneyEntry } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
 import { staggerContainer, staggerItem, cardHover, scaleIn, fadeIn } from '@/animations/motion';
 import { useJourney } from '@/hooks/useJourney';
 
+// ─── Helpers ────────────────────────────────────────────────────
+
+/** Filter out empty/whitespace-only strings from skills array */
+function cleanSkills(skills: string[] | undefined | null): string[] {
+	return (skills ?? []).filter(s => s.trim().length > 0);
+}
+
+/** Format a date range from startDate/endDate or fall back to the pre-formatted date string */
+function formatDateRange(job: JourneyEntry): string {
+	if (job.startDate) {
+		const start = new Date(job.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+		const end = job.isCurrent
+			? 'Present'
+			: job.endDate
+				? new Date(job.endDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+				: '';
+		return end ? `${start} — ${end}` : start;
+	}
+	return job.date;
+}
+
+/** Get display location — prefer workLocation, fallback to location */
+function getLocation(job: JourneyEntry): string | null {
+	return (job.workLocation ?? job.location) || null;
+}
+
 // ─── Skeleton ───────────────────────────────────────────────────
 
 function ExperienceSkeleton() {
 	return (
-		<div className="p-6 md:p-12 max-w-5xl mx-auto animate-pulse pb-32">
-			<div className="space-y-4 mb-12 pb-8">
-				<div className="h-6 w-32 bg-foreground/5 rounded-lg" />
-				<div className="h-12 w-72 bg-foreground/5 rounded-xl" />
-				<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
+		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
+			<div className="space-y-3 mb-8">
+				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
+				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="max-w-4xl mx-auto space-y-6 mt-16 relative">
-				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
+			<div className="max-w-4xl mx-auto space-y-8 mt-12 relative">
+				<div className="absolute left-[31px] md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
 				{[1, 2, 3].map(i => (
 					<div key={i} className="flex items-start gap-8 relative z-10">
-						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-foreground/10 border-4 border-card" />
+						<div className="absolute left-[31px] md:left-1/2 w-4 h-4 -translate-x-1/2 rounded-full bg-foreground/10 border-4 border-card" />
 						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-48 bg-foreground/5 rounded-2xl" />
+							<div className="h-40 bg-foreground/5 rounded-xl" />
 						</div>
 					</div>
 				))}
 			</div>
 		</div>
 	);
-}
-
-// ─── Helpers ────────────────────────────────────────────────────
-
-/** Filter out empty/whitespace-only strings from skills array */
-function cleanSkills(skills: string[] | undefined | null): string[] {
-	return (skills ?? []).filter(s => s.trim().length > 0);
 }
 
 // ─── Job Card (Timeline) ────────────────────────────────────────
@@ -52,7 +73,8 @@ const JobCard = memo(function JobCard({
 	isEven: boolean;
 	onSelect: (job: JourneyEntry) => void;
 }) {
-	const skills = cleanSkills(job.skills);
+	const location = getLocation(job);
+	const dateRange = formatDateRange(job);
 
 	return (
 		<motion.div
@@ -62,13 +84,20 @@ const JobCard = memo(function JobCard({
 				!isEven && 'md:flex-row-reverse',
 			)}
 		>
-			{/* Timeline Node */}
+			{/* Timeline Node — pulses for current roles */}
 			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
 				<div
-					className="w-4 h-4 rounded-full bg-card border-4 group-hover:scale-150 transition-all duration-500"
+					className={cn(
+						'w-4 h-4 rounded-full border-4 group-hover:scale-150 transition-all duration-500',
+						job.isCurrent
+							? 'bg-primary animate-pulse'
+							: 'bg-card',
+					)}
 					style={{
 						borderColor: 'color-mix(in oklch, var(--theme-primary) 50%, transparent)',
-						boxShadow: '0 0 0 rgba(0,0,0,0)',
+						...(job.isCurrent && {
+							boxShadow: '0 0 12px color-mix(in oklch, var(--theme-primary) 40%, transparent)',
+						}),
 					}}
 				/>
 			</div>
@@ -77,10 +106,10 @@ const JobCard = memo(function JobCard({
 			<div
 				className={cn(
 					'w-full pl-20 md:pl-0 md:w-1/2 relative',
-					isEven ? 'md:pr-16 md:text-right' : 'md:pl-16',
+					isEven ? 'md:pr-16' : 'md:pl-16',
 				)}
 			>
-				{/* Connector Line to Node (Desktop Only) */}
+				{/* Connector Line (Desktop) */}
 				<div
 					className={cn(
 						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-border group-hover:bg-(--theme-primary)/50 transition-colors duration-500',
@@ -92,7 +121,7 @@ const JobCard = memo(function JobCard({
 					whileHover={cardHover}
 					onClick={() => onSelect(job)}
 					className={cn(
-						'relative p-3 sm:p-4 rounded-xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left cursor-pointer',
+						'relative p-3 sm:p-4 rounded-xl bg-linear-to-br from-foreground/5 to-transparent border border-border backdrop-blur-sm overflow-hidden cursor-pointer',
 						job.highlighted
 							? 'border-(--theme-primary)/30 bg-(--theme-primary)/5'
 							: 'hover:border-foreground/20',
@@ -100,53 +129,68 @@ const JobCard = memo(function JobCard({
 				>
 					<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/5 transition-colors duration-500" />
 
-					{/* Highlight Badge */}
 					{job.highlighted && (
 						<div className="absolute -top-3 -right-3 w-16 h-16 rounded-full blur-xl pointer-events-none" style={{ background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)' }} />
 					)}
 
 					<div className="relative z-10 flex flex-col h-full">
-						{/* Header */}
-						<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground mb-2 relative inline-flex items-center gap-2">
-							{job.title}
-							{job.highlighted && (
-								<Star className="w-4 h-4 shrink-0" style={{ color: 'var(--theme-primary)', fill: 'var(--theme-primary)' }} />
+						{/* Title row */}
+						<div className="flex items-start justify-between gap-2 mb-2">
+							<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground leading-tight">
+								{job.title}
+							</h3>
+							{job.isCurrent && (
+								<span
+									className="shrink-0 px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest"
+									style={{
+										color: 'var(--theme-primary)',
+										background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+										border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+									}}
+								>
+									Current
+								</span>
 							)}
-						</h3>
+						</div>
 
-						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+						{/* Meta pills */}
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
 							{job.organization && (
 								<span
-									className="flex items-center gap-1.5 px-2 py-1 rounded-md"
+									className="flex items-center gap-1.5 px-2 py-0.5 rounded-md"
 									style={{
 										color: 'var(--theme-primary)',
 										background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
 									}}
 								>
-									<Building2 className="w-3.5 h-3.5" />
+									<Building2 className="w-3 h-3" />
 									{job.organization}
 								</span>
 							)}
 							<span className="flex items-center gap-1.5">
-								<Calendar className="w-3.5 h-3.5" />
-								{job.date}
+								<Calendar className="w-3 h-3" />
+								{dateRange}
 							</span>
+							{location && (
+								<span className="flex items-center gap-1.5">
+									<MapPin className="w-3 h-3" />
+									{location}
+								</span>
+							)}
 						</div>
 
-						{/* Description — truncated on card */}
+						{/* Description — truncated */}
 						<p className="text-muted-foreground leading-relaxed text-sm font-medium line-clamp-2">
 							{job.description}
 						</p>
 
-						{/* View Details hint */}
+						{/* Footer */}
 						<div className="mt-3 pt-2 border-t border-border flex items-center justify-between">
 							<span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 group-hover:text-(--theme-primary) transition-colors">
 								View Details →
 							</span>
-							{skills.length > 0 && (
-								<span className="text-[9px] font-bold text-muted-foreground/50">
-									{skills.length} skill{skills.length !== 1 ? 's' : ''}
-								</span>
+							{job.highlighted && (
+								<Star className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)', fill: 'var(--theme-primary)' }} />
 							)}
 						</div>
 					</div>
@@ -166,6 +210,10 @@ function ExperienceDetailModal({
 	onClose: () => void;
 }) {
 	const skills = cleanSkills(job.skills);
+	const location = getLocation(job);
+	const dateRange = formatDateRange(job);
+	const achievements = job.achievements ?? [];
+	const documents = job.documents ?? [];
 
 	// Body scroll lock
 	useEffect(() => {
@@ -227,33 +275,47 @@ function ExperienceDetailModal({
 				{/* Scrollable Body */}
 				<div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
 					<div className="p-4 sm:p-6 space-y-5 pb-8">
-						{/* Title + Highlight */}
+						{/* Title + Badges */}
 						<div>
-							<div className="flex items-start gap-3">
-								<h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight flex-1">
+							<div className="flex items-start gap-2 flex-wrap">
+								<h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight flex-1 min-w-0">
 									{job.title}
 								</h2>
-								{job.highlighted && (
-									<div
-										className="shrink-0 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
-										style={{
-											color: 'var(--theme-primary)',
-											background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
-											border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
-										}}
-									>
-										<Star className="w-3 h-3 inline mr-1" style={{ fill: 'var(--theme-primary)' }} />
-										Featured
-									</div>
-								)}
+								<div className="flex items-center gap-2 shrink-0">
+									{job.isCurrent && (
+										<span
+											className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
+											style={{
+												color: 'var(--theme-primary)',
+												background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+												border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+											}}
+										>
+											● Current
+										</span>
+									)}
+									{job.highlighted && (
+										<span
+											className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
+											style={{
+												color: 'var(--theme-primary)',
+												background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
+												border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
+											}}
+										>
+											<Star className="w-3 h-3 inline mr-1" style={{ fill: 'var(--theme-primary)' }} />
+											Featured
+										</span>
+									)}
+								</div>
 							</div>
 						</div>
 
 						{/* Meta Info Grid */}
-						<div className="flex flex-wrap gap-3">
+						<div className="flex flex-wrap gap-2">
 							{job.organization && (
 								<div
-									className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
+									className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm font-semibold"
 									style={{
 										color: 'var(--theme-primary)',
 										background: 'color-mix(in oklch, var(--theme-primary) 8%, transparent)',
@@ -264,24 +326,31 @@ function ExperienceDetailModal({
 									{job.organization}
 								</div>
 							)}
-							<div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground">
+							<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground">
 								<Calendar className="w-4 h-4" />
-								{job.date}
+								{dateRange}
 							</div>
-							{job.location && (
-								<div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground">
+							{location && (
+								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground">
 									<MapPin className="w-4 h-4" />
-									{job.location}
+									{location}
 								</div>
 							)}
 							{job.employmentType && (
-								<div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
+								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
 									<Clock className="w-4 h-4" />
 									{job.employmentType}
 								</div>
 							)}
+							{job.workType && (
+								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
+									<Briefcase className="w-4 h-4" />
+									{job.workType}
+								</div>
+							)}
 							{job.workMode && (
-								<div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
+								<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted border border-border text-sm font-semibold text-muted-foreground capitalize">
+									<Wifi className="w-4 h-4" />
 									{job.workMode}
 								</div>
 							)}
@@ -315,15 +384,38 @@ function ExperienceDetailModal({
 							</div>
 						)}
 
-						{/* Attached Documents */}
-						{(job.documents ?? []).length > 0 && (
+						{/* Achievements */}
+						{achievements.length > 0 && (
 							<div className="space-y-2">
 								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
-									<ExternalLink className="w-3.5 h-3.5" />
+									<Trophy className="w-3.5 h-3.5" />
+									<span>Achievements</span>
+								</div>
+								<div className="space-y-2">
+									{achievements.map(ach => (
+										<div key={ach.id} className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 border border-border">
+											<Trophy className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--theme-primary)' }} />
+											<div className="flex-1 min-w-0">
+												<p className="text-sm font-bold text-foreground">{ach.title}</p>
+												{ach.description && (
+													<p className="text-xs text-muted-foreground mt-1 leading-relaxed">{ach.description}</p>
+												)}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+
+						{/* Documents */}
+						{documents.length > 0 && (
+							<div className="space-y-2">
+								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+									<FileText className="w-3.5 h-3.5" />
 									<span>Documents</span>
 								</div>
 								<div className="flex flex-wrap gap-2">
-									{(job.documents ?? []).map(doc => (
+									{documents.map(doc => (
 										<a
 											key={doc.id}
 											href={doc.url}
@@ -413,7 +505,7 @@ export function ExperienceModule() {
 						No work experience data found.
 					</div>
 				) : (
-					<div className="relative mt-8 md:mt-12 max-w-4xl mx-auto">
+					<div className="relative mt-6 md:mt-10 max-w-4xl mx-auto">
 						{/* Timeline Center Line */}
 						<div className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2" style={{ background: `linear-gradient(to bottom, transparent, color-mix(in oklch, var(--theme-primary) 20%, transparent), transparent)` }} />
 
