@@ -32,9 +32,9 @@ const envSchema = z.object({
 	GITHUB_TOKEN: z.string().optional(),
 
 	// AI Chatbot (optional — chatbot disabled if missing)
-	AI_PROVIDER: z.enum(['gemini', 'openai', 'groq']).default('gemini'),
-	AI_API_KEY: z.string().optional(),
-	AI_MODEL: z.string().optional(),
+	AI_PROVIDER: z.enum(['gemini', 'openai', 'huggingface', 'groq']).optional().default('huggingface'),
+	HF_TOKEN: z.string().optional(),
+	AI_MODEL: z.string().optional().default('meta-llama/Llama-3.3-70B-Instruct-Turbo'),
 });
 
 const parsed = envSchema.safeParse(process.env);

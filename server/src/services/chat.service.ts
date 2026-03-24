@@ -1,5 +1,4 @@
-import { FunctionDeclaration, SchemaType } from '@google/generative-ai';
-import { getAIModel, SYSTEM_PROMPT } from '../config/ai';
+import { getAIClient, AI_MODEL, SYSTEM_PROMPT } from '../config/ai';
 import { classifyIntent, buildContext, getProjectsContext } from './rag.service';
 import { fetchGithubActivity, fetchLeetCodeStats } from './external.service';
 import { submitContactLead } from './actions.service';
@@ -7,8 +6,10 @@ import { submitContactLead } from './actions.service';
 // ─── Types ──────────────────────────────────────────────────────
 
 interface ChatMessage {
-	role: 'user' | 'model';
-	content: string;
+	role: 'system' | 'user' | 'assistant' | 'tool';
+	content?: string;
+	name?: string; // used for tool role
+	tool_calls?: any[]; // used for assistant role when calling tools
 }
 
 interface ChatResponse {
@@ -17,8 +18,8 @@ interface ChatResponse {
 	sessionId: string;
 }
 
-const SESSION_TTL = 1800;
-const MAX_HISTORY = 10;
+const SESSION_TTL = 1800; // 30 minutes
+const MAX_HISTORY = 10; // Keep last 10 messages for context
 
 const sessionStore = new Map<string, { messages: ChatMessage[]; expiresAt: number }>();
 
@@ -33,7 +34,8 @@ async function getHistory(sessionId: string): Promise<ChatMessage[]> {
 }
 
 async function saveHistory(sessionId: string, messages: ChatMessage[]): Promise<void> {
-	const trimmed = messages.slice(-MAX_HISTORY);
+	// Only keep normal user/assistant message history across sessions to avoid token bloat
+	const trimmed = messages.filter(m => m.role === 'user' || m.role === 'assistant' && m.content).slice(-MAX_HISTORY);
 	sessionStore.set(sessionId, {
 		messages: trimmed,
 		expiresAt: Date.now() + SESSION_TTL * 1000,
@@ -44,53 +46,65 @@ export async function clearSession(sessionId: string): Promise<void> {
 	sessionStore.delete(sessionId);
 }
 
-// ─── AGENT TOOLS (Function Declarations) ────────────────────────
+// ─── AGENT TOOLS (OpenAI / HuggingFace Format) ──────────────────
 
-const agentFunctions: FunctionDeclaration[] = [
+const agentTools = [
 	{
-		name: 'search_projects',
-		description: 'Search Anurag\'s portfolio projects by keyword or tech stack',
-		parameters: {
-			type: SchemaType.OBJECT,
-			properties: {
-				query: { type: SchemaType.STRING, description: 'The search query or technology name (e.g. React, Python, E-commerce)' },
+		type: 'function',
+		function: {
+			name: 'search_projects',
+			description: 'Search Anurag\'s portfolio projects by keyword or tech stack',
+			parameters: {
+				type: 'object',
+				properties: {
+					query: { type: 'string', description: 'The search query or technology name (e.g. React, Python, E-commerce)' },
+				},
+				required: ['query'],
 			},
-			required: ['query'],
 		},
 	},
 	{
-		name: 'get_github_activity',
-		description: 'Fetch Anurag\'s live GitHub profile stats and recent public activity',
-		parameters: {
-			type: SchemaType.OBJECT,
-			properties: {
-				username: { type: SchemaType.STRING, description: 'GitHub username, default to anurag-basuri' },
+		type: 'function',
+		function: {
+			name: 'get_github_activity',
+			description: 'Fetch Anurag\'s live GitHub profile stats and recent public activity',
+			parameters: {
+				type: 'object',
+				properties: {
+					username: { type: 'string', description: 'GitHub username, default to anurag-basuri' },
+				},
+				required: ['username'],
 			},
-			required: ['username'],
 		},
 	},
 	{
-		name: 'get_leetcode_stats',
-		description: 'Fetch Anurag\'s live LeetCode competitive programming stats',
-		parameters: {
-			type: SchemaType.OBJECT,
-			properties: {
-				username: { type: SchemaType.STRING, description: 'LeetCode username, default to anuragbasuri' },
+		type: 'function',
+		function: {
+			name: 'get_leetcode_stats',
+			description: 'Fetch Anurag\'s live LeetCode competitive programming stats',
+			parameters: {
+				type: 'object',
+				properties: {
+					username: { type: 'string', description: 'LeetCode username, default to anuragbasuri' },
+				},
+				required: ['username'],
 			},
-			required: ['username'],
 		},
 	},
 	{
-		name: 'submit_contact_lead',
-		description: 'Submit an inquiry or contact message to Anurag. Always ask the user for their name, email, and message before calling this tool.',
-		parameters: {
-			type: SchemaType.OBJECT,
-			properties: {
-				name: { type: SchemaType.STRING, description: 'Visitor\'s full name' },
-				email: { type: SchemaType.STRING, description: 'Visitor\'s email address' },
-				message: { type: SchemaType.STRING, description: 'The message or inquiry' },
+		type: 'function',
+		function: {
+			name: 'submit_contact_lead',
+			description: 'Submit an inquiry or contact message to Anurag. Always ask the user for their name, email, and message before calling this tool.',
+			parameters: {
+				type: 'object',
+				properties: {
+					name: { type: 'string', description: 'Visitor\'s full name' },
+					email: { type: 'string', description: 'Visitor\'s email address' },
+					message: { type: 'string', description: 'The message or inquiry' },
+				},
+				required: ['name', 'email', 'message'],
 			},
-			required: ['name', 'email', 'message'],
 		},
 	},
 ];
@@ -105,7 +119,7 @@ async function executeTool(name: string, args: Record<string, any>): Promise<any
 			case 'get_github_activity':
 				return { result: await fetchGithubActivity(args.username || 'anurag-basuri') };
 			case 'get_leetcode_stats':
-				return { result: await fetchLeetCodeStats(args.username || 'avijit-basuri') }; // Fallback to provided username if known 
+				return { result: await fetchLeetCodeStats(args.username || 'avijit-basuri') };
 			case 'submit_contact_lead':
 				const res = await submitContactLead(args.name, args.email, args.message);
 				return JSON.parse(res);
@@ -122,67 +136,80 @@ async function executeTool(name: string, args: Record<string, any>): Promise<any
 export async function chat(message: string, sessionId: string): Promise<ChatResponse> {
 	// 1. Pre-warm context via Intents
 	const intents = classifyIntent(message);
-	// We still pull basic RAG context so the LLM doesn't have to tool-call for simple things like "Who are you?"
 	const baseContext = await buildContext(intents, message);
 	
 	const history = await getHistory(sessionId);
-	const historyForModel = history.map(msg => ({
-		role: msg.role as 'user' | 'model',
-		parts: [{ text: msg.content }],
-	}));
+	const hf = getAIClient();
 
-	const model = getAIModel();
-	const chatSession = model.startChat({
-		tools: [{ functionDeclarations: agentFunctions }],
-		history: [
-			{
-				role: 'user',
-				parts: [{ text: 'System instructions: ' + SYSTEM_PROMPT }],
-			},
-			{
-				role: 'model',
-				parts: [{ text: 'Understood. I will act as Anurag, use the provided tools if needed, and respond according to instructions.' }],
-			},
-			...historyForModel,
-		],
-	});
+	const messages: any[] = [
+		{ role: 'system', content: SYSTEM_PROMPT },
+		...history
+	];
 
-	// Inject base context only on the first message turn to save tokens
+	// Inject base context only on the active turn
 	const prompt = baseContext
 		? `[BASE PORTFOLIO DATA]\n${baseContext}\n[END DATA]\n\nVisitor says: ${message}`
 		: `Visitor says: ${message}`;
 
-	// 2. Agentic Execution Loop
-	let result = await chatSession.sendMessage([{ text: prompt }]);
-	
-	// Handle potential function calls (up to 3 chained calls to prevent infinite loops)
-	let callCount = 0;
-	while (result.response.functionCalls() && callCount < 3) {
-		const calls = result.response.functionCalls()!;
-		// Gemini can technically return multiple parallel calls, we handle them all
-		const functionResponses = await Promise.all(
-			calls.map(async call => {
-				const response = await executeTool(call.name, call.args);
-				return {
-					functionResponse: {
-						name: call.name,
-						response,
-					},
-				};
-			})
-		);
+	messages.push({ role: 'user', content: prompt });
 
-		// Send tool results back to the model
-		result = await chatSession.sendMessage(functionResponses);
-		callCount++;
+	// 2. Agentic Execution Loop
+	let callCount = 0;
+	let currentResponse: any = null;
+
+	while (callCount < 3) {
+		try {
+			currentResponse = await hf.chatCompletion({
+				model: AI_MODEL,
+				messages: messages,
+				tools: agentTools as any,
+				max_tokens: 1000,
+			});
+
+			const responseMessage = currentResponse.choices[0].message;
+
+			// If the model wants to call a tool
+			if (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
+				// Append the assistant's tool calls to the history
+				messages.push(responseMessage);
+
+				// Execute all requested tools
+				for (const toolCall of responseMessage.tool_calls) {
+					let args = {};
+					try {
+						args = JSON.parse(toolCall.function.arguments);
+					} catch (e) {
+						console.error('Failed to parse tool arguments:', toolCall.function.arguments);
+					}
+
+					const toolResult = await executeTool(toolCall.function.name, args);
+
+					// Append the tool result
+					messages.push({
+						role: 'tool',
+						name: toolCall.function.name,
+						content: JSON.stringify(toolResult),
+					});
+				}
+
+				callCount++;
+				// Loop continues to let the model generate the final response with tool outputs
+				continue;
+			}
+
+			// If no tool calls, this is the final answer
+			messages.push({ role: 'assistant', content: responseMessage.content });
+			break;
+		} catch (error: any) {
+			console.error('[hf.inference] Error:', error);
+			throw error;
+		}
 	}
 
-	const reply = result.response.text();
+	const reply = messages[messages.length - 1].content || 'I encountered an issue processing that. Could you rephrase?';
 
-	// 3. Save to history
-	history.push({ role: 'user', content: message });
-	history.push({ role: 'model', content: reply });
-	await saveHistory(sessionId, history);
+	// 3. Save to memory
+	await saveHistory(sessionId, messages);
 
 	return { reply, intents, sessionId };
 }

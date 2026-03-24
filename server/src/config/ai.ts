@@ -1,36 +1,22 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { HfInference } from '@huggingface/inference';
 import { env } from './env';
 
 // ─── AI Client Factory ──────────────────────────────────────────
-// Returns a configured Gemini model instance.
-// Supports swapping providers via AI_PROVIDER env var in the future.
-
-const DEFAULT_MODELS: Record<string, string> = {
-	gemini: 'gemini-2.0-flash',
-	openai: 'gpt-4o-mini',
-	groq: 'llama-3.3-70b-versatile',
-};
+// Returns a configured Hugging Face Inference client.
 
 export function isAIEnabled(): boolean {
-	return !!env.AI_API_KEY;
+	return !!env.HF_TOKEN;
 }
 
-export function getAIModel() {
-	if (!env.AI_API_KEY) {
-		throw new Error('AI_API_KEY is not configured');
+export function getAIClient() {
+	if (!env.HF_TOKEN) {
+		throw new Error('HF_TOKEN is not configured');
 	}
 
-	const provider = env.AI_PROVIDER ?? 'gemini';
-	const modelName = env.AI_MODEL ?? DEFAULT_MODELS[provider] ?? 'gemini-3-flash-preview';
-
-	if (provider === 'gemini') {
-		const genAI = new GoogleGenerativeAI(env.AI_API_KEY);
-		return genAI.getGenerativeModel({ model: modelName });
-	}
-
-	// Future: add OpenAI/Groq support here
-	throw new Error(`AI provider "${provider}" is not yet supported. Use "gemini".`);
+	return new HfInference(env.HF_TOKEN);
 }
+
+export const AI_MODEL = env.AI_MODEL || 'meta-llama/Llama-3.3-70B-Instruct-Turbo';
 
 export const SYSTEM_PROMPT = `You are Anurag Basuri's AI assistant embedded on his personal portfolio website.
 
