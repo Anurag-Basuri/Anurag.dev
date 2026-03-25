@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Power, Maximize2 } from 'lucide-react';
 import { BootGuard } from '@/boot/components/BootGuard';
-import { ChatWidget } from '@/modules/chatbot/ChatWidget';
+import { AgentWidget } from '@/modules/agent';
 
 const ResizableSidebar = dynamic(() => import('@/layout/ResizableSidebar').then(m => m.ResizableSidebar), {
 	ssr: false,
@@ -139,7 +139,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			</div>
 			
 			{/* Global Chatbot Widget */}
-			<ChatWidget />
+			<AgentWidget />
 		</BootGuard>
 	);
 }
