@@ -31,10 +31,10 @@ const envSchema = z.object({
 	// External APIs (optional)
 	GITHUB_TOKEN: z.string().optional(),
 
-	// AI Chatbot (optional — chatbot disabled if missing)
-	AI_PROVIDER: z.enum(['gemini', 'openai', 'huggingface', 'groq']).optional().default('huggingface'),
+	// AI Chatbot
+	AI_PROVIDER: z.enum(['gemini', 'openai', 'huggingface', 'groq']).optional().default('gemini'),
+	GEMINI_API_KEY: z.string().optional(),
 	HF_TOKEN: z.string().optional(),
-	AI_MODEL: z.string().optional().default('Qwen/Qwen2.5-72B-Instruct'),
 });
 
 const parsed = envSchema.safeParse(process.env);

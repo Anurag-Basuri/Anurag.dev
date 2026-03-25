@@ -1,5 +1,5 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { ChatHuggingFace } from "@langchain/huggingface";
+import { ChatOpenAI } from "@langchain/openai";
 import { env } from "../../../config/env";
 
 /**
@@ -24,11 +24,12 @@ export function getLLM() {
         }
     }
 
-    // 2. Configure Fallback Model (Hugging Face)
+    // 2. Configure Fallback Model (Hugging Face Serverless via OpenAI SDK)
     if (env.HF_TOKEN) {
-        fallbackLlm = new ChatHuggingFace({
+        fallbackLlm = new ChatOpenAI({
             model: "Qwen/Qwen2.5-72B-Instruct",
-            credentials: { apiKey: env.HF_TOKEN },
+            apiKey: env.HF_TOKEN,
+            configuration: { baseURL: "https://api-inference.huggingface.co/models/" },
             temperature: 0.3,
             maxTokens: 1000,
         });
