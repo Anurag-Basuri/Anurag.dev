@@ -1,49 +1,61 @@
-import { BaseMessage } from '@langchain/core/messages';
+import { BaseMessage, mapChatMessagesToStoredMessages, mapStoredMessagesToChatMessages } from '@langchain/core/messages';
 import { BaseListChatMessageHistory } from '@langchain/core/chat_history';
+import { prisma } from '../../../lib/prisma';
 
 /**
- * In-memory Chat History implementation for LangChain.
- * Used for storing Multi-turn Conversation Context explicitly.
+ * Permanent Chat History implementation for LangChain using PostgreSQL.
+ * Used for storing Multi-turn Conversation Context permanently so Anurag can view visitor questions.
  */
-class InMemoryChatMessageHistory extends BaseListChatMessageHistory {
-	lc_namespace = ['langchain', 'stores', 'message', 'in_memory'];
-	private messages: BaseMessage[] = [];
+class PrismaChatMessageHistory extends BaseListChatMessageHistory {
+	lc_namespace = ['langchain', 'stores', 'message', 'prisma'];
+	private sessionId: string;
 
-	constructor(messages?: BaseMessage[]) {
+	constructor(sessionId: string) {
 		super();
-		this.messages = messages || [];
+		this.sessionId = sessionId;
 	}
 
 	async getMessages(): Promise<BaseMessage[]> {
-		return this.messages;
+		const session = await prisma.agentSession.findUnique({
+			where: { sessionId: this.sessionId }
+		});
+
+		if (!session || !session.history) return [];
+
+		const parsed = typeof session.history === 'string' ? JSON.parse(session.history) : session.history;
+		// LangChain's native mapper safely converts raw DB JSON back into ToolMessage, HumanMessage, AIMessage class instances
+		return mapStoredMessagesToChatMessages(parsed);
 	}
 
 	async addMessage(message: BaseMessage): Promise<void> {
-		this.messages.push(message);
+		// First, grab the current history state from the database
+		const currentMessages = await this.getMessages();
+		
+		// Map the new consolidated state to LangChain's safe JSON structure
+		currentMessages.push(message);
+		const stored = mapChatMessagesToStoredMessages(currentMessages);
+
+		// Upsert the DB row
+		await prisma.agentSession.upsert({
+			where: { sessionId: this.sessionId },
+			update: { history: stored as any },
+			create: { sessionId: this.sessionId, history: stored as any }
+		});
 	}
 
 	async clear(): Promise<void> {
-		this.messages = [];
+		await prisma.agentSession.deleteMany({
+			where: { sessionId: this.sessionId }
+		});
 	}
 }
 
-// Global store to keep track of sessions
-export const messageHistories: Record<string, InMemoryChatMessageHistory> = {};
-
-/**
- * Retrieves or creates a new history session instance based on sessionId.
- * Keeps memory isolated per user socket/session.
- */
-export function getMessageHistory(sessionId: string): InMemoryChatMessageHistory {
-	if (!messageHistories[sessionId]) {
-		messageHistories[sessionId] = new InMemoryChatMessageHistory();
-	}
-	return messageHistories[sessionId];
+// Global factory to instantiate Postgres adapters
+export function getMessageHistory(sessionId: string): PrismaChatMessageHistory {
+	return new PrismaChatMessageHistory(sessionId);
 }
 
-export function clearSessionMemory(sessionId: string) {
-	if (messageHistories[sessionId]) {
-		messageHistories[sessionId].clear();
-		delete messageHistories[sessionId];
-	}
+export async function clearSessionMemory(sessionId: string) {
+	const history = new PrismaChatMessageHistory(sessionId);
+	await history.clear();
 }

@@ -12,6 +12,7 @@ const NAV_ITEMS = [
 	{ href: '/admin/certifications', label: 'Certifications', icon: '📜' },
 	{ href: '/admin/blog', label: 'Blog', icon: '✍️' },
 	{ href: '/admin/messages', label: 'Messages', icon: '💬' },
+	{ href: '/admin/agent-sessions', label: 'AI Sessions', icon: '🤖' },
 ];
 
 export function AdminNav() {
