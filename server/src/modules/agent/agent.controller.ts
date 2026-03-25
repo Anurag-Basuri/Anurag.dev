@@ -10,6 +10,7 @@ import { ApiResponse } from '../../utils/ApiResponse';
 const ChatMessageSchema = z.object({
 	message: z.string().min(1, 'Message cannot be empty').max(1000, 'Message too long'),
 	sessionId: z.string().min(1, 'Session ID is required'),
+	currentUrl: z.string().optional(),
 });
 
 const ClearSessionSchema = z.object({
@@ -22,7 +23,7 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ChatMessageSchema.parse(req.body);
 
-		const response = await processUserMessage(data.message, data.sessionId);
+		const response = await processUserMessage(data.message, data.sessionId, data.currentUrl);
 
 		ApiResponse.ok(
 			res,

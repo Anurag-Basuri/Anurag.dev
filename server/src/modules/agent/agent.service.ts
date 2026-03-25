@@ -13,6 +13,7 @@ export interface AgentResponse {
 export async function processUserMessage(
 	message: string,
 	sessionId: string,
+	currentUrl?: string,
 ): Promise<AgentResponse> {
 	console.log(`[agent.service] Processing message for session: ${sessionId}`);
 
@@ -22,8 +23,12 @@ export async function processUserMessage(
 	const history = await memory.getMessages();
 
 	const portfolioContext = await getBasePortfolioContext();
+	const locationContext = currentUrl
+		? `\n[SCREEN CONTEXT]\nThe user is currently looking at the page: ${currentUrl}. If they use words like "this" or "here", they are referring to this page.\n[END SCREEN CONTEXT]`
+		: '';
+
 	const systemPrompt = new SystemMessage(
-		`${SYSTEM_PERSONA}\n\n[PORTFOLIO CONTEXT]\n${portfolioContext}\n[END CONTEXT]`,
+		`${SYSTEM_PERSONA}\n\n[PORTFOLIO CONTEXT]\n${portfolioContext}\n[END CONTEXT]${locationContext}`,
 	);
 
 	// Prepare messages array for the current turn
