@@ -268,6 +268,26 @@ export const contactMessageSchema = z.object({
 	createdAt: z.string(),
 });
 
+// ─── Agent Session (Prisma: AgentSession) ────────────────────
+
+export const agentSessionSchema = z.object({
+	id: z.string(),
+	sessionId: z.string(),
+	history: z.any(), // Raw JSON from Prisma DB
+	createdAt: z.string(),
+	updatedAt: z.string(),
+});
+
+// ─── Agent Message (Prisma: AgentMessage) ────────────────────
+
+export const agentMessageSchema = z.object({
+	id: z.string(),
+	sessionId: z.string(),
+	role: z.string(),
+	content: z.string(),
+	createdAt: z.string(),
+});
+
 // ─── Inferred Types ──────────────────────────────────────────
 
 export type WorkPreferences = z.infer<typeof workPreferencesSchema>;
@@ -280,6 +300,7 @@ export type JourneyEntry = z.infer<typeof journeyEntrySchema>;
 export type Certification = z.infer<typeof certificationSchema>;
 export type BlogPost = z.infer<typeof blogPostSchema>;
 export type ContactMessage = z.infer<typeof contactMessageSchema>;
+export type AgentSession = z.infer<typeof agentSessionSchema>;
 
 // Backward-compat alias — existing code references AboutData
 export type AboutData = Profile;

@@ -9,6 +9,7 @@ import type {
 	AboutData,
 	SocialLink,
 	ContactMessage,
+	AgentSession,
 } from '@/api/schema';
 
 // Admin API service — all endpoints require auth
@@ -274,6 +275,16 @@ async function deleteMessage(id: string): Promise<void> {
 	await apiClient.del(`/admin/messages/${id}`);
 }
 
+// ─── AGENT SESSIONS ────────────────────────────────────────────────────────
+
+async function getAgentSessions(page = 1, limit = 50): Promise<any> {
+	return apiClient.get<any>(`/admin/agent-sessions?page=${page}&limit=${limit}`, true);
+}
+
+async function deleteAgentSession(id: string): Promise<void> {
+	await apiClient.del(`/admin/agent-sessions/${id}`);
+}
+
 export const adminService = {
 	getProfile,
 	updateProfile,
@@ -328,4 +339,8 @@ export const adminService = {
 	getMessages,
 	getMessage,
 	deleteMessage,
+
+	// Agent Sessions
+	getAgentSessions,
+	deleteAgentSession,
 };
