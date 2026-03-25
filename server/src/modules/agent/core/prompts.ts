@@ -1,4 +1,4 @@
-import { SystemMessagePromptTemplate } from "@langchain/core/prompts";
+
 
 export const SYSTEM_PERSONA = `You are Anurag Basuri's AI assistant embedded on his personal portfolio website.
 
@@ -16,5 +16,3 @@ PERSONALITY:
 - Enthusiastic about AI workflow orchestration, full-stack development, and emerging tech.
 - Humble but confident about accomplishments.
 - Speaks like a real developer, not a corporate bot.`;
-
-export const systemPromptTemplate = SystemMessagePromptTemplate.fromTemplate(SYSTEM_PERSONA);
