@@ -5,14 +5,15 @@ import { AgentWindow } from './AgentWindow';
 import { useAgentSession } from '../hooks/useAgentSession';
 
 export function AgentWidget() {
-	const { isOpen, setIsOpen } = useAgentSession();
+	const session = useAgentSession();
+	const { isOpen, setIsOpen } = session;
 
 	return (
 		<>
 			{/* The Floating Action Button */}
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="group fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 tracking-wide text-white shadow-lg transition-transform hover:scale-105 hover:bg-emerald-700 active:scale-95 sm:bottom-6 sm:right-6 ring-4 ring-emerald-600/20"
+				className="group fixed bottom-4 right-4 z-9999 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-600 tracking-wide text-white shadow-lg transition-transform hover:scale-105 hover:bg-emerald-700 active:scale-95 sm:bottom-6 sm:right-6 ring-4 ring-emerald-600/20"
 				aria-label="Toggle AI Assistant"
 			>
 				<div className="relative">
@@ -32,7 +33,7 @@ export function AgentWidget() {
 			</button>
 
 			{/* The Chat Window popup */}
-			{isOpen && <AgentWindow />}
+			{isOpen && <AgentWindow {...session} />}
 		</>
 	);
 }

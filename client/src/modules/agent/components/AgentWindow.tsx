@@ -3,9 +3,25 @@ import { Send, X, Bot, Trash2 } from 'lucide-react';
 import { useAgentSession } from '../hooks/useAgentSession';
 import { AgentMessageBubble } from './AgentMessageBubble';
 import { AgentTypingLoader } from './AgentTypingLoader';
+import { AgentMessage } from '../types/agent.types';
 
-export function AgentWindow() {
-	const { messages, isLoading, isOpen, setIsOpen, sendMessage, clearSession } = useAgentSession();
+export interface AgentWindowProps {
+	messages: AgentMessage[];
+	isLoading: boolean;
+	isOpen: boolean;
+	setIsOpen: (val: boolean) => void;
+	sendMessage: (val: string) => void;
+	clearSession: () => void;
+}
+
+export function AgentWindow({
+	messages,
+	isLoading,
+	isOpen,
+	setIsOpen,
+	sendMessage,
+	clearSession,
+}: AgentWindowProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +43,7 @@ export function AgentWindow() {
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed bottom-24 right-4 z-50 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-zinc-200 transition-all dark:bg-zinc-950 dark:ring-zinc-800 sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px]">
+		<div className="fixed bottom-20 right-4 z-9999 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-zinc-200 transition-all dark:bg-zinc-950 dark:ring-zinc-800 sm:bottom-24 sm:right-6 sm:h-[550px] sm:w-[380px]">
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
 				<div className="flex items-center gap-2">
