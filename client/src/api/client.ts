@@ -1,7 +1,7 @@
 import type { ApiSuccessResponse, ApiErrorResponse } from './types';
 
-const API_BASE =
-	process.env.NEXT_PUBLIC_API_URL || 'https://personalportfolio-production-ecaf.up.railway.app/api/v1';
+const _RAW_URL = process.env.NEXT_PUBLIC_API_URL || 'https://personalportfolio-production-ecaf.up.railway.app/api/v1';
+export const API_BASE = _RAW_URL.endsWith('/api/v1') ? _RAW_URL : `${_RAW_URL.replace(/\/$/, '')}/api/v1`;
 const REQUEST_TIMEOUT = 5000;
 
 // Custom error class for API failures
