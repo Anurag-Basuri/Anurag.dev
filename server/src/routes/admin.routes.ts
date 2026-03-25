@@ -7,6 +7,7 @@ import achievementRoutes from './achievement.routes';
 import certificationRoutes from './certification.routes';
 import blogRoutes from './blog.routes';
 import messagesRoutes from './messages.routes';
+import agentAdminRoutes from '../modules/agent/agent.admin.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use(achievementRoutes);
 router.use(certificationRoutes);
 router.use(blogRoutes);
 router.use(messagesRoutes);
+router.use(agentAdminRoutes);
 
 export default router;
