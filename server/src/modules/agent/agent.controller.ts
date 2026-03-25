@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { chat, clearSession } from '../services/chat.service';
-import { isAIEnabled } from '../config/ai';
-import { ApiError } from '../utils/ApiError';
-import { ApiResponse } from '../utils/ApiResponse';
+import { processUserMessage } from './agent.service';
+import { clearSessionMemory } from './core/memory.service';
+import { ApiError } from '../../utils/ApiError';
+import { ApiResponse } from '../../utils/ApiResponse';
 
 // ─── Validation ─────────────────────────────────────────────────
 
@@ -20,38 +20,36 @@ const ClearSessionSchema = z.object({
 
 export async function sendMessage(req: Request, res: Response): Promise<void> {
 	try {
-		if (!isAIEnabled()) {
-			throw ApiError.ServiceUnavailable('AI Chatbot is not configured on this server');
-		}
-
 		const data = ChatMessageSchema.parse(req.body);
 
-		const response = await chat(data.message, data.sessionId);
+		const response = await processUserMessage(data.message, data.sessionId);
 
 		ApiResponse.ok(
 			res,
 			{
 				reply: response.reply,
-				intents: response.intents,
+				intents: [], // Legacy compatibility
 				sessionId: response.sessionId,
 			},
-			'Message processed successfully',
+			'Message processed successfully by Agent',
 		);
 	} catch (error: any) {
-		console.error('[chat.controller] AI Error:', error.message || error);
-		// Specific error for rate limiting or AI provider errors
-		if (error instanceof Error && (error.message.includes('Quota') || error.message.includes('Resource has been exhausted') || error.message.includes('429'))) {
-			throw ApiError.ServiceUnavailable('AI service is currently overloaded. Please try again later.');
+		console.error('[agent.controller] Global Error:', error.message || error);
+		
+		// Map specific LangChain or API rate limit errors securely
+		if (error instanceof Error && (error.message.includes('Quota') || error.message.includes('429'))) {
+			throw ApiError.ServiceUnavailable('AI service is currently rate limited. Falling back failed. Please try again later.');
 		}
-		throw error;
+		
+		throw new ApiError(500, 'Failed to process message due to Agent failure');
 	}
 }
 
 export async function resetSession(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ClearSessionSchema.parse(req.body);
-		await clearSession(data.sessionId);
-		ApiResponse.ok(res, { cleared: true }, 'Chat session cleared');
+		clearSessionMemory(data.sessionId);
+		ApiResponse.ok(res, { cleared: true }, 'Agent session memory cleared');
 	} catch (error) {
 		throw error;
 	}
