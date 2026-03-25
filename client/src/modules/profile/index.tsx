@@ -586,11 +586,15 @@ export function ProfileModule() {
 													<motion.div
 														key={skill}
 														variants={staggerFastItem}
-														className="group relative flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border hover:border-border/80 transition-all duration-300 hover:-translate-y-1 shadow-[inset_0_1px_rgba(255,255,255,0.02)]"
+														className="group relative flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border hover:border-transparent transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl shadow-[inset_0_1px_rgba(255,255,255,0.02)] cursor-default"
 													>
 														<div
 															className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl pointer-events-none blur-md"
 															style={{ backgroundColor: color }}
+														/>
+														<div 
+															className="absolute inset-0 border border-transparent group-hover:border-current transition-colors duration-300 rounded-xl pointer-events-none opacity-20"
+															style={{ color }}
 														/>
 														<SkillIcon
 															className="w-5 h-5 mb-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"

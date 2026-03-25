@@ -6,7 +6,6 @@ import {
 	Terminal,
 	BrainCircuit,
 	Cpu,
-	Workflow,
 	Globe,
 	Layers,
 	Shield,
@@ -24,6 +23,9 @@ import {
 	Component,
 	Server,
 	Blocks,
+	Eye,
+	MessageSquare,
+	Workflow,
 } from 'lucide-react';
 import {
 	SiReact, SiNextdotjs, SiTypescript, SiJavascript, SiHtml5, SiCss, SiTailwindcss, SiVuedotjs, SiAngular, SiSvelte,
@@ -72,8 +74,8 @@ const EXACT_MATCH_DICT: Record<string, SkillIconData> = {
 	// Frontend
 	'react': { icon: SiReact, color: '#61DAFB' },
 	'reactjs': { icon: SiReact, color: '#61DAFB' },
-	'next': { icon: SiNextdotjs, color: '#000000' },
-	'nextjs': { icon: SiNextdotjs, color: '#000000' },
+	'next': { icon: SiNextdotjs, color: '#FFFFFF' },
+	'nextjs': { icon: SiNextdotjs, color: '#FFFFFF' },
 	'vue': { icon: SiVuedotjs, color: '#4FC08D' },
 	'vuejs': { icon: SiVuedotjs, color: '#4FC08D' },
 	'angular': { icon: SiAngular, color: '#DD0031' },
@@ -168,6 +170,12 @@ const EXACT_MATCH_DICT: Record<string, SkillIconData> = {
 	'llm': { icon: BrainCircuit, color: '#8B5CF6' },
 	'agent': { icon: Bot, color: '#6366F1' },
 	'ai': { icon: Sparkles, color: '#A855F7' },
+	'cv': { icon: Eye, color: '#F43F5E' },
+	'computervision': { icon: Eye, color: '#F43F5E' },
+	'nlp': { icon: MessageSquare, color: '#10B981' },
+	'naturallanguageprocessing': { icon: MessageSquare, color: '#10B981' },
+	'aiorchestration': { icon: Workflow, color: '#6366F1' },
+	'orchestration': { icon: Workflow, color: '#6366F1' },
 	'neuralnetwork': { icon: Waypoints, color: '#EF4444' },
 	'deeplearning': { icon: Layers, color: '#3B82F6' },
 	'microservices': { icon: Component, color: '#14B8A6' },
@@ -183,12 +191,22 @@ const EXACT_MATCH_DICT: Record<string, SkillIconData> = {
 function getCategoryFallback(skillStr: string, normalized: string): SkillIconData | null {
 	const text = skillStr.toLowerCase();
 
+	if (text.includes('vision')) {
+		return { icon: Eye, color: '#F43F5E' };
+	}
+	if (text.includes('nlp') || text.includes('natural language')) {
+		return { icon: MessageSquare, color: '#10B981' };
+	}
+	if (text.includes('orchestration') || text.includes('workflow')) {
+		return { icon: Workflow, color: '#6366F1' };
+	}
+
 	// AI & Machine Learning & LLMs
 	if (
 		text.includes('ai') || text.includes('ml') || text.includes('llm') ||
 		text.includes('neural') || text.includes('model') || text.includes('langchain') ||
 		text.includes('rag') || text.includes('agent') || text.includes('mcp') ||
-		text.includes('gpt') || text.includes('vision') || text.includes('nlp') ||
+		text.includes('gpt') ||
 		text.includes('deep learning') || text.includes('machine learning') ||
 		text.includes('generative')
 	) {
