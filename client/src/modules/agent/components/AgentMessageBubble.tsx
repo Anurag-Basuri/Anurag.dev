@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import { motion } from 'framer-motion';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { AgentMessage } from '../types/agent.types';
@@ -12,8 +13,13 @@ export function AgentMessageBubble({ message }: Props) {
 	const isUser = message.role === 'user';
 
 	return (
-		<div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
-			<div className={`flex max-w-[85%] gap-3 md:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+		<motion.div 
+			initial={{ opacity: 0, y: 10, scale: 0.98 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+			className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+		>
+			<div className={`flex max-w-[85%] gap-2.5 md:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
 				{/* Avatar */}
 				<div
 					className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${
@@ -79,6 +85,6 @@ export function AgentMessageBubble({ message }: Props) {
 					)}
 				</div>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

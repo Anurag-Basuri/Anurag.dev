@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Send, X, Bot, Trash2 } from 'lucide-react';
 import { useAgentSession } from '../hooks/useAgentSession';
 import { AgentMessageBubble } from './AgentMessageBubble';
@@ -43,7 +44,13 @@ export function AgentWindow({
 	if (!isOpen) return null;
 
 	return (
-		<div className="fixed bottom-20 right-4 z-9999 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-zinc-200 transition-all dark:bg-zinc-950 dark:ring-zinc-800 sm:bottom-24 sm:right-6 sm:h-[550px] sm:w-[380px]">
+		<motion.div 
+			initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: 'bottom right' }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0, y: 20, scale: 0.95 }}
+			transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+			className="fixed bottom-20 right-4 z-9999 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl bg-white/95 shadow-2xl ring-1 ring-zinc-200/50 backdrop-blur-xl transition-colors dark:bg-zinc-950/95 dark:ring-zinc-800/50 sm:bottom-24 sm:right-6 sm:h-[550px] sm:w-[380px]"
+		>
 			{/* Header */}
 			<div className="flex items-center justify-between border-b border-zinc-100 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
 				<div className="flex items-center gap-2">
@@ -75,7 +82,7 @@ export function AgentWindow({
 			{/* Message List */}
 			<div
 				ref={scrollRef}
-				className="flex-1 overflow-y-auto bg-zinc-50/50 p-4 dark:bg-zinc-900/50"
+				className="flex-1 overflow-y-auto bg-zinc-50/30 p-4 dark:bg-zinc-900/30 supports-scrollbars:pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-200 dark:[&::-webkit-scrollbar-thumb]:bg-zinc-800"
 			>
 				{messages.length === 0 ? (
 					<div className="flex h-full flex-col items-center justify-center space-y-3 text-center opacity-70">
@@ -100,24 +107,24 @@ export function AgentWindow({
 			</div>
 
 			{/* Input Area */}
-			<div className="border-t border-zinc-100 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
-				<form onSubmit={handleSubmit} className="flex items-center gap-2">
+			<div className="border-t border-zinc-100 bg-white/50 p-3 pt-4 dark:border-zinc-800/50 dark:bg-zinc-950/50">
+				<form onSubmit={handleSubmit} className="flex items-center gap-2 relative">
 					<input
 						ref={inputRef}
 						disabled={isLoading}
 						type="text"
-						placeholder={isLoading ? 'Thinking... 💡' : 'Ask me anything...'}
-						className="flex-1 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-900 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-emerald-500 dark:focus:ring-emerald-500"
+						placeholder={isLoading ? 'Agent is thinking...' : 'Ask me anything about Anurag...'}
+						className="flex-1 rounded-full border border-zinc-200 bg-white px-4 py-2.5 pl-4 pr-12 text-sm text-zinc-900 outline-none transition-shadow focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-60 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-emerald-500"
 					/>
 					<button
 						type="submit"
 						disabled={isLoading}
-						className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white transition-all hover:bg-emerald-700 active:scale-95 disabled:bg-zinc-300 disabled:active:scale-100 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
+						className="absolute right-1.5 top-1.5 bottom-1.5 flex aspect-square h-auto items-center justify-center rounded-full bg-emerald-600 text-white shadow-sm transition-all hover:bg-emerald-700 hover:scale-105 active:scale-95 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:hover:scale-100 dark:disabled:bg-zinc-800 dark:disabled:text-zinc-600"
 					>
-						<Send size={16} className="ml-[-2px] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+						<Send size={15} className="-ml-px" />
 					</button>
 				</form>
 			</div>
-		</div>
+		</motion.div>
 	);
 }

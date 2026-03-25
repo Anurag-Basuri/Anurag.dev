@@ -1,5 +1,4 @@
-'use client';
-
+import { AnimatePresence, motion } from 'framer-motion';
 import { Bot, X } from 'lucide-react';
 import { AgentWindow } from './AgentWindow';
 import { useAgentSession } from '../hooks/useAgentSession';
@@ -17,11 +16,29 @@ export function AgentWidget() {
 				aria-label="Toggle AI Assistant"
 			>
 				<div className="relative">
-					{isOpen ? (
-						<X size={24} className="transition-transform group-hover:rotate-90" />
-					) : (
-						<Bot size={24} className="transition-transform group-hover:-translate-y-0.5" />
-					)}
+					<AnimatePresence mode="wait">
+						{isOpen ? (
+							<motion.div
+								key="close"
+								initial={{ rotate: -90, opacity: 0 }}
+								animate={{ rotate: 0, opacity: 1 }}
+								exit={{ rotate: 90, opacity: 0 }}
+								transition={{ duration: 0.15 }}
+							>
+								<X size={24} />
+							</motion.div>
+						) : (
+							<motion.div
+								key="bot"
+								initial={{ scale: 0.5, opacity: 0 }}
+								animate={{ scale: 1, opacity: 1 }}
+								exit={{ scale: 0.5, opacity: 0 }}
+								transition={{ duration: 0.15 }}
+							>
+								<Bot size={24} />
+							</motion.div>
+						)}
+					</AnimatePresence>
 					{/* Notification Dot */}
 					{!isOpen && (
 						<span className="absolute -right-1 -top-1 flex h-3 w-3">
@@ -32,8 +49,20 @@ export function AgentWidget() {
 				</div>
 			</button>
 
-			{/* The Chat Window popup */}
-			{isOpen && <AgentWindow {...session} />}
+			{/* The Chat Window popup wrapped in AnimatePresence */}
+			<AnimatePresence>
+				{isOpen && (
+					<>
+						{/* Invisible Backdrop for Click-Outside-to-Close */}
+						<div
+							className="fixed inset-0 z-9998 bg-black/5 backdrop-blur-[1px] dark:bg-black/20"
+							onClick={() => setIsOpen(false)}
+							aria-hidden="true"
+						/>
+						<AgentWindow {...session} />
+					</>
+				)}
+			</AnimatePresence>
 		</>
 	);
 }
