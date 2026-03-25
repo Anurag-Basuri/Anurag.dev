@@ -20,12 +20,25 @@ export const githubTool = tool(
 				`https://api.github.com/users/${username}/events/public?per_page=5`,
 				{ headers },
 			);
-			if (!eventsRes.ok) return `Failed to fetch GitHub events for ${username}`;
-			const events = (await eventsRes.json()) as any[];
+			if (!eventsRes.ok)
+				return `Failed to fetch GitHub events for ${username}. GitHub API Status: ${eventsRes.status}`;
+
+			const eventsText = await eventsRes.text();
+			let events;
+			try {
+				events = JSON.parse(eventsText) as any[];
+			} catch (e) {
+				return 'GitHub API returned malformed data. Tell the user you cannot fetch events right now.';
+			}
 
 			// Fetch user info
 			const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
-			const user = userRes.ok ? ((await userRes.json()) as any) : null;
+			let user = null;
+			if (userRes.ok) {
+				try {
+					user = JSON.parse(await userRes.text()) as any;
+				} catch (e) {}
+			}
 
 			// Format human-readable output for the LLM
 			let result = `GitHub Profile: ${username}\n`;

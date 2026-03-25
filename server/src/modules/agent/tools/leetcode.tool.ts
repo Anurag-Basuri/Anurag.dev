@@ -6,7 +6,18 @@ export const leetcodeTool = tool(
 		try {
 			// Using a popular public proxy for LeetCode stats since they only have GraphQL
 			const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`);
-			const data = (await res.json()) as any;
+
+			if (!res.ok) {
+				return `The LeetCode stats API is currently offline (Status ${res.status}). Tell the user you can't fetch live stats right now.`;
+			}
+
+			const text = await res.text();
+			let data;
+			try {
+				data = JSON.parse(text);
+			} catch (e) {
+				return `The LeetCode API returned an invalid response (likely an HTML error page). Tell the user the service is temporarily down.`;
+			}
 
 			if (data.status === 'error') {
 				return `LeetCode account "${username}" not found or private.`;
