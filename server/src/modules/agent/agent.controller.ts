@@ -35,12 +35,17 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 		);
 	} catch (error: any) {
 		console.error('[agent.controller] Global Error:', error.message || error);
-		
+
 		// Map specific LangChain or API rate limit errors securely
-		if (error instanceof Error && (error.message.includes('Quota') || error.message.includes('429'))) {
-			throw ApiError.ServiceUnavailable('AI service is currently rate limited. Falling back failed. Please try again later.');
+		if (
+			error instanceof Error &&
+			(error.message.includes('Quota') || error.message.includes('429'))
+		) {
+			throw ApiError.ServiceUnavailable(
+				'AI service is currently rate limited. Falling back failed. Please try again later.',
+			);
 		}
-		
+
 		throw new ApiError(500, 'Failed to process message due to Agent failure');
 	}
 }

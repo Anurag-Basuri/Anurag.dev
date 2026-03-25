@@ -16,7 +16,10 @@ export const githubTool = tool(
 			}
 
 			// Fetch recent events
-			const eventsRes = await fetch(`https://api.github.com/users/${username}/events/public?per_page=5`, { headers });
+			const eventsRes = await fetch(
+				`https://api.github.com/users/${username}/events/public?per_page=5`,
+				{ headers },
+			);
 			if (!eventsRes.ok) return `Failed to fetch GitHub events for ${username}`;
 			const events = (await eventsRes.json()) as any[];
 
@@ -72,9 +75,12 @@ export const githubTool = tool(
 	},
 	{
 		name: 'get_github_activity',
-		description: 'Fetch Anurag\'s live GitHub profile stats and recent open-source activity.',
+		description: "Fetch Anurag's live GitHub profile stats and recent open-source activity.",
 		schema: z.object({
-			username: z.string().default('anurag-basuri').describe('The GitHub username to fetch. Always defaults to anurag-basuri.'),
+			username: z
+				.string()
+				.default('anurag-basuri')
+				.describe('The GitHub username to fetch. Always defaults to anurag-basuri.'),
 		}),
 	},
 );

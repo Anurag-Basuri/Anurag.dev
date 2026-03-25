@@ -35,9 +35,13 @@ export const leetcodeTool = tool(
 	},
 	{
 		name: 'get_leetcode_stats',
-		description: 'Fetch Anurag\'s live LeetCode competitive programming stats (problems solved, ranking, etc).',
+		description:
+			"Fetch Anurag's live LeetCode competitive programming stats (problems solved, ranking, etc).",
 		schema: z.object({
-			username: z.string().default('avijit-basuri').describe('The LeetCode username to fetch. Always defaults to "avijit-basuri".'),
+			username: z
+				.string()
+				.default('avijit-basuri')
+				.describe('The LeetCode username to fetch. Always defaults to "avijit-basuri".'),
 		}),
 	},
 );

@@ -6,9 +6,4 @@ import { portfolioTool } from './portfolio.tool';
 /**
  * All Model Context Protocol (MCP) tools available to the LangChain Agent.
  */
-export const agentTools = [
-    githubTool,
-    leetcodeTool,
-    submitContactTool,
-    portfolioTool
-];
+export const agentTools = [githubTool, leetcodeTool, submitContactTool, portfolioTool];

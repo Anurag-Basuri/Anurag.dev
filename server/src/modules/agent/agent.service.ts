@@ -10,9 +10,12 @@ export interface AgentResponse {
 	sessionId: string;
 }
 
-export async function processUserMessage(message: string, sessionId: string): Promise<AgentResponse> {
+export async function processUserMessage(
+	message: string,
+	sessionId: string,
+): Promise<AgentResponse> {
 	console.log(`[agent.service] Processing message for session: ${sessionId}`);
-	
+
 	const llm = getLLM();
 	const llmWithTools = llm.bindTools(agentTools);
 
@@ -20,14 +23,12 @@ export async function processUserMessage(message: string, sessionId: string): Pr
 	const history = await memory.getMessages();
 
 	const portfolioContext = await getBasePortfolioContext();
-	const systemPrompt = new SystemMessage(`${SYSTEM_PERSONA}\n\n[PORTFOLIO CONTEXT]\n${portfolioContext}\n[END CONTEXT]`);
-	
+	const systemPrompt = new SystemMessage(
+		`${SYSTEM_PERSONA}\n\n[PORTFOLIO CONTEXT]\n${portfolioContext}\n[END CONTEXT]`,
+	);
+
 	// Prepare messages array for the current turn
-	const turnMessages = [
-		systemPrompt,
-		...history,
-		new HumanMessage(message)
-	];
+	const turnMessages = [systemPrompt, ...history, new HumanMessage(message)];
 
 	// Ensure user message is saved to memory first
 	await memory.addMessage(new HumanMessage(message));
@@ -38,7 +39,7 @@ export async function processUserMessage(message: string, sessionId: string): Pr
 	while (callCount < MAX_LOOPS) {
 		const aiMsg = await llmWithTools.invoke(turnMessages);
 		turnMessages.push(aiMsg);
-		
+
 		// Wait, we only add the final generated standard text to history, not intermediate tool steps?
 		// Actually, adding tool calls to memory is standard so long-term memory tracks agent operations.
 		await memory.addMessage(aiMsg);
@@ -51,7 +52,7 @@ export async function processUserMessage(message: string, sessionId: string): Pr
 					const toolMsg = new ToolMessage({
 						tool_call_id: toolCall.id!,
 						content: `Tool ${toolCall.name} not found.`,
-						name: toolCall.name
+						name: toolCall.name,
 					});
 					turnMessages.push(toolMsg);
 					await memory.addMessage(toolMsg);
@@ -63,16 +64,19 @@ export async function processUserMessage(message: string, sessionId: string): Pr
 					const toolMsg = new ToolMessage({
 						tool_call_id: toolCall.id!,
 						content: String(toolOutput),
-						name: toolCall.name
+						name: toolCall.name,
 					});
 					turnMessages.push(toolMsg);
 					await memory.addMessage(toolMsg);
 				} catch (e: any) {
-					console.error(`[agent.service] Tool execution error for ${toolCall.name}:`, e.message);
+					console.error(
+						`[agent.service] Tool execution error for ${toolCall.name}:`,
+						e.message,
+					);
 					const errorMsg = new ToolMessage({
 						tool_call_id: toolCall.id!,
 						content: `Failed to execute tool: ${e.message}`,
-						name: toolCall.name
+						name: toolCall.name,
 					});
 					turnMessages.push(errorMsg);
 					await memory.addMessage(errorMsg);

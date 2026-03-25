@@ -19,10 +19,12 @@ export async function getBasePortfolioContext(): Promise<string> {
 				context += `- ${category}: ${list.join(', ')}\n`;
 			});
 		}
-		
-        const availability = profile.openToWork ? `Open to Work (Available ${profile.availableFrom || 'immediately'}, Notice Period: ${profile.noticePeriod || 'N/A'})` : 'Currently employed / Not looking';
+
+		const availability = profile.openToWork
+			? `Open to Work (Available ${profile.availableFrom || 'immediately'}, Notice Period: ${profile.noticePeriod || 'N/A'})`
+			: 'Currently employed / Not looking';
 		context += `Current Status: ${availability}\n`;
-        context += `[End Profile Data]\n`;
+		context += `[End Profile Data]\n`;
 
 		return context;
 	} catch (error) {

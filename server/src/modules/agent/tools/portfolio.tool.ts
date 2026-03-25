@@ -6,7 +6,7 @@ export const portfolioTool = tool(
 	async ({ query }) => {
 		try {
 			console.log(`[portfolio.tool] Searching projects/skills for: ${query}`);
-			
+
 			// Simple Prisma full-text search simulation using OR filters
 			const projects = await prisma.project.findMany({
 				where: {
@@ -33,7 +33,7 @@ export const portfolioTool = tool(
 
 			// Format the DB response into Markdown text for the LLM to read
 			let result = `Found ${projects.length} relevant projects for "${query}":\n\n`;
-			
+
 			projects.forEach(p => {
 				result += `### ${p.title}\n`;
 				result += `Tech Stack: ${p.techStack.join(', ')}\n`;
@@ -51,7 +51,8 @@ export const portfolioTool = tool(
 	},
 	{
 		name: 'search_projects',
-		description: 'Search अनुराग\'s DB for portfolio projects by keyword or tech stack (e.g. React, Python, E-commerce).',
+		description:
+			"Search अनुराग's DB for portfolio projects by keyword or tech stack (e.g. React, Python, E-commerce).",
 		schema: z.object({
 			query: z.string().describe('The search query or technology name'),
 		}),
