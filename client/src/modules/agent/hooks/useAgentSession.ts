@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { apiClient } from '@/api';
 import { AgentMessage, AgentApiResponse } from '../types/agent.types';
 
@@ -6,6 +7,8 @@ export function useAgentSession() {
 	const [messages, setMessages] = useState<AgentMessage[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const router = useRouter();
+	const pathname = usePathname();
 	
 	// Persistent Session ID Memory across reloads
 	const sessionIdRef = useRef<string>('');
@@ -39,12 +42,26 @@ export function useAgentSession() {
 			const resData = await apiClient.post<AgentApiResponse>('/chat', {
 				message: content,
 				sessionId: sessionIdRef.current,
+				currentUrl: pathname || (typeof window !== 'undefined' ? window.location.pathname : undefined),
 			});
+
+			let rawReply = resData.reply;
+
+			// Intercept Autonomous Navigation Commands from the LLM
+			const navRegex = /\[NAVIGATE:([\w\-\/]+)\]/g;
+			const match = navRegex.exec(rawReply);
+			if (match && match[1]) {
+				const routeTarget = match[1];
+				console.log('[useAgentSession] Autonomous Navigation triggered to:', routeTarget);
+				router.push(routeTarget);
+				// Strip the silent command from the visible message
+				rawReply = rawReply.replace(navRegex, '').trim();
+			}
 
 			const assistantMsg: AgentMessage = {
 				id: (Date.now() + 1).toString(),
 				role: 'assistant',
-				content: resData.reply,
+				content: rawReply,
 			};
 
 			setMessages(prev => [...prev, assistantMsg]);
