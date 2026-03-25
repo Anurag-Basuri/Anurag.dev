@@ -12,6 +12,7 @@ import docsRoutes from './routes/docs.routes';
 import agentRoutes from './modules/agent/agent.routes';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Security & Parsing
 app.disable('x-powered-by');

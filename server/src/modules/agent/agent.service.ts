@@ -1,4 +1,4 @@
-import { getLLM } from './core/llm.factory';
+import { getBoundLLM } from './core/llm.factory';
 import { agentTools } from './tools';
 import { SYSTEM_PERSONA } from './core/prompts';
 import { getMessageHistory } from './core/memory.service';
@@ -16,8 +16,7 @@ export async function processUserMessage(
 ): Promise<AgentResponse> {
 	console.log(`[agent.service] Processing message for session: ${sessionId}`);
 
-	const llm = getLLM();
-	const llmWithTools = llm.bindTools(agentTools);
+	const llmWithTools = getBoundLLM(agentTools);
 
 	const memory = getMessageHistory(sessionId);
 	const history = await memory.getMessages();
