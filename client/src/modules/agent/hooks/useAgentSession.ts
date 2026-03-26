@@ -67,10 +67,17 @@ export function useAgentSession() {
 			setMessages(prev => [...prev, assistantMsg]);
 		} catch (error: any) {
 			console.error('[useAgentSession] Error:', error);
+
+			// ApiClientError has .message and .status directly (not Axios-style .response.data)
+			let errorText = 'Sorry, I am having trouble connecting right now. Please try again later.';
+			if (error?.message && typeof error.message === 'string' && error.message !== 'Network error') {
+				errorText = error.message;
+			}
+
 			const errMsg: AgentMessage = {
 				id: (Date.now() + 1).toString(),
 				role: 'assistant',
-				content: error?.response?.data?.error?.message || 'Sorry, I am having trouble connecting right now. Please try again later.',
+				content: errorText,
 			};
 			setMessages(prev => [...prev, errMsg]);
 		} finally {

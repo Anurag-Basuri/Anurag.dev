@@ -4,32 +4,41 @@ import { z } from 'zod';
 export const leetcodeTool = tool(
 	async ({ username }) => {
 		try {
-			// Using a popular public proxy for LeetCode stats since they only have GraphQL
-			const res = await fetch(`https://leetcode-stats-api.herokuapp.com/${username}`);
+			// Using alfa-leetcode-api (maintained, deployed on Render)
+			const controller = new AbortController();
+			const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
+			const res = await fetch(
+				`https://alfa-leetcode-api.onrender.com/userProfile/${username}`,
+				{ signal: controller.signal },
+			);
+			clearTimeout(timeout);
 
 			if (!res.ok) {
-				return `The LeetCode stats API is currently offline (Status ${res.status}). Tell the user you can't fetch live stats right now.`;
+				return `The LeetCode stats API returned status ${res.status}. Tell the user you can't fetch live LeetCode stats right now but they can check the coding profiles section.`;
 			}
 
 			const text = await res.text();
-			let data;
+			let data: any;
 			try {
 				data = JSON.parse(text);
 			} catch (e) {
 				return `The LeetCode API returned an invalid response (likely an HTML error page). Tell the user the service is temporarily down.`;
 			}
 
-			if (data.status === 'error') {
+			if (data.errors || data.status === 'error') {
 				return `LeetCode account "${username}" not found or private.`;
 			}
 
-			// Format for the LLM
+			// Format for the LLM — adapt to alfa-leetcode-api response shape
 			let result = `LeetCode Profile: ${username}\n`;
-			result += `Total Solved: ${data.totalSolved} / ${data.totalQuestions} (Global Ranking: ${data.ranking})\n`;
+			result += `Total Solved: ${data.totalSolved ?? 'N/A'} / ${data.totalQuestions ?? 'N/A'}`;
+			if (data.ranking) result += ` (Global Ranking: ${data.ranking})`;
+			result += '\n';
 			result += `Difficulty Breakdown:\n`;
-			result += `- Easy: ${data.easySolved}\n`;
-			result += `- Medium: ${data.mediumSolved}\n`;
-			result += `- Hard: ${data.hardSolved}\n`;
+			result += `- Easy: ${data.easySolved ?? 'N/A'} / ${data.totalEasy ?? '?'}\n`;
+			result += `- Medium: ${data.mediumSolved ?? 'N/A'} / ${data.totalMedium ?? '?'}\n`;
+			result += `- Hard: ${data.hardSolved ?? 'N/A'} / ${data.totalHard ?? '?'}\n`;
 
 			if (data.acceptanceRate) {
 				result += `Acceptance Rate: ${data.acceptanceRate}%\n`;
@@ -37,11 +46,17 @@ export const leetcodeTool = tool(
 			if (data.contributionPoints) {
 				result += `Contribution Points: ${data.contributionPoints}\n`;
 			}
+			if (data.reputation !== undefined) {
+				result += `Reputation: ${data.reputation}\n`;
+			}
 
 			return result;
-		} catch (error) {
+		} catch (error: any) {
 			console.error('[leetcode.tool] Error:', error);
-			return `Error fetching LeetCode data: ${(error as Error).message}`;
+			if (error?.name === 'AbortError') {
+				return 'LeetCode API timed out. Tell the user the service is slow right now, but they can check the coding profiles section on the portfolio.';
+			}
+			return `Error fetching LeetCode data: ${error.message}. Tell the user to check the coding profiles section instead.`;
 		}
 	},
 	{

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { processUserMessage } from './agent.service';
 import { clearSessionMemory } from './core/memory.service';
-import { ApiError } from '../../utils/ApiError';
 import { ApiResponse } from '../../utils/ApiResponse';
 
 // ─── Validation ─────────────────────────────────────────────────
@@ -37,17 +36,40 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 	} catch (error: any) {
 		console.error('[agent.controller] Global Error:', error.message || error);
 
-		// Map specific LangChain or API rate limit errors securely
+		// Zod validation errors should still throw (bad request from client)
+		if (error?.name === 'ZodError') {
+			throw error;
+		}
+
+		// Rate limit errors — surface as 503 so the client can show a specific message
 		if (
 			error instanceof Error &&
 			(error.message.includes('Quota') || error.message.includes('429'))
 		) {
-			throw ApiError.ServiceUnavailable(
-				'AI service is currently rate limited. Falling back failed. Please try again later.',
+			// Return as a graceful chat reply, not a crash
+			ApiResponse.ok(
+				res,
+				{
+					reply: 'I\'m currently experiencing high demand. Please try again in a few moments!',
+					intents: [],
+					sessionId: req.body?.sessionId || '',
+				},
+				'Rate limited',
 			);
+			return;
 		}
 
-		throw new ApiError(500, 'Failed to process message due to Agent failure');
+		// ALL other errors: return a graceful fallback chat message (HTTP 200)
+		// This prevents the frontend from ever showing the error page for agent failures.
+		ApiResponse.ok(
+			res,
+			{
+				reply: 'I ran into a hiccup processing that. Could you try rephrasing your question?',
+				intents: [],
+				sessionId: req.body?.sessionId || '',
+			},
+			'Agent encountered an internal error but recovered gracefully',
+		);
 	}
 }
 
