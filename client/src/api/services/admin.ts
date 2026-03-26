@@ -277,8 +277,8 @@ async function deleteMessage(id: string): Promise<void> {
 
 // ─── AGENT SESSIONS ────────────────────────────────────────────────────────
 
-async function getAgentSessions(page = 1, limit = 50): Promise<any> {
-	return apiClient.get<any>(`/admin/agent-sessions?page=${page}&limit=${limit}`, true);
+async function getAgentSessions(page = 1, limit = 50): Promise<{ sessions: AgentSession[]; total: number; page: number; totalPages: number }> {
+	return apiClient.get<{ sessions: AgentSession[]; total: number; page: number; totalPages: number }>(`/admin/agent-sessions?page=${page}&limit=${limit}`, true);
 }
 
 async function deleteAgentSession(id: string): Promise<void> {

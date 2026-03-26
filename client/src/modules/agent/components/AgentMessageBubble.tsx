@@ -44,6 +44,12 @@ function normalizeNavTarget(target: string): string {
 		'experience': '/portfolio/experience',
 		'/education': '/portfolio/education',
 		'education': '/portfolio/education',
+		'/blog': '/portfolio/blog',
+		'blog': '/portfolio/blog',
+		'/achievements': '/portfolio/achievements',
+		'achievements': '/portfolio/achievements',
+		'/certifications': '/portfolio/certifications',
+		'certifications': '/portfolio/certifications',
 	};
 	const normalized = fixes[target];
 	if (normalized) return normalized;
