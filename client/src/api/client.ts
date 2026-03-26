@@ -8,12 +8,14 @@ const REQUEST_TIMEOUT = 5000;
 export class ApiClientError extends Error {
 	public readonly status: number;
 	public readonly details?: unknown;
+	public readonly source?: string;
 
-	constructor(status: number, message: string, details?: unknown) {
+	constructor(status: number, message: string, details?: unknown, source?: string) {
 		super(message);
 		this.name = 'ApiClientError';
 		this.status = status;
 		this.details = details;
+		this.source = source;
 	}
 }
 
@@ -133,6 +135,7 @@ async function request<T>(
 				response.status,
 				errorBody.error?.message || response.statusText,
 				errorBody.error?.details,
+				errorBody.error?.source,
 			);
 		}
 

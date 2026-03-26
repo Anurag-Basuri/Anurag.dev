@@ -11,6 +11,7 @@ export interface AgentWindowProps {
 	isOpen: boolean;
 	setIsOpen: (val: boolean) => void;
 	sendMessage: (val: string) => void;
+	retryMessage: (id: string) => void;
 	clearSession: () => void;
 }
 
@@ -20,6 +21,7 @@ export function AgentWindow({
 	isOpen,
 	setIsOpen,
 	sendMessage,
+	retryMessage,
 	clearSession,
 }: AgentWindowProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +100,7 @@ export function AgentWindow({
 				) : (
 					<div className="flex flex-col gap-1">
 						{messages.map((msg) => (
-							<AgentMessageBubble key={msg.id} message={msg} />
+							<AgentMessageBubble key={msg.id} message={msg} onRetry={retryMessage} />
 						))}
 						{isLoading && <AgentTypingLoader />}
 					</div>
