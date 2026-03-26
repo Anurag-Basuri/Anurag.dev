@@ -1,14 +1,17 @@
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../utils/ApiResponse';
 import { getReadme } from '../controllers/docs.controller';
+import { llmInfo } from '../modules/agent/core/llm.factory';
 
 const router = Router();
 
-// API documentation manifest
+// ─── API Documentation Manifest ─────────────────────────────────
+
 const API_DOCS = {
 	version: 'v1',
 	baseUrl: '/api/v1',
 	endpoints: {
+		// ─── Public ─────────────────────────────────────────────
 		public: [
 			{ method: 'GET', path: '/health', description: 'Health check' },
 			{ method: 'GET', path: '/profile', description: 'Get public profile' },
@@ -25,12 +28,48 @@ const API_DOCS = {
 				description: 'Submit contact message (rate-limited)',
 			},
 		],
+
+		// ─── AI Agent ───────────────────────────────────────────
+		agent: [
+			{
+				method: 'POST',
+				path: '/chat',
+				description: 'Send a message to the AI Agent (rate-limited: 15/min)',
+				body: {
+					message: 'string (required, max 1000 chars)',
+					sessionId: 'string (required — persistent browser ID)',
+					currentUrl: 'string (optional — page the user is viewing)',
+				},
+				response: {
+					reply: 'string — Agent markdown response',
+					intents: '[] — Reserved for future use',
+					sessionId: 'string — Echo of the session ID',
+				},
+				notes: [
+					'The Agent uses a dual-LLM architecture with automatic failover',
+					'Supports autonomous tool execution (GitHub, LeetCode, Portfolio search, Contact)',
+					'May include [NAVIGATE:/path] tokens for client-side routing',
+					'All errors return HTTP 200 with a graceful fallback reply — never crashes',
+				],
+			},
+			{
+				method: 'POST',
+				path: '/chat/reset',
+				description: 'Clear the Agent session memory for a given session ID',
+				body: { sessionId: 'string (required)' },
+				response: { cleared: 'boolean' },
+			},
+		],
+
+		// ─── Auth ───────────────────────────────────────────────
 		auth: [
 			{ method: 'POST', path: '/auth/login', description: 'Admin login' },
 			{ method: 'POST', path: '/auth/refresh', description: 'Refresh access token' },
 			{ method: 'POST', path: '/auth/logout', description: 'Logout (discard tokens)' },
 			{ method: 'GET', path: '/auth/me', description: 'Get current admin info', auth: true },
 		],
+
+		// ─── Admin ──────────────────────────────────────────────
 		admin: [
 			{ method: 'GET', path: '/admin/profile', description: 'Get admin profile', auth: true },
 			{ method: 'PUT', path: '/admin/profile', description: 'Update profile', auth: true },
@@ -296,14 +335,94 @@ const API_DOCS = {
 				description: 'Delete message',
 				auth: true,
 			},
+			{
+				method: 'GET',
+				path: '/admin/agent-sessions',
+				description: 'List AI Agent chat sessions (paginated)',
+				auth: true,
+			},
+			{
+				method: 'DELETE',
+				path: '/admin/agent-sessions/:id',
+				description: 'Delete AI Agent session',
+				auth: true,
+			},
+		],
+
+		// ─── Docs ───────────────────────────────────────────────
+		docs: [
+			{ method: 'GET', path: '/docs', description: 'This API documentation manifest' },
+			{ method: 'GET', path: '/docs/readme', description: 'Project README.md contents' },
+			{ method: 'GET', path: '/docs/agent', description: 'Live AI Agent architecture status' },
 		],
 	},
 };
+
+// ─── Routes ─────────────────────────────────────────────────────
 
 router.get('/docs', (_req: Request, res: Response) => {
 	ApiResponse.ok(res, API_DOCS, 'API documentation');
 });
 
 router.get('/docs/readme', getReadme);
+
+/**
+ * Live AI Agent Architecture Status
+ * Returns real-time info about which LLMs are configured, their mode, and available tools.
+ */
+router.get('/docs/agent', (_req: Request, res: Response) => {
+	ApiResponse.ok(
+		res,
+		{
+			architecture: {
+				mode: llmInfo.mode,
+				primary: {
+					provider: llmInfo.primaryProvider || null,
+					model: llmInfo.primaryModel || null,
+				},
+				fallback: {
+					provider: llmInfo.fallbackProvider || null,
+					model: llmInfo.fallbackModel || null,
+				},
+				features: [
+					'Dual-LLM with automatic failover',
+					'Sticky fallback — if primary fails once in a request, all subsequent loops use fallback',
+					'30-second timeout per LLM invocation',
+					'Persistent session memory (PostgreSQL)',
+					'Screen-aware context injection (currentUrl)',
+					'Autonomous navigation via [NAVIGATE:] tokens',
+				],
+			},
+			tools: [
+				{
+					name: 'get_github_activity',
+					description: "Fetch Anurag's GitHub profile stats and recent activity",
+				},
+				{
+					name: 'read_github_readme',
+					description: 'Read raw README.md from any public GitHub repository',
+				},
+				{
+					name: 'get_leetcode_stats',
+					description: "Fetch Anurag's live LeetCode stats (problems solved, ranking)",
+				},
+				{
+					name: 'search_projects',
+					description: 'Search published portfolio projects by keyword',
+				},
+				{
+					name: 'submit_contact_lead',
+					description: 'Submit a contact message from the chat interface',
+				},
+			],
+			errorHandling: {
+				strategy: 'Graceful degradation — all errors return HTTP 200 with a friendly fallback reply',
+				categories: ['RATE_LIMIT', 'TIMEOUT', 'NETWORK', 'INTERNAL'],
+				note: 'The Agent never returns HTTP 500 to the frontend',
+			},
+		},
+		'AI Agent architecture status',
+	);
+});
 
 export default router;
