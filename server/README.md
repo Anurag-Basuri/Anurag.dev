@@ -1,176 +1,109 @@
-# AnuragOS — Developer Portfolio Platform
+# AnuragOS — Backend Server
 
-A full-stack personal portfolio and brand platform. Express backend with PostgreSQL + Prisma, Next.js frontend with scroll-based navigation, animated sections, and a premium personal branding system.
-
-## Architecture
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                   Frontend (Next.js 16)                     │
-│  Personal Brand • Scroll Nav • Animated Modules • Admin    │
-└────────────────────────────────────────────────────────────┘
-                          │
-                    REST API (HTTP)
-                          │
-┌────────────────────────────────────────────────────────────┐
-│                   Backend (Express)                         │
-│  Auth • Profile • Projects • Journey • Blog • Contact      │
-│  Achievements • Certifications • Coding Stats • Media      │
-└────────────────────────────────────────────────────────────┘
-                          │
-          ┌───────────────┴───────────────┐
-   ┌──────────────┐              ┌────────────────┐
-   │  PostgreSQL  │              │     Redis      │
-   │   Database   │              │  Cache/Queue   │
-   └──────────────┘              └────────────────┘
-```
-
-### Hybrid Data Strategy (Circuit Breaker)
-
-The frontend implements a **Circuit Breaker** pattern:
-
-1. **Online** — Fetches from the backend API
-2. **Failover** — After 3 consecutive failures, the circuit opens
-3. **Offline** — Serves static fallback data from `client/src/api/fallback/` with zero latency
-4. **Recovery** — Retries the backend every 60 seconds (half-open state)
-
-The portfolio **never goes down**, even if the API crashes.
-
-## Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- PostgreSQL 14+
-- Redis 6+
-
-### Setup
-
-```bash
-# Backend
-cd server
-npm install
-cp .env.example .env           # Edit with your DB/Redis/JWT/Cloudinary values
-npm run db:generate
-npm run db:migrate
-npm run db:seed
-npm run dev                    # → http://localhost:4000
-
-# Frontend
-cd ../client
-npm install
-cp .env.local.example .env.local
-npm run dev                    # → http://localhost:3000
-```
-
-**Default Admin**: `admin` / `admin123`
+Express.js REST API powering the AnuragOS portfolio platform. Manages authentication, content CRUD, media uploads, and the autonomous AI Agent engine.
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | Next.js 16, React 19, Tailwind CSS v4, Framer Motion, Jotai, Radix UI |
-| **Backend** | Express, TypeScript, Prisma ORM, Zod validation |
-| **Database** | PostgreSQL 14+ |
-| **Cache** | Redis 6+ |
-| **Auth** | JWT (access + refresh tokens), bcrypt |
-| **Media** | Cloudinary (image/file uploads) |
-| **Icons** | Lucide React, React Icons (Si/Fa6) |
+| **Framework** | Express.js + TypeScript |
+| **ORM** | Prisma (PostgreSQL) |
+| **Cache** | Redis |
+| **Validation** | Zod |
+| **Auth** | JWT (access + refresh rotation), bcrypt |
+| **Media** | Cloudinary (via Multer) |
+| **AI Primary** | HuggingFace (Qwen 2.5 72B-Instruct) via `@langchain/openai` |
+| **AI Fallback** | Google Gemini 2.5 Flash via `@langchain/google-genai` |
 
-## Project Structure
+## Quick Start
 
-```
-personal_portfolio/
-├── server/                        # Backend (Express + Prisma)
-│   ├── prisma/
-│   │   ├── schema.prisma          # Database schema
-│   │   └── seed.ts                # Database seeding
-│   └── src/
-│       ├── controllers/           # Route handlers
-│       │   ├── profile.controller.ts
-│       │   ├── project.controller.ts
-│       │   ├── journey.controller.ts
-│       │   ├── blog.controller.ts
-│       │   ├── achievement.controller.ts
-│       │   ├── certification.controller.ts
-│       │   ├── coding-stats.controller.ts
-│       │   ├── auth.controller.ts
-│       │   ├── messages.controller.ts
-│       │   ├── docs.controller.ts
-│       │   └── public.controller.ts
-│       ├── routes/                # API route definitions
-│       ├── schemas/               # Zod validation schemas
-│       ├── services/              # Business logic
-│       ├── middleware/            # Auth, validation, rate limiting
-│       ├── config/               # Environment & app config
-│       ├── lib/                  # DB & Redis clients
-│       ├── utils/                # ApiError, ApiResponse helpers
-│       ├── app.ts                # Express app setup
-│       └── server.ts             # Entry point
-│
-└── client/                        # Frontend (Next.js)
-    └── src/
-        ├── app/                   # Next.js App Router
-        │   ├── portfolio/         # Main portfolio page
-        │   ├── admin/             # Admin dashboard
-        │   ├── resume/            # Resume viewer
-        │   └── readme/            # README viewer
-        ├── modules/               # Feature modules
-        │   ├── profile/           # Personal brand hero + bio + skills
-        │   ├── projects/          # Project showcase
-        │   ├── blog/              # Blog posts
-        │   ├── experience/        # Work timeline
-        │   ├── education/         # Education timeline
-        │   ├── achievements/      # Awards & competitions
-        │   ├── certifications/    # Professional certs
-        │   ├── coding-stats/      # CP platform profiles
-        │   └── contact/           # Contact form
-        ├── layout/                # App shell (sidebar, topbar, scroll)
-        ├── lib/                   # Utilities, skill-icons, theme, routes
-        ├── ui/                    # Reusable components
-        ├── animations/            # Framer Motion presets
-        ├── api/                   # API client + fallback data
-        ├── hooks/                 # Custom React hooks
-        ├── theme/                 # Theme provider
-        └── boot/                  # Boot/splash animation
+```bash
+npm install
+cp .env.example .env           # Fill in all variables
+npm run db:generate             # Generate Prisma types
+npm run db:migrate              # Push schema to PostgreSQL
+npm run db:seed                 # Seed data + admin account
+npm run dev                     # → http://localhost:4000
 ```
 
-## Features
+## 🧠 AI Agent Architecture
 
-### Frontend
+The Agent is a fully autonomous LangChain-powered system in `src/modules/agent/`. It uses a **manual ReAct loop** with dual-LLM failover and persistent session memory.
 
-- ✅ **Personal Branding** — Large photo hero, typing tagline, availability & freelance badges
-- ✅ **Smart Skill Icons** — 3-layer fallback icon system (exact → category → generic)
-- ✅ **Image Lightbox** — Click-to-view full profile photo
-- ✅ **Social Tooltips** — Hover-reveal platform labels on social icons
-- ✅ **Language Popup** — Hover Languages stat to see spoken languages
-- ✅ **Scroll Navigation** — Section-based scroll spy with sidebar TOC
-- ✅ **Projects Showcase** — Tech stack tags, GitHub/live links, star/fork counts
-- ✅ **Blog System** — Posts with tags, content preview, published dates
-- ✅ **Journey Timelines** — Experience & education with categorized entries
-- ✅ **Achievements & Certifications** — Awards, competitions, credentials
-- ✅ **Coding Stats** — LeetCode, Codeforces, CodeChef, GFG profiles
-- ✅ **Contact Form** — Validation, sanitization, error feedback
-- ✅ **Multi-Theme** — CSS custom property-based theme switching
-- ✅ **Admin Dashboard** — Full CRUD for all content modules
-- ✅ **Responsive Design** — Mobile, tablet, and desktop optimized
-- ✅ **Circuit Breaker** — Offline fallback with auto-recovery
+### Key Components
 
-### Backend
+| File | Role |
+|------|------|
+| `agent.service.ts` | Main ReAct loop — invokes LLMs, executes tools, manages sticky fallback |
+| `agent.controller.ts` | HTTP handler — zero-crash error recovery, always returns HTTP 200 |
+| `core/llm.factory.ts` | Singleton dual-LLM initializer (HuggingFace primary, Gemini fallback) |
+| `core/agent.logger.ts` | Structured observability with categories: `SYSTEM`, `LLM`, `TOOL`, `MEMORY`, `CTRL` |
+| `core/memory.service.ts` | Persistent session memory via Prisma (PostgreSQL) |
+| `core/prompts.ts` | System persona and behavioral instructions |
+| `tools/*.ts` | MCP tool implementations (GitHub, LeetCode, Portfolio, Contact) |
+| `rag/context.builder.ts` | RAG context retrieval from database |
 
-- ✅ JWT auth with refresh token rotation
-- ✅ Account lockout after failed attempts
-- ✅ Profile CRUD with social links management
-- ✅ Projects CRUD with media uploads (Cloudinary)
-- ✅ Journey timeline with document attachments
-- ✅ Blog CRUD with draft/published/archived workflow
-- ✅ Achievements & Certifications CRUD
-- ✅ Contact form with HTML sanitization
-- ✅ Coding platform stats proxy
-- ✅ Zod request validation
-- ✅ Redis caching
-- ✅ Swagger/OpenAPI documentation
-- ✅ Link preview API
+### Dual-LLM Sticky Fallback
+
+```
+Request starts → Try HuggingFace (Primary)
+  ✅ Success → Continue
+  ❌ Fail → Set STICKY flag, try Gemini (Fallback)
+    ✅ Success → Continue
+    ❌ Fail → Return graceful fallback reply
+
+Subsequent loops in same request:
+  STICKY flag set? → Skip Primary → Go directly to Fallback
+```
+
+- **30-second timeout** per LLM invocation (`Promise.race`)
+- Once primary fails, it's **disabled for the rest of that request**
+- Both LLMs are initialized once on server startup (singleton pattern)
+
+### MCP Tools
+
+| Tool | Description | Source |
+|------|-------------|--------|
+| `get_github_activity` | GitHub profile + recent 5 events | `api.github.com` |
+| `read_github_readme` | Raw README from any public repo | `api.github.com` |
+| `get_leetcode_stats` | Solving stats, ranking, difficulty breakdown | `alfa-leetcode-api.onrender.com` |
+| `search_projects` | Portfolio project search by keyword | PostgreSQL |
+| `submit_contact_lead` | Insert contact lead into database | PostgreSQL |
+
+### Structured Logging
+
+Every operation is logged with timestamps, categories, and execution timing:
+
+```
+[2026-03-26 07:30:00] [INFO]  [Agent:SYSTEM] ━━━ New Request ━━━ | {"llmMode":"dual","primary":"HuggingFace"}
+[2026-03-26 07:30:01] [INFO]  [Agent:LLM]    🧠 Invoking HuggingFace (Qwen2.5-72B-Instruct)
+[2026-03-26 07:30:05] [INFO]  [Agent:LLM]    ✅ LLM responded | {"durationMs":4200,"hasToolCalls":true}
+[2026-03-26 07:30:05] [INFO]  [Agent:TOOL]   ⚡ Executing: get_github_activity
+[2026-03-26 07:30:06] [INFO]  [Agent:TOOL]   ✅ get_github_activity completed | {"durationMs":875}
+[2026-03-26 07:30:08] [INFO]  [Agent:SYSTEM] ━━━ Request Complete ━━━ | {"totalDurationMs":8200}
+```
+
+## 🛡️ Error Handling
+
+### Agent Error Philosophy: Zero-Crash
+
+The Agent controller **never** returns HTTP 500. All errors are caught and converted to friendly chat replies:
+
+| Error Type | Category | User Sees |
+|-----------|----------|-----------|
+| LLM rate limit (429) | `RATE_LIMIT` | "I'm experiencing high demand..." |
+| LLM timeout (30s) | `TIMEOUT` | Automatic fallback to secondary LLM |
+| Network failure | `NETWORK` | "I ran into a hiccup..." |
+| Both LLMs down | `INTERNAL` | "Could you try rephrasing?" |
+| Tool failure | N/A | LLM reads the error and responds naturally |
+
+### Standard API Error Handling
+
+- All routes use `asyncHandler` wrapper for automatic error propagation
+- `ApiError` class with static factory methods (`NotFound`, `Unauthorized`, `ServiceUnavailable`)
+- `ApiResponse` class for consistent success response formatting
+- Global error middleware returns structured JSON errors with appropriate status codes
+- Zod validation errors are caught and returned as 400 Bad Request
 
 ## API Endpoints
 
@@ -188,90 +121,80 @@ personal_portfolio/
 | `GET` | `/api/v1/achievements` | Achievements |
 | `GET` | `/api/v1/certifications` | Certifications |
 | `POST` | `/api/v1/contact` | Submit contact form |
-| `GET` | `/api/v1/docs/readme` | Project README |
+
+### AI Agent
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/chat` | Send message to AI Agent (15/min rate limit) |
+| `POST` | `/api/v1/chat/reset` | Clear Agent session memory |
+
+### Auth
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/v1/auth/login` | Admin login |
+| `POST` | `/api/v1/auth/refresh` | Refresh access token |
+| `POST` | `/api/v1/auth/logout` | Logout |
+| `GET` | `/api/v1/auth/me` | Current admin info |
 
 ### Admin (JWT Required)
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/v1/auth/login` | Login |
-| `POST` | `/api/v1/auth/refresh` | Refresh token |
-| `POST` | `/api/v1/auth/logout` | Logout |
-| `PUT` | `/api/v1/admin/profile` | Update profile |
-| `POST/PUT/DELETE` | `/api/v1/admin/projects/:id` | Project CRUD |
-| `POST/PUT/DELETE` | `/api/v1/admin/journey/:id` | Journey CRUD |
-| `POST/PUT/DELETE` | `/api/v1/admin/blog/:id` | Blog CRUD |
-| `POST/PUT/DELETE` | `/api/v1/admin/achievements/:id` | Achievement CRUD |
-| `POST/PUT/DELETE` | `/api/v1/admin/certifications/:id` | Certification CRUD |
+| `GET/PUT` | `/admin/profile` | Profile CRUD |
+| `CRUD` | `/admin/projects/*` | Projects + media |
+| `CRUD` | `/admin/journey/*` | Journey + documents |
+| `CRUD` | `/admin/blog/*` | Blog + cover/images |
+| `CRUD` | `/admin/achievements/*` | Achievements + proof |
+| `CRUD` | `/admin/certifications/*` | Certifications + files |
+| `GET/DELETE` | `/admin/messages/*` | Contact messages |
+| `GET/DELETE` | `/admin/agent-sessions/*` | AI Agent session logs |
 
-## Development Scripts
+### Documentation
 
-### Backend (`server/`)
-
-```bash
-npm run dev          # Dev server with hot reload
-npm run build        # Build for production
-npm start            # Start production server
-npm run db:migrate   # Run Prisma migrations
-npm run db:generate  # Generate Prisma client
-npm run db:studio    # Open Prisma Studio
-npm run db:seed      # Seed database
-```
-
-### Frontend (`client/`)
-
-```bash
-npm run dev          # Dev server
-npm run build        # Production build
-npm start            # Start production
-npm run lint         # ESLint
-```
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/docs` | Full API endpoint manifest |
+| `GET` | `/api/v1/docs/readme` | Project README content |
+| `GET` | `/api/v1/docs/agent` | Live AI Agent architecture status |
 
 ## Environment Variables
 
-### Backend (`server/.env`)
-
 ```env
+# Core
 NODE_ENV=development
 PORT=4000
 DATABASE_URL=postgresql://user:password@localhost:5432/anuragos_db
 REDIS_HOST=localhost
 REDIS_PORT=6379
+
+# Auth
 JWT_SECRET=your-jwt-secret-min-32-chars
 JWT_REFRESH_SECRET=your-refresh-secret-min-32-chars
+
+# Media
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
+
+# AI Agent
+HF_TOKEN=your-huggingface-access-token          # Primary LLM
+GEMINI_API_KEY=your-gemini-api-key               # Fallback LLM
+GITHUB_TOKEN=your-github-pat                     # Elevated API limits
 ```
 
-### Frontend (`client/.env.local`)
+## Scripts
 
-```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
+```bash
+npm run dev          # Dev server with hot reload
+npm run build        # Production build
+npm start            # Start production
+npm run db:generate  # Generate Prisma client
+npm run db:migrate   # Run migrations
+npm run db:studio    # Prisma Studio GUI
+npm run db:seed      # Seed database
 ```
-
-## Deployment
-
-### Backend
-
-1. Provision PostgreSQL + Redis
-2. Set environment variables
-3. `npm run db:migrate && npm run build && npm start`
-
-### Frontend
-
-1. Set `NEXT_PUBLIC_API_URL` to production backend
-2. `npm run build`
-3. Deploy to Vercel, Netlify, or any Node.js hosting
-
-## Security
-
-- JWT tokens (15-min access, rotated refresh)
-- Account lockout after 3 failed login attempts
-- HTML sanitization on all user input
-- Zod validation on all request bodies
-- CORS configuration
-- Environment variable validation
 
 ## Author
 
