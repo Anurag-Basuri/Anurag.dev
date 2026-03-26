@@ -4,13 +4,13 @@ import { prisma } from '../lib/prisma';
 // ─── Types ──────────────────────────────────────────────────────
 
 interface ContributionDay {
-	date: string;      // YYYY-MM-DD
-	count: number;     // contribution count
-	level: number;     // 0-4 intensity level
+	date: string; // YYYY-MM-DD
+	count: number; // contribution count
+	level: number; // 0-4 intensity level
 }
 
 interface RatingHistoryEntry {
-	date: string;      // ISO date
+	date: string; // ISO date
 	rating: number;
 	contestName?: string;
 }
@@ -136,11 +136,12 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 					variables: { username },
 				}),
 			})
-				.then(async (res) => {
+				.then(async res => {
 					if (!res.ok) return null;
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
 					const json = (await res.json()) as any;
-					const weeks = json.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
+					const weeks =
+						json.data?.user?.contributionsCollection?.contributionCalendar?.weeks;
 					if (!weeks) return null;
 
 					const days: ContributionDay[] = [];
@@ -165,7 +166,12 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 
 		if (!userRes.ok) return base;
 
-		const user = (await userRes.json()) as { followers?: number; following?: number; public_repos?: number; public_gists?: number };
+		const user = (await userRes.json()) as {
+			followers?: number;
+			following?: number;
+			public_repos?: number;
+			public_gists?: number;
+		};
 		let totalStars = 0;
 
 		if (reposRes.ok) {

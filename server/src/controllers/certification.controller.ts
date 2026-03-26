@@ -147,8 +147,8 @@ async function reorderCertifications(req: Request, res: Response): Promise<void>
 			prisma.certification.update({
 				where: { id: item.id },
 				data: { order: item.order },
-			})
-		)
+			}),
+		),
 	);
 
 	await logAudit({

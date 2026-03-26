@@ -66,7 +66,11 @@ class ApiError extends Error {
 		return new ApiError(409, message, { details, source });
 	}
 
-	static UnprocessableEntity(message = 'Unprocessable Entity', details?: unknown, source?: string) {
+	static UnprocessableEntity(
+		message = 'Unprocessable Entity',
+		details?: unknown,
+		source?: string,
+	) {
 		return new ApiError(422, message, { details, source });
 	}
 
@@ -118,7 +122,11 @@ class ApiError extends Error {
 	 * | P2003       | 400  | Foreign key constraint violation   |
 	 * | P2025       | 404  | Record not found                  |
 	 */
-	static fromPrisma(err: { code: string; meta?: Record<string, unknown>; message: string }): ApiError {
+	static fromPrisma(err: {
+		code: string;
+		meta?: Record<string, unknown>;
+		message: string;
+	}): ApiError {
 		const meta = err.meta ?? {};
 
 		switch (err.code) {

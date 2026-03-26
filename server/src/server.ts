@@ -62,7 +62,10 @@ async function bootstrap() {
 		await verifyCloudinary();
 		console.log('  ✓ Cloudinary connected');
 	} catch (err) {
-		console.error('  ✗ Cloudinary connection failed:', err instanceof Error ? err.message : err);
+		console.error(
+			'  ✗ Cloudinary connection failed:',
+			err instanceof Error ? err.message : err,
+		);
 		process.exit(1);
 	}
 
@@ -74,7 +77,8 @@ async function bootstrap() {
 
 		console.log('\n┌──────────────────────────────────────┐');
 		console.log(`│  Environment : ${env.NODE_ENV.padEnd(21)} │`);
-		const url = env.NODE_ENV === 'development' ? `http://localhost:${env.PORT}` : `Port ${env.PORT}`;
+		const url =
+			env.NODE_ENV === 'development' ? `http://localhost:${env.PORT}` : `Port ${env.PORT}`;
 		console.log(`│  URL         : ${url.padEnd(21)} │`);
 		console.log(`│  Port        : ${String(env.PORT).padEnd(21)} │`);
 		console.log(`│  API Base    : /api/v1${' '.repeat(15)}│`);

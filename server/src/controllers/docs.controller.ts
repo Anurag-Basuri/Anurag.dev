@@ -9,7 +9,7 @@ export async function getReadme(_req: Request, res: Response): Promise<void> {
 		// Try checking relative to server directory and then monorepo root
 		const pathsToTry = [
 			path.resolve(process.cwd(), '../README.md'),
-			path.resolve(process.cwd(), 'README.md')
+			path.resolve(process.cwd(), 'README.md'),
 		];
 
 		let targetPath = '';
@@ -30,19 +30,23 @@ export async function getReadme(_req: Request, res: Response): Promise<void> {
 		const lines = content.split('\n').length;
 		const words = content.trim().split(/\s+/).length;
 
-		ApiResponse.ok(res, {
-			metadata: {
-				sizeBytes: stats.size,
-				lastModified: stats.mtime.toISOString(),
-				lines,
-				words,
+		ApiResponse.ok(
+			res,
+			{
+				metadata: {
+					sizeBytes: stats.size,
+					lastModified: stats.mtime.toISOString(),
+					lines,
+					words,
+				},
+				content,
 			},
-			content,
-		}, 'System Document retrieved securely');
+			'System Document retrieved securely',
+		);
 	} catch (error) {
 		if (error instanceof ApiError) throw error;
-		
-        console.error('Failed to read README.md', error);
+
+		console.error('Failed to read README.md', error);
 		throw new ApiError(500, 'Failed to extract system document data');
 	}
 }

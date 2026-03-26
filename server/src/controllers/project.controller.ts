@@ -240,8 +240,8 @@ async function reorderProjects(req: Request, res: Response): Promise<void> {
 			prisma.project.update({
 				where: { id: item.id },
 				data: { order: item.order },
-			})
-		)
+			}),
+		),
 	);
 
 	await logAudit({

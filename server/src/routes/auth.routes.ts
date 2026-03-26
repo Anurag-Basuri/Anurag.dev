@@ -20,22 +20,10 @@ router.post(
 	asyncHandler(loginHandler),
 );
 
-router.post(
-	'/auth/refresh',
-	validate(RefreshSchema),
-	asyncHandler(refreshHandler),
-);
+router.post('/auth/refresh', validate(RefreshSchema), asyncHandler(refreshHandler));
 
-router.post(
-	'/auth/logout',
-	authMiddleware,
-	asyncHandler(logoutHandler),
-);
+router.post('/auth/logout', authMiddleware, asyncHandler(logoutHandler));
 
-router.get(
-	'/auth/me',
-	authMiddleware,
-	asyncHandler(meHandler),
-);
+router.get('/auth/me', authMiddleware, asyncHandler(meHandler));
 
 export default router;
