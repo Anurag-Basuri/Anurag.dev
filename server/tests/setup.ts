@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // Test setup file
 import { beforeAll, afterAll } from 'vitest';
 
