@@ -48,16 +48,16 @@ function initLLMs() {
 		const apiKey = env.GEMINI_API_KEY || process.env.AI_API_KEY;
 		if (apiKey) {
 			_fallbackLlm = new ChatGoogleGenerativeAI({
-				model: 'gemini-1.5-flash',
+				model: 'gemini-2.5-flash',
 				apiKey: apiKey,
 				temperature: 0.3,
 				maxOutputTokens: 1000,
 			});
 			llmInfo.fallbackProvider = 'Gemini';
-			llmInfo.fallbackModel = 'gemini-1.5-flash';
+			llmInfo.fallbackModel = 'gemini-2.5-flash-preview-05-20';
 			agentLogger.info('LLM', '🟡 Fallback LLM configured', {
 				provider: 'Google Gemini',
-				model: 'gemini-1.5-flash',
+				model: 'gemini-2.5-flash-preview-05-20',
 			});
 		}
 	}

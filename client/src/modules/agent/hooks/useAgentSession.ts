@@ -73,13 +73,8 @@ export function useAgentSession() {
 				// Strip the [NAVIGATE:...] tokens from visible text
 				const cleanReply = rawReply.replace(NAV_REGEX, '').trim();
 
-				// Navigate to the first target automatically
-				if (navigationTargets.length > 0) {
-					const target = navigationTargets[0].startsWith('/')
-						? navigationTargets[0]
-						: `/${navigationTargets[0]}`;
-					router.push(target);
-				}
+				// NOTE: Navigation is handled by buttons in AgentMessageBubble
+				// which properly normalizes routes (e.g., /projects → /portfolio/projects)
 
 				const assistantMsg: AgentMessage = {
 					id: (Date.now() + 1).toString(),

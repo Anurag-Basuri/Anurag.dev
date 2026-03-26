@@ -36,6 +36,14 @@ function normalizeNavTarget(target: string): string {
 	const fixes: Record<string, string> = {
 		'/coding-profiles': '/portfolio/coding_stats',
 		'coding-profiles': '/portfolio/coding_stats',
+		'/projects': '/portfolio/projects',
+		'projects': '/portfolio/projects',
+		'/contact': '/portfolio/contact',
+		'contact': '/portfolio/contact',
+		'/experience': '/portfolio/experience',
+		'experience': '/portfolio/experience',
+		'/education': '/portfolio/education',
+		'education': '/portfolio/education',
 	};
 	const normalized = fixes[target];
 	if (normalized) return normalized;
