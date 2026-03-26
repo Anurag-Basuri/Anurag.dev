@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { processUserMessage } from './agent.service';
 import { clearSessionMemory } from './core/memory.service';
 import { ApiResponse } from '../../utils/ApiResponse';
+import { agentLogger } from './core/agent.logger';
 
 // ─── Validation ─────────────────────────────────────────────────
 
@@ -34,19 +35,24 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 			'Message processed successfully by Agent',
 		);
 	} catch (error: any) {
-		console.error('[agent.controller] Global Error:', error.message || error);
-
 		// Zod validation errors should still throw (bad request from client)
 		if (error?.name === 'ZodError') {
+			agentLogger.warn('CTRL', 'Zod validation failed', { issues: error.issues });
 			throw error;
 		}
 
-		// Rate limit errors — surface as 503 so the client can show a specific message
-		if (
-			error instanceof Error &&
-			(error.message.includes('Quota') || error.message.includes('429'))
-		) {
-			// Return as a graceful chat reply, not a crash
+		// Categorize the error for structured logging
+		const isRateLimit = error?.message?.includes('Quota') || error?.message?.includes('429');
+		const isTimeout = error?.message?.includes('timeout') || error?.message?.includes('AbortError');
+		const isNetworkErr = error?.message?.includes('fetch') || error?.message?.includes('ECONNREFUSED');
+
+		agentLogger.error('CTRL', 'Request failed — returning graceful fallback', error, {
+			sessionId: req.body?.sessionId,
+			category: isRateLimit ? 'RATE_LIMIT' : isTimeout ? 'TIMEOUT' : isNetworkErr ? 'NETWORK' : 'INTERNAL',
+		});
+
+		// Rate limit → specific message
+		if (isRateLimit) {
 			ApiResponse.ok(
 				res,
 				{
@@ -60,7 +66,6 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 		}
 
 		// ALL other errors: return a graceful fallback chat message (HTTP 200)
-		// This prevents the frontend from ever showing the error page for agent failures.
 		ApiResponse.ok(
 			res,
 			{
@@ -77,6 +82,7 @@ export async function resetSession(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ClearSessionSchema.parse(req.body);
 		clearSessionMemory(data.sessionId);
+		agentLogger.info('MEMORY', `Session memory cleared`, { sessionId: data.sessionId });
 		ApiResponse.ok(res, { cleared: true }, 'Agent session memory cleared');
 	} catch (error) {
 		throw error;
