@@ -71,6 +71,8 @@ export function ScrollContainer({ initialSection }: ScrollContainerProps) {
 				style={{
 					scrollbarWidth: 'thin',
 					scrollbarColor: 'rgba(255,255,255,0.08) transparent',
+					WebkitOverflowScrolling: 'touch',
+					overscrollBehaviorY: 'contain',
 				}}
 			>
 				{sectionComponents.map(section => (
