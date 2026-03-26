@@ -6,7 +6,7 @@ import { HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messag
 import { getBasePortfolioContext } from './rag/context.builder';
 import { agentLogger } from './core/agent.logger';
 
-const LLM_TIMEOUT_MS = 30_000; // 30 seconds
+const LLM_TIMEOUT_MS = 20_000; // 20 seconds — faster failure detection
 
 /** Race an LLM call against a timeout. */
 async function invokeWithTimeout(llm: any, messages: any[], label: string): Promise<any> {
@@ -76,7 +76,7 @@ export async function processUserMessage(
 	agentLogger.debug('LLM', `Estimated prompt size: ${approxChars} characters`, { sessionId });
 
 	let callCount = 0;
-	const MAX_LOOPS = 4;
+	const MAX_LOOPS = 3;
 
 	// ─── Sticky Fallback ────────────────────────────────────────────
 	// If the primary LLM fails once during a request, skip it for all
