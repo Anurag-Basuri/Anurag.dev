@@ -30,117 +30,132 @@ export function useAgentSession() {
 		}
 	}, []);
 
-	const sendMessage = useCallback(async (content: string) => {
-		if (!content.trim() || isLoadingRef.current) return;
+	const sendMessage = useCallback(
+		async (content: string) => {
+			if (!content.trim() || isLoadingRef.current) return;
 
-		const userMsg: AgentMessage = {
-			id: Date.now().toString(),
-			role: 'user',
-			content,
-		};
-
-		setMessages(prev => [...prev, userMsg]);
-		setIsLoading(true);
-		isLoadingRef.current = true;
-
-		try {
-			const resData = await apiClient.post<AgentApiResponse>('/chat', {
-				message: content,
-				sessionId: sessionIdRef.current,
-				currentUrl: pathname || (typeof window !== 'undefined' ? window.location.pathname : undefined),
-			});
-
-			let rawReply = resData.reply;
-
-			// Extract navigation targets for rendering as buttons
-			const navigationTargets: string[] = [];
-			let match: RegExpExecArray | null;
-			const regex = new RegExp(NAV_REGEX.source, NAV_REGEX.flags);
-			while ((match = regex.exec(rawReply)) !== null) {
-				if (match[1]) navigationTargets.push(match[1]);
-			}
-
-			// Strip the [NAVIGATE:...] tokens from visible text
-			const cleanReply = rawReply.replace(NAV_REGEX, '').trim();
-
-			// Navigate to the first target automatically
-			if (navigationTargets.length > 0) {
-				const target = navigationTargets[0].startsWith('/')
-					? navigationTargets[0]
-					: `/${navigationTargets[0]}`;
-				router.push(target);
-			}
-
-			const assistantMsg: AgentMessage = {
-				id: (Date.now() + 1).toString(),
-				role: 'assistant',
-				content: cleanReply,
-				navigationTargets: navigationTargets.length > 0 ? navigationTargets : undefined,
+			const userMsg: AgentMessage = {
+				id: Date.now().toString(),
+				role: 'user',
+				content,
 			};
 
-			setMessages(prev => [...prev, assistantMsg]);
-		} catch (error: any) {
-			console.error('[useAgentSession] Error:', error);
+			setMessages(prev => [...prev, userMsg]);
+			setIsLoading(true);
+			isLoadingRef.current = true;
+			console.log('[Agent] User Message:', content);
 
-			let errorText = 'Sorry, I am having trouble connecting right now. Please try again later.';
-			let status = 0;
-			let details = '';
-			let source = '';
+			try {
+				const resData = await apiClient.post<AgentApiResponse>('/chat', {
+					message: content,
+					sessionId: sessionIdRef.current,
+					currentUrl:
+						pathname ||
+						(typeof window !== 'undefined' ? window.location.pathname : undefined),
+				});
 
-			if (error instanceof ApiClientError) {
-				status = error.status;
-				details = error.message;
-				source = error.source || '';
-			} else if (error instanceof Error) {
-				details = error.message;
+				let rawReply = resData.reply;
+				console.log('[Agent] Assistant Reply:', rawReply);
+
+				// Extract navigation targets for rendering as buttons
+				const navigationTargets: string[] = [];
+				let match: RegExpExecArray | null;
+				const regex = new RegExp(NAV_REGEX.source, NAV_REGEX.flags);
+				while ((match = regex.exec(rawReply)) !== null) {
+					if (match[1]) navigationTargets.push(match[1]);
+				}
+
+				// Strip the [NAVIGATE:...] tokens from visible text
+				const cleanReply = rawReply.replace(NAV_REGEX, '').trim();
+
+				// Navigate to the first target automatically
+				if (navigationTargets.length > 0) {
+					const target = navigationTargets[0].startsWith('/')
+						? navigationTargets[0]
+						: `/${navigationTargets[0]}`;
+					router.push(target);
+				}
+
+				const assistantMsg: AgentMessage = {
+					id: (Date.now() + 1).toString(),
+					role: 'assistant',
+					content: cleanReply,
+					navigationTargets: navigationTargets.length > 0 ? navigationTargets : undefined,
+				};
+
+				setMessages(prev => [...prev, assistantMsg]);
+			} catch (error: any) {
+				console.error('[useAgentSession] Error:', error);
+
+				let errorText =
+					'Sorry, I am having trouble connecting right now. Please try again later.';
+				let status = 0;
+				let details = '';
+				let source = '';
+
+				if (error instanceof ApiClientError) {
+					status = error.status;
+					details = error.message;
+					source = error.source || '';
+				} else if (error instanceof Error) {
+					details = error.message;
+				}
+
+				// Friendly error mapping
+				if (status === 408)
+					errorText = 'Request timed out. The server might be busy or cold-starting.';
+				if (status === 429)
+					errorText = "I'm receiving too many requests right now. Please wait a moment.";
+				if (status === 0)
+					errorText =
+						'Network error. Please check your internet connection or if the server is running.';
+
+				const errMsg: AgentMessage = {
+					id: (Date.now() + 1).toString(),
+					role: 'assistant',
+					content: errorText,
+					isError: true,
+					error: {
+						status,
+						message: details,
+						code: error?.name || 'Error',
+						source,
+					},
+				};
+				setMessages(prev => [...prev, errMsg]);
+			} finally {
+				setIsLoading(false);
+				isLoadingRef.current = false;
+			}
+		},
+		[router, pathname],
+	);
+
+	const retryMessage = useCallback(
+		(messageId: string) => {
+			// Find the message that failed (it's an assistant message)
+			const failedMsgIndex = messages.findIndex(m => m.id === messageId);
+			if (failedMsgIndex === -1) return;
+
+			// Find the previous user message to re-send
+			let userMsgContent = '';
+			for (let i = failedMsgIndex - 1; i >= 0; i--) {
+				if (messages[i].role === 'user') {
+					userMsgContent = messages[i].content;
+					break;
+				}
 			}
 
-			// Friendly error mapping
-			if (status === 408) errorText = 'Request timed out. The server might be busy or cold-starting.';
-			if (status === 429) errorText = "I'm receiving too many requests right now. Please wait a moment.";
-			if (status === 0) errorText = 'Network error. Please check your internet connection or if the server is running.';
+			if (!userMsgContent) return;
 
-			const errMsg: AgentMessage = {
-				id: (Date.now() + 1).toString(),
-				role: 'assistant',
-				content: errorText,
-				isError: true,
-				error: {
-					status,
-					message: details,
-					code: error?.name || 'Error',
-					source,
-				},
-			};
-			setMessages(prev => [...prev, errMsg]);
-		} finally {
-			setIsLoading(false);
-			isLoadingRef.current = false;
-		}
-	}, [router, pathname]);
+			// Remove the failed message and its associated user message from the list
+			setMessages(prev => prev.filter((_, i) => i !== failedMsgIndex));
 
-	const retryMessage = useCallback((messageId: string) => {
-		// Find the message that failed (it's an assistant message)
-		const failedMsgIndex = messages.findIndex(m => m.id === messageId);
-		if (failedMsgIndex === -1) return;
-
-		// Find the previous user message to re-send
-		let userMsgContent = '';
-		for (let i = failedMsgIndex - 1; i >= 0; i--) {
-			if (messages[i].role === 'user') {
-				userMsgContent = messages[i].content;
-				break;
-			}
-		}
-
-		if (!userMsgContent) return;
-
-		// Remove the failed message and its associated user message from the list
-		setMessages(prev => prev.filter((_, i) => i !== failedMsgIndex));
-
-		// Re-send the content
-		sendMessage(userMsgContent);
-	}, [messages, sendMessage]);
+			// Re-send the content
+			sendMessage(userMsgContent);
+		},
+		[messages, sendMessage],
+	);
 
 	const clearSession = useCallback(async () => {
 		setMessages([]);

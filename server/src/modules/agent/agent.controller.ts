@@ -23,8 +23,15 @@ const ClearSessionSchema = z.object({
 export async function sendMessage(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ChatMessageSchema.parse(req.body);
+		console.log('[Agent] User Message:', data.message);
 
 		const response = await processUserMessage(data.message, data.sessionId, data.currentUrl);
+
+		console.log('[Agent] Assistant Reply:', response.reply);
+		agentLogger.debug('CTRL', 'Agent Reply', {
+			reply: response.reply,
+			sessionId: response.sessionId,
+		});
 
 		ApiResponse.ok(
 			res,
