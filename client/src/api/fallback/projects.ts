@@ -3,12 +3,12 @@ import type { Project } from '@/api/schema';
 export const FALLBACK_PROJECTS: Project[] = [
 	{
 		id: 'fb-proj-1',
-		title: 'AnuragOS',
+		title: 'Anurag.dev',
 		description:
 			'A terminal-style personal portfolio website with a fully functional file system and window manager.',
 		techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Jotai'],
-		thumbnail: '/projects/anuragos-thumb.png',
-		images: ['/projects/anuragos-1.png', '/projects/anuragos-2.png'],
+		thumbnail: '/projects/portfolio-thumb.png',
+		images: ['/projects/portfolio-1.png', '/projects/portfolio-2.png'],
 		githubUrl: 'https://github.com/Anurag-Basuri/personal_portfolio',
 		liveUrl: 'https://anurag.dev',
 		status: 'completed',

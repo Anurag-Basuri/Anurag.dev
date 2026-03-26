@@ -1,4 +1,4 @@
-// Prisma schema for AnuragOS Backend
+// Prisma schema for Anurag.dev Backend
 // Database: NeonDB (Serverless PostgreSQL)
 
 generator client {

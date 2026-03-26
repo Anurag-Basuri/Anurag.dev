@@ -1,6 +1,6 @@
-# AnuragOS — Backend Server
+# Anurag.dev — Backend Server
 
-Express.js REST API powering the AnuragOS portfolio platform. Manages authentication, content CRUD, media uploads, and the autonomous AI Agent engine.
+Express.js REST API powering the Anurag.dev portfolio platform. Manages authentication, content CRUD, media uploads, and the autonomous AI Agent engine.
 
 ## Tech Stack
 
@@ -165,7 +165,7 @@ The Agent controller **never** returns HTTP 500. All errors are caught and conve
 # Core
 NODE_ENV=development
 PORT=4000
-DATABASE_URL=postgresql://user:password@localhost:5432/anuragos_db
+DATABASE_URL=postgresql://user:password@localhost:5432/portfolio_db
 REDIS_HOST=localhost
 REDIS_PORT=6379
 

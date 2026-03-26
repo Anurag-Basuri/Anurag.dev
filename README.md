@@ -1,12 +1,12 @@
-# AnuragOS — Enterprise Personal Portfolio & Autonomous AI Agent
+# Anurag.dev — Enterprise Personal Portfolio & Autonomous AI Agent
 
-AnuragOS is a bleeding-edge, full-stack personal brand platform. It transcends traditional static portfolios by integrating a **fully autonomous LangChain LLM Agent** that serves as a 24/7 personal assistant for visitors. Built on an Express REST API backend with PostgreSQL + Prisma and a highly animated Next.js frontend, this project demonstrates scalability, resilience, and advanced AI integration.
+Anurag.dev is a bleeding-edge, full-stack personal brand platform. It transcends traditional static portfolios by integrating a **fully autonomous LangChain LLM Agent** that serves as a 24/7 personal assistant for visitors. Built on an Express REST API backend with PostgreSQL + Prisma and a highly animated Next.js frontend, this project demonstrates scalability, resilience, and advanced AI integration.
 
 ---
 
 ## 🏗️ Master System Architecture
 
-AnuragOS relies on a strictly decoupled architecture, meaning the frontend, backend, database, and AI inference engines can all crash, restart, and scale independently without tearing each other down.
+Anurag.dev relies on a strictly decoupled architecture, meaning the frontend, backend, database, and AI inference engines can all crash, restart, and scale independently without tearing each other down.
 
 ```mermaid
 flowchart TB
@@ -80,7 +80,7 @@ flowchart TB
 
 ## 🧠 Deep Dive: The AI Agent Architecture
 
-Instead of basic chatbot text-in/text-out completions, the AnuragOS agent operates using the **Model Context Protocol (MCP)** and a **manual ReAct (Reasoning and Acting) loop** with enterprise-grade failover.
+Instead of basic chatbot text-in/text-out completions, the Anurag.dev agent operates using the **Model Context Protocol (MCP)** and a **manual ReAct (Reasoning and Acting) loop** with enterprise-grade failover.
 
 ### How a Chat Query Works (Step-by-Step)
 
@@ -158,7 +158,7 @@ The Agent pipeline includes a centralized logging system (`agent.logger.ts`) tha
 
 ## 🛡️ Error Handling Strategy
 
-AnuragOS implements a **zero-crash** error handling philosophy. The AI Agent is designed to **never** return an HTTP 500 to the frontend.
+Anurag.dev implements a **zero-crash** error handling philosophy. The AI Agent is designed to **never** return an HTTP 500 to the frontend.
 
 ### Backend Error Cascade
 

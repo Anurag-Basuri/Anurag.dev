@@ -86,7 +86,7 @@ export const SidebarProfile = memo(function SidebarProfile({ isCollapsed }: { is
 							) : (
 								<Image
 									src="/logo.png"
-									alt="AnuragOS Logo"
+									alt="Anurag.dev Logo"
 									width={40}
 									height={40}
 									className="w-full h-full object-cover"

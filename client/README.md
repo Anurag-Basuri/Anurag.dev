@@ -1,4 +1,4 @@
-# AnuragOS — Frontend Client
+# Anurag.dev — Frontend Client
 
 A premium personal portfolio and brand platform built with Next.js, featuring a scrollable single-page layout, animated sections, an AI Agent chat widget, and a personal branding system.
 

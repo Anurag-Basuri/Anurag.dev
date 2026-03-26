@@ -9,7 +9,7 @@ export const githubRepoTool = tool(
 			
 			const headers: Record<string, string> = {
 				Accept: 'application/vnd.github.v3.raw', // Fetch raw markdown without Base64 decoding
-				'User-Agent': 'AnuragOS-AI-Agent',
+				'User-Agent': 'Anurag-Dev-AI-Agent',
 			};
 
 			if (env.GITHUB_TOKEN) {
