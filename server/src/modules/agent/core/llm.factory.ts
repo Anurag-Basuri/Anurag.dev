@@ -47,7 +47,7 @@ function initLLMs() {
 		_fallbackLlm = new ChatOpenAI({
 			model: 'Qwen/Qwen2.5-72B-Instruct',
 			apiKey: env.HF_TOKEN,
-			configuration: { baseURL: 'https://router.huggingface.co/hf-inference/models/' },
+			configuration: { baseURL: 'https://router.huggingface.co/v1' },
 			temperature: 0.3,
 			timeout: 30000, // 30s timeout
 			maxTokens: 1000,
