@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { processUserMessage } from './agent.service';
 import { clearSessionMemory } from './core/memory.service';
 import { ApiResponse } from '../../utils/ApiResponse';
+import { ApiError } from '../../utils/ApiError';
 import { agentLogger } from './core/agent.logger';
 
 // ─── Validation ─────────────────────────────────────────────────
@@ -35,46 +36,44 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 			'Message processed successfully by Agent',
 		);
 	} catch (error: any) {
-		// Zod validation errors should still throw (bad request from client)
+		// Zod validation errors handled by global error handler if re-thrown
 		if (error?.name === 'ZodError') {
-			agentLogger.warn('CTRL', 'Zod validation failed', { issues: error.issues });
 			throw error;
 		}
 
 		// Categorize the error for structured logging
 		const isRateLimit = error?.message?.includes('Quota') || error?.message?.includes('429');
-		const isTimeout = error?.message?.includes('timeout') || error?.message?.includes('AbortError');
-		const isNetworkErr = error?.message?.includes('fetch') || error?.message?.includes('ECONNREFUSED');
+		const isTimeout =
+			error?.message?.includes('timeout') || error?.message?.includes('AbortError');
+		const isNetworkErr =
+			error?.message?.includes('fetch') || error?.message?.includes('ECONNREFUSED');
 
-		agentLogger.error('CTRL', 'Request failed — returning graceful fallback', error, {
+		const source = 'AgentController.sendMessage';
+
+		agentLogger.error('CTRL', 'Request failed', error, {
 			sessionId: req.body?.sessionId,
-			category: isRateLimit ? 'RATE_LIMIT' : isTimeout ? 'TIMEOUT' : isNetworkErr ? 'NETWORK' : 'INTERNAL',
+			category: isRateLimit
+				? 'RATE_LIMIT'
+				: isTimeout
+					? 'TIMEOUT'
+					: isNetworkErr
+						? 'NETWORK'
+						: 'INTERNAL',
 		});
 
-		// Rate limit → specific message
 		if (isRateLimit) {
-			ApiResponse.ok(
-				res,
-				{
-					reply: 'I\'m currently experiencing high demand. Please try again in a few moments!',
-					intents: [],
-					sessionId: req.body?.sessionId || '',
-				},
-				'Rate limited',
+			throw ApiError.TooManyRequests(
+				"I'm currently experiencing high demand. Please try again in a few moments!",
+				source,
 			);
-			return;
 		}
 
-		// ALL other errors: return a graceful fallback chat message (HTTP 200)
-		ApiResponse.ok(
-			res,
-			{
-				reply: 'I ran into a hiccup processing that. Could you try rephrasing your question?',
-				intents: [],
-				sessionId: req.body?.sessionId || '',
-			},
-			'Agent encountered an internal error but recovered gracefully',
-		);
+		// Throw a structured ApiError so the frontend gets the "what and where"
+		throw new ApiError(500, error.message || 'Agent failed to process message', {
+			source,
+			details: { originalError: error.name || 'Unknown' },
+			isOperational: true,
+		});
 	}
 }
 

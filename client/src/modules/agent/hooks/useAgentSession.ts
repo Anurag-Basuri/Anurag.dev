@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { apiClient } from '@/api';
+import { apiClient, ApiClientError } from '@/api/client';
 import type { AgentMessage, AgentApiResponse } from '../types/agent.types';
 
 /** Regex to find [NAVIGATE:/some/path] tokens in agent replies */
@@ -83,14 +83,34 @@ export function useAgentSession() {
 			console.error('[useAgentSession] Error:', error);
 
 			let errorText = 'Sorry, I am having trouble connecting right now. Please try again later.';
-			if (error?.message && typeof error.message === 'string' && error.message !== 'Network error') {
-				errorText = error.message;
+			let status = 0;
+			let details = '';
+			let source = '';
+
+			if (error instanceof ApiClientError) {
+				status = error.status;
+				details = error.message;
+				source = error.source || '';
+			} else if (error instanceof Error) {
+				details = error.message;
 			}
+
+			// Friendly error mapping
+			if (status === 408) errorText = 'Request timed out. The server might be busy or cold-starting.';
+			if (status === 429) errorText = "I'm receiving too many requests right now. Please wait a moment.";
+			if (status === 0) errorText = 'Network error. Please check your internet connection or if the server is running.';
 
 			const errMsg: AgentMessage = {
 				id: (Date.now() + 1).toString(),
 				role: 'assistant',
 				content: errorText,
+				isError: true,
+				error: {
+					status,
+					message: details,
+					code: error?.name || 'Error',
+					source,
+				},
 			};
 			setMessages(prev => [...prev, errMsg]);
 		} finally {
@@ -98,6 +118,29 @@ export function useAgentSession() {
 			isLoadingRef.current = false;
 		}
 	}, [router, pathname]);
+
+	const retryMessage = useCallback((messageId: string) => {
+		// Find the message that failed (it's an assistant message)
+		const failedMsgIndex = messages.findIndex(m => m.id === messageId);
+		if (failedMsgIndex === -1) return;
+
+		// Find the previous user message to re-send
+		let userMsgContent = '';
+		for (let i = failedMsgIndex - 1; i >= 0; i--) {
+			if (messages[i].role === 'user') {
+				userMsgContent = messages[i].content;
+				break;
+			}
+		}
+
+		if (!userMsgContent) return;
+
+		// Remove the failed message and its associated user message from the list
+		setMessages(prev => prev.filter((_, i) => i !== failedMsgIndex));
+
+		// Re-send the content
+		sendMessage(userMsgContent);
+	}, [messages, sendMessage]);
 
 	const clearSession = useCallback(async () => {
 		setMessages([]);
@@ -119,6 +162,7 @@ export function useAgentSession() {
 		isOpen,
 		setIsOpen,
 		sendMessage,
+		retryMessage,
 		clearSession,
 	};
 }

@@ -6,6 +6,14 @@ export interface AgentMessage {
 	content: string;
 	/** Navigation targets extracted from [NAVIGATE:...] patterns */
 	navigationTargets?: string[];
+	/** Error state details */
+	isError?: boolean;
+	error?: {
+		status?: number;
+		message?: string;
+		code?: string;
+		source?: string;
+	};
 }
 
 export interface AgentApiResponse {
