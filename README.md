@@ -19,7 +19,7 @@ flowchart TB
         
         subgraph Hooks [State & API Hooks]
             SessionHook["useAgentSession.ts"]
-            Api["Axios Singletons"]
+            Api["Custom API Client"]
         end
         
         CircuitBreaker{"Offline Circuit Breaker"}
@@ -30,19 +30,19 @@ flowchart TB
         StandardBusiness["Standard CRUD Services"]
         
         subgraph LangChain_Agent [Enterprise LangChain Engine]
-            AgentLoop[".bindTools() ReAct Loop"]
-            Memory["Session Message History"]
-            RouterAgent{"Multi-Model Router"}
+            AgentLoop["Manual ReAct Loop"]
+            Memory["Persistent Session Memory"]
+            Logger["Structured Agent Logger"]
             
-            subgraph Models
-                Gemini["Primary: Gemini 2.0 Flash"]
-                HF["Fallback: Qwen 2.5 72B"]
+            subgraph Models [Dual-LLM with Sticky Fallback]
+                HF["Primary: Qwen 2.5 72B"]
+                Gemini["Fallback: Gemini 2.5 Flash"]
             end
             
             subgraph MCP_Tools [Model Context Protocols]
-                GitHubTool["GitHub Live Activity"]
-                LeetCodeTool["LeetCode Contest Stats"]
-                PortfolioTool["Prisma Vector-style Search"]
+                GitHubTool["GitHub Activity + README"]
+                LeetCodeTool["LeetCode Stats"]
+                PortfolioTool["Portfolio Project Search"]
                 ContactTool["Direct DB Lead Insertion"]
             end
         end
@@ -67,9 +67,9 @@ flowchart TB
     StandardBusiness <--> Redis
     
     AgentLoop <--> Memory
-    AgentLoop --> RouterAgent
-    RouterAgent --> Gemini
-    RouterAgent -.-> |429 Error| HF
+    AgentLoop --> Logger
+    AgentLoop --> HF
+    HF -.-> |Primary fails| Gemini
     
     AgentLoop <--> MCP_Tools
     MCP_Tools <--> Postgres
@@ -80,34 +80,131 @@ flowchart TB
 
 ## 🧠 Deep Dive: The AI Agent Architecture
 
-Instead of basic chatbot text-in/text-out completions, the AnuragOS agent operates using the **Model Context Protocol (MCP)** and **LangChain's ReAct (Reasoning and Acting) framework.**
+Instead of basic chatbot text-in/text-out completions, the AnuragOS agent operates using the **Model Context Protocol (MCP)** and a **manual ReAct (Reasoning and Acting) loop** with enterprise-grade failover.
 
 ### How a Chat Query Works (Step-by-Step)
+
 1. **User Input:** A visitor types *"What React projects have you built? And how many LeetCode questions have you solved?"*
-2. **Context Injection (RAG):** The backend grabs Anurag's static profile (Bio, primary Skills, Job Status) directly from Postgres and silently injects it into the `SystemPersona`.
-3. **The LLM Loop Begins:** The model reads the user's prompt and decides it needs external information. It generates a rigid JSON payload requesting two tools: `search_projects("React")` and `get_leetcode_stats()`.
-4. **Tool Execution:** The Express backend intercepts these requests. 
-   - It performs a semantic-style search on Postgres for "React" projects. 
-   - It simultaneously pings a LeetCode proxy for live competitive programming data.
-5. **Final Generation:** The backend feeds the raw tool outputs back into the LLM. The LLM then structures a human-readable, highly polite Markdown message comparing the results, and sends it back to the React UI. Everything happens in under ~2 seconds.
+2. **Context Injection (RAG):** The backend pulls Anurag's profile data (Bio, Skills, Job Status) from PostgreSQL and injects it into the `SystemPersona` prompt alongside screen-awareness context (`currentUrl`).
+3. **The LLM Loop Begins:** The primary LLM reads the prompt and decides it needs external data. It generates a JSON payload requesting tools: `search_projects("React")` and `get_leetcode_stats()`.
+4. **Tool Execution:** The Express backend intercepts these requests and executes them with full observability logging (execution time, output preview, success/failure status).
+5. **Final Generation:** Tool outputs are fed back into the LLM for a second pass. The model structures a human-readable Markdown response and returns it to the React UI.
 
-### The Fail-Proof Dual-Model Fallback
-To bypass free-tier rate limits, the system operates on a dual-engine core (`src/modules/agent/core/llm.factory.ts`):
-- **Google Gemini 2.0 Flash** acts as the primary brain. It's wildly fast and native at tool-calling.
-- If Gemini errors out (e.g. `429 Quota Exceeded`), LangChain's native `.withFallbacks()` automatically catches the error before the user notices, rerouting the entire payload and conversation history seamlessly to **Hugging Face's Serverless API (Qwen 2.5 72B-Instruct)**.
+### The Dual-LLM Architecture with Sticky Fallback
 
-### Action Capabilities (Write Operations)
-The agent is not strictly read-only. Using the `submit_contact_lead` tool, the LLM is instructed to proactively ask for a visitor's name and email if they express interest in hiring. The LLM then writes the lead directly into the PostgreSQL Database, skipping the manual contact form entirely.
+The system operates on a **dual-engine core** (`src/modules/agent/core/llm.factory.ts`):
+
+```
+┌──────────────────────────────────────────────────────┐
+│              LLM Invocation Flow                     │
+│                                                      │
+│  Request Loop 1:                                     │
+│    ┌─────────────┐     ┌──────────────────────┐      │
+│    │ HuggingFace │────►│ Success? → Continue  │      │
+│    │  (Primary)  │     │ Fail? → Set STICKY   │      │
+│    └─────────────┘     │   flag, try Gemini   │      │
+│                        └──────────────────────┘      │
+│                                                      │
+│  Request Loops 2-4:                                  │
+│    ┌──────────────────────────────────────────┐      │
+│    │ STICKY flag set? → Skip Primary entirely │      │
+│    │ Go directly to Gemini (no timeout wait)  │      │
+│    └──────────────────────────────────────────┘      │
+└──────────────────────────────────────────────────────┘
+```
+
+**Key design decisions:**
+- **HuggingFace (Qwen 2.5 72B-Instruct)** is the primary LLM — fast, reliable, no rate-limit issues on free-tier.
+- **Google Gemini 2.5 Flash** is the fallback — powerful but subject to daily free-tier rate limits.
+- **Sticky Fallback**: Once the primary fails within a single request, all subsequent LLM loops in that request skip the primary entirely. This eliminates repeated 30-second timeout penalties.
+- **30-Second Timeout**: Every LLM invocation is wrapped in a `Promise.race()` timeout to prevent SDK-level internal retry hangs (Google's SDK retries internally for ~3 minutes by default).
+
+### MCP Tool Registry
+
+| Tool | Description | External API |
+|------|-------------|-------------|
+| `get_github_activity` | Fetches GitHub profile stats and recent 5 events | `api.github.com` |
+| `read_github_readme` | Reads raw README.md from any public repository | `api.github.com` |
+| `get_leetcode_stats` | Fetches LeetCode solving stats and ranking | `alfa-leetcode-api.onrender.com` |
+| `search_projects` | Searches published portfolio projects by keyword | PostgreSQL (Prisma) |
+| `submit_contact_lead` | Inserts a contact lead directly into the database | PostgreSQL (Prisma) |
+
+### Autonomous Navigation
+
+The Agent can trigger client-side routing via `[NAVIGATE:/path]` tokens embedded in its response. The frontend's `useAgentSession` hook intercepts these tokens, executes `router.push()`, and strips the command from the visible message — so the user sees a seamless page transition.
+
+---
+
+## 📊 Structured Observability Logging
+
+The Agent pipeline includes a centralized logging system (`agent.logger.ts`) that provides full visibility into every layer:
+
+```
+[2026-03-26 01:58:22] [INFO]  [Agent:SYSTEM] ━━━ New Request ━━━
+                              {"sessionId":"abc","llmMode":"dual","primary":"HuggingFace","fallback":"Gemini"}
+[2026-03-26 01:58:23] [INFO]  [Agent:LLM]    🧠 Invoking HuggingFace (Qwen2.5-72B-Instruct)
+[2026-03-26 01:58:27] [INFO]  [Agent:LLM]    ✅ LLM responded {"durationMs":4600,"hasToolCalls":true}
+[2026-03-26 01:58:27] [INFO]  [Agent:TOOL]   ⚡ Executing: get_github_activity
+[2026-03-26 01:58:28] [INFO]  [Agent:TOOL]   ✅ get_github_activity completed {"durationMs":875}
+
+[2026-03-26 01:58:52] [INFO]  [Agent:SYSTEM] ━━━ Request Complete ━━━
+                              {"usedProvider":"HuggingFace","totalDurationMs":30200,"llmLoops":2}
+```
+
+**Log Categories:** `SYSTEM`, `LLM`, `TOOL`, `MEMORY`, `CTRL`  
+**Log Levels:** `INFO`, `WARN`, `ERROR`, `DEBUG` (DEBUG only in development)
+
+---
+
+## 🛡️ Error Handling Strategy
+
+AnuragOS implements a **zero-crash** error handling philosophy. The AI Agent is designed to **never** return an HTTP 500 to the frontend.
+
+### Backend Error Cascade
+
+```
+┌────────────────────────────────────────────────────┐
+│  Tool Execution Error (e.g., GitHub API down)      │
+│  → Caught inside tool → Returns error string       │
+│  → LLM reads error → Generates human-friendly msg  │
+│  → User sees: "I can't fetch GitHub right now..."   │
+└────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────┐
+│  LLM Invocation Error (e.g., API rate limit)       │
+│  → Primary fails → Sticky flag set                 │
+│  → Fallback LLM invoked → Success                  │
+│  → User doesn't notice anything                    │
+└────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────┐
+│  Both LLMs Fail (catastrophic)                     │
+│  → Controller catches → Returns HTTP 200           │
+│  → reply: "I ran into a hiccup..."                 │
+│  → Error category logged: RATE_LIMIT / TIMEOUT /   │
+│    NETWORK / INTERNAL                              │
+└────────────────────────────────────────────────────┘
+```
+
+### Frontend Error Isolation
+
+| Layer | Strategy |
+|-------|----------|
+| **`useAgentSession` hook** | All API errors caught → displayed as a chat bubble. Error never propagates to React tree. |
+| **`ApiClientError` handling** | Reads `.message` directly (not Axios-style `.response.data`). Fallback message for network errors. |
+| **Global `error.tsx` boundary** | Styled terminal-themed error page with stack trace toggle (dev only) and recovery button. Only triggers for non-Agent rendering crashes. |
+| **Circuit Breaker** | After 3 consecutive API failures, portfolio falls back to static JSON. Background health checks resume live API after recovery. |
 
 ---
 
 ## 🛡️ Frontend Hybrid Strategy (Circuit Breaker)
 
 To guarantee 100% uptime regardless of backend maintenance windows, the frontend wraps API calls in a **Circuit Breaker state machine**:
+
 1. **Online (Closed):** The Next.js app queries the Express API normally.
 2. **Tripped (Open):** After 3 consecutive HTTP timeouts or 500 errors, the frontend "trips" its breaker.
-3. **Offline Mode:** The application instantly and seamlessly falls back to reading static hard-coded JSON files (`client/src/api/fallback/`) containing last-known-good profile states.
-4. **Recovery (Half-Open):** A background chron-job pings the backend `health` route every 60 seconds. Once healthy, the breaker closes and live API requests resume.
+3. **Offline Mode:** The application seamlessly falls back to reading static JSON files (`client/src/api/fallback/`) containing last-known-good data.
+4. **Recovery (Half-Open):** A background job pings the backend `health` route every 60 seconds. Once healthy, the breaker closes and live API requests resume.
 
 The visitor never sees a white error screen.
 
@@ -115,135 +212,138 @@ The visitor never sees a white error screen.
 
 ## 💻 Technical Stack
 
-### Frontend Hierarchy
-- **Framework:** Next.js (App Router) + React 19.
-- **Styling & Motion:** Tailwind CSS v4 alongside Framer Motion for scroll-linked animations, bouncing tool-calling indicators, and parallax effects.
-- **State isolation:** Heavily relies on Custom Hooks (e.g., `useAgentSession`) to detach UI components from Axios API handlers and `localStorage` persistence.
-- **Rich Media:** Integrates `react-markdown` to safely render the agent's complex syntax (lists, links, code blocks).
-
-### Backend Hierarchy
-- **Framework:** Express.js + strict TypeScript compiler settings (`skipLibCheck`).
-- **Data ORM:** Prisma Client interacting with PostgreSQL (supporting schemas for Profiles, Projects, Experiences, Education, Blog Posts, and Contact Messages).
-- **AI Brain:** Initialized exclusively via the official `@langchain/core` & `@langchain/openai` SDKs to guarantee perfect Tool JSON stringification.
-- **Rate Limiting:** `express-rate-limit` prevents spam on both generic API paths and strict bot loops.
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 16, React 19, Tailwind CSS v4, Framer Motion |
+| **Backend** | Express, TypeScript, Prisma ORM, Zod validation |
+| **Database** | PostgreSQL 14+ |
+| **Cache** | Redis 6+ |
+| **AI Primary** | HuggingFace Inference API (Qwen 2.5 72B-Instruct) via `@langchain/openai` |
+| **AI Fallback** | Google Gemini 2.5 Flash via `@langchain/google-genai` |
+| **Auth** | JWT (access + refresh tokens), bcrypt, account lockout |
+| **Media** | Cloudinary (image/file uploads via Multer) |
+| **Observability** | Custom structured logger with timestamped categories |
 
 ---
 
-## ⚙️ Environment Variables Explained in Detail
-
-Correctly filling out your environments is required to enable all fallback arrays and storage hooks.
+## ⚙️ Environment Variables
 
 ### Backend (`server/.env`)
 
-**Core System Configuration:**
-- `NODE_ENV`: Operations mode (`development` or `production`). Dictates error stack verbosity.
-- `PORT`: Backend listener port (defaults to 4000).
-- `DATABASE_URL`: Connection string to PostgreSQL (`postgresql://user:password@node:5432/db`).
-- `REDIS_HOST` & `REDIS_PORT`: (Optional) Connects to an external Redis instance like Upstash for robust route caching.
-
-**Authentication & Cryptography:**
-- `JWT_SECRET`: The cryptographic symmetric key used to sign `access_tokens`. Make this a random 64-character string.
-- `JWT_REFRESH_SECRET`: The cryptographic key used to sign long-lived `refresh_tokens` for the admin panel.
-
-**Media & Storage Layer (Cloudinary):**
-- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: Required to serve optimized images. When a user creates a project from the admin dashboard, images are routed through Multer directly to this Cloudinary bucket, saving bandwidth on your NodeJS server.
-
-**AI Ecosystem (The Agent Brain):**
-- `AI_PROVIDER`: Force-selects the primary provider (`gemini` or `huggingface`). Leave as `gemini` for the intended dual-fallback behavior.
-- `GEMINI_API_KEY`: The API key mapped to your Google Generative AI account. Powers `gemini-2.0-flash`.
-- `HF_TOKEN`: The Access Token pointing to your Hugging Face Hub account. MUST have read/Inference permissions enabled natively on Hugging Face to process the fallback Qwen 72B requests.
-- `GITHUB_TOKEN`: A generic fine-grained Personal Access Token (Read-Only). Passed into the GitHub API (`github.tool.ts`) so the LLM doesn't hit unauthenticated 60 Request/Hour rate limits from standard IPs.
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NODE_ENV` | ✓ | `development` or `production` |
+| `PORT` | ✓ | Backend port (default: `4000`) |
+| `DATABASE_URL` | ✓ | PostgreSQL connection string |
+| `REDIS_HOST` / `REDIS_PORT` | ○ | Redis instance for route caching |
+| `JWT_SECRET` | ✓ | 64-char symmetric key for access tokens |
+| `JWT_REFRESH_SECRET` | ✓ | Symmetric key for refresh tokens |
+| `CLOUDINARY_CLOUD_NAME` | ✓ | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | ✓ | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | ✓ | Cloudinary API secret |
+| `HF_TOKEN` | ✓ | HuggingFace access token (primary LLM) |
+| `GEMINI_API_KEY` | ○ | Google Gemini API key (fallback LLM) |
+| `AI_PROVIDER` | ○ | Force-select provider (legacy, defaults to `gemini`) |
+| `GITHUB_TOKEN` | ○ | GitHub PAT for elevated API rate limits |
 
 ### Frontend (`client/.env.local`)
 
-- `NEXT_PUBLIC_API_URL`: The fully qualified URL pointing to your backend (e.g. `http://localhost:4000` locally, or `https://api.portfolio.com` in production). Injected into the primary Axios Singleton (`apiClient.ts`).
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | ✓ | Backend URL (e.g., `http://localhost:4000`) |
 
 ---
 
-## 🚀 Quick Start & Development Setup
-
-### 1. Database & Backend Configuration
+## 🚀 Quick Start
 
 ```bash
+# 1. Backend
 cd server
 npm install
+cp .env.example .env        # Fill in all variables
+npm run db:generate          # Generate Prisma types
+npm run db:migrate           # Push schema to PostgreSQL
+npm run db:seed              # Seed initial data + admin account
+npm run dev                  # → http://localhost:4000
 
-# 1. Setup Environment
-cp .env.example .env
-
-# 2. Database Type Generation & Migration
-npm run db:generate   # Generates Prisma TS definitions Based on your schema
-npm run db:migrate    # Pushes table structures (Profile, Blog, Contacts) to Postgres
-npm run db:seed       # Injects initial mock data and the Admin Account
-
-# 3. Development Mode
-npm run dev           # Ignites the Express runtime on http://localhost:4000 with Hot Reloading
-```
-
-### 2. Frontend Application
-
-```bash
-cd client
+# 2. Frontend
+cd ../client
 npm install
-
-# Setup Environment
 cp .env.local.example .env.local
-
-# Build the web app
-npm run dev           # Opens the Next.js React Router on http://localhost:3000
+npm run dev                  # → http://localhost:3000
 ```
 
-**Default Admin Credentials**: Check `server/prisma/seed.ts` (usually `admin` / `admin123`). Log in via `http://localhost:3000/admin`.
+**Default Admin**: `admin` / `admin123`
 
 ---
 
-## 📦 File System Master Structure
+## 📦 File System Structure
 
 ```
 personal_portfolio/
-├── server/                        # Node.js + Express + Prisma Ecosystem
-│   ├── prisma/                    # Schema models & migrations
+├── server/                          # Node.js + Express + Prisma
+│   ├── prisma/                      # Schema, migrations, seed
 │   └── src/
-│       ├── controllers/           # Standard HTTP logic (Parsing bodies)
-│       ├── services/              # Business logic (DB calls, external requests)
-│       ├── routes/                # Express routing trees
-│       ├── schemas/               # Zod strict validations
+│       ├── controllers/             # Standard HTTP handlers
+│       ├── services/                # Business logic (DB, external APIs)
+│       ├── routes/                  # Express routing + API docs
+│       ├── schemas/                 # Zod validation schemas
+│       ├── middleware/              # Auth, validation, rate limiting
+│       ├── config/                  # Environment & app config
+│       ├── utils/                   # ApiError, ApiResponse helpers
 │       └── modules/
-│           └── agent/             # [STANDALONE] The Enterprise Chatbot
-│               ├── agent.service.ts   # Main executor while loop mapped to history
-│               ├── agent.controller.ts# Rate-limited endpoint handler
-│               ├── core/              # Memory isolation & Dual-Prov LLM factory
-│               ├── tools/             # Native LangChain action tools
-│               └── rag/               # Context retrieval functions
+│           └── agent/               # [STANDALONE] AI Agent Engine
+│               ├── agent.service.ts     # ReAct loop with sticky fallback
+│               ├── agent.controller.ts  # Zero-crash error handling
+│               ├── agent.admin.*        # Admin CRUD for sessions
+│               ├── core/
+│               │   ├── llm.factory.ts   # Dual-LLM singleton init
+│               │   ├── agent.logger.ts  # Structured observability
+│               │   ├── memory.service.ts# Persistent Prisma sessions
+│               │   └── prompts.ts       # System persona
+│               ├── tools/               # MCP tool implementations
+│               │   ├── github.tool.ts   # GitHub activity + events
+│               │   ├── github.repo.tool.ts # README reader
+│               │   ├── leetcode.tool.ts # LeetCode stats
+│               │   ├── portfolio.tool.ts# Project search
+│               │   └── contact.tool.ts  # Lead insertion
+│               └── rag/                 # Context retrieval
 │
-└── client/                        # React + Next.js App Router
+└── client/                          # React + Next.js App Router
     └── src/
-        ├── app/                   # Public Portfolio, Login logic, Admin Dashboard
-        ├── components/
-        │   └── modules/
-        │       ├── agent/         # [STANDALONE] AI Widget UI Library
-        │       │   ├── components/  # Floating Toggler, Chat Scroll Window, Bubbles
-        │       │   ├── hooks/       # useAgentSession isolating network states
-        │       │   └── types/       # Message interfaces
-        │       ├── profile/       # Classic Portfolio Sections
-        │       ├── projects/
-        │       └── blog/
-        ├── layout/                # Global Shell (Sidebar, Fixed backgrounds)
-        ├── api/                   # HTTP Singletons wrapping Circuit Breakers
-        └── boot/                  # Preloaders and Welcome branding
+        ├── app/                     # Portfolio, Admin, Resume, README
+        ├── modules/                 # Feature modules (profile, projects, blog...)
+        │   └── agent/               # AI Widget UI
+        │       ├── components/      # Chat window, bubbles, loader
+        │       ├── hooks/           # useAgentSession (error isolation)
+        │       └── types/           # Message interfaces
+        ├── layout/                  # App shell (sidebar, scroll, TOC)
+        ├── api/                     # API client + circuit breaker + fallback
+        ├── lib/                     # Skill icons, routes, utils
+        └── boot/                    # Splash animation
 ```
 
 ---
 
-## 🛡️ Production Security Measures
+## 🛡️ Production Security
 
-- **LangChain Memory Isolation:** Conversation history is stored natively in a dictionary mapped to randomized browser `sessionIds`. External sessions cannot overlap, meaning users cannot poison other clients' LLM generation context.
-- **Form Injection Defense:** Tools like `submit_contact_lead` programmatically run inputs through advanced `sanitize-html` modules *before* executing the Prisma insert.
-- **DDoS/Spam Protection:** Strict `express-rate-limit` windows are placed dynamically. Standard JSON routes allow more throughput, while the Agent LLM loop restricts IPs to extremely limited calls per minute to block prompt-engineering bill-spam.
-- **Admin JWT Refresh Cycle:** The Control dashboard relies on rotating Refresh JWTs instead of long-lived LocalStorage tokens, preventing session hijack extraction.
+- **Session Isolation:** Conversation history is keyed to randomized browser `sessionIds` — users cannot read or poison other sessions.
+- **Input Sanitization:** All user inputs pass through `sanitize-html` before database insertion.
+- **DDoS Protection:** `express-rate-limit` restricts Agent chat to 15 messages/minute per IP.
+- **JWT Rotation:** 15-minute access tokens with rotated refresh tokens. Account lockout after 3 failed attempts.
+- **CORS:** Strict origin allowlisting in production.
+
+---
+
+## 📡 API Documentation
+
+Access full API documentation at `GET /api/v1/docs`.  
+Live AI Agent architecture status at `GET /api/v1/docs/agent`.
 
 ---
 
 ### Author
-Designed and Architected by **Anurag Basuri**  
-*The ecosystem seamlessly merges rigid REST paradigms alongside dynamic LangChain AI reasoning, resulting in a virtually indestructible personal brand platform.*
+Designed and Architected by **Anurag Basuri**
+
+## License
+Private
