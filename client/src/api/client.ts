@@ -158,8 +158,8 @@ async function request<T>(
 export const apiClient = {
 	get: <T>(endpoint: string, auth = false) => request<T>('GET', endpoint, { auth }),
 
-	post: <T>(endpoint: string, body: unknown, auth = false) =>
-		request<T>('POST', endpoint, { body, auth }),
+	post: <T>(endpoint: string, body: unknown, auth = false, timeout?: number) =>
+		request<T>('POST', endpoint, { body, auth, ...(timeout ? { timeout } : {}) }),
 
 	put: <T>(endpoint: string, body: unknown, auth = true) =>
 		request<T>('PUT', endpoint, { body, auth }),

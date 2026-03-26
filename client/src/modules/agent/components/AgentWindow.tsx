@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, X, Bot, Trash2 } from 'lucide-react';
 import type { AgentMessage } from '../types/agent.types';
 import { AgentMessageBubble } from './AgentMessageBubble';
-import { AgentTypingLoader } from './AgentTypingLoader';
+import { AgentThinkingLoader } from './AgentThinkingLoader';
 
 export interface AgentWindowProps {
 	messages: AgentMessage[];
@@ -93,16 +93,16 @@ export function AgentWindow({
 						<div className="space-y-1">
 							<p className="text-sm font-medium text-foreground">Hi there!</p>
 							<p className="text-xs text-muted-foreground max-w-[200px]">
-								I can answer questions about Anurag&apos;s projects, LeetCode stats, or schedule a meeting.
+								I can answer questions about Anurag&apos;s projects, LeetCode stats.
 							</p>
 						</div>
 					</div>
 				) : (
 					<div className="flex flex-col gap-1">
-						{messages.map((msg) => (
+						{messages.map(msg => (
 							<AgentMessageBubble key={msg.id} message={msg} onRetry={retryMessage} />
 						))}
-						{isLoading && <AgentTypingLoader />}
+						{isLoading && <AgentThinkingLoader />}
 					</div>
 				)}
 			</div>
@@ -114,7 +114,9 @@ export function AgentWindow({
 						ref={inputRef}
 						disabled={isLoading}
 						type="text"
-						placeholder={isLoading ? 'Agent is thinking...' : 'Ask me anything about Anurag...'}
+						placeholder={
+							isLoading ? 'Agent is thinking...' : 'Ask me anything about Anurag...'
+						}
 						className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 pl-4 pr-12 text-sm text-foreground outline-none transition-shadow focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60 placeholder:text-muted-foreground/50"
 					/>
 					<button

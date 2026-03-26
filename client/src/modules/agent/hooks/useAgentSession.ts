@@ -45,14 +45,19 @@ export function useAgentSession() {
 			isLoadingRef.current = true;
 			console.log('[Agent] User Message:', content);
 
-			try {
-				const resData = await apiClient.post<AgentApiResponse>('/chat', {
-					message: content,
-					sessionId: sessionIdRef.current,
-					currentUrl:
-						pathname ||
-						(typeof window !== 'undefined' ? window.location.pathname : undefined),
-				});
+		try {
+				const resData = await apiClient.post<AgentApiResponse>(
+					'/chat',
+					{
+						message: content,
+						sessionId: sessionIdRef.current,
+						currentUrl:
+							pathname ||
+							(typeof window !== 'undefined' ? window.location.pathname : undefined),
+					},
+					false, // auth
+					60_000, // 60s timeout for agent — LLM + tool loops take time
+				);
 
 				let rawReply = resData.reply;
 				console.log('[Agent] Assistant Reply:', rawReply);
