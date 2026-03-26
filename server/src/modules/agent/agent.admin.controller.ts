@@ -24,8 +24,16 @@ export const getAgentSessions = async (req: Request, res: Response) => {
 
 export const deleteAgentSession = async (req: Request, res: Response) => {
 	const id = req.params.id as string;
-	await prisma.agentSession.delete({
-		where: { id },
-	});
-	ApiResponse.ok(res, null, 'Agent session deleted successfully');
+	try {
+		await prisma.agentSession.delete({
+			where: { id },
+		});
+		ApiResponse.ok(res, null, 'Agent session deleted successfully');
+	} catch (error: any) {
+		if (error?.code === 'P2025') {
+			ApiResponse.ok(res, null, 'Session already deleted');
+		} else {
+			throw error;
+		}
+	}
 };

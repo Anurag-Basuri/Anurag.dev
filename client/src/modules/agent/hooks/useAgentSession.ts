@@ -43,9 +43,9 @@ export function useAgentSession() {
 			setMessages(prev => [...prev, userMsg]);
 			setIsLoading(true);
 			isLoadingRef.current = true;
-			console.log('[Agent] User Message:', content);
+			if (process.env.NODE_ENV === 'development') console.log('[Agent] User Message:', content);
 
-		try {
+			try {
 				const resData = await apiClient.post<AgentApiResponse>(
 					'/chat',
 					{
@@ -60,7 +60,7 @@ export function useAgentSession() {
 				);
 
 				let rawReply = resData.reply;
-				console.log('[Agent] Assistant Reply:', rawReply);
+				if (process.env.NODE_ENV === 'development') console.log('[Agent] Assistant Reply:', rawReply);
 
 				// Extract navigation targets for rendering as buttons
 				const navigationTargets: string[] = [];
@@ -128,7 +128,7 @@ export function useAgentSession() {
 				isLoadingRef.current = false;
 			}
 		},
-		[router, pathname],
+		[pathname],
 	);
 
 	const retryMessage = useCallback(

@@ -23,11 +23,11 @@ const ClearSessionSchema = z.object({
 export async function sendMessage(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ChatMessageSchema.parse(req.body);
-		console.log('[Agent] User Message:', data.message);
+		if (process.env.NODE_ENV === 'development') console.log('[Agent] User Message:', data.message);
 
 		const response = await processUserMessage(data.message, data.sessionId, data.currentUrl);
 
-		console.log('[Agent] Assistant Reply:', response.reply);
+		if (process.env.NODE_ENV === 'development') console.log('[Agent] Assistant Reply:', response.reply);
 		agentLogger.debug('CTRL', 'Agent Reply', {
 			reply: response.reply,
 			sessionId: response.sessionId,
@@ -87,7 +87,7 @@ export async function sendMessage(req: Request, res: Response): Promise<void> {
 export async function resetSession(req: Request, res: Response): Promise<void> {
 	try {
 		const data = ClearSessionSchema.parse(req.body);
-		clearSessionMemory(data.sessionId);
+		await clearSessionMemory(data.sessionId);
 		agentLogger.info('MEMORY', `Session memory cleared`, { sessionId: data.sessionId });
 		ApiResponse.ok(res, { cleared: true }, 'Agent session memory cleared');
 	} catch (error) {
