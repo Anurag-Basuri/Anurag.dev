@@ -15,10 +15,13 @@ export const githubTool = tool(
 				headers['Authorization'] = `token ${env.GITHUB_TOKEN}`;
 			}
 
+			const controller = new AbortController();
+			const timeout = setTimeout(() => controller.abort(), 10000);
+
 			// Fetch recent events
 			const eventsRes = await fetch(
 				`https://api.github.com/users/${username}/events/public?per_page=5`,
-				{ headers },
+				{ headers, signal: controller.signal },
 			);
 			if (!eventsRes.ok)
 				return `Failed to fetch GitHub events for ${username}. GitHub API Status: ${eventsRes.status}`;
@@ -32,7 +35,8 @@ export const githubTool = tool(
 			}
 
 			// Fetch user info
-			const userRes = await fetch(`https://api.github.com/users/${username}`, { headers });
+			const userRes = await fetch(`https://api.github.com/users/${username}`, { headers, signal: controller.signal });
+			clearTimeout(timeout);
 			let user = null;
 			if (userRes.ok) {
 				try {
@@ -83,6 +87,9 @@ export const githubTool = tool(
 			return result;
 		} catch (error) {
 			console.error('[github.tool] Error:', error);
+			if ((error as Error).name === 'AbortError') {
+				return 'GitHub API timed out. Tell the user the service is slow right now.';
+			}
 			return `Error fetching GitHub data: ${(error as Error).message}`;
 		}
 	},

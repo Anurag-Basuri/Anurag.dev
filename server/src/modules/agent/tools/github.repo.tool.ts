@@ -16,8 +16,12 @@ export const githubRepoTool = tool(
 				headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
 			}
 
+			const controller = new AbortController();
+			const timeout = setTimeout(() => controller.abort(), 10000);
+
 			const url = `https://api.github.com/repos/${owner}/${repo}/readme`;
-			const response = await fetch(url, { headers });
+			const response = await fetch(url, { headers, signal: controller.signal });
+			clearTimeout(timeout);
 
 			if (response.status === 404) {
 				return `No README found for repository ${owner}/${repo}. The repository might be private or empty. Tell the user you cannot read its internal structure.`;
@@ -37,6 +41,9 @@ export const githubRepoTool = tool(
 			return `TECHNICAL ARCHITECTURE DOCUMENTATION FOR ${owner}/${repo}:\n\n${markdown}`;
 		} catch (error) {
 			console.error('[github.repo.tool] Error:', error);
+			if ((error as Error).name === 'AbortError') {
+				return 'GitHub API timed out. Tell the user the service is slow right now.';
+			}
 			return `Network error resolving GitHub repository: ${(error as Error).message}`;
 		}
 	},

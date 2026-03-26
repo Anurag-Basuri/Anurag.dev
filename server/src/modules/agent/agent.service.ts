@@ -70,7 +70,7 @@ export async function processUserMessage(
 	);
 
 	const turnMessages = [systemPrompt, ...history, new HumanMessage(message)];
-	await memory.addMessage(new HumanMessage(message));
+	// NOTE: Human message is persisted AFTER the response loop to avoid duplicates
 
 	const approxChars = turnMessages.reduce((acc, m) => acc + String(m.content).length, 0);
 	agentLogger.debug('LLM', `Estimated prompt size: ${approxChars} characters`, { sessionId });
@@ -244,6 +244,9 @@ export async function processUserMessage(
 				llmLoops: callCount + 1,
 				replyPreview: String(aiMsg.content).substring(0, 100),
 			});
+
+			// Persist the human message + final AI reply
+			await memory.addMessage(new HumanMessage(message));
 
 			return {
 				reply: String(aiMsg.content),
