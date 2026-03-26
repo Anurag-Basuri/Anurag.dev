@@ -1,10 +1,22 @@
-import { getBoundLLM, getActiveProviderInfo } from './core/llm.factory';
+import { getBoundLLMs, llmInfo } from './core/llm.factory';
 import { agentTools } from './tools';
 import { SYSTEM_PERSONA } from './core/prompts';
 import { getMessageHistory } from './core/memory.service';
 import { HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messages';
 import { getBasePortfolioContext } from './rag/context.builder';
 import { agentLogger } from './core/agent.logger';
+
+const LLM_TIMEOUT_MS = 30_000; // 30 seconds — abort if LLM hangs longer
+
+/** Race an LLM call against a timeout. Prevents 3-minute SDK retry hangs. */
+async function invokeWithTimeout(llm: any, messages: any[], label: string): Promise<any> {
+	return Promise.race([
+		llm.invoke(messages),
+		new Promise((_, reject) =>
+			setTimeout(() => reject(new Error(`${label} timed out after ${LLM_TIMEOUT_MS / 1000}s`)), LLM_TIMEOUT_MS),
+		),
+	]);
+}
 
 export interface AgentResponse {
 	reply: string;
@@ -17,21 +29,23 @@ export async function processUserMessage(
 	currentUrl?: string,
 ): Promise<AgentResponse> {
 	const requestStartTime = Date.now();
-	const { provider, model } = getActiveProviderInfo();
 
 	agentLogger.info('SYSTEM', `━━━ New Request ━━━`, {
 		sessionId,
-		provider,
-		model,
+		llmMode: llmInfo.mode,
+		primary: llmInfo.primaryProvider || 'NONE',
+		fallback: llmInfo.fallbackProvider || 'NONE',
 		currentUrl: currentUrl || 'N/A',
 		messagePreview: message.substring(0, 80),
 	});
 
-	const llmWithTools = getBoundLLM(agentTools);
+	const { primary, fallback } = getBoundLLMs(agentTools);
 
 	const memory = getMessageHistory(sessionId);
 	const history = await memory.getMessages();
-	agentLogger.debug('MEMORY', `Loaded ${history.length} messages from session history`, { sessionId });
+	agentLogger.debug('MEMORY', `Loaded ${history.length} messages from session history`, {
+		sessionId,
+	});
 
 	const portfolioContext = await getBasePortfolioContext();
 	const locationContext = currentUrl
@@ -42,37 +56,103 @@ export async function processUserMessage(
 		`${SYSTEM_PERSONA}\n\n[PORTFOLIO CONTEXT]\n${portfolioContext}\n[END CONTEXT]${locationContext}`,
 	);
 
-	// Prepare messages array for the current turn
 	const turnMessages = [systemPrompt, ...history, new HumanMessage(message)];
-
-	// Ensure user message is saved to memory first
 	await memory.addMessage(new HumanMessage(message));
 
 	let callCount = 0;
 	const MAX_LOOPS = 4;
 
 	while (callCount < MAX_LOOPS) {
-		const llmStartTime = agentLogger.llmStart(provider, model);
+		// ─── LLM Invocation with Manual Fallback ────────────────────
+		let aiMsg: any;
+		let usedProvider = llmInfo.primaryProvider || llmInfo.fallbackProvider;
 
-		let aiMsg;
-		try {
-			aiMsg = await llmWithTools.invoke(turnMessages);
-		} catch (llmError: any) {
-			agentLogger.llmError(llmStartTime, llmError);
-			throw llmError; // Re-throw so the controller can handle it gracefully
+		if (primary) {
+			const llmStart = agentLogger.llmStart(llmInfo.primaryProvider, llmInfo.primaryModel);
+			try {
+				aiMsg = await invokeWithTimeout(primary, turnMessages, 'Gemini');
+				agentLogger.llmSuccess(
+					llmStart,
+					(aiMsg.tool_calls?.length ?? 0) > 0,
+					aiMsg.tool_calls?.length ?? 0,
+				);
+				usedProvider = llmInfo.primaryProvider;
+			} catch (primaryError: any) {
+				agentLogger.llmError(llmStart, primaryError);
+
+				// ─── Manual Fallback ────────────────────────────────
+				if (fallback) {
+					agentLogger.info(
+						'LLM',
+						`🔄 Primary (${llmInfo.primaryProvider}) failed — switching to fallback (${llmInfo.fallbackProvider})`,
+					);
+					const fallbackStart = agentLogger.llmStart(
+						llmInfo.fallbackProvider,
+						llmInfo.fallbackModel,
+					);
+					try {
+						aiMsg = await invokeWithTimeout(fallback, turnMessages, 'HuggingFace');
+						agentLogger.llmSuccess(
+							fallbackStart,
+							(aiMsg.tool_calls?.length ?? 0) > 0,
+							aiMsg.tool_calls?.length ?? 0,
+						);
+						usedProvider = llmInfo.fallbackProvider;
+					} catch (fallbackError: any) {
+						agentLogger.llmError(fallbackStart, fallbackError);
+						agentLogger.error(
+							'LLM',
+							'💀 Both primary AND fallback LLMs failed',
+							fallbackError,
+							{
+								primaryError: primaryError.message?.substring(0, 100),
+							},
+						);
+						throw fallbackError; // Let controller handle gracefully
+					}
+				} else {
+					agentLogger.error(
+						'LLM',
+						'💀 Primary LLM failed and no fallback configured',
+						primaryError,
+					);
+					throw primaryError;
+				}
+			}
+		} else if (fallback) {
+			// No primary — use fallback directly
+			const llmStart = agentLogger.llmStart(llmInfo.fallbackProvider, llmInfo.fallbackModel);
+			try {
+				aiMsg = await invokeWithTimeout(fallback, turnMessages, 'HuggingFace');
+				agentLogger.llmSuccess(
+					llmStart,
+					(aiMsg.tool_calls?.length ?? 0) > 0,
+					aiMsg.tool_calls?.length ?? 0,
+				);
+				usedProvider = llmInfo.fallbackProvider;
+			} catch (err: any) {
+				agentLogger.llmError(llmStart, err);
+				throw err;
+			}
+		} else {
+			throw new Error('No LLM providers available');
 		}
 
-		const toolCalls = aiMsg.tool_calls ?? [];
-		agentLogger.llmSuccess(llmStartTime, toolCalls.length > 0, toolCalls.length);
-
+		// ─── Process Response ───────────────────────────────────────
 		turnMessages.push(aiMsg);
 		await memory.addMessage(aiMsg);
 
+		const toolCalls = aiMsg.tool_calls ?? [];
+
 		if (toolCalls.length > 0) {
-			agentLogger.info('TOOL', `Agent requested ${toolCalls.length} tool(s)`, {
-				tools: toolCalls.map((tc: any) => tc.name),
-				loop: callCount + 1,
-			});
+			agentLogger.info(
+				'TOOL',
+				`Agent (${usedProvider}) requested ${toolCalls.length} tool(s)`,
+				{
+					tools: toolCalls.map((tc: any) => tc.name),
+					loop: callCount + 1,
+				},
+			);
 
 			for (const toolCall of toolCalls) {
 				const selectedTool = agentTools.find(tool => tool.name === toolCall.name);
@@ -117,10 +197,11 @@ export async function processUserMessage(
 			}
 			callCount++;
 		} else {
-			// Finished execution — final reply
+			// Finished — final reply
 			const totalDuration = Date.now() - requestStartTime;
 			agentLogger.info('SYSTEM', `━━━ Request Complete ━━━`, {
 				sessionId,
+				usedProvider,
 				totalDurationMs: totalDuration,
 				llmLoops: callCount + 1,
 				replyPreview: String(aiMsg.content).substring(0, 100),
