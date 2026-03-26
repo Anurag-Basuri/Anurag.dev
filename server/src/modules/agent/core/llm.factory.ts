@@ -6,10 +6,9 @@ import { agentLogger } from './agent.logger';
 import { DynamicStructuredTool } from '@langchain/core/tools';
 
 // ─── Singleton State ─────────────────────────────────────────────
-// Initialize once on first import, not per-request.
 
-let _primaryLlm: ChatGoogleGenerativeAI | null = null;
-let _fallbackLlm: ChatOpenAI | null = null;
+let _primaryLlm: ChatOpenAI | null = null;        // HuggingFace is now primary
+let _fallbackLlm: ChatGoogleGenerativeAI | null = null; // Gemini is now fallback
 let _initialized = false;
 
 export const llmInfo = {
@@ -24,53 +23,53 @@ function initLLMs() {
 	if (_initialized) return;
 	_initialized = true;
 
-	// 1. Configure Primary Model (Gemini)
+	// 1. Configure Primary Model (HuggingFace — fast, no rate limit issues)
+	if (env.HF_TOKEN) {
+		_primaryLlm = new ChatOpenAI({
+			model: 'Qwen/Qwen2.5-72B-Instruct',
+			apiKey: env.HF_TOKEN,
+			configuration: { baseURL: 'https://router.huggingface.co/v1' },
+			temperature: 0.3,
+			timeout: 30000,
+			maxTokens: 1000,
+		});
+		llmInfo.primaryProvider = 'HuggingFace';
+		llmInfo.primaryModel = 'Qwen2.5-72B-Instruct';
+		agentLogger.info('LLM', '🟢 Primary LLM configured', { provider: 'HuggingFace', model: 'Qwen2.5-72B-Instruct' });
+	} else {
+		agentLogger.warn('LLM', '⚠️ HF_TOKEN not set — HuggingFace primary skipped');
+	}
+
+	// 2. Configure Fallback Model (Gemini)
 	if (env.GEMINI_API_KEY || env.AI_PROVIDER === 'gemini') {
 		const apiKey = env.GEMINI_API_KEY || process.env.AI_API_KEY;
 		if (apiKey) {
-			_primaryLlm = new ChatGoogleGenerativeAI({
+			_fallbackLlm = new ChatGoogleGenerativeAI({
 				model: 'gemini-2.5-flash',
 				apiKey: apiKey,
 				temperature: 0.3,
 				maxOutputTokens: 1000,
 			});
-			llmInfo.primaryProvider = 'Gemini';
-			llmInfo.primaryModel = 'gemini-2.5-flash';
-			agentLogger.info('LLM', '🟢 Primary LLM configured', { provider: 'Google Gemini', model: 'gemini-2.5-flash' });
-		} else {
-			agentLogger.warn('LLM', '⚠️ GEMINI_API_KEY env var present but empty — Gemini skipped');
+			llmInfo.fallbackProvider = 'Gemini';
+			llmInfo.fallbackModel = 'gemini-2.5-flash';
+			agentLogger.info('LLM', '🟡 Fallback LLM configured', { provider: 'Google Gemini', model: 'gemini-2.5-flash' });
 		}
-	}
-
-	// 2. Configure Fallback Model (HuggingFace via OpenAI SDK)
-	if (env.HF_TOKEN) {
-		_fallbackLlm = new ChatOpenAI({
-			model: 'Qwen/Qwen2.5-72B-Instruct',
-			apiKey: env.HF_TOKEN,
-			configuration: { baseURL: 'https://router.huggingface.co/v1' },
-			temperature: 0.3,
-			timeout: 30000, // 30s timeout
-			maxTokens: 1000,
-		});
-		llmInfo.fallbackProvider = 'HuggingFace';
-		llmInfo.fallbackModel = 'Qwen2.5-72B-Instruct';
-		agentLogger.info('LLM', '🟡 Fallback LLM configured', { provider: 'HuggingFace', model: 'Qwen2.5-72B-Instruct' });
 	}
 
 	// Determine mode
 	if (_primaryLlm && _fallbackLlm) {
 		llmInfo.mode = 'dual';
-		agentLogger.info('LLM', '🚀 Dual-LLM ready: Gemini (primary) → HuggingFace (fallback)');
+		agentLogger.info('LLM', '🚀 Dual-LLM ready: HuggingFace (primary) → Gemini (fallback)');
 	} else if (_primaryLlm) {
 		llmInfo.mode = 'primary-only';
-		agentLogger.info('LLM', '🚀 Single-LLM ready: Gemini (no fallback configured)');
+		agentLogger.info('LLM', '🚀 Single-LLM ready: HuggingFace (no fallback configured)');
 	} else if (_fallbackLlm) {
 		llmInfo.mode = 'fallback-only';
-		agentLogger.warn('LLM', '⚠️ Running on HuggingFace only (no primary Gemini configured)');
+		agentLogger.warn('LLM', '⚠️ Running on Gemini only (no primary HuggingFace configured)');
 	} else {
 		llmInfo.mode = 'NONE';
 		agentLogger.error('SYSTEM', 'FATAL: No AI Providers configured', null, {
-			hint: 'Set GEMINI_API_KEY or HF_TOKEN',
+			hint: 'Set HF_TOKEN or GEMINI_API_KEY',
 		});
 	}
 }
@@ -80,11 +79,10 @@ initLLMs();
 
 /**
  * Returns the bound primary + fallback LLM instances.
- * The caller (agent.service) handles manual fallback logic.
  */
 export function getBoundLLMs(tools: DynamicStructuredTool[]) {
 	if (llmInfo.mode === 'NONE') {
-		throw new Error('No AI Providers configured. Please set GEMINI_API_KEY or HF_TOKEN.');
+		throw new Error('No AI Providers configured. Please set HF_TOKEN or GEMINI_API_KEY.');
 	}
 
 	return {

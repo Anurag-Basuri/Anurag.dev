@@ -6,14 +6,17 @@ import { HumanMessage, SystemMessage, ToolMessage } from '@langchain/core/messag
 import { getBasePortfolioContext } from './rag/context.builder';
 import { agentLogger } from './core/agent.logger';
 
-const LLM_TIMEOUT_MS = 30_000; // 30 seconds — abort if LLM hangs longer
+const LLM_TIMEOUT_MS = 30_000; // 30 seconds
 
-/** Race an LLM call against a timeout. Prevents 3-minute SDK retry hangs. */
+/** Race an LLM call against a timeout. */
 async function invokeWithTimeout(llm: any, messages: any[], label: string): Promise<any> {
 	return Promise.race([
 		llm.invoke(messages),
 		new Promise((_, reject) =>
-			setTimeout(() => reject(new Error(`${label} timed out after ${LLM_TIMEOUT_MS / 1000}s`)), LLM_TIMEOUT_MS),
+			setTimeout(
+				() => reject(new Error(`${label} timed out after ${LLM_TIMEOUT_MS / 1000}s`)),
+				LLM_TIMEOUT_MS,
+			),
 		),
 	]);
 }
@@ -62,15 +65,26 @@ export async function processUserMessage(
 	let callCount = 0;
 	const MAX_LOOPS = 4;
 
-	while (callCount < MAX_LOOPS) {
-		// ─── LLM Invocation with Manual Fallback ────────────────────
-		let aiMsg: any;
-		let usedProvider = llmInfo.primaryProvider || llmInfo.fallbackProvider;
+	// ─── Sticky Fallback ────────────────────────────────────────────
+	// If the primary LLM fails once during a request, skip it for all
+	// subsequent loops. This prevents repeated 30s timeout penalties.
+	let primaryFailed = false;
 
-		if (primary) {
+	while (callCount < MAX_LOOPS) {
+		let aiMsg: any;
+		let usedProvider = '';
+
+		// ─── LLM Invocation with Sticky Fallback ────────────────────
+		const activePrimary = primary && !primaryFailed ? primary : null;
+
+		if (activePrimary) {
 			const llmStart = agentLogger.llmStart(llmInfo.primaryProvider, llmInfo.primaryModel);
 			try {
-				aiMsg = await invokeWithTimeout(primary, turnMessages, 'Gemini');
+				aiMsg = await invokeWithTimeout(
+					activePrimary,
+					turnMessages,
+					llmInfo.primaryProvider,
+				);
 				agentLogger.llmSuccess(
 					llmStart,
 					(aiMsg.tool_calls?.length ?? 0) > 0,
@@ -79,19 +93,28 @@ export async function processUserMessage(
 				usedProvider = llmInfo.primaryProvider;
 			} catch (primaryError: any) {
 				agentLogger.llmError(llmStart, primaryError);
+				primaryFailed = true; // ← Sticky: won't try primary again this request
+				agentLogger.warn(
+					'LLM',
+					`🔒 Primary (${llmInfo.primaryProvider}) disabled for remainder of this request`,
+				);
 
-				// ─── Manual Fallback ────────────────────────────────
+				// Try fallback
 				if (fallback) {
 					agentLogger.info(
 						'LLM',
-						`🔄 Primary (${llmInfo.primaryProvider}) failed — switching to fallback (${llmInfo.fallbackProvider})`,
+						`🔄 Switching to fallback (${llmInfo.fallbackProvider})`,
 					);
 					const fallbackStart = agentLogger.llmStart(
 						llmInfo.fallbackProvider,
 						llmInfo.fallbackModel,
 					);
 					try {
-						aiMsg = await invokeWithTimeout(fallback, turnMessages, 'HuggingFace');
+						aiMsg = await invokeWithTimeout(
+							fallback,
+							turnMessages,
+							llmInfo.fallbackProvider,
+						);
 						agentLogger.llmSuccess(
 							fallbackStart,
 							(aiMsg.tool_calls?.length ?? 0) > 0,
@@ -108,22 +131,23 @@ export async function processUserMessage(
 								primaryError: primaryError.message?.substring(0, 100),
 							},
 						);
-						throw fallbackError; // Let controller handle gracefully
+						throw fallbackError;
 					}
 				} else {
-					agentLogger.error(
-						'LLM',
-						'💀 Primary LLM failed and no fallback configured',
-						primaryError,
-					);
 					throw primaryError;
 				}
 			}
 		} else if (fallback) {
-			// No primary — use fallback directly
+			// Primary already failed (sticky) or not configured — go straight to fallback
+			if (primaryFailed) {
+				agentLogger.debug(
+					'LLM',
+					`⏩ Skipping ${llmInfo.primaryProvider} (failed earlier) — using ${llmInfo.fallbackProvider} directly`,
+				);
+			}
 			const llmStart = agentLogger.llmStart(llmInfo.fallbackProvider, llmInfo.fallbackModel);
 			try {
-				aiMsg = await invokeWithTimeout(fallback, turnMessages, 'HuggingFace');
+				aiMsg = await invokeWithTimeout(fallback, turnMessages, llmInfo.fallbackProvider);
 				agentLogger.llmSuccess(
 					llmStart,
 					(aiMsg.tool_calls?.length ?? 0) > 0,
@@ -202,6 +226,7 @@ export async function processUserMessage(
 			agentLogger.info('SYSTEM', `━━━ Request Complete ━━━`, {
 				sessionId,
 				usedProvider,
+				primarySkipped: primaryFailed,
 				totalDurationMs: totalDuration,
 				llmLoops: callCount + 1,
 				replyPreview: String(aiMsg.content).substring(0, 100),
