@@ -1,53 +1,93 @@
 import { tool } from '@langchain/core/tools';
 import { z } from 'zod';
 
+/**
+ * LeetCode GraphQL query — same approach as coding-stats.service.ts (which works reliably).
+ * Uses the official LeetCode GraphQL API instead of third-party proxies that get rate-limited.
+ */
+const LEETCODE_QUERY = `
+query getUserProfile($username: String!) {
+  matchedUser(username: $username) {
+    username
+    profile {
+      ranking
+    }
+    submitStatsGlobal {
+      acSubmissionNum {
+        difficulty
+        count
+      }
+    }
+  }
+  userContestRanking(username: $username) {
+    rating
+    globalRanking
+  }
+}`;
+
 export const leetcodeTool = tool(
 	async ({ username }) => {
 		try {
-			// Using alfa-leetcode-api (maintained, deployed on Render)
 			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 8000); // 8s timeout
+			const timeout = setTimeout(() => controller.abort(), 10000);
 
-			const res = await fetch(
-				`https://alfa-leetcode-api.onrender.com/userProfile/${username}`,
-				{ signal: controller.signal },
-			);
+			const res = await fetch('https://leetcode.com/graphql/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Referer: 'https://leetcode.com/',
+					Origin: 'https://leetcode.com',
+					'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+				},
+				body: JSON.stringify({
+					query: LEETCODE_QUERY,
+					variables: { username },
+				}),
+				signal: controller.signal,
+			});
 			clearTimeout(timeout);
 
 			if (!res.ok) {
-				return `The LeetCode stats API returned status ${res.status}. Tell the user you can't fetch live LeetCode stats right now but they can check the coding profiles section.`;
+				return `The LeetCode API returned status ${res.status}. Tell the user you can't fetch live LeetCode stats right now but they can check the coding profiles section.`;
 			}
 
 			const text = await res.text();
-			let data: any;
+			let json: any;
 			try {
-				data = JSON.parse(text);
-			} catch (e) {
-				return `The LeetCode API returned an invalid response (likely an HTML error page). Tell the user the service is temporarily down.`;
+				json = JSON.parse(text);
+			} catch {
+				return `The LeetCode API returned an invalid response. Tell the user the service is temporarily down.`;
 			}
 
-			if (data.errors || data.status === 'error') {
-				return `LeetCode account "${username}" not found or private.`;
+			const user = json.data?.matchedUser;
+			if (!user) {
+				return `LeetCode account "${username}" not found or the API returned no data.`;
 			}
 
-			// Format for the LLM — adapt to alfa-leetcode-api response shape
+			// Parse submission stats
+			const submissions = user.submitStatsGlobal?.acSubmissionNum || [];
+			const findCount = (difficulty: string) =>
+				submissions.find(
+					(s: { difficulty: string; count: number }) => s.difficulty === difficulty,
+				)?.count || 0;
+
+			const contestRanking = json.data?.userContestRanking;
+
+			// Format for the LLM
 			let result = `LeetCode Profile: ${username}\n`;
-			result += `Total Solved: ${data.totalSolved ?? 'N/A'} / ${data.totalQuestions ?? 'N/A'}`;
-			if (data.ranking) result += ` (Global Ranking: ${data.ranking})`;
+			result += `Total Solved: ${findCount('All')}`;
+			if (user.profile?.ranking) result += ` (Global Ranking: #${user.profile.ranking})`;
 			result += '\n';
 			result += `Difficulty Breakdown:\n`;
-			result += `- Easy: ${data.easySolved ?? 'N/A'} / ${data.totalEasy ?? '?'}\n`;
-			result += `- Medium: ${data.mediumSolved ?? 'N/A'} / ${data.totalMedium ?? '?'}\n`;
-			result += `- Hard: ${data.hardSolved ?? 'N/A'} / ${data.totalHard ?? '?'}\n`;
+			result += `- Easy: ${findCount('Easy')}\n`;
+			result += `- Medium: ${findCount('Medium')}\n`;
+			result += `- Hard: ${findCount('Hard')}\n`;
 
-			if (data.acceptanceRate) {
-				result += `Acceptance Rate: ${data.acceptanceRate}%\n`;
+			if (contestRanking?.rating) {
+				result += `Contest Rating: ${Math.round(contestRanking.rating)}\n`;
 			}
-			if (data.contributionPoints) {
-				result += `Contribution Points: ${data.contributionPoints}\n`;
-			}
-			if (data.reputation !== undefined) {
-				result += `Reputation: ${data.reputation}\n`;
+			if (contestRanking?.globalRanking) {
+				result += `Contest Global Rank: #${contestRanking.globalRanking}\n`;
 			}
 
 			return result;

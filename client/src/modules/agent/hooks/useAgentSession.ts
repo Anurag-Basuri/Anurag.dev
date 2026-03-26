@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { apiClient } from '@/api';
-import { AgentMessage, AgentApiResponse } from '../types/agent.types';
+import type { AgentMessage, AgentApiResponse } from '../types/agent.types';
+
+/** Regex to find [NAVIGATE:/some/path] tokens in agent replies */
+const NAV_REGEX = /\[NAVIGATE:([\w\-\/]+)\]/g;
 
 export function useAgentSession() {
 	const [messages, setMessages] = useState<AgentMessage[]>([]);
@@ -9,8 +12,11 @@ export function useAgentSession() {
 	const [isOpen, setIsOpen] = useState(false);
 	const router = useRouter();
 	const pathname = usePathname();
-	
-	// Persistent Session ID Memory across reloads
+
+	// Use a ref to prevent stale closure issues with isLoading
+	const isLoadingRef = useRef(false);
+
+	// Persistent Session ID across reloads
 	const sessionIdRef = useRef<string>('');
 
 	useEffect(() => {
@@ -24,9 +30,8 @@ export function useAgentSession() {
 		}
 	}, []);
 
-	// Send message to the LangChain backend
 	const sendMessage = useCallback(async (content: string) => {
-		if (!content.trim() || isLoading) return;
+		if (!content.trim() || isLoadingRef.current) return;
 
 		const userMsg: AgentMessage = {
 			id: Date.now().toString(),
@@ -34,9 +39,9 @@ export function useAgentSession() {
 			content,
 		};
 
-		// Optimistic UI update
 		setMessages(prev => [...prev, userMsg]);
 		setIsLoading(true);
+		isLoadingRef.current = true;
 
 		try {
 			const resData = await apiClient.post<AgentApiResponse>('/chat', {
@@ -47,28 +52,36 @@ export function useAgentSession() {
 
 			let rawReply = resData.reply;
 
-			// Intercept Autonomous Navigation Commands from the LLM
-			const navRegex = /\[NAVIGATE:([\w\-\/]+)\]/g;
-			const match = navRegex.exec(rawReply);
-			if (match && match[1]) {
-				const routeTarget = match[1];
-				console.log('[useAgentSession] Autonomous Navigation triggered to:', routeTarget);
-				router.push(routeTarget);
-				// Strip the silent command from the visible message
-				rawReply = rawReply.replace(navRegex, '').trim();
+			// Extract navigation targets for rendering as buttons
+			const navigationTargets: string[] = [];
+			let match: RegExpExecArray | null;
+			const regex = new RegExp(NAV_REGEX.source, NAV_REGEX.flags);
+			while ((match = regex.exec(rawReply)) !== null) {
+				if (match[1]) navigationTargets.push(match[1]);
+			}
+
+			// Strip the [NAVIGATE:...] tokens from visible text
+			const cleanReply = rawReply.replace(NAV_REGEX, '').trim();
+
+			// Navigate to the first target automatically
+			if (navigationTargets.length > 0) {
+				const target = navigationTargets[0].startsWith('/')
+					? navigationTargets[0]
+					: `/${navigationTargets[0]}`;
+				router.push(target);
 			}
 
 			const assistantMsg: AgentMessage = {
 				id: (Date.now() + 1).toString(),
 				role: 'assistant',
-				content: rawReply,
+				content: cleanReply,
+				navigationTargets: navigationTargets.length > 0 ? navigationTargets : undefined,
 			};
 
 			setMessages(prev => [...prev, assistantMsg]);
 		} catch (error: any) {
 			console.error('[useAgentSession] Error:', error);
 
-			// ApiClientError has .message and .status directly (not Axios-style .response.data)
 			let errorText = 'Sorry, I am having trouble connecting right now. Please try again later.';
 			if (error?.message && typeof error.message === 'string' && error.message !== 'Network error') {
 				errorText = error.message;
@@ -82,15 +95,15 @@ export function useAgentSession() {
 			setMessages(prev => [...prev, errMsg]);
 		} finally {
 			setIsLoading(false);
+			isLoadingRef.current = false;
 		}
-	}, [isLoading]);
+	}, [router, pathname]);
 
 	const clearSession = useCallback(async () => {
 		setMessages([]);
 		if (sessionIdRef.current) {
 			try {
 				await apiClient.post('/chat/reset', { sessionId: sessionIdRef.current });
-				// Generate new session ID locally too
 				const newSid = Math.random().toString(36).substring(2, 15);
 				localStorage.setItem('agent_session_id', newSid);
 				sessionIdRef.current = newSid;
