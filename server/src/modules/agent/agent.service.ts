@@ -13,12 +13,22 @@ async function invokeWithTimeout(llm: any, messages: any[], label: string): Prom
 	return Promise.race([
 		llm.invoke(messages),
 		new Promise((_, reject) =>
-			setTimeout(
-				() => reject(new Error(`${label} timed out after ${LLM_TIMEOUT_MS / 1000}s`)),
-				LLM_TIMEOUT_MS,
-			),
+			setTimeout(() => {
+				const timeoutErr = new Error(`${label} timed out after ${LLM_TIMEOUT_MS / 1000}s`);
+				(timeoutErr as any).isTimeout = true;
+				reject(timeoutErr);
+			}, LLM_TIMEOUT_MS),
 		),
-	]);
+	]).catch(err => {
+		// Log specific errors for better debugging if available
+		if (err?.message?.includes('400')) {
+			agentLogger.error('LLM', `🚨 ${label} returned 400 Bad Request`, err, {
+				hint: 'Check model name or message format',
+				messagesCount: messages.length,
+			});
+		}
+		throw err;
+	});
 }
 
 export interface AgentResponse {
@@ -61,6 +71,9 @@ export async function processUserMessage(
 
 	const turnMessages = [systemPrompt, ...history, new HumanMessage(message)];
 	await memory.addMessage(new HumanMessage(message));
+
+	const approxChars = turnMessages.reduce((acc, m) => acc + String(m.content).length, 0);
+	agentLogger.debug('LLM', `Estimated prompt size: ${approxChars} characters`, { sessionId });
 
 	let callCount = 0;
 	const MAX_LOOPS = 4;

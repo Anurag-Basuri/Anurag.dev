@@ -7,7 +7,7 @@ import { DynamicStructuredTool } from '@langchain/core/tools';
 
 // ─── Singleton State ─────────────────────────────────────────────
 
-let _primaryLlm: ChatOpenAI | null = null;        // HuggingFace is now primary
+let _primaryLlm: ChatOpenAI | null = null; // HuggingFace is now primary
 let _fallbackLlm: ChatGoogleGenerativeAI | null = null; // Gemini is now fallback
 let _initialized = false;
 
@@ -35,7 +35,10 @@ function initLLMs() {
 		});
 		llmInfo.primaryProvider = 'HuggingFace';
 		llmInfo.primaryModel = 'Qwen2.5-72B-Instruct';
-		agentLogger.info('LLM', '🟢 Primary LLM configured', { provider: 'HuggingFace', model: 'Qwen2.5-72B-Instruct' });
+		agentLogger.info('LLM', '🟢 Primary LLM configured', {
+			provider: 'HuggingFace',
+			model: 'Qwen2.5-72B-Instruct',
+		});
 	} else {
 		agentLogger.warn('LLM', '⚠️ HF_TOKEN not set — HuggingFace primary skipped');
 	}
@@ -45,14 +48,17 @@ function initLLMs() {
 		const apiKey = env.GEMINI_API_KEY || process.env.AI_API_KEY;
 		if (apiKey) {
 			_fallbackLlm = new ChatGoogleGenerativeAI({
-				model: 'gemini-2.5-flash',
+				model: 'gemini-1.5-flash',
 				apiKey: apiKey,
 				temperature: 0.3,
 				maxOutputTokens: 1000,
 			});
 			llmInfo.fallbackProvider = 'Gemini';
-			llmInfo.fallbackModel = 'gemini-2.5-flash';
-			agentLogger.info('LLM', '🟡 Fallback LLM configured', { provider: 'Google Gemini', model: 'gemini-2.5-flash' });
+			llmInfo.fallbackModel = 'gemini-1.5-flash';
+			agentLogger.info('LLM', '🟡 Fallback LLM configured', {
+				provider: 'Google Gemini',
+				model: 'gemini-1.5-flash',
+			});
 		}
 	}
 
