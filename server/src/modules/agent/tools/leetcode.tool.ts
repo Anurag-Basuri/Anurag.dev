@@ -106,8 +106,8 @@ export const leetcodeTool = tool(
 		schema: z.object({
 			username: z
 				.string()
-				.default('avijit-basuri')
-				.describe('The LeetCode username to fetch. Always defaults to "avijit-basuri".'),
+				.default('Anurag_Basuri')
+				.describe('The LeetCode username to fetch. Always defaults to "Anurag_Basuri".'),
 		}),
 	},
 );
