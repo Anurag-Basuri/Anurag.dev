@@ -251,6 +251,9 @@ The visitor never sees a white error screen.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `NEXT_PUBLIC_API_URL` | ✓ | Backend URL (e.g., `http://localhost:4000`) |
+| `NEXT_PUBLIC_API_TIMEOUT_MS` | ○ | API timeout in ms (default `5000`; mobile uses a higher floor) |
+
+For production deployments, set `NEXT_PUBLIC_API_URL` to a publicly reachable HTTPS backend URL (not `localhost`).
 
 ---
 

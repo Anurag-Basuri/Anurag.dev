@@ -151,6 +151,9 @@ npm run lint         # ESLint
 | Variable | Default | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:4000` | Backend API URL |
+| `NEXT_PUBLIC_API_TIMEOUT_MS` | `5000` | Base API timeout (ms). Mobile requests automatically use at least 10s. |
+
+Production note: never point `NEXT_PUBLIC_API_URL` to `localhost` for deployed builds. Use your public backend origin.
 
 ## Browser Support
 

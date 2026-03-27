@@ -1,8 +1,44 @@
 import type { ApiSuccessResponse, ApiErrorResponse } from './types';
 
-const _RAW_URL = process.env.NEXT_PUBLIC_API_URL || 'https://personalportfolio-production-ecaf.up.railway.app/api/v1';
-export const API_BASE = _RAW_URL.endsWith('/api/v1') ? _RAW_URL : `${_RAW_URL.replace(/\/$/, '')}/api/v1`;
-const REQUEST_TIMEOUT = 5000;
+const _RAW_URL =
+	process.env.NEXT_PUBLIC_API_URL ||
+	'https://personalportfolio-production-ecaf.up.railway.app/api/v1';
+const _NORMALIZED_API_BASE = _RAW_URL.endsWith('/api/v1')
+	? _RAW_URL
+	: `${_RAW_URL.replace(/\/$/, '')}/api/v1`;
+const _IS_BROWSER = typeof window !== 'undefined';
+const _IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const _IS_LOCALHOST_API = /^https?:\/\/(?:localhost|127(?:\.\d{1,3}){3})(?::\d+)?(?:\/|$)/i.test(
+	_NORMALIZED_API_BASE,
+);
+
+// Guard against accidental production builds pointing to localhost.
+export const API_BASE =
+	_IS_BROWSER && _IS_PRODUCTION && _IS_LOCALHOST_API
+		? 'https://personalportfolio-production-ecaf.up.railway.app/api/v1'
+		: _NORMALIZED_API_BASE;
+
+const parseTimeout = (value: string | undefined): number | null => {
+	if (!value) return null;
+	const parsed = Number(value);
+	if (!Number.isFinite(parsed) || parsed <= 0) return null;
+	return Math.floor(parsed);
+};
+
+const ENV_REQUEST_TIMEOUT = parseTimeout(process.env.NEXT_PUBLIC_API_TIMEOUT_MS);
+const DEFAULT_REQUEST_TIMEOUT = ENV_REQUEST_TIMEOUT ?? 5000;
+const MOBILE_REQUEST_TIMEOUT = Math.max(DEFAULT_REQUEST_TIMEOUT, 10000);
+
+const isMobileUserAgent = (): boolean => {
+	if (!_IS_BROWSER) return false;
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+		window.navigator.userAgent,
+	);
+};
+
+const REQUEST_TIMEOUT = isMobileUserAgent() ? MOBILE_REQUEST_TIMEOUT : DEFAULT_REQUEST_TIMEOUT;
+const TRANSIENT_RETRYABLE_STATUSES = new Set([0, 408]);
+const DEFAULT_RETRIES = 2;
 
 // Custom error class for API failures
 export class ApiClientError extends Error {
@@ -154,9 +190,37 @@ async function request<T>(
 	}
 }
 
+async function requestWithRetry<T>(
+	method: string,
+	endpoint: string,
+	options: Parameters<typeof request<T>>[2] = {},
+	retries = DEFAULT_RETRIES,
+): Promise<T> {
+	let attempts = 0;
+	let lastError: ApiClientError | null = null;
+
+	while (attempts <= retries) {
+		try {
+			return await request<T>(method, endpoint, options);
+		} catch (error) {
+			if (!(error instanceof ApiClientError)) throw error;
+			lastError = error;
+
+			const canRetry = TRANSIENT_RETRYABLE_STATUSES.has(error.status) && attempts < retries;
+			if (!canRetry) throw error;
+
+			const delayMs = 200 * 2 ** attempts;
+			await new Promise(resolve => setTimeout(resolve, delayMs));
+			attempts += 1;
+		}
+	}
+
+	throw lastError ?? new ApiClientError(0, 'Request failed after retries');
+}
+
 // Public API methods
 export const apiClient = {
-	get: <T>(endpoint: string, auth = false) => request<T>('GET', endpoint, { auth }),
+	get: <T>(endpoint: string, auth = false) => requestWithRetry<T>('GET', endpoint, { auth }),
 
 	post: <T>(endpoint: string, body: unknown, auth = false, timeout?: number) =>
 		request<T>('POST', endpoint, { body, auth, ...(timeout ? { timeout } : {}) }),

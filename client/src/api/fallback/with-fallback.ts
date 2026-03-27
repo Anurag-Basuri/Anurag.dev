@@ -12,6 +12,14 @@ export async function withFallback<T>(
 	label?: string,
 ): Promise<{ data: T; source: 'api' | 'fallback' }> {
 	const tag = label || 'unknown';
+	const isBrowser = typeof window !== 'undefined';
+	const deviceBucket =
+		isBrowser &&
+		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+			window.navigator.userAgent,
+		)
+			? 'mobile'
+			: 'desktop';
 
 	try {
 		const data = await fetcher();
@@ -19,13 +27,64 @@ export async function withFallback<T>(
 		// If the API returned null/undefined, use fallback data instead
 		if (data === null || data === undefined) {
 			console.warn(`[Fallback:${tag}] API returned empty data, using fallback.`);
+			if (isBrowser) {
+				const stats = (
+					window as Window & {
+						__portfolioFallbackStats?: {
+							total: number;
+							byTag: Record<string, number>;
+							byDevice: Record<string, number>;
+						};
+					}
+				).__portfolioFallbackStats ?? {
+					total: 0,
+					byTag: {},
+					byDevice: {},
+				};
+				stats.total += 1;
+				stats.byTag[tag] = (stats.byTag[tag] ?? 0) + 1;
+				stats.byDevice[deviceBucket] = (stats.byDevice[deviceBucket] ?? 0) + 1;
+				(
+					window as Window & { __portfolioFallbackStats?: typeof stats }
+				).__portfolioFallbackStats = stats;
+			}
 			return { data: fallbackData, source: 'fallback' };
 		}
 
 		return { data, source: 'api' };
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Unknown error';
+		const details =
+			error instanceof Error
+				? {
+						name: error.name,
+						message: error.message,
+						stack: error.stack,
+					}
+				: { value: error };
+		console.error(`[Fallback:${tag}] API request failed`, details);
 		console.warn(`[Fallback:${tag}] API failed, using fallback data. Reason: ${message}`);
+		if (isBrowser) {
+			const stats = (
+				window as Window & {
+					__portfolioFallbackStats?: {
+						total: number;
+						byTag: Record<string, number>;
+						byDevice: Record<string, number>;
+					};
+				}
+			).__portfolioFallbackStats ?? {
+				total: 0,
+				byTag: {},
+				byDevice: {},
+			};
+			stats.total += 1;
+			stats.byTag[tag] = (stats.byTag[tag] ?? 0) + 1;
+			stats.byDevice[deviceBucket] = (stats.byDevice[deviceBucket] ?? 0) + 1;
+			(
+				window as Window & { __portfolioFallbackStats?: typeof stats }
+			).__portfolioFallbackStats = stats;
+		}
 		return { data: fallbackData, source: 'fallback' };
 	}
 }
