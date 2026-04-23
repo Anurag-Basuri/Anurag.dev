@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { AppProviders } from '@/layout/AppProviders';
-import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,7 +22,6 @@ export default function RootLayout({
 			<body className={inter.className} style={{ background: '#020409' }}>
 				<AppProviders>
 					{children}
-					<Analytics />
 				</AppProviders>
 				<Analytics />
 			</body>
