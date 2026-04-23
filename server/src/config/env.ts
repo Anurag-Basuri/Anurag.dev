@@ -9,6 +9,7 @@ const envSchema = z.object({
 
 	// Database (NeonDB)
 	DATABASE_URL: z.string().url(),
+	DATABASE_URL_DIRECT: z.string().url().optional(),
 
 	// JWT
 	JWT_SECRET: z.string().min(32),

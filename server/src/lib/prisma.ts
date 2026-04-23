@@ -13,9 +13,13 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient(): { client: PrismaClient; pool: Pool } {
 	const isVercel = process.env.VERCEL === '1';
 	const poolMax = isVercel ? 3 : env.NODE_ENV === 'production' ? 20 : 5;
+	const connectionString =
+		env.NODE_ENV === 'development'
+			? (env.DATABASE_URL_DIRECT ?? env.DATABASE_URL)
+			: env.DATABASE_URL;
 
 	const pool = new Pool({
-		connectionString: env.DATABASE_URL,
+		connectionString,
 		max: poolMax,
 		idleTimeoutMillis: 30_000,
 		connectionTimeoutMillis: 5_000,
