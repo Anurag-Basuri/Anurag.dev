@@ -349,4 +349,4 @@ Live AI Agent architecture status at `GET /api/v1/docs/agent`.
 Designed and Architected by **Anurag Basuri**
 
 ## License
-Private
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
