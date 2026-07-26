@@ -1,12 +1,14 @@
 import cors from 'cors';
 import { env } from '../config/env';
 
+// CORS middleware — allows specified origins to access the API
 const allowedOrigins = env.CORS_ORIGIN.split(',')
 	.map(o => o.trim())
 	.filter(Boolean);
 
 const allowAnyOrigin = allowedOrigins.includes('*');
 
+// Configure CORS options
 const corsOptions: cors.CorsOptions = {
 	origin: allowAnyOrigin ? true : allowedOrigins,
 	credentials: !allowAnyOrigin,

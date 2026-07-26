@@ -44,8 +44,7 @@ class ApiError extends Error {
 		};
 	}
 
-	// ─── Factory Methods ────────────────────────────────────────────
-
+	// Factory Methods
 	static BadRequest(message = 'Bad Request', details?: unknown, source?: string) {
 		return new ApiError(400, message, { details, source });
 	}
@@ -86,8 +85,7 @@ class ApiError extends Error {
 		return new ApiError(503, message, { isOperational: false });
 	}
 
-	// ─── Zod Validation → ApiError ──────────────────────────────────
-
+	// Zod Validation → ApiError
 	/**
 	 * Converts a ZodError into a 400 ApiError with per-field details.
 	 *
@@ -111,8 +109,7 @@ class ApiError extends Error {
 		});
 	}
 
-	// ─── Prisma Error → ApiError ────────────────────────────────────
-
+	// Prisma Error → ApiError
 	/**
 	 * Translates known Prisma error codes into user-friendly ApiErrors.
 	 *

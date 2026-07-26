@@ -11,9 +11,7 @@ declare global {
 	}
 }
 
-/**
- * Authentication middleware — verifies Bearer token and attaches admin info to request.
- */
+// Authentication middleware — verifies Bearer token and attaches admin info to request
 export function authMiddleware(req: Request, _res: Response, next: NextFunction): void {
 	const authHeader = req.headers.authorization;
 

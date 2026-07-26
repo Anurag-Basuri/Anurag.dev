@@ -1,22 +1,15 @@
-/**
- * Link Preview Service
- * Fetches Open Graph images from URLs — similar to how LinkedIn/Twitter
- * generate link previews. Results are cached for 24 hours.
- */
-
-// ─── Cache ──────────────────────────────────────────────────────
-
+// Cache
 interface CacheEntry {
 	ogImage: string | null;
 	timestamp: number;
 }
 
 const cache = new Map<string, CacheEntry>();
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 6000;
-const MAX_HTML_BYTES = 200_000; // only read first ~200KB for OG tags
+const MAX_HTML_BYTES = 200_000;
 
-// ─── OG image extraction ────────────────────────────────────────
+// OG image extraction
 
 function extractOgImage(html: string, baseUrl: string): string | null {
 	// Try og:image (both attribute orderings)
@@ -48,8 +41,7 @@ function extractOgImage(html: string, baseUrl: string): string | null {
 	return imageUrl;
 }
 
-// ─── Public API ─────────────────────────────────────────────────
-
+// Public API
 export async function getOgImage(url: string): Promise<string | null> {
 	// Check cache first
 	const cached = cache.get(url);

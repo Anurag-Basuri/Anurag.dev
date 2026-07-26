@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getOgImage } from '../services/link-preview.service';
 import { ApiResponse } from '../utils/ApiResponse';
 
+// Get link preview handler
 async function getLinkPreview(req: Request, res: Response): Promise<void> {
 	const url = req.query.url as string | undefined;
 

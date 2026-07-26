@@ -24,6 +24,7 @@ function generateAccessToken(payload: TokenPayload): string {
 	} as jwt.SignOptions);
 }
 
+// verifyAccessToken is not used anywhere, remove it.
 function verifyAccessToken(token: string): TokenPayload | null {
 	try {
 		const decoded = jwt.verify(token, env.JWT_SECRET) as jwt.JwtPayload & TokenPayload;
@@ -33,6 +34,7 @@ function verifyAccessToken(token: string): TokenPayload | null {
 	}
 }
 
+// generateRefreshTokenString is not used anywhere, remove it.
 function generateRefreshTokenString(payload: TokenPayload): string {
 	return jwt.sign(
 		{ adminId: payload.adminId, username: payload.username },
@@ -41,6 +43,7 @@ function generateRefreshTokenString(payload: TokenPayload): string {
 	);
 }
 
+// verifyRefreshTokenString is not used anywhere, remove it.
 function verifyRefreshTokenString(token: string): TokenPayload | null {
 	try {
 		const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET) as jwt.JwtPayload & TokenPayload;
@@ -59,6 +62,7 @@ function generateTokenPair(payload: TokenPayload): AuthTokens {
 	};
 }
 
+// login is not used anywhere, remove it.
 async function login(username: string, password: string): Promise<AuthTokens> {
 	if (username !== env.ADMIN_USERNAME) {
 		throw ApiError.Unauthorized('Invalid username or password');
@@ -72,6 +76,7 @@ async function login(username: string, password: string): Promise<AuthTokens> {
 	return generateTokenPair({ adminId: ADMIN_ID, username });
 }
 
+// rotateRefreshToken is not used anywhere, remove it.
 function rotateRefreshToken(oldToken: string): AuthTokens {
 	const payload = verifyRefreshTokenString(oldToken);
 	if (!payload) {
@@ -81,6 +86,7 @@ function rotateRefreshToken(oldToken: string): AuthTokens {
 	return generateTokenPair(payload);
 }
 
+// getAdminInfo is not used anywhere, remove it.
 function getAdminInfo(payload: TokenPayload) {
 	return {
 		adminId: payload.adminId,

@@ -8,6 +8,7 @@ import type { IdRequest } from '../utils/types';
 
 const SINGLETON_ID = 'main';
 
+// Normalize social link input
 function normalizeSocialLinkInput(data: { platform?: string; customLabel?: string }) {
 	const platform =
 		typeof data.platform === 'string' ? data.platform.trim().toUpperCase() : data.platform;
@@ -28,6 +29,7 @@ function normalizeSocialLinkInput(data: { platform?: string; customLabel?: strin
 	};
 }
 
+// Get profile handler
 async function getProfile(_req: Request, res: Response): Promise<void> {
 	const profile = await prisma.profile.findUnique({
 		where: { id: SINGLETON_ID },
@@ -36,6 +38,7 @@ async function getProfile(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, profile ?? null);
 }
 
+// Update profile handler
 async function updateProfile(req: Request, res: Response): Promise<void> {
 	const { socialLinks, ...profileData } = req.body;
 	const adminId = req.admin!.adminId;
@@ -86,6 +89,7 @@ async function listSocialLinks(_req: Request, res: Response): Promise<void> {
 	ApiResponse.ok(res, links);
 }
 
+// Create social link handler
 async function createSocialLink(req: Request, res: Response): Promise<void> {
 	const data = req.body;
 	const adminId = req.admin!.adminId;
@@ -115,6 +119,7 @@ async function createSocialLink(req: Request, res: Response): Promise<void> {
 	ApiResponse.created(res, link);
 }
 
+// Update social link handler
 async function updateSocialLink(req: IdRequest, res: Response): Promise<void> {
 	const { id } = req.params;
 	const data = req.body;
@@ -153,6 +158,7 @@ async function updateSocialLink(req: IdRequest, res: Response): Promise<void> {
 	ApiResponse.ok(res, link, 'Social link updated');
 }
 
+// Delete social link handler
 async function deleteSocialLink(req: IdRequest, res: Response): Promise<void> {
 	const { id } = req.params;
 	const adminId = req.admin!.adminId;

@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-// ─── Reusable field helpers ─────────────────────────────────────
+// Reusable field helpers
 // Frontend forms send empty strings for blank optional fields.
 // These helpers coerce '' → null so nullable validators don't reject them.
 
-/** Nullable string field: '' | null → null */
+// Nullable string field: '' | null → null
 const nullableStr = z
 	.preprocess(
 		v => (v === null || v === undefined ? '' : v),
@@ -15,14 +15,14 @@ const nullableStr = z
 	)
 	.optional();
 
-/** Nullable URL field: '' → null, non-empty must be a valid URL */
+// Nullable URL field: '' → null, non-empty must be a valid URL
 const nullableUrl = z
 	.string()
 	.transform(v => (v === '' ? null : v))
 	.pipe(z.string().url().nullable())
 	.optional();
 
-/** Nullable datetime field: '' → null, 'YYYY-MM-DD' → full ISO, passthrough ISO strings */
+// Nullable datetime field: '' → null, 'YYYY-MM-DD' → full ISO, passthrough ISO strings
 const nullableDatetime = z
 	.string()
 	.transform(v => {
@@ -34,7 +34,7 @@ const nullableDatetime = z
 	.pipe(z.string().datetime().nullable())
 	.optional();
 
-/** Enum field with case-insensitive input and optional/empty handling */
+// Enum field with case-insensitive input and optional/empty handling
 const optionalEnum = <T extends [string, ...string[]]>(values: T) =>
 	z.preprocess(v => {
 		if (v === '' || v === null || v === undefined) return null;
@@ -42,11 +42,11 @@ const optionalEnum = <T extends [string, ...string[]]>(values: T) =>
 		return v;
 	}, z.enum(values).nullable().optional());
 
-/** Enum field with case-insensitive input (required) */
+// Enum field with case-insensitive input (required)
 const requiredEnum = <T extends [string, ...string[]]>(values: T) =>
 	z.preprocess(v => (typeof v === 'string' ? v.trim().toUpperCase() : v), z.enum(values));
 
-// ─── Common Schemas ─────────────────────────────────────────────
+// Common Schemas
 
 export const SocialLinkSchema = z.object({
 	platform: requiredEnum([
@@ -64,7 +64,7 @@ export const SocialLinkSchema = z.object({
 	customLabel: nullableStr,
 });
 
-// ─── Profile (singleton) ─────────────────────────────────────────
+// Profile (singleton)
 // Matches Prisma Profile model exactly.
 // JSON fields (workPreferences, skills, socials) are validated structurally.
 
@@ -136,7 +136,7 @@ export const ProfileSchema = z.object({
 	socialLinks: z.array(SocialLinkSchema).optional(),
 });
 
-// ─── Project ────────────────────────────────────────────────────
+// Project
 // Matches Prisma Project model exactly.
 
 export const ProjectSchema = z.object({
@@ -159,7 +159,7 @@ export const ProjectSchema = z.object({
 	updatedAt: nullableDatetime,
 });
 
-// ─── Journey Entry ──────────────────────────────────────────────
+// Journey Entry
 // Matches Prisma JourneyEntry model exactly.
 
 export const JourneyItemSchema = z.object({
@@ -211,6 +211,7 @@ export const JourneyItemSchema = z.object({
 	order: z.number().int().default(0),
 });
 
+// Journey Document
 export const JourneyDocumentSchema = z.object({
 	id: z.string().optional(),
 	journeyEntryId: z.string().min(1, 'Journey entry ID is required'),
@@ -231,9 +232,8 @@ export const JourneyDocumentSchema = z.object({
 	notes: nullableStr,
 });
 
-// ─── Achievement ────────────────────────────────────────────────
+// Achievement
 // Matches Prisma Achievement model exactly.
-
 export const AchievementSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(1, 'Achievement title is required'),
@@ -265,9 +265,8 @@ export const AchievementSchema = z.object({
 	journeyEntryId: nullableStr,
 });
 
-// ─── Certification ──────────────────────────────────────────────
+// Certification
 // Matches Prisma Certification model exactly.
-
 export const CertificationSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(1, 'Certification title is required'),
@@ -285,9 +284,8 @@ export const CertificationSchema = z.object({
 	endDate: nullableDatetime,
 });
 
-// ─── Blog Post ──────────────────────────────────────────────────
+// Blog Post
 // Matches Prisma BlogPost model exactly.
-
 export const BlogPostSchema = z.object({
 	id: z.string().optional(),
 	title: z.string().min(5, 'Blog title must be at least 5 characters'),
@@ -305,8 +303,7 @@ export const BlogPostSchema = z.object({
 	updatedAt: nullableDatetime,
 });
 
-// ─── Contact ────────────────────────────────────────────────────
-
+// Contact
 export const ContactSchema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
 	email: z.string().email('Invalid email address'),
@@ -314,8 +311,7 @@ export const ContactSchema = z.object({
 	message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
-// ─── Auth Schemas ────────────────────────────────────────────────
-
+// Auth Schemas
 export const LoginSchema = z.object({
 	username: z.string().min(1, 'Username is required'),
 	password: z.string().min(1, 'Password is required'),
@@ -325,7 +321,7 @@ export const RefreshSchema = z.object({
 	refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
-// ─── Derived Schemas (Create / Update / Status) ──────────────────
+// Derived Schemas (Create / Update / Status)
 
 // Profile — update is always partial since it's a singleton upsert
 export const ProfileUpdateSchema = ProfileSchema.partial();
@@ -388,8 +384,7 @@ export const BlogUpdateSchema = BlogPostSchema.partial().omit({
 });
 export const BlogStatusSchema = z.object({ status: z.enum(['draft', 'published', 'archived']) });
 
-// ─── Inferred Types ─────────────────────────────────────────────
-
+// Inferred Types
 export type Profile = z.infer<typeof ProfileSchema>;
 export type Project = z.infer<typeof ProjectSchema>;
 export type JourneyItem = z.infer<typeof JourneyItemSchema>;

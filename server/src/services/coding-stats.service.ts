@@ -1,7 +1,7 @@
 import { env } from '../config/env';
 import { prisma } from '../lib/prisma';
 
-// ─── Types ──────────────────────────────────────────────────────
+// Types
 
 interface ContributionDay {
 	date: string; // YYYY-MM-DD
@@ -36,9 +36,9 @@ interface PlatformStats {
 		gists?: number;
 		commits?: number;
 	};
-	/** GitHub: 52 weeks of daily contribution data */
+	// GitHub: 52 weeks of daily contribution data
 	contributionHeatmap?: ContributionDay[];
-	/** Contest rating history (LeetCode / Codeforces) */
+	// Contest rating history (LeetCode / Codeforces)
 	ratingHistory?: RatingHistoryEntry[];
 }
 
@@ -50,14 +50,12 @@ interface CodingStatsResult {
 	github: PlatformStats;
 }
 
-// ─── In-memory cache ────────────────────────────────────────────
-
+// In-memory cache
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
-
 let cachedResult: CodingStatsResult | null = null;
 let cachedAt = 0;
 
-// ─── Username extraction from profile URLs ──────────────────────
+// Username extraction from profile URLs
 
 function extractUsername(url: string | null | undefined, pattern: RegExp): string | null {
 	if (!url) return null;
@@ -71,8 +69,7 @@ const CODEFORCES_PATTERN = /codeforces\.com\/profile\/([a-zA-Z0-9_.]+)\/?$/;
 const CODECHEF_PATTERN = /codechef\.com\/users\/([a-zA-Z0-9_]+)\/?$/;
 const GFG_PATTERN = /geeksforgeeks\.org\/user\/([a-zA-Z0-9_]+)\/?$/;
 
-// ─── GitHub API (REST + GraphQL) ────────────────────────────────
-
+// GitHub API (REST + GraphQL)
 const GITHUB_CONTRIBUTIONS_QUERY = `
 query($username: String!) {
   user(login: $username) {
@@ -90,6 +87,7 @@ query($username: String!) {
   }
 }`;
 
+// Map contribution levels to numbers
 const CONTRIBUTION_LEVELS: Record<string, number> = {
 	NONE: 0,
 	FIRST_QUARTILE: 1,
@@ -98,6 +96,7 @@ const CONTRIBUTION_LEVELS: Record<string, number> = {
 	FOURTH_QUARTILE: 4,
 };
 
+// Fetch GitHub stats
 async function fetchGitHub(username: string): Promise<PlatformStats> {
 	const headers: Record<string, string> = {
 		Accept: 'application/vnd.github+json',
@@ -229,8 +228,7 @@ async function fetchGitHub(username: string): Promise<PlatformStats> {
 	}
 }
 
-// ─── LeetCode GraphQL API ───────────────────────────────────────
-
+// LeetCode GraphQL API
 const LEETCODE_QUERY = `
 query getUserProfile($username: String!) {
   matchedUser(username: $username) {
@@ -329,8 +327,7 @@ async function fetchLeetCode(username: string): Promise<PlatformStats> {
 	}
 }
 
-// ─── Codeforces API ─────────────────────────────────────────────
-
+// Codeforces API
 async function fetchCodeforces(handle: string): Promise<PlatformStats> {
 	const base: PlatformStats = {
 		username: handle,
@@ -383,8 +380,7 @@ async function fetchCodeforces(handle: string): Promise<PlatformStats> {
 	}
 }
 
-// ─── Main service function ──────────────────────────────────────
-
+// Main service function
 const EMPTY_PLATFORM: PlatformStats = { username: '', url: '', stats: undefined };
 
 export async function getCodingStatsData(): Promise<CodingStatsResult> {

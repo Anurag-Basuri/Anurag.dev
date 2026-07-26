@@ -4,6 +4,7 @@ import path from 'path';
 import { ApiResponse } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
 
+// Get README.md handler
 export async function getReadme(_req: Request, res: Response): Promise<void> {
 	try {
 		// Try checking relative to server directory and then monorepo root
