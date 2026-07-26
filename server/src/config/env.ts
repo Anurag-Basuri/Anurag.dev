@@ -32,10 +32,8 @@ const envSchema = z.object({
 	// External APIs (optional)
 	GITHUB_TOKEN: z.string().optional(),
 
-	// AI Chatbot
-	AI_PROVIDER: z.enum(['gemini', 'openai', 'huggingface', 'groq']).optional().default('gemini'),
-	GEMINI_API_KEY: z.string().optional(),
-	HF_TOKEN: z.string().optional(),
+	// AI Agent Proxy
+	AGENT_BACKEND_URL: z.string().url().default('http://localhost:8000'),
 });
 
 const parsed = envSchema.safeParse(process.env);

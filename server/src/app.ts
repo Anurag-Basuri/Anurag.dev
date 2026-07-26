@@ -9,7 +9,7 @@ import publicRoutes from './routes/public.routes';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
 import docsRoutes from './routes/docs.routes';
-import agentRoutes from './modules/agent/agent.routes';
+import agentRoutes from './agent/agent.routes';
 
 const app = express();
 app.set('trust proxy', 1);

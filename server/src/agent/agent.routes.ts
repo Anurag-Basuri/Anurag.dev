@@ -4,14 +4,15 @@ import * as AgentController from './agent.controller';
 
 const router = Router();
 
-// Rate limiter for chat endpoint (Stricter than generic APIs)
+// Rate limiter for chat endpoint
 const chatLimiter = rateLimit({
-	windowMs: 60 * 1000, // 1 minute
-	max: 15, // Max 15 messages per IP per minute
+	windowMs: 60 * 1000,
+	max: 15,
 	message: 'Too many messages sent. Please wait a minute.',
 });
 
 router.post('/', chatLimiter, AgentController.sendMessage);
-router.post('/reset', AgentController.resetSession); // Clear session memory
+// Clear session memory
+router.post('/reset', AgentController.resetSession);
 
 export default router;

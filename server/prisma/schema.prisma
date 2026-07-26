@@ -358,17 +358,3 @@ enum SocialPlatform {
   QUORA
   OTHER
 }
-
-// AgentSession - Stores the LangChain AI Assistant conversation history permanently
-model AgentSession {
-  id        String   @id @default(uuid())
-  sessionId String   @unique // The unique browser ID from the frontend
-  
-  // LangChain serialized message array containing BaseMessage instances
-  history   Json     @default("[]")
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([updatedAt])
-}

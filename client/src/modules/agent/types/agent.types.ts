@@ -20,4 +20,5 @@ export interface AgentApiResponse {
 	reply: string;
 	intents?: string[];
 	sessionId: string;
+	messagesRemaining?: number;
 }

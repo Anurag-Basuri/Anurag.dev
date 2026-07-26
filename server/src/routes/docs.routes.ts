@@ -1,7 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { ApiResponse } from '../utils/ApiResponse';
 import { getReadme } from '../controllers/docs.controller';
-import { llmInfo } from '../modules/agent/core/llm.factory';
 
 const router = Router();
 
@@ -375,53 +374,28 @@ router.get('/docs/agent', (_req: Request, res: Response) => {
 		res,
 		{
 			architecture: {
-				mode: llmInfo.mode,
-				primary: {
-					provider: llmInfo.primaryProvider || null,
-					model: llmInfo.primaryModel || null,
-				},
-				fallback: {
-					provider: llmInfo.fallbackProvider || null,
-					model: llmInfo.fallbackModel || null,
-				},
+				mode: 'proxy',
+				description: 'Thin proxy forwarding to Personal Agent backend',
 				features: [
-					'Dual-LLM with automatic failover',
-					'Sticky fallback — if primary fails once in a request, all subsequent loops use fallback',
-					'30-second timeout per LLM invocation',
-					'Persistent session memory (PostgreSQL)',
-					'Screen-aware context injection (currentUrl)',
-					'Autonomous navigation via [NAVIGATE:] tokens',
+					'6-Layer LLM Cascade (GPT-4o, Llama-3.3, etc)',
+					'LangGraph state machine',
+					'20-message cap per session',
+					'Ephemeral sessionStorage memory',
+					'Automatic portfolio API tools (RAG)',
 				],
 			},
 			tools: [
 				{
-					name: 'get_github_activity',
-					description: "Fetch Anurag's GitHub profile stats and recent activity",
-				},
-				{
-					name: 'read_github_readme',
-					description: 'Read raw README.md from any public GitHub repository',
-				},
-				{
-					name: 'get_leetcode_stats',
-					description: "Fetch Anurag's live LeetCode stats (problems solved, ranking)",
-				},
-				{
-					name: 'search_projects',
-					description: 'Search published portfolio projects by keyword',
-				},
-				{
-					name: 'submit_contact_lead',
-					description: 'Submit a contact message from the chat interface',
-				},
+					name: 'Proxy API',
+					description: 'All tool execution is handled externally by the Personal Agent backend.',
+				}
 			],
 			errorHandling: {
-				strategy: 'Graceful degradation — all errors return HTTP 200 with a friendly fallback reply',
-				categories: ['RATE_LIMIT', 'TIMEOUT', 'NETWORK', 'INTERNAL'],
-				note: 'The Agent never returns HTTP 500 to the frontend',
+				strategy: 'Structured errors with fallback',
+				note: 'Returns 429 for rate limits, 500 for backend failures',
 			},
 		},
-		'AI Agent architecture status',
+		'AI Agent Proxy architecture status',
 	);
 });
 

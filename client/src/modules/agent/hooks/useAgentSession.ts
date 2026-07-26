@@ -10,6 +10,7 @@ export function useAgentSession() {
 	const [messages, setMessages] = useState<AgentMessage[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [messagesRemaining, setMessagesRemaining] = useState<number | null>(null);
 	const router = useRouter();
 	const pathname = usePathname();
 
@@ -21,10 +22,10 @@ export function useAgentSession() {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			let sid = localStorage.getItem('agent_session_id');
+			let sid = sessionStorage.getItem('agent_session_id');
 			if (!sid) {
 				sid = Math.random().toString(36).substring(2, 15);
-				localStorage.setItem('agent_session_id', sid);
+				sessionStorage.setItem('agent_session_id', sid);
 			}
 			sessionIdRef.current = sid;
 		}
@@ -32,7 +33,7 @@ export function useAgentSession() {
 
 	const sendMessage = useCallback(
 		async (content: string) => {
-			if (!content.trim() || isLoadingRef.current) return;
+			if (!content.trim() || isLoadingRef.current || messagesRemaining === 0) return;
 
 			const userMsg: AgentMessage = {
 				id: Date.now().toString(),
@@ -84,6 +85,10 @@ export function useAgentSession() {
 				};
 
 				setMessages(prev => [...prev, assistantMsg]);
+				
+				if (resData.messagesRemaining !== undefined) {
+					setMessagesRemaining(resData.messagesRemaining);
+				}
 			} catch (error: any) {
 				console.error('[useAgentSession] Error:', error);
 
@@ -163,8 +168,9 @@ export function useAgentSession() {
 			try {
 				await apiClient.post('/chat/reset', { sessionId: sessionIdRef.current });
 				const newSid = Math.random().toString(36).substring(2, 15);
-				localStorage.setItem('agent_session_id', newSid);
+				sessionStorage.setItem('agent_session_id', newSid);
 				sessionIdRef.current = newSid;
+				setMessagesRemaining(null);
 			} catch (e) {
 				console.error('[useAgentSession] Failed to reset memory:', e);
 			}
@@ -175,6 +181,7 @@ export function useAgentSession() {
 		messages,
 		isLoading,
 		isOpen,
+		messagesRemaining,
 		setIsOpen,
 		sendMessage,
 		retryMessage,

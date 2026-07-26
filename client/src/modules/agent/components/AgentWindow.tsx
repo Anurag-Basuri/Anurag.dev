@@ -9,6 +9,7 @@ export interface AgentWindowProps {
 	messages: AgentMessage[];
 	isLoading: boolean;
 	isOpen: boolean;
+	messagesRemaining: number | null;
 	setIsOpen: (val: boolean) => void;
 	sendMessage: (val: string) => void;
 	retryMessage: (id: string) => void;
@@ -19,6 +20,7 @@ export function AgentWindow({
 	messages,
 	isLoading,
 	isOpen,
+	messagesRemaining,
 	setIsOpen,
 	sendMessage,
 	retryMessage,
@@ -59,8 +61,15 @@ export function AgentWindow({
 						<Bot size={18} />
 					</div>
 					<div>
-						<h3 className="text-sm font-semibold text-foreground">AI Assistant</h3>
-						<p className="text-xs text-primary">Powered by LangChain</p>
+						<h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+							AI Assistant
+							{messagesRemaining !== null && (
+								<span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+									{messagesRemaining} left
+								</span>
+							)}
+						</h3>
+						<p className="text-xs text-primary">Powered by LangGraph</p>
 					</div>
 				</div>
 				<div className="flex items-center gap-1">
@@ -112,16 +121,20 @@ export function AgentWindow({
 				<form onSubmit={handleSubmit} className="flex items-center gap-2 relative">
 					<input
 						ref={inputRef}
-						disabled={isLoading}
+						disabled={isLoading || messagesRemaining === 0}
 						type="text"
 						placeholder={
-							isLoading ? 'Agent is thinking...' : 'Ask me anything about Anurag...'
+							messagesRemaining === 0
+								? 'Message limit reached.'
+								: isLoading
+									? 'Agent is thinking...'
+									: 'Ask me anything about Anurag...'
 						}
 						className="flex-1 rounded-full border border-border bg-background px-4 py-2.5 pl-4 pr-12 text-sm text-foreground outline-none transition-shadow focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60 placeholder:text-muted-foreground/50"
 					/>
 					<button
 						type="submit"
-						disabled={isLoading}
+						disabled={isLoading || messagesRemaining === 0}
 						className="absolute right-1.5 top-1.5 bottom-1.5 flex aspect-square h-auto items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-all hover:bg-primary/90 hover:scale-105 active:scale-95 disabled:bg-muted disabled:text-muted-foreground disabled:hover:scale-100"
 					>
 						<Send size={15} className="-ml-px" />
