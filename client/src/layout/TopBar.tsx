@@ -4,10 +4,13 @@ import { useSetAtom } from 'jotai';
 import { windowStateAtom, bootCompleteAtom } from '@/boot/atoms';
 import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
-import { Maximize2, Cpu, FileText } from 'lucide-react';
+import { Maximize2, Cpu, FileText, Zap } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/ui/tooltip';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+
+const AGENT_WEBSITE_URL =
+	process.env.NEXT_PUBLIC_AGENT_WEBSITE_URL || 'https://agent.anuragbasuri.me';
 
 // Perfectly-round window control dots at every screen size
 function Dot({ color, onClick, label, children }: {
@@ -71,7 +74,7 @@ export function TopBar() {
 				{/* Left: window controls — title hidden on small screens */}
 				<div className="flex items-center gap-2 sm:gap-3 shrink-0">
 					{/* Mac-style dots — always visible on every page */}
-					<div className="flex items-center gap-[6px]">
+					<div className="flex items-center gap-1.5">
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Dot color="rgb(239 68 68 / 0.85)" onClick={() => setBootComplete(false)} label="Restart" />
@@ -110,6 +113,24 @@ export function TopBar() {
 
 				{/* Right: nav actions + selectors */}
 				<div className="flex items-center gap-2 sm:gap-3 shrink-0">
+					{/* Dedicated Agent App Gateway */}
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<a
+								href={AGENT_WEBSITE_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="px-2.5 sm:px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/20 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_0_rgba(16,185,129,0.5)] shrink-0 whitespace-nowrap flex items-center gap-1.5 cursor-pointer"
+							>
+								<Zap className="w-3 h-3 text-emerald-400 fill-emerald-400/50" />
+								<span>Agent App</span>
+							</a>
+						</TooltipTrigger>
+						<TooltipContent side="bottom" sideOffset={12}>Launch Autonomous AI Agent Website</TooltipContent>
+					</Tooltip>
+
+					<div className="w-px h-3.5 bg-border hidden sm:block shrink-0" />
+
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<Link
@@ -119,7 +140,7 @@ export function TopBar() {
 								aria-label="System Diagnostics"
 							>
 								<div className="absolute inset-0 blur rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }} />
-								<Cpu className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative z-10" strokeWidth={2.5} />
+								<Cpu className="w-4 h-4 sm:w-4.5 sm:h-4.5 relative z-10" strokeWidth={2.5} />
 							</Link>
 						</TooltipTrigger>
 						<TooltipContent side="bottom" sideOffset={12}>System Diagnostics</TooltipContent>
@@ -134,7 +155,7 @@ export function TopBar() {
 								aria-label="Interactive Resume"
 							>
 								<div className="absolute inset-0 blur rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)' }} />
-								<FileText className="w-4 h-4 sm:w-[18px] sm:h-[18px] relative z-10" strokeWidth={2.5} />
+								<FileText className="w-4 h-4 sm:w-4.5 sm:h-4.5 relative z-10" strokeWidth={2.5} />
 							</Link>
 						</TooltipTrigger>
 						<TooltipContent side="bottom" sideOffset={12}>Interactive Resume</TooltipContent>
@@ -146,7 +167,7 @@ export function TopBar() {
 						<TooltipTrigger asChild>
 							<button
 								onClick={goToContact}
-								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0 whitespace-nowrap"
+								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0 whitespace-nowrap cursor-pointer"
 							>
 								Contact
 							</button>
@@ -161,5 +182,3 @@ export function TopBar() {
 		</TooltipProvider>
 	);
 }
-
-

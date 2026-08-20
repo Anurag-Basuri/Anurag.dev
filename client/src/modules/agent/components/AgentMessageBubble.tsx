@@ -5,12 +5,28 @@ import rehypeRaw from 'rehype-raw';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { AgentMessage } from '../types/agent.types';
-import { User, Bot, ArrowRight, AlertCircle, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+	User,
+	Bot,
+	ArrowRight,
+	AlertCircle,
+	RotateCcw,
+	ChevronDown,
+	ChevronUp,
+	Sparkles,
+	ExternalLink,
+	Zap,
+	Search,
+	Cpu,
+} from 'lucide-react';
 
 interface Props {
 	message: AgentMessage;
 	onRetry?: (id: string) => void;
 }
+
+const AGENT_WEBSITE_URL =
+	process.env.NEXT_PUBLIC_AGENT_WEBSITE_URL || 'https://agent.anuragbasuri.me';
 
 /** Map NAVIGATE targets to user-friendly labels */
 function getNavLabel(target: string): string {
@@ -61,40 +77,75 @@ export function AgentMessageBubble({ message, onRetry }: Props) {
 	const router = useRouter();
 	const [showDetails, setShowDetails] = useState(false);
 
-	const hasError = message.isError;
+	const isLimit = message.isRateLimit || message.isLimitReached || message.error?.status === 429 || message.error?.status === 403;
+	const hasError = message.isError && !isLimit;
 
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 10, scale: 0.98 }}
 			animate={{ opacity: 1, y: 0, scale: 1 }}
 			transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-			className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+			className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} mb-3`}
 		>
-			<div className={`flex max-w-[85%] gap-2.5 md:max-w-[75%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+			<div className={`flex max-w-[88%] gap-2.5 sm:max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
 				{/* Avatar */}
 				<div
-					className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${
+					className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm transition-all ${
 						isUser
 							? 'bg-primary/80 text-primary-foreground'
-							: hasError 
-								? 'bg-rose-500 text-white ring-2 ring-rose-500/20'
-								: 'bg-primary text-primary-foreground ring-2 ring-primary/20'
+							: isLimit
+							? 'bg-amber-500 text-black ring-2 ring-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+							: hasError
+							? 'bg-rose-500 text-white ring-2 ring-rose-500/20'
+							: 'bg-primary text-primary-foreground ring-2 ring-primary/20'
 					}`}
 				>
-					{isUser ? <User size={16} /> : hasError ? <AlertCircle size={16} /> : <Bot size={16} />}
+					{isUser ? (
+						<User size={16} />
+					) : isLimit ? (
+						<Zap size={16} className="fill-black" />
+					) : hasError ? (
+						<AlertCircle size={16} />
+					) : (
+						<Bot size={16} />
+					)}
 				</div>
 
 				{/* Bubble Body */}
-				<div className="flex flex-col gap-2">
+				<div className="flex flex-col gap-2 min-w-0 flex-1">
 					<div
 						className={`flex flex-col rounded-2xl px-4 py-3 text-sm shadow-sm transition-colors ${
 							isUser
 								? 'rounded-tr-sm bg-primary text-primary-foreground'
+								: isLimit
+								? 'rounded-tl-sm bg-amber-950/20 border border-amber-500/30 text-foreground backdrop-blur-md shadow-[0_0_20px_-5px_rgba(245,158,11,0.15)]'
 								: hasError
-									? 'rounded-tl-sm bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-200'
-									: 'rounded-tl-sm bg-card text-card-foreground border border-border'
+								? 'rounded-tl-sm bg-rose-50 border border-rose-200 text-rose-800 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-200'
+								: 'rounded-tl-sm bg-card text-card-foreground border border-border'
 						}`}
 					>
+						{/* Live Streaming / Tool Phase Badge */}
+						{!isUser && message.isStreaming && message.statusPhase && message.statusPhase !== 'generating' && (
+							<div className="mb-2 flex items-center gap-1.5 rounded-md bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary w-fit border border-primary/20 animate-pulse">
+								{message.statusPhase === 'executing' ? (
+									<>
+										<Cpu size={12} className="animate-spin" />
+										<span>Calling {message.currentTool || 'tool'}...</span>
+									</>
+								) : message.statusPhase === 'thinking' ? (
+									<>
+										<Sparkles size={12} className="animate-pulse" />
+										<span>Reasoning cascade active...</span>
+									</>
+								) : (
+									<>
+										<Search size={12} />
+										<span>Routing intent...</span>
+									</>
+								)}
+							</div>
+						)}
+
 						{isUser ? (
 							<p className="whitespace-pre-wrap">{message.content}</p>
 						) : (
@@ -123,7 +174,7 @@ export function AgentMessageBubble({ message, onRetry }: Props) {
 										code: ({ node, className, children, ...props }: any) => {
 											const isInline = !String(children).includes('\n');
 											return isInline ? (
-												<code {...props} className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-primary">
+												<code {...props} className="rounded-md bg-muted px-1.5 py-0.5 text-xs text-primary font-mono">
 													{children}
 												</code>
 											) : (
@@ -136,20 +187,48 @@ export function AgentMessageBubble({ message, onRetry }: Props) {
 								>
 									{message.content}
 								</ReactMarkdown>
+								{/* Blinking Cursor while actively streaming content */}
+								{message.isStreaming && message.statusPhase === 'generating' && (
+									<span className="inline-block w-1.5 h-3.5 ml-1 bg-primary animate-pulse align-middle" />
+								)}
 							</div>
 						)}
 
-						{/* Error Details Accordion */}
+						{/* Rate Limit / Session Cap Callout Card */}
+						{isLimit && (
+							<div className="mt-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 backdrop-blur-md">
+								<div className="flex items-center gap-2 mb-1.5">
+									<Sparkles className="w-4 h-4 text-amber-400" />
+									<span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+										Experience the Full Agent Platform
+									</span>
+								</div>
+								<p className="text-[12px] text-muted-foreground leading-relaxed mb-3">
+									Unlock uninterrupted conversations, unrestricted tool access (Code Execution, RAG Knowledge, Web Search), and personalized memory on our full agent portal.
+								</p>
+								<a
+									href={AGENT_WEBSITE_URL}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-amber-500 to-yellow-400 px-3.5 py-2 text-xs font-bold text-black shadow-[0_0_20px_-3px_rgba(245,158,11,0.5)] transition-all hover:scale-[1.02] hover:shadow-[0_0_25px_0_rgba(245,158,11,0.7)] active:scale-[0.98]"
+								>
+									<span>Launch Agent Platform</span>
+									<ExternalLink size={14} className="transition-transform group-hover:translate-x-0.5" />
+								</a>
+							</div>
+						)}
+
+						{/* Generic Error Details Accordion */}
 						{hasError && message.error && (
 							<div className="mt-3 border-t border-rose-200/50 pt-2 dark:border-rose-900/30">
-								<button 
+								<button
 									onClick={() => setShowDetails(!showDetails)}
 									className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-rose-600/70 hover:text-rose-600 dark:text-rose-400/70 dark:hover:text-rose-400"
 								>
 									{showDetails ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
 									Technical Details
 								</button>
-								
+
 								<AnimatePresence>
 									{showDetails && (
 										<motion.div
@@ -159,10 +238,18 @@ export function AgentMessageBubble({ message, onRetry }: Props) {
 											className="overflow-hidden"
 										>
 											<div className="mt-2 space-y-1 rounded-lg bg-rose-100/50 p-2 font-mono text-[11px] text-rose-900 dark:bg-rose-900/20 dark:text-rose-300">
-												<p><span className="opacity-50">Status:</span> {message.error.status || 'N/A'}</p>
-												<p><span className="opacity-50">Origin:</span> {message.error.source || 'Unknown'}</p>
-												<p><span className="opacity-50">Code:</span> {message.error.code}</p>
-												<p className="wrap-break-word line-clamp-3"><span className="opacity-50">Message:</span> {message.error.message}</p>
+												<p>
+													<span className="opacity-50">Status:</span>{' '}
+													{message.error.status || 'N/A'}
+												</p>
+												<p>
+													<span className="opacity-50">Code:</span>{' '}
+													{message.error.code || 'UNKNOWN'}
+												</p>
+												<p className="wrap-break-word">
+													<span className="opacity-50">Message:</span>{' '}
+													{message.error.message}
+												</p>
 											</div>
 										</motion.div>
 									)}
@@ -175,7 +262,7 @@ export function AgentMessageBubble({ message, onRetry }: Props) {
 					{!isUser && (
 						<div className="flex flex-wrap gap-2 pl-1">
 							{/* Navigation Links */}
-							{message.navigationTargets?.map((target) => {
+							{message.navigationTargets?.map(target => {
 								const route = normalizeNavTarget(target);
 								return (
 									<button
