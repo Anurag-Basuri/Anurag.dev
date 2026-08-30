@@ -6,11 +6,12 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { PlatformStats } from '@/api/schema';
 import { staggerItem } from '@/animations/motion';
 import { cn } from '@/lib/utils';
+import { SpotlightCard } from '@/ui/SpotlightCard';
 import type { PlatformConfig } from './constants';
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // SKELETON
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export function CodingStatsSkeleton() {
 	return (
@@ -33,9 +34,9 @@ export function CodingStatsSkeleton() {
 	);
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// SVG DONUT CHART (Real data — for LeetCode/GFG difficulty)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// SVG DONUT CHART (Real data â€” for LeetCode/GFG difficulty)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export const SVGDoughnutChart = memo(function SVGDoughnutChart({
 	easy,
@@ -110,9 +111,9 @@ export const SVGDoughnutChart = memo(function SVGDoughnutChart({
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // STAT PILL (compact inline stat)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function StatPill({ label, value, accent }: { label: string; value: string | number; accent?: boolean }) {
 	return (
@@ -130,9 +131,9 @@ function StatPill({ label, value, accent }: { label: string; value: string | num
 	);
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // LINK-ONLY PILL (profile without stats)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export const LinkOnlyPill = memo(function LinkOnlyPill({
 	config,
@@ -164,9 +165,9 @@ export const LinkOnlyPill = memo(function LinkOnlyPill({
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// HERO CARD — Problem Solving (LeetCode / GFG)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// HERO CARD â€” Problem Solving (LeetCode / GFG)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 	platform,
@@ -189,12 +190,12 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 	];
 
 	return (
-		<motion.div
-			variants={staggerItem}
-			className="group relative rounded-xl border border-border bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/20"
-			style={{ boxShadow: `0 0 0 0px ${config.accent}00` }}
-			whileHover={{ boxShadow: `0 0 40px -15px ${config.accent}30` }}
-		>
+		<motion.div variants={staggerItem}>
+			<SpotlightCard
+				spotlightColor={config.accent}
+				tilt={true}
+				className="rounded-xl border border-border/80 bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/30 shadow-md hover:shadow-xl"
+			>
 			{/* Accent top bar */}
 			<div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${config.accent}, transparent)` }} />
 
@@ -259,13 +260,14 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 					</div>
 				)}
 			</div>
+			</SpotlightCard>
 		</motion.div>
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// HERO CARD — GitHub
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// HERO CARD â€” GitHub
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export const GitHubCard = memo(function GitHubCard({
 	platform,
@@ -287,11 +289,12 @@ export const GitHubCard = memo(function GitHubCard({
 	if (s?.issues != null && s.issues > 0) statItems.push({ label: 'Issues', value: s.issues });
 
 	return (
-		<motion.div
-			variants={staggerItem}
-			className="group relative rounded-xl border border-border bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/20"
-			whileHover={{ boxShadow: `0 0 40px -15px ${config.accent}20` }}
-		>
+		<motion.div variants={staggerItem}>
+			<SpotlightCard
+				spotlightColor={config.accent}
+				tilt={true}
+				className="rounded-xl border border-border/80 bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/30 shadow-md hover:shadow-xl"
+			>
 			{/* Accent top bar */}
 			<div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${config.accent}80, transparent)` }} />
 
@@ -333,13 +336,14 @@ export const GitHubCard = memo(function GitHubCard({
 					</div>
 				)}
 			</div>
+			</SpotlightCard>
 		</motion.div>
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// COMPACT CARD — Competitive Platforms (Codeforces, CodeChef, etc.)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// COMPACT CARD â€” Competitive Platforms (Codeforces, CodeChef, etc.)
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 export const CompetitiveCard = memo(function CompetitiveCard({
 	platform,
@@ -357,14 +361,15 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 	if (s?.maxRating != null) statItems.push({ label: 'Peak', value: s.maxRating });
 	if (s?.globalRank != null) statItems.push({ label: 'Rank', value: s.globalRank });
 	if (s?.solved != null && s.solved > 0) statItems.push({ label: 'Solved', value: s.solved });
-	if (s?.stars != null && s.stars > 0) statItems.push({ label: 'Stars', value: `${s.stars}★` });
+	if (s?.stars != null && s.stars > 0) statItems.push({ label: 'Stars', value: `${s.stars}â˜…` });
 
 	return (
-		<motion.div
-			variants={staggerItem}
-			className="group relative rounded-xl border border-border bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/20"
-			whileHover={{ boxShadow: `0 0 40px -15px ${config.accent}30` }}
-		>
+		<motion.div variants={staggerItem}>
+			<SpotlightCard
+				spotlightColor={config.accent}
+				tilt={true}
+				className="rounded-xl border border-border/80 bg-linear-to-br from-foreground/[0.03] to-transparent overflow-hidden transition-all duration-300 hover:border-foreground/30 shadow-md hover:shadow-xl"
+			>
 			{/* Accent top bar */}
 			<div className="h-0.5 w-full" style={{ background: `linear-gradient(90deg, ${config.accent}, transparent)` }} />
 
@@ -408,13 +413,14 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 					</div>
 				)}
 			</div>
+			</SpotlightCard>
 		</motion.div>
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // CONTRIBUTION HEATMAP (Real GitHub data)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const HEATMAP_COLORS: Record<number, string> = {
 	0: 'var(--foreground-5, rgba(255,255,255,0.05))',
@@ -433,7 +439,7 @@ const ContributionHeatmap = memo(function ContributionHeatmap({
 }) {
 	const shouldReduceMotion = useReducedMotion();
 
-	// Organize into weeks (columns) × days (rows)
+	// Organize into weeks (columns) Ã— days (rows)
 	const weeks = useMemo(() => {
 		const result: Array<Array<{ date: string; count: number; level: number }>> = [];
 		let currentWeek: typeof result[0] = [];
@@ -487,9 +493,9 @@ const ContributionHeatmap = memo(function ContributionHeatmap({
 	);
 });
 
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // RATING CHART (Real LeetCode / Codeforces data)
-// ═══════════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 const RatingChart = memo(function RatingChart({
 	entries,

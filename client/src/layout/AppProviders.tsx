@@ -7,6 +7,7 @@ import { ThemeContextProvider } from '@/theme/colors/theme-context';
 import { ErrorBoundary } from '@/ui/ErrorBoundary';
 import { BackgroundRenderer } from '@/theme/backgrounds/BackgroundRenderer';
 import { AgentPromoBadge } from '@/layout/AgentPromoBadge';
+import { CustomCursor } from '@/ui/CustomCursor';
 
 const jotaiStore = createStore();
 
@@ -16,6 +17,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 			<ThemeContextProvider>
 				<ErrorBoundary label="App Root">
 					<BackgroundRenderer />
+					<CustomCursor />
 					{children}
 					<AgentPromoBadge />
 

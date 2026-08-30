@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState, memo } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Medal, Star, Target, ExternalLink, Award, Sparkles } from 'lucide-react';
 import { publicService } from '@/api';
 import type { Achievement } from '@/api/schema';
+
+import { Trophy, Award, Medal, Target, ExternalLink, Sparkles, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { staggerContainer, staggerItem } from '@/animations/motion';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
-import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
+import { SpotlightCard } from '@/ui/SpotlightCard';
 
 // ─── Skeleton ───────────────────────────────────────────────────
 
@@ -20,8 +21,8 @@ function AchievementsSkeleton() {
 				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
 			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
-				{[1, 2, 3, 4, 5, 6].map(i => (
-					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
+				{[1, 2, 3, 4].map(i => (
+					<div key={i} className="h-52 bg-foreground/5 rounded-xl" />
 				))}
 			</div>
 		</div>
@@ -54,93 +55,93 @@ const AchievementCard = memo(function AchievementCard({
 	const link = achievement.url || achievement.proofUrl;
 
 	return (
-		<motion.div
-			variants={staggerItem}
-			whileHover={cardHover}
-			className="group relative flex flex-col h-full bg-linear-to-br from-foreground/5 to-transparent backdrop-blur-sm border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-(--theme-primary)/40 shadow-lg"
-		>
-			<div className="absolute inset-0 bg-linear-to-br from-transparent to-transparent group-hover:from-(--theme-primary)/8 transition-colors duration-300 pointer-events-none" />
-
-			{/* Thumbnail — edge-to-edge */}
-			<div className="relative aspect-video overflow-hidden bg-card">
-				<UrlThumbnail
-					url={achievement.proofUrl || achievement.url}
-					title={achievement.title}
-					fallbackIcon={details.fallback}
-					fallbackLabel={achievement.issuer || undefined}
-				/>
-				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
-			</div>
-
-			<div className="p-3 relative z-10 flex flex-col grow">
-				<div className="flex justify-between items-center mb-2">
-					<div className="p-1.5 rounded-lg bg-card border border-border shadow-md">
-						{details.icon}
-					</div>
-					{achievement.featured && (
-						<div 
-							className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest"
-							style={{
-								background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
-								color: 'var(--theme-primary)',
-								borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)'
-							}}
-						>
-							<Sparkles className="w-2.5 h-2.5" />
-							Featured
-						</div>
-					)}
+		<motion.div variants={staggerItem} className="h-full flex flex-col">
+			<SpotlightCard
+				tilt={true}
+				beam={achievement.featured}
+				className="group relative flex flex-col h-full rounded-xl border border-border/80 hover:border-[var(--theme-primary)]/40 transition-all duration-300 shadow-md hover:shadow-xl overflow-hidden"
+			>
+				{/* Thumbnail — edge-to-edge */}
+				<div className="relative aspect-video overflow-hidden bg-card">
+					<UrlThumbnail
+						url={achievement.proofUrl || achievement.url}
+						title={achievement.title}
+						fallbackIcon={details.fallback}
+						fallbackLabel={achievement.issuer || undefined}
+					/>
+					<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
 				</div>
 
-				<h3 className="text-sm font-black text-foreground tracking-tight mb-1 leading-tight group-hover:text-foreground/90 transition-colors line-clamp-2">
-					{achievement.title}
-				</h3>
-
-				{achievement.issuer && (
-					<p className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
-						<span className="w-3 h-[1.5px] rounded-full" style={{ background: 'var(--theme-primary)', opacity: 0.5 }} />
-						{achievement.issuer}
-					</p>
-				)}
-
-				{achievement.description && (
-					<p className="text-[10px] text-muted-foreground leading-snug mb-3 grow line-clamp-2 font-medium">
-						{achievement.description}
-					</p>
-				)}
-
-				<div className="mt-auto space-y-2.5">
-					{(achievement.rank || achievement.event) && (
-						<div className="flex flex-wrap gap-1.5">
-							{achievement.rank && (
-								<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-foreground">
-									{achievement.rank}
-								</span>
-							)}
-							{achievement.event && (
-								<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-muted-foreground">
-									{achievement.event}
-								</span>
-							)}
+				<div className="p-3.5 relative z-10 flex flex-col grow">
+					<div className="flex justify-between items-center mb-2">
+						<div className="p-1.5 rounded-lg bg-card border border-border shadow-md">
+							{details.icon}
 						</div>
-					)}
-
-					{link && (
-						<div className="pt-2.5 border-t border-border">
-							<a
-								href={link}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-(--theme-primary) transition-colors group/link"
-								aria-label={`View certificate for ${achievement.title}`}
+						{achievement.featured && (
+							<div 
+								className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest"
+								style={{
+									background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
+									color: 'var(--theme-primary)',
+									borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)'
+								}}
 							>
-								View Details
-								<ExternalLink className="w-3 h-3 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
-							</a>
-						</div>
+								<Sparkles className="w-2.5 h-2.5" />
+								Featured
+							</div>
+						)}
+					</div>
+
+					<h3 className="text-sm font-black text-foreground tracking-tight mb-1 leading-tight group-hover:text-foreground/90 transition-colors line-clamp-2">
+						{achievement.title}
+					</h3>
+
+					{achievement.issuer && (
+						<p className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
+							<span className="w-3 h-[1.5px] rounded-full" style={{ background: 'var(--theme-primary)', opacity: 0.5 }} />
+							{achievement.issuer}
+						</p>
 					)}
+
+					{achievement.description && (
+						<p className="text-[10px] text-muted-foreground leading-snug mb-3 grow line-clamp-2 font-medium">
+							{achievement.description}
+						</p>
+					)}
+
+					<div className="mt-auto space-y-2.5">
+						{(achievement.rank || achievement.event) && (
+							<div className="flex flex-wrap gap-1.5">
+								{achievement.rank && (
+									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-foreground">
+										{achievement.rank}
+									</span>
+								)}
+								{achievement.event && (
+									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-muted-foreground">
+										{achievement.event}
+									</span>
+								)}
+							</div>
+						)}
+
+						{link && (
+							<div className="pt-2.5 border-t border-border/60">
+								<a
+									href={link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
+									aria-label={'View certificate for ' + achievement.title}
+								>
+									View Details
+									<ExternalLink className="w-3 h-3 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
+								</a>
+							</div>
+						)}
+					</div>
 				</div>
-			</div>
+			</SpotlightCard>
 		</motion.div>
 	);
 });
@@ -171,10 +172,9 @@ export function AchievementsModule() {
 
 	return (
 		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
+			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-2 md:pt-3">
 				<SectionHeader
 					icon={Trophy}
-					label="Triumphs"
 					title="Achievements"
 					description="Hackathon wins, open-source milestones, and competitive programming ranks."
 					sectionId="achievements"
@@ -182,21 +182,18 @@ export function AchievementsModule() {
 
 				{achievements.length === 0 ? (
 					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
-						No achievements recorded yet.
+						No achievements found.
 					</div>
 				) : (
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
-						viewport={{ once: true, margin: '-20px' }}
-						className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+						viewport={{ once: true, margin: '-40px' }}
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5 mt-4"
 					>
 						{achievements.map(achievement => (
-							<AchievementCard
-								key={achievement.id}
-								achievement={achievement}
-							/>
+							<AchievementCard key={achievement.id} achievement={achievement} />
 						))}
 					</motion.div>
 				)}

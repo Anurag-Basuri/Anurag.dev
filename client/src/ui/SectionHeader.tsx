@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
@@ -5,99 +7,105 @@ import { fadeInUp } from '@/animations/motion';
 import { cn } from '@/lib/utils';
 import { getSectionTheme, type SectionAccent } from '@/lib/theme';
 
-// ─── Component ──────────────────────────────────────────────────
-
 interface SectionHeaderProps {
 	icon: LucideIcon;
-	label: string;
+	label?: string;
 	title: string;
 	description?: string;
 	actions?: ReactNode;
 	accent?: SectionAccent;
-	/** Section ID — auto-resolves accent from the global registry if provided */
 	sectionId?: string;
+	className?: string;
 }
 
 export function SectionHeader({
 	icon: Icon,
-	label,
 	title,
 	description,
 	actions,
 	accent,
 	sectionId,
+	className,
 }: SectionHeaderProps) {
-	// If sectionId is provided, resolve accent from registry; otherwise use explicit accent prop
-	const theme = sectionId ? getSectionTheme(sectionId) : accent ? getSectionTheme(
-		// Map legacy accent names to section IDs for backward compat
-		accent === 'pink' ? 'profile' :
-		accent === 'purple' ? 'experience' :
-		accent === 'blue' ? 'education' :
-		accent === 'yellow' ? 'projects' :
-		accent === 'orange' ? 'achievements' :
-		accent === 'emerald' ? 'certifications' :
-		accent === 'sky' ? 'blog' :
-		accent === 'red' ? 'coding_stats' :
-		accent === 'indigo' ? 'contact' :
-		'certifications'
-	) : getSectionTheme('certifications');
+	const theme = sectionId
+		? getSectionTheme(sectionId)
+		: accent
+		? getSectionTheme(
+				accent === 'pink'
+					? 'profile'
+					: accent === 'purple'
+					? 'experience'
+					: accent === 'blue'
+					? 'education'
+					: accent === 'yellow'
+					? 'projects'
+					: accent === 'orange'
+					? 'achievements'
+					: accent === 'emerald'
+					? 'certifications'
+					: accent === 'sky'
+					? 'blog'
+					: accent === 'red'
+					? 'coding_stats'
+					: accent === 'indigo'
+					? 'contact'
+					: 'certifications'
+		  )
+		: getSectionTheme('certifications');
 
 	return (
 		<motion.div
 			variants={fadeInUp}
 			initial="hidden"
 			whileInView="visible"
-			viewport={{ once: true, margin: '-20px' }}
-			className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl pt-2 pb-2 mb-3 sm:mb-4 border-b border-border/50 flex flex-col md:flex-row md:items-end justify-between gap-2 sm:gap-3 shadow-sm"
+			viewport={{ once: true, margin: '-10px' }}
+			className={cn(
+				'sticky top-0 z-40 bg-background/85 backdrop-blur-xl py-2 mb-3 border-b border-border/40 flex items-center justify-between gap-3 shadow-xs',
+				className
+			)}
 		>
-			<div className="relative z-10 w-full max-w-2xl">
-				<motion.div
-					initial={{ opacity: 0, x: -20 }}
-					whileInView={{ opacity: 1, x: 0 }}
-					viewport={{ once: true }}
-					transition={{ delay: 0.1 }}
+			<div className="flex items-center gap-2.5 min-w-0">
+				<div
 					className={cn(
-						'flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] mb-1.5',
-						theme.icon,
+						'p-1.5 rounded-lg border backdrop-blur-sm shadow-xs flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105',
+						theme.badge,
+						theme.icon
 					)}
 				>
-					<span className={cn('p-1 rounded-lg border backdrop-blur-sm', theme.badge)}>
-						<Icon className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-					</span>
-					<span>{label}</span>
-				</motion.div>
+					<Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+				</div>
 
-				<h1 className="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground to-white leading-tight mb-0.5 tracking-tight" style={{ backgroundImage: `linear-gradient(to right, var(--theme-primary), white)` }}>
-					{title}
-				</h1>
+				<div className="flex items-baseline gap-2.5 min-w-0">
+					<h2 className="text-base sm:text-lg font-black tracking-tight text-foreground whitespace-nowrap">
+						<span
+							className="bg-clip-text text-transparent bg-linear-to-r from-foreground via-foreground to-[var(--theme-primary)]"
+						>
+							{title}
+						</span>
+					</h2>
 
-				{description && (
-					<p className="hidden sm:block text-xs text-muted-foreground/80 leading-snug font-medium">
-						{description}
-					</p>
-				)}
+					{description && (
+						<p className="hidden md:inline-block text-xs text-muted-foreground/75 font-medium truncate max-w-md">
+							{description}
+						</p>
+					)}
+				</div>
 			</div>
 
 			{actions && (
 				<motion.div
-					initial={{ opacity: 0, scale: 0.9 }}
+					initial={{ opacity: 0, scale: 0.95 }}
 					whileInView={{ opacity: 1, scale: 1 }}
 					viewport={{ once: true }}
-					transition={{ delay: 0.2 }}
-					className="shrink-0 relative z-10"
+					className="shrink-0 flex items-center gap-2"
 				>
 					{actions}
 				</motion.div>
 			)}
 
-			{/* Accent line */}
 			<div
-				className={cn(
-					'absolute bottom-0 left-0 right-0 h-px bg-linear-to-r via-transparent to-transparent opacity-50',
-					theme.line,
-				)}
+				className="absolute bottom-0 left-0 w-32 h-[1.5px] bg-linear-to-r from-[var(--theme-primary)] via-transparent to-transparent opacity-80 pointer-events-none"
 			/>
-			<div className={cn('absolute -bottom-px left-0 w-16 h-px blur-[1px]', theme.glow)} />
 		</motion.div>
 	);
 }

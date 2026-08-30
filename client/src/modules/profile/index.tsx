@@ -37,8 +37,9 @@ import {
 } from 'react-icons/si';
 import { FaLinkedinIn } from 'react-icons/fa6';
 import { fadeInUp, staggerContainer, staggerFast, staggerFastItem } from '@/animations/motion';
+import { SpotlightCard } from '@/ui/SpotlightCard';
 
-// ─── Social Platform Icon Map ───────────────────────────────────
+// â”€â”€â”€ Social Platform Icon Map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const SOCIAL_ICONS: Record<
 	string,
@@ -72,7 +73,7 @@ function getSocialIcon(platform: string) {
 	);
 }
 
-// ─── Typing Animation Hook ──────────────────────────────────────
+// â”€â”€â”€ Typing Animation Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function useTypingAnimation(text: string, speed = 35, startDelay = 500) {
 	const [displayed, setDisplayed] = useState('');
@@ -102,7 +103,7 @@ function useTypingAnimation(text: string, speed = 35, startDelay = 500) {
 	return { displayed, isDone };
 }
 
-// ─── Skeleton ───────────────────────────────────────────────────
+// â”€â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function ProfileSkeleton() {
 	return (
@@ -131,7 +132,7 @@ function ProfileSkeleton() {
 	);
 }
 
-// ─── Helper: Stat Card ──────────────────────────────────────────
+// â”€â”€â”€ Helper: Stat Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function StatCard({
 	icon: Icon,
@@ -150,36 +151,35 @@ function StatCard({
 
 	return (
 		<div
-			className="relative flex-1 flex flex-col justify-center p-4 sm:p-5 rounded-2xl bg-card/40 backdrop-blur-xl border border-border hover:border-primary/30 transition-all group overflow-visible shadow-sm cursor-default"
+			className="relative flex-1"
 			onMouseEnter={() => setHovered(true)}
 			onMouseLeave={() => setHovered(false)}
 		>
-			<div
-				className={cn(
-					'absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-500',
-					colorClass,
-				)}
-			/>
-			<div className="flex items-center gap-4 relative z-10">
-				<motion.div
-					animate={hovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
-					transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-					className={cn(
-						'p-3 rounded-xl border bg-background shadow-inner transition-colors',
-						colorClass.replace('bg-', 'text-'),
-					)}
-				>
-					<Icon className="w-5 h-5" />
-				</motion.div>
-				<div>
-					<p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest mb-0.5">
-						{label}
-					</p>
-					<p className="text-base sm:text-lg font-black text-foreground tracking-tight leading-none">
-						{value}
-					</p>
+			<SpotlightCard
+				tilt={true}
+				className="flex flex-col justify-center p-4 sm:p-5 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/80 hover:border-primary/40 transition-all shadow-sm hover:shadow-lg cursor-default h-full"
+			>
+				<div className="flex items-center gap-4 relative z-10">
+					<motion.div
+						animate={hovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
+						transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+						className={cn(
+							'p-3 rounded-xl border bg-background shadow-inner transition-colors',
+							colorClass.replace('bg-', 'text-'),
+						)}
+					>
+						<Icon className="w-5 h-5" />
+					</motion.div>
+					<div>
+						<p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest mb-0.5">
+							{label}
+						</p>
+						<p className="text-base sm:text-lg font-black text-foreground tracking-tight leading-none">
+							{value}
+						</p>
+					</div>
 				</div>
-			</div>
+			</SpotlightCard>
 
 			{/* Hover popover */}
 			<AnimatePresence>
@@ -199,7 +199,7 @@ function StatCard({
 	);
 }
 
-// ─── Helper: Social Button with Tooltip ─────────────────────────
+// â”€â”€â”€ Helper: Social Button with Tooltip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function SocialButton({
 	social,
@@ -241,7 +241,7 @@ function SocialButton({
 	);
 }
 
-// ─── Typing Tagline ─────────────────────────────────────────────
+// â”€â”€â”€ Typing Tagline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TypingTagline({ text }: { text: string }) {
 	const { displayed, isDone } = useTypingAnimation(text, 35, 500);
@@ -256,7 +256,7 @@ function TypingTagline({ text }: { text: string }) {
 	);
 }
 
-// ─── Main Module ────────────────────────────────────────────────
+// â”€â”€â”€ Main Module â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ProfileModule() {
 	const [profile, setProfile] = useState<Profile | null>(null);
@@ -336,11 +336,11 @@ export function ProfileModule() {
 					animate="visible"
 					className="flex flex-col"
 				>
-					{/* ═══════════════════════════════════════════════════════
-					    HERO — Large Photo + Identity
-					    ═══════════════════════════════════════════════════════ */}
+					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+					    HERO â€” Large Photo + Identity
+					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
 					<div className="flex flex-col md:flex-row gap-8 md:gap-14 items-center md:items-center">
-						{/* Profile Photo — very large */}
+						{/* Profile Photo â€” very large */}
 						<motion.div
 							variants={fadeInUp}
 							className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-4xl overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group cursor-pointer"
@@ -360,7 +360,7 @@ export function ProfileModule() {
 							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-4xl pointer-events-none" />
 						</motion.div>
 
-						{/* Name + Tagline ONLY — beside the photo, vertically centered */}
+						{/* Name + Tagline ONLY â€” beside the photo, vertically centered */}
 						<div className="flex-1 flex flex-col justify-center min-w-0 text-center md:text-left">
 							<motion.div variants={fadeInUp}>
 								<h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-foreground leading-[1.05]">
@@ -373,7 +373,7 @@ export function ProfileModule() {
 						</div>
 					</div>
 
-					{/* ═══ DETAILS STRIP (below photo+name) ═══ */}
+					{/* â•â•â• DETAILS STRIP (below photo+name) â•â•â• */}
 					<div className="mt-8 flex flex-col items-center md:items-start gap-5">
 						{/* Header / Role */}
 						{header && (
@@ -402,7 +402,7 @@ export function ProfileModule() {
 										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
 									</span>
 									{profile.noticePeriod
-										? `Available · ${profile.noticePeriod}`
+										? `Available Â· ${profile.noticePeriod}`
 										: 'Open to Work'}
 								</div>
 							)}
@@ -471,7 +471,7 @@ export function ProfileModule() {
 						className="mt-12 mb-2 h-px bg-linear-to-r from-transparent via-border to-transparent"
 					/>
 
-					{/* ═══ METRICS BAR ═══ */}
+					{/* â•â•â• METRICS BAR â•â•â• */}
 					<motion.div
 						variants={fadeInUp}
 						className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
@@ -518,9 +518,9 @@ export function ProfileModule() {
 						</StatCard>
 					</motion.div>
 
-					{/* ═══════════════════════════════════════════════════════
+					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 					    BIO SECTION
-					    ═══════════════════════════════════════════════════════ */}
+					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
 					{profile.bio && (
 						<motion.div
 							variants={fadeInUp}
@@ -536,9 +536,9 @@ export function ProfileModule() {
 						</motion.div>
 					)}
 
-					{/* ═══════════════════════════════════════════════════════
+					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 					    TECHNICAL ARSENAL
-					    ═══════════════════════════════════════════════════════ */}
+					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
 					{profile.skills && Object.keys(profile.skills).length > 0 && (
 						<motion.div
 							variants={fadeInUp}
