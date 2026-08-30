@@ -13,15 +13,44 @@ import {
 } from 'lucide-react';
 import type { AppModuleId } from './routes';
 
-const ProfileModule = lazy(() => import('@/modules/profile').then(m => ({ default: m.ProfileModule })));
-const ExperienceModule = lazy(() => import('@/modules/experience').then(m => ({ default: m.ExperienceModule })));
-const EducationModule = lazy(() => import('@/modules/education').then(m => ({ default: m.EducationModule })));
-const ProjectsModule = lazy(() => import('@/modules/projects').then(m => ({ default: m.ProjectsModule })));
-const AchievementsModule = lazy(() => import('@/modules/achievements').then(m => ({ default: m.AchievementsModule })));
-const CertificationsModule = lazy(() => import('@/modules/certifications').then(m => ({ default: m.CertificationModule })));
-const BlogModule = lazy(() => import('@/modules/blog').then(m => ({ default: m.BlogModule })));
-const CodingStatsModule = lazy(() => import('@/modules/coding-stats').then(m => ({ default: m.CodingStatsModule })));
-const ContactModule = lazy(() => import('@/modules/contact').then(m => ({ default: m.ContactModule })));
+function lazyWithRetry<T extends React.ComponentType<any>>(
+	importer: () => Promise<{ default: T } | Record<string, any>>,
+	exportName?: string
+) {
+	return lazy(async () => {
+		try {
+			const mod = await importer();
+			if (exportName && mod && (mod as any)[exportName]) {
+				return { default: (mod as any)[exportName] as T };
+			}
+			return (mod as any).default ? (mod as { default: T }) : { default: mod as unknown as T };
+		} catch (error: any) {
+			if (typeof window !== 'undefined') {
+				const isChunkError =
+					error?.name === 'ChunkLoadError' ||
+					/Loading.*chunk.*failed/i.test(error?.message || '');
+				if (isChunkError) {
+					const hasRefreshed = sessionStorage.getItem('chunk_refreshed');
+					if (!hasRefreshed) {
+						sessionStorage.setItem('chunk_refreshed', 'true');
+						window.location.reload();
+					}
+				}
+			}
+			throw error;
+		}
+	});
+}
+
+const ProfileModule = lazyWithRetry(() => import('@/modules/profile'), 'ProfileModule');
+const ExperienceModule = lazyWithRetry(() => import('@/modules/experience'), 'ExperienceModule');
+const EducationModule = lazyWithRetry(() => import('@/modules/education'), 'EducationModule');
+const ProjectsModule = lazyWithRetry(() => import('@/modules/projects'), 'ProjectsModule');
+const AchievementsModule = lazyWithRetry(() => import('@/modules/achievements'), 'AchievementsModule');
+const CertificationsModule = lazyWithRetry(() => import('@/modules/certifications'), 'CertificationModule');
+const BlogModule = lazyWithRetry(() => import('@/modules/blog'), 'BlogModule');
+const CodingStatsModule = lazyWithRetry(() => import('@/modules/coding-stats'), 'CodingStatsModule');
+const ContactModule = lazyWithRetry(() => import('@/modules/contact'), 'ContactModule');
 
 const ModuleLoader = () => (
 	<div className="flex items-center justify-center h-full w-full">
@@ -68,11 +97,6 @@ const moduleConfigs: Record<AppModuleId, ModuleConfig> = {
 		icon: LayoutDashboard,
 		title: 'Projects',
 	},
-	achievements: {
-		component: withSuspense(AchievementsModule),
-		icon: Medal,
-		title: 'Achievements',
-	},
 	certifications: {
 		component: withSuspense(CertificationsModule),
 		icon: ShieldQuestion,
@@ -82,6 +106,11 @@ const moduleConfigs: Record<AppModuleId, ModuleConfig> = {
 		component: withSuspense(BlogModule),
 		icon: Book,
 		title: 'Blog',
+	},
+	achievements: {
+		component: withSuspense(AchievementsModule),
+		icon: Medal,
+		title: 'Achievements',
 	},
 	coding_stats: {
 		component: withSuspense(CodingStatsModule),
@@ -95,26 +124,21 @@ const moduleConfigs: Record<AppModuleId, ModuleConfig> = {
 	},
 };
 
-export const moduleRegistry = Object.fromEntries(
-	Object.entries(moduleConfigs).map(([id, config]) => [id, config.component]),
-) as Record<string, React.ReactNode>;
-
-export const getModuleComponent = (id: string): React.ReactNode => {
-	const moduleId = id.includes('/') ? id.split('/')[0] : id;
-	return moduleRegistry[moduleId] || <div className="p-4">Module not found: {id}</div>;
+export const getModuleComponent = (id: AppModuleId): React.ReactNode => {
+	const config = moduleConfigs[id];
+	return config ? config.component : null;
 };
 
-export function getModuleIcon(id: string): LucideIcon {
-	return moduleConfigs[id as AppModuleId]?.icon ?? Info;
-}
+export const getModuleIcon = (id: AppModuleId): LucideIcon | null => {
+	const config = moduleConfigs[id];
+	return config ? config.icon : null;
+};
 
-export function getModuleTitle(id: string): string {
-	return moduleConfigs[id as AppModuleId]?.title ?? 'Unknown';
-}
+export const getModuleTitle = (id: AppModuleId): string | null => {
+	const config = moduleConfigs[id];
+	return config ? config.title : null;
+};
 
-export function isValidModuleId(id: string): id is AppModuleId {
+export const isValidModuleId = (id: string): id is AppModuleId => {
 	return id in moduleConfigs;
-}
-
-export type { AppModuleId };
-
+};

@@ -9,7 +9,6 @@ import { windowStateAtom } from '@/boot/atoms';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Power, Maximize2 } from 'lucide-react';
-import { BootGuard } from '@/boot/components/BootGuard';
 import { AgentWidget } from '@/modules/agent';
 
 const ResizableSidebar = dynamic(() => import('@/layout/ResizableSidebar').then(m => m.ResizableSidebar), {
@@ -43,7 +42,7 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 	}, []);
 
 	return (
-		<BootGuard>
+		<>
 			<div className="fixed inset-0 flex flex-col overflow-hidden bg-transparent font-sans text-foreground">
 				<AnimatePresence mode="wait">
 					{windowState === 'open' && (
@@ -140,6 +139,6 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 			
 			{/* Global Chatbot Widget */}
 			<AgentWidget />
-		</BootGuard>
+		</>
 	);
 }
