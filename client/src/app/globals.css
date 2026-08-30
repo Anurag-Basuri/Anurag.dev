@@ -70,10 +70,11 @@
 		border-color: var(--border);
 	}
 
-	/* Smooth theme transitions */
-	*,
-	*::before,
-	*::after {
+	/* Smooth theme transitions (scoped to avoid performance issues) */
+	.theme-transition,
+	.theme-transition *,
+	.theme-transition *::before,
+	.theme-transition *::after {
 		transition-property: background-color, border-color, color, fill, stroke;
 		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 		transition-duration: 200ms;
@@ -575,3 +576,4 @@
 .delay-2000 {
 	animation-delay: 2000ms;
 }
+

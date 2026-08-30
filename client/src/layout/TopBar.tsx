@@ -1,7 +1,7 @@
 'use client';
 
 import { useSetAtom } from 'jotai';
-import { windowStateAtom, bootCompleteAtom } from '@/boot/atoms';
+import { windowStateAtom } from '@/boot/atoms';
 import { ThemeSelector } from '@/theme/colors/ThemeSelector';
 import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 import { Maximize2, Cpu, FileText, Zap } from 'lucide-react';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const AGENT_WEBSITE_URL =
-	process.env.NEXT_PUBLIC_AGENT_WEBSITE_URL || 'https://agent.anuragbasuri.me';
+	process.env.NEXT_PUBLIC_AGENT_WEBSITE_URL || 'https://cortex-anurag.vercel.app';
 
 // Perfectly-round window control dots at every screen size
 function Dot({ color, onClick, label, children }: {
@@ -33,7 +33,7 @@ function Dot({ color, onClick, label, children }: {
 
 export function TopBar() {
 	const setWindowState = useSetAtom(windowStateAtom);
-	const setBootComplete = useSetAtom(bootCompleteAtom);
+	
 	const pathname = usePathname();
 	const isPortfolioShell = pathname.startsWith('/portfolio');
 
@@ -77,9 +77,9 @@ export function TopBar() {
 					<div className="flex items-center gap-1.5">
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<Dot color="rgb(239 68 68 / 0.85)" onClick={() => setBootComplete(false)} label="Restart" />
+								<Dot color="rgb(239 68 68 / 0.85)" onClick={() => setWindowState('closed')} label="Close" />
 							</TooltipTrigger>
-							<TooltipContent side="bottom" sideOffset={12}>Restart to Portfolio</TooltipContent>
+							<TooltipContent side="bottom" sideOffset={12}>Close Window</TooltipContent>
 						</Tooltip>
 
 						<Tooltip>

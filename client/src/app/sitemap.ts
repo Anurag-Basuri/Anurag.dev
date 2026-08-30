@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { getAllModuleIds, getModulePath } from '@/lib/routes';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-	const baseUrl = 'https://anuragbasuri.com'; // Update with your actual domain
+	const baseUrl = 'https://anuragbasuri.vercel.app';
 	const currentDate = new Date();
 
 	// Get all module routes

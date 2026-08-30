@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
 	outputFileTracingRoot: path.join(__dirname, '..'),
 
 	compiler: {
-		removeConsole: process.env.NODE_ENV === 'production',
+		removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
 	},
 
 	// Image optimization
@@ -19,9 +19,40 @@ const nextConfig: NextConfig = {
 		remotePatterns: [
 			{
 				protocol: 'https',
-				hostname: '**',
+				hostname: 'personalportfolio-production-ecaf.up.railway.app',
+			},
+			{
+				protocol: 'https',
+				hostname: '*.githubusercontent.com',
+			},
+			{
+				protocol: 'https',
+				hostname: 'avatars.githubusercontent.com',
+			},
+			{
+				protocol: 'https',
+				hostname: 'images.unsplash.com',
+			},
+			{
+				protocol: 'https',
+				hostname: 'cdn.hashnode.com',
+			},
+			{
+				protocol: 'https',
+				hostname: 'res.cloudinary.com',
 			},
 		],
+	},
+
+	// Static redirect for homepage (avoids force-dynamic server function)
+	async redirects() {
+		return [
+			{
+				source: '/',
+				destination: '/portfolio',
+				permanent: false,
+			},
+		];
 	},
 
 	// Experimental features
