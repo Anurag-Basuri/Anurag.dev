@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, memo, useCallback } from 'react';
-import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 import { FileText, Globe } from 'lucide-react';
 
@@ -41,11 +40,11 @@ export interface UrlThumbnailProps {
 	fallbackLabel?: string;
 	/** Tailwind gradient from-* class for the fallback (e.g. "from-emerald-950/60") */
 	fallbackGradient?: string;
-	/** next/image sizes attribute */
+	/** next/image sizes attribute (preserved for API compatibility) */
 	sizes?: string;
-	/** next/image priority flag */
+	/** priority flag */
 	priority?: boolean;
-	/** Tailwind classes for the <Image> element */
+	/** Tailwind classes for the <img> element */
 	imgClassName?: string;
 }
 
@@ -64,19 +63,18 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 
 	const kind = classifyUrl(url);
 
-	// ── Direct image URL → use next/image directly ──────────────
+	// ── Direct image URL → render with resilient <img> tag ─────────
 	if (kind === 'image' && url && !imgFailed) {
 		return (
 			<>
 				<div className="absolute inset-0 bg-card z-0" />
-				<Image
+				<img
 					src={url}
 					alt={title}
-					fill
-					sizes={sizes}
-					className={imgClassName}
+					className={`absolute inset-0 w-full h-full ${imgClassName}`}
 					onError={handleImgError}
-					priority={priority}
+					loading={priority ? 'eager' : 'lazy'}
+					decoding="async"
 				/>
 			</>
 		);
@@ -88,15 +86,13 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 		return (
 			<>
 				<div className="absolute inset-0 bg-card z-0" />
-				<Image
+				<img
 					src={screenshotSrc}
 					alt={`Preview of ${title}`}
-					fill
-					sizes={sizes}
-					className={imgClassName}
+					className={`absolute inset-0 w-full h-full ${imgClassName}`}
 					onError={handleImgError}
-					priority={priority}
-					unoptimized
+					loading={priority ? 'eager' : 'lazy'}
+					decoding="async"
 				/>
 			</>
 		);

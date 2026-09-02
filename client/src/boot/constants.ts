@@ -3,8 +3,8 @@
 
 export const BOOT_CONFIG = {
 	// Timing
-	PHASE_DURATION: 1.6, // seconds per phase
-	COMPLETE_DELAY: 400, // ms after 100% before transitioning
+	PHASE_DURATION: 0.4, // seconds per phase (snappy 2s total duration)
+	COMPLETE_DELAY: 300, // ms after 100% before transitioning
 
 	// Matrix Rain Effect
 	MATRIX_CHARS: 'संगणकदात्तयंत्रतर्कजालसंकेतविधिस्मृति01',

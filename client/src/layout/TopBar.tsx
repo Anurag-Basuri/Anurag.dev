@@ -7,7 +7,7 @@ import { BackgroundSelector } from '@/theme/backgrounds/BackgroundSelector';
 import { Maximize2, Cpu, FileText, Zap } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/ui/tooltip';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const AGENT_WEBSITE_URL =
 	process.env.NEXT_PUBLIC_AGENT_WEBSITE_URL || 'https://cortex-anurag.vercel.app';
@@ -35,6 +35,7 @@ export function TopBar() {
 	const setWindowState = useSetAtom(windowStateAtom);
 	
 	const pathname = usePathname();
+	const router = useRouter();
 	const isPortfolioShell = pathname.startsWith('/portfolio');
 
 	const toggleFullscreen = () => {
@@ -48,7 +49,7 @@ export function TopBar() {
 	// Yellow: minimize window, but navigate home first if on a sub-page
 	const handleMinimize = () => {
 		if (!isPortfolioShell) {
-			window.location.href = '/portfolio?window=minimized';
+			router.push('/portfolio?window=minimized');
 			return;
 		}
 		setWindowState('minimized');
@@ -61,7 +62,7 @@ export function TopBar() {
 				new CustomEvent('scroll-to-section', { detail: { sectionId: 'contact' } }),
 			);
 		} else {
-			window.location.href = '/portfolio#contact';
+			router.push('/portfolio#contact');
 		}
 	};
 

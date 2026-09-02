@@ -19,27 +19,11 @@ const nextConfig: NextConfig = {
 		remotePatterns: [
 			{
 				protocol: 'https',
-				hostname: 'personalportfolio-production-ecaf.up.railway.app',
+				hostname: '**',
 			},
 			{
-				protocol: 'https',
-				hostname: '*.githubusercontent.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'avatars.githubusercontent.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'images.unsplash.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'cdn.hashnode.com',
-			},
-			{
-				protocol: 'https',
-				hostname: 'res.cloudinary.com',
+				protocol: 'http',
+				hostname: '**',
 			},
 		],
 	},

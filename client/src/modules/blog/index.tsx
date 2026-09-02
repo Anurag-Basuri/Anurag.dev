@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback, memo } from 'react';
-import Image from 'next/image';
 import { publicService } from '@/api';
 import type { BlogPost } from '@/api/schema';
 import {
@@ -72,12 +71,11 @@ const ImageGallery = memo(function ImageGallery({ images }: { images: string[] }
 	return (
 		<div className="space-y-3">
 			<div className="relative aspect-video rounded-xl overflow-hidden border border-border bg-black">
-				<Image
+				<img
 					src={images[current] ?? ''}
 					alt={`Image ${current + 1}`}
-					fill
-					sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px"
-					className="object-cover"
+					className="w-full h-full object-cover"
+					loading="lazy"
 				/>
 				{images.length > 1 && (
 					<>
@@ -324,7 +322,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 						<div className="relative w-full bg-muted overflow-hidden shrink-0" style={{ maxHeight: '40vh' }}>
 							{post.coverImage ? (
 								<div className="relative w-full aspect-video">
-									<Image src={post.coverImage} alt={post.title ?? 'Article cover'} fill sizes="100vw" className="object-cover" priority />
+									<img src={post.coverImage} alt={post.title ?? 'Article cover'} className="w-full h-full object-cover" loading="lazy" />
 								</div>
 							) : (
 								<div className="relative w-full aspect-video">
@@ -459,7 +457,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 					{(post.coverImage || post.link) && (
 						<div className="relative w-full aspect-video bg-muted overflow-hidden">
 							{post.coverImage ? (
-								<Image src={post.coverImage} alt={post.title ?? ''} fill sizes="100vw" className="object-cover" priority />
+								<img src={post.coverImage} alt={post.title ?? ''} className="w-full h-full object-cover" loading="lazy" />
 							) : (
 								<UrlThumbnail url={post.link} title={post.title ?? ''} fallbackIcon={FileText} fallbackGradient="from-indigo-950/60" />
 							)}
