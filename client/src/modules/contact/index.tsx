@@ -57,7 +57,7 @@ function ContactSkeleton() {
 					<div className="h-36 bg-foreground/5 rounded-2xl" />
 				</div>
 				<div className="flex-1 lg:max-w-xl">
-					<div className="h-[480px] bg-foreground/5 rounded-2xl" />
+					<div className="h-120 bg-foreground/5 rounded-2xl" />
 				</div>
 			</div>
 		</div>
@@ -143,7 +143,7 @@ export function ContactModule() {
 	return (
 		<div className="h-full w-full relative">
 			{/* Ambient Bottom Glow */}
-			<div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-[600px] rounded-[100%] bg-[radial-gradient(ellipse_at_center,var(--theme-primary)_0%,transparent_60%)] opacity-5 blur-[120px] pointer-events-none -z-10" />
+			<div className="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[120%] h-150 rounded-[100%] bg-[radial-gradient(ellipse_at_center,var(--theme-primary)_0%,transparent_60%)] opacity-5 blur-[120px] pointer-events-none -z-10" />
 
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-10 sm:pb-16 pt-4 md:pt-6">
 				<SectionHeader
@@ -240,7 +240,7 @@ export function ContactModule() {
 								<h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground text-left">
 									Find Me Online
 								</h3>
-								<div className="h-px bg-border flex-1 max-w-[40px] block" />
+								<div className="h-px bg-border flex-1 max-w-10 block" />
 							</div>
 							<div className="flex flex-wrap justify-start gap-4">
 								{(about?.socialLinks ?? []).map((social, index) => {
@@ -278,11 +278,11 @@ export function ContactModule() {
 							<div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent rounded-2xl pointer-events-none" />
 
 							<div className="relative z-10 mb-2">
-								<h2 className="text-3xl font-black text-foreground mb-3 tracking-tight flex items-center gap-3">
+								<h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 tracking-tight flex items-center gap-3 font-sans">
 									<Sparkles className="w-6 h-6 text-primary" />
 									Send a Message
 								</h2>
-								<p className="text-muted-foreground text-base font-medium">
+								<p className="text-muted-foreground/80 text-sm sm:text-base font-normal leading-relaxed font-sans">
 									Got a question or proposal, or just want to say hello? Go ahead.
 								</p>
 							</div>
@@ -290,7 +290,7 @@ export function ContactModule() {
 							<div className="space-y-5 relative z-10">
 								<div className="grid grid-cols-2 gap-5">
 									<div className="space-y-2">
-										<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+										<label className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider ml-1">
 											Your Name
 										</label>
 										<input
@@ -304,7 +304,7 @@ export function ContactModule() {
 										/>
 									</div>
 									<div className="space-y-2">
-										<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+										<label className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider ml-1">
 											Email Address
 										</label>
 										<input
@@ -320,7 +320,7 @@ export function ContactModule() {
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+									<label className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider ml-1">
 										Subject
 									</label>
 									<input
@@ -335,7 +335,7 @@ export function ContactModule() {
 								</div>
 
 								<div className="space-y-2">
-									<label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">
+									<label className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider ml-1">
 										Message
 									</label>
 									<textarea
@@ -354,7 +354,7 @@ export function ContactModule() {
 										type="submit"
 										disabled={loading || success}
 										className={cn(
-											'w-full py-4 rounded-xl font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 transition-all duration-300 overflow-hidden relative group/btn',
+											'w-full py-3.5 rounded-xl font-sans font-semibold tracking-normal text-sm sm:text-base flex items-center justify-center gap-3 transition-all duration-300 overflow-hidden relative group/btn',
 											success
 												? 'bg-emerald-500 text-black cursor-default border-transparent'
 												: 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_20px_rgba(var(--theme-primary-rgb),0.4)] hover:-translate-y-1',

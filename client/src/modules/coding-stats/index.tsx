@@ -144,7 +144,7 @@ export function CodingStatsModule() {
 				<div className="p-5 rounded-2xl bg-orange-500/10 border border-orange-500/20 mb-5">
 					<Terminal className="w-8 h-8 text-orange-400" />
 				</div>
-				<p className="text-xl font-black text-foreground mb-2 tracking-tight">
+				<p className="text-xl font-bold text-foreground mb-2 tracking-tight font-sans">
 					{error ? 'Failed to Sync Telemetry' : 'No Profiles Configured'}
 				</p>
 				<p className="text-xs text-muted-foreground leading-snug mb-8 max-w-sm">
@@ -206,7 +206,7 @@ export function CodingStatsModule() {
 					<div className="mt-6">
 						<div className="flex items-center gap-2 mb-3">
 							<ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-							<span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+							<span className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 								Additional Profiles
 							</span>
 						</div>

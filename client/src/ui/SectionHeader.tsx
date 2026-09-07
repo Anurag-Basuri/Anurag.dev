@@ -76,16 +76,16 @@ export function SectionHeader({
 				</div>
 
 				<div className="flex items-baseline gap-2.5 min-w-0">
-					<h2 className="text-base sm:text-lg font-black tracking-tight text-foreground whitespace-nowrap">
+					<h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground whitespace-nowrap font-sans">
 						<span
-							className="bg-clip-text text-transparent bg-linear-to-r from-foreground via-foreground to-[var(--theme-primary)]"
+							className="bg-clip-text text-transparent bg-linear-to-r from-foreground via-foreground to-(--theme-primary)"
 						>
 							{title}
 						</span>
 					</h2>
 
 					{description && (
-						<p className="hidden md:inline-block text-xs text-muted-foreground/75 font-medium truncate max-w-md">
+						<p className="hidden md:inline-block text-xs text-muted-foreground/80 font-normal truncate max-w-md">
 							{description}
 						</p>
 					)}
@@ -104,7 +104,7 @@ export function SectionHeader({
 			)}
 
 			<div
-				className="absolute bottom-0 left-0 w-32 h-[1.5px] bg-linear-to-r from-[var(--theme-primary)] via-transparent to-transparent opacity-80 pointer-events-none"
+				className="absolute bottom-0 left-0 w-32 h-[1.5px] bg-linear-to-r from-(--theme-primary) via-transparent to-transparent opacity-80 pointer-events-none"
 			/>
 		</motion.div>
 	);

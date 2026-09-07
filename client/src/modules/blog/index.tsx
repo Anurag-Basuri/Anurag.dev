@@ -159,7 +159,7 @@ const PostCard = memo(function PostCard({
 						target="_blank"
 						rel="noopener noreferrer"
 						onClick={e => e.stopPropagation()}
-						className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg backdrop-blur-md border text-white/90 opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all duration-300 text-[9px] font-bold uppercase tracking-wider hover:scale-105 active:scale-95"
+						className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg backdrop-blur-md border text-white/90 opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:translate-y-0 transition-all duration-300 text-xs font-mono font-medium uppercase tracking-wide hover:scale-105 active:scale-95"
 						style={{
 							background: 'color-mix(in oklch, var(--theme-secondary) 25%, rgba(0,0,0,0.5))',
 							borderColor: 'color-mix(in oklch, var(--theme-secondary) 40%, transparent)',
@@ -177,7 +177,7 @@ const PostCard = memo(function PostCard({
 				{/* Date */}
 				{dateStr && (
 					<div
-						className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider mb-1.5"
+						className="flex items-center gap-1.5 text-xs font-mono font-medium uppercase tracking-wide mb-1.5"
 						style={{ color: 'var(--theme-secondary)' }}
 					>
 						<Calendar className="w-3 h-3" />
@@ -186,7 +186,7 @@ const PostCard = memo(function PostCard({
 				)}
 
 				{/* Title */}
-				<h3 className="text-sm font-black text-foreground leading-tight tracking-tight mb-2 group-hover:text-foreground/90 transition-colors line-clamp-2">
+				<h3 className="text-sm sm:text-base font-semibold text-foreground leading-snug tracking-tight mb-2 group-hover:text-foreground/90 transition-colors line-clamp-2 font-sans">
 					{post.title ?? 'Untitled'}
 				</h3>
 
@@ -196,13 +196,13 @@ const PostCard = memo(function PostCard({
 						{tags.slice(0, 3).map(tag => (
 							<span
 								key={tag}
-								className="px-2 py-0.5 rounded-md text-[8px] uppercase font-black tracking-widest bg-card border border-border text-foreground/60 group-hover:border-(--theme-secondary)/20 group-hover:text-(--theme-secondary) transition-colors"
+								className="px-2 py-0.5 rounded-md text-[11px] font-mono font-medium bg-card border border-border text-foreground/70 group-hover:border-(--theme-secondary)/20 group-hover:text-(--theme-secondary) transition-colors"
 							>
 								{tag}
 							</span>
 						))}
 						{tags.length > 3 && (
-							<span className="px-2 py-0.5 rounded-md text-[8px] uppercase font-black tracking-widest bg-card border border-border text-muted-foreground">
+							<span className="px-2 py-0.5 rounded-md text-[11px] font-mono font-medium bg-card border border-border text-muted-foreground">
 								+{tags.length - 3}
 							</span>
 						)}
@@ -284,7 +284,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 				{/* Sticky Header */}
 				<div className="flex items-center justify-between px-4 sm:px-5 py-2 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
-					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+					<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
 						<span>Article</span>
 					</div>
@@ -294,7 +294,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								href={post.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95"
+								className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium uppercase tracking-wide transition-all hover:scale-105 active:scale-95"
 								style={{
 									background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 									color: 'var(--theme-secondary)',
@@ -352,7 +352,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							</span>
 						</div>
 
-						<h1 className="text-xl sm:text-3xl md:text-4xl font-black text-foreground leading-tight tracking-tight">
+						<h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground leading-snug tracking-tight font-sans">
 							{post.title ?? 'Untitled Article'}
 						</h1>
 
@@ -361,7 +361,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								{tags.map(tag => (
 									<span
 										key={tag}
-										className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
+										className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium uppercase tracking-wider"
 										style={{
 											background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 											color: 'var(--theme-secondary)',
@@ -376,7 +376,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 						<div className="border-t border-border" />
 
-						<article className="prose prose-invert prose-sm sm:prose-base max-w-none text-foreground/80 leading-relaxed font-medium prose-headings:font-black prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:border prose-img:border-border">
+						<article className="prose prose-invert prose-sm sm:prose-base max-w-none text-foreground/85 leading-relaxed font-normal font-sans prose-headings:font-bold prose-headings:tracking-tight prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:border prose-img:border-border">
 							<div className="whitespace-pre-wrap tracking-wide text-sm sm:text-base">
 								{post.content ?? ''}
 							</div>
@@ -384,7 +384,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 						{allImages.length > 1 && (
 							<div className="mt-10 pt-6 border-t border-border">
-								<h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2" style={{ color: 'var(--theme-secondary)' }}>
+								<h4 className="text-xs font-mono font-medium uppercase tracking-wider mb-6 flex items-center gap-2" style={{ color: 'var(--theme-secondary)' }}>
 									<BookOpen className="w-3.5 h-3.5" />
 									Media Gallery
 								</h4>
@@ -392,7 +392,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							</div>
 						)}
 
-						<div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[9px] font-mono font-bold uppercase tracking-widest text-muted-foreground">
+						<div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 							<span>ID: {post.id}</span>
 							{post.updatedAt && post.updatedAt !== post.createdAt && (
 								<span>Last Updated: {formatDate(post.updatedAt)}</span>
@@ -420,7 +420,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 				{/* Mobile Header */}
 				<div className="flex items-center justify-between px-3 py-1.5 border-b border-border shrink-0">
-					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+					<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 						<BookOpen className="w-3.5 h-3.5" style={{ color: 'var(--theme-secondary)' }} />
 						<span>Article</span>
 					</div>
@@ -430,7 +430,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								href={post.link}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all active:scale-95"
+								className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-mono font-medium uppercase tracking-wide transition-all active:scale-95"
 								style={{
 									background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 									color: 'var(--theme-secondary)',
@@ -466,7 +466,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 
 					<div className="p-3 space-y-3 pb-6">
 						{/* Meta */}
-						<div className="flex flex-wrap items-center gap-2 text-[9px] font-bold uppercase tracking-widest" style={{ color: 'var(--theme-secondary)' }}>
+						<div className="flex flex-wrap items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider" style={{ color: 'var(--theme-secondary)' }}>
 							<span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-muted border border-border">
 								<Calendar className="w-3 h-3" />
 								{formatDate(post.publishedAt ?? post.createdAt)}
@@ -477,7 +477,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 							</span>
 						</div>
 
-						<h1 className="text-lg font-black text-foreground leading-tight tracking-tight">
+						<h1 className="text-lg font-bold text-foreground leading-snug tracking-tight font-sans">
 							{post.title ?? 'Untitled'}
 						</h1>
 
@@ -486,7 +486,7 @@ function BlogDetailModal({ post, onClose }: { post: BlogPost; onClose: () => voi
 								{tags.map(tag => (
 									<span
 										key={tag}
-										className="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest"
+										className="px-2 py-0.5 rounded-md text-[11px] font-mono font-medium uppercase tracking-wider"
 										style={{
 											background: 'color-mix(in oklch, var(--theme-secondary) 10%, transparent)',
 											color: 'var(--theme-secondary)',

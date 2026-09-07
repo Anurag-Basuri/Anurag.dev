@@ -104,8 +104,8 @@ export const SVGDoughnutChart = memo(function SVGDoughnutChart({
 				)}
 			</svg>
 			<div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-				<span className="text-sm font-black text-foreground">{total}</span>
-				<span className="text-[7px] uppercase tracking-widest text-muted-foreground">Solved</span>
+				<span className="text-sm font-mono font-bold text-foreground tabular-nums">{total}</span>
+				<span className="text-[10px] font-mono font-medium uppercase tracking-wider text-muted-foreground">Solved</span>
 			</div>
 		</div>
 	);
@@ -121,10 +121,10 @@ function StatPill({ label, value, accent }: { label: string; value: string | num
 			'flex flex-col px-3 py-2 rounded-xl bg-foreground/[0.03] border border-border/50',
 			accent && 'border-primary/30 bg-primary/5',
 		)}>
-			<span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-0.5">
+			<span className="text-[11px] font-mono font-medium text-muted-foreground uppercase tracking-wide mb-1">
 				{label}
 			</span>
-			<span className={cn('text-base font-black tracking-tight', accent ? 'text-primary' : 'text-foreground')}>
+			<span className={cn('text-base font-mono font-bold tracking-tight tabular-nums', accent ? 'text-primary' : 'text-foreground')}>
 				{value}
 			</span>
 		</div>
@@ -158,7 +158,7 @@ export const LinkOnlyPill = memo(function LinkOnlyPill({
 			</div>
 			<div className="flex flex-col min-w-0">
 				<span className="text-xs font-bold text-foreground truncate">{config.name}</span>
-				<span className="text-[9px] text-muted-foreground truncate">@{username}</span>
+				<span className="text-[11px] font-mono font-normal text-muted-foreground truncate">@{username}</span>
 			</div>
 			<ExternalLink className="w-3 h-3 text-muted-foreground/50 group-hover:text-foreground transition-colors shrink-0" />
 		</motion.a>
@@ -207,8 +207,8 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 							<Icon className="w-5 h-5" />
 						</div>
 						<div>
-							<h3 className="text-base font-black text-foreground tracking-tight">{config.name}</h3>
-							<span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">@{platform.username}</span>
+							<h3 className="text-base font-semibold text-foreground tracking-tight font-sans">{config.name}</h3>
+							<span className="text-xs font-mono font-medium text-muted-foreground/80">@{platform.username}</span>
 						</div>
 					</div>
 					<a
@@ -255,7 +255,7 @@ export const ProblemSolvingCard = memo(function ProblemSolvingCard({
 				{/* Rating History Chart */}
 				{platform.ratingHistory && platform.ratingHistory.length > 1 && (
 					<div className="mt-3 pt-3 border-t border-border">
-						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Contest Rating Trend</div>
+						<div className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider mb-2">Contest Rating Trend</div>
 						<RatingChart entries={platform.ratingHistory} accent={config.accent} />
 					</div>
 				)}
@@ -306,8 +306,8 @@ export const GitHubCard = memo(function GitHubCard({
 							<Icon className="w-5 h-5" />
 						</div>
 						<div>
-							<h3 className="text-base font-black text-foreground tracking-tight">{config.name}</h3>
-							<span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">@{platform.username}</span>
+							<h3 className="text-base font-semibold text-foreground tracking-tight font-sans">{config.name}</h3>
+							<span className="text-xs font-mono font-medium text-muted-foreground/80">@{platform.username}</span>
 						</div>
 					</div>
 					<a
@@ -331,7 +331,7 @@ export const GitHubCard = memo(function GitHubCard({
 				{/* Contribution Heatmap */}
 				{platform.contributionHeatmap && platform.contributionHeatmap.length > 0 && (
 					<div className="mt-4 pt-3 border-t border-border">
-						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Contributions (Last Year)</div>
+						<div className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider mb-2">Contributions (Last Year)</div>
 						<ContributionHeatmap days={platform.contributionHeatmap} accent={config.accent} />
 					</div>
 				)}
@@ -381,8 +381,8 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 							<Icon className="w-4 h-4" />
 						</div>
 						<div>
-							<h3 className="text-sm font-black text-foreground tracking-tight">{config.name}</h3>
-							<span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground">@{platform.username}</span>
+							<h3 className="text-sm font-semibold text-foreground tracking-tight font-sans">{config.name}</h3>
+							<span className="text-[11px] font-mono font-medium text-muted-foreground/80">@{platform.username}</span>
 						</div>
 					</div>
 					<a
@@ -408,7 +408,7 @@ export const CompetitiveCard = memo(function CompetitiveCard({
 				{/* Rating History Chart */}
 				{platform.ratingHistory && platform.ratingHistory.length > 1 && (
 					<div className="mt-3 pt-3 border-t border-border">
-						<div className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Rating Trend</div>
+						<div className="text-xs font-mono font-medium text-muted-foreground uppercase tracking-wider mb-2">Rating Trend</div>
 						<RatingChart entries={platform.ratingHistory} accent={config.accent} />
 					</div>
 				)}

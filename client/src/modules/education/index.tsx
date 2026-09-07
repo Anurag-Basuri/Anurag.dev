@@ -108,13 +108,13 @@ const EducationCard = memo(function EducationCard({
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Header row: Title + Badge */}
 						<div className="flex items-start justify-between gap-3 mb-2">
-							<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground line-clamp-2">
+							<h3 className="text-base sm:text-lg font-semibold tracking-tight text-foreground line-clamp-2 font-sans">
 								{entry.title}
 							</h3>
 							<div className="flex items-center gap-2 shrink-0">
 								{entry.isCurrent && (
 									<span
-										className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest"
+										className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium uppercase tracking-wider"
 										style={{
 											background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
 											color: 'var(--theme-primary)',
@@ -129,7 +129,7 @@ const EducationCard = memo(function EducationCard({
 									</span>
 								)}
 								{entry.grade && (
-									<div className="px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-bold text-xs shadow-inner">
+									<div className="px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-mono font-medium text-xs shadow-inner">
 										{entry.grade}
 									</div>
 								)}
@@ -142,7 +142,7 @@ const EducationCard = memo(function EducationCard({
 							</p>
 						)}
 
-						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-5">
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground mb-5">
 							{entry.organization && (
 								<span
 									className="flex items-center gap-1.5 px-2 py-1 rounded-md"
@@ -179,7 +179,7 @@ const EducationCard = memo(function EducationCard({
 								{(entry.skills ?? []).filter(s => s.trim().length > 0).map(skill => (
 									<span
 										key={skill}
-										className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/20 transition-colors"
+										className="px-2.5 py-1 text-[11px] font-mono font-medium rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/20 transition-colors"
 									>
 										{skill}
 									</span>

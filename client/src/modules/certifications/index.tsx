@@ -52,16 +52,16 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 					{/* Issuer Badge */}
 					<div className="flex items-center gap-1.5 mb-2">
 						<ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)' }} />
-						<span className="text-[9px] font-black uppercase tracking-widest text-foreground/80">
+						<span className="text-[11px] font-mono font-medium uppercase tracking-wider text-foreground/80">
 							{cert.issuer}
 						</span>
 					</div>
 
-					<h3 className="text-sm font-black text-foreground tracking-tight leading-tight group-hover:text-[var(--theme-primary)] transition-colors mb-1.5 line-clamp-2">
+					<h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight leading-snug group-hover:text-[var(--theme-primary)] transition-colors mb-1.5 line-clamp-2 font-sans">
 						{cert.title}
 					</h3>
 
-					<div className="flex items-center gap-1.5 text-[9px] font-bold font-mono mb-2.5" style={{ color: 'color-mix(in oklch, var(--theme-primary) 70%, transparent)' }}>
+					<div className="flex items-center gap-1.5 text-xs font-mono font-normal mb-2.5" style={{ color: 'color-mix(in oklch, var(--theme-primary) 70%, transparent)' }}>
 						<Activity className="w-3 h-3" />
 						<span>Issued: {new Date(cert.startDate ?? cert.createdAt).getFullYear()}</span>
 					</div>
@@ -71,7 +71,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 							{(cert.skills ?? []).slice(0, 4).map(skill => (
 								<span
 									key={skill}
-									className="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider rounded-md bg-foreground/5 text-muted-foreground border border-border group-hover:border-[var(--theme-primary)]/30 group-hover:text-foreground/90 transition-colors"
+									className="px-2 py-0.5 text-[11px] font-mono font-medium rounded-md bg-foreground/5 text-muted-foreground border border-border group-hover:border-[var(--theme-primary)]/30 group-hover:text-foreground/90 transition-colors"
 								>
 									{skill}
 								</span>
@@ -85,7 +85,7 @@ const CertCard = memo(function CertCard({ cert }: { cert: Certification }) {
 								href={cert.credentialUrl}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
+								className="inline-flex items-center gap-1.5 text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
 								aria-label={'Verify credential for ' + cert.title}
 							>
 								Verify
