@@ -1,161 +1,137 @@
 'use client';
 
-import { useState, useEffect, memo, type FC } from 'react';
-import { Rocket, Brain, Terminal } from 'lucide-react';
-import { MatrixRain } from './MatrixRain';
+import { useState, useEffect, type FC } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { BootProgress } from './BootProgress';
 import { useBootSequence } from '../hooks/useBootSequence';
-import { ROLES } from '../constants';
+import { BOOT_CONFIG } from '../constants';
 
 // ============================================================================
-// Internal Components
+// Boot Screen — "Quiet Reveal"
 // ============================================================================
+// A minimal, premium intro splash. No canvas, no matrix rain — pure CSS +
+// Framer Motion. Shows monogram initials, clean name, thin progress line,
+// static subtitle, and an elegant skip hint. Exits with a zoom-in + blur
+// that suggests "entering" the workspace.
 
-// Decorative hex grid background pattern. Fades out during boot completion transition.
-const HexGrid = memo(function HexGrid({ visible }: { visible: boolean }) {
-	return (
-		<div
-			className="absolute inset-0 pointer-events-none transition-opacity duration-1000 ease-in-out"
-			style={{ opacity: visible ? 0.2 : 0 }}
-			aria-hidden="true"
-		>
-			<div className="w-full h-full bg-[radial-gradient(#10b98115_1px,transparent_1px)] bg-size-[32px_32px]" />
-		</div>
-	);
-});
-
-interface TypewriterProps {
-	texts: readonly string[];
-}
-
-// Animated typewriter effect that cycles through an array of texts. Types out each string, pauses, then deletes and moves to the next.
-const Typewriter = memo(function Typewriter({ texts }: TypewriterProps) {
-	const [index, setIndex] = useState(0);
-	const [displayText, setDisplayText] = useState('');
-	const [isDeleting, setIsDeleting] = useState(false);
-
-	useEffect(() => {
-		const currentText = texts[index];
-		const speed = isDeleting ? 30 : 50;
-
-		const timeout = setTimeout(() => {
-			if (!isDeleting && displayText === currentText) {
-				setTimeout(() => setIsDeleting(true), 2000);
-			} else if (isDeleting && displayText === '') {
-				setIsDeleting(false);
-				setIndex(i => (i + 1) % texts.length);
-			} else {
-				setDisplayText(
-					currentText.substring(0, displayText.length + (isDeleting ? -1 : 1)),
-				);
-			}
-		}, speed);
-
-		return () => clearTimeout(timeout);
-	}, [displayText, isDeleting, index, texts]);
-
-	return (
-		<span className="inline-block text-emerald-400 font-bold min-h-[1.5em]" aria-live="polite">
-			{displayText}
-			<span
-				className="animate-pulse ml-1 inline-block w-2.5 h-4 bg-emerald-500 align-middle"
-				aria-hidden="true"
-			/>
-		</span>
-	);
-});
-
-// ============================================================================
-// Main Component
-// ============================================================================
-
-// Boot screen component that displays during application initialization. Features Matrix rain effect, typewriter animation, and progress bar. Can be skipped via keyboard (Space/Enter/Escape) or button click.
 export function BootScreen() {
-	const { status, progress, isCompleting, skip } = useBootSequence();
+	const { progress, isCompleting, skip } = useBootSequence();
+	const [showSkipHint, setShowSkipHint] = useState(false);
+
+	// Fade in the skip hint after a delay
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setShowSkipHint(true);
+		}, BOOT_CONFIG.SKIP_HINT_DELAY);
+		return () => clearTimeout(timer);
+	}, []);
 
 	return (
-		<div
-			className="fixed inset-0 bg-[#020202] text-emerald-500 font-mono overflow-hidden cursor-default flex items-center justify-center"
-			style={{ zIndex: 9999 }}
-			aria-label="Booting Portfolio"
-			role="alert"
-			aria-busy="true"
-		>
-			{/* Background layers */}
-			<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-emerald-900/15 via-[#020202] to-black opacity-90" />
-			<MatrixRain />
-			<HexGrid visible={!isCompleting} />
-
-			{/* Content */}
-			<div className="relative z-10 flex flex-col items-center w-full max-w-4xl px-4">
-				{/* Card */}
-				<div className="relative z-20 w-full flex justify-center">
-					<div className="bg-black/60 backdrop-blur-xl border border-emerald-500/20 p-8 sm:p-14 rounded-2xl shadow-[0_0_50px_-10px_rgba(16,185,129,0.15)] relative overflow-hidden w-full max-w-xl">
-						{/* Inner Glow */}
-						<div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 via-transparent to-cyan-500/5" />
-
-						<div className="relative z-10 flex flex-col items-center text-center">
-							{/* Icons */}
-							<div className="flex gap-6 mb-8 text-emerald-500/60">
-								<Terminal className="w-6 h-6 animate-pulse" />
-								<Rocket className="w-6 h-6 text-emerald-400" />
-								<Brain className="w-6 h-6" />
-							</div>
-
-							{/* Title */}
-							<div className="flex flex-col items-center gap-2 mb-4">
-								<h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-white/90 uppercase">
-									Anurag&apos;s
-								</h1>
-								<div className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 via-cyan-400 to-emerald-400">
-									PORTFOLIO
-								</div>
-							</div>
-
-							{/* Typewriter */}
-							<div className="h-8 sm:h-10 mb-8 sm:mb-12 flex items-center justify-center">
-								<p className="text-sm sm:text-lg font-medium tracking-[0.2em] uppercase text-emerald-500/80">
-									<Typewriter texts={ROLES} />
-								</p>
-							</div>
-
-							{/* Divider */}
-							<div className="w-24 h-px bg-linear-to-r from-transparent via-emerald-500/50 to-transparent mb-10" />
-
-							{/* Progress */}
-							<BootProgress status={status} progress={progress} />
-						</div>
-					</div>
-				</div>
-
-				{/* Creative Skip Prompt */}
-				<div className="absolute bottom-8 sm:bottom-12 w-full flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-5 duration-1000 fill-mode-forwards opacity-0 [animation-delay:1.5s] z-50">
-					
-					{/* Explicit Override Button */}
-					<button 
-						onClick={(e) => {
-							e.stopPropagation();
-							skip();
+		<AnimatePresence>
+			{!isCompleting ? (
+				<motion.div
+					key="boot"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{
+						opacity: 0,
+						scale: 1.04,
+						filter: 'blur(6px)',
+					}}
+					transition={{
+						duration: 0.4,
+						ease: [0.4, 0, 0.2, 1],
+					}}
+					className="fixed inset-0 flex items-center justify-center cursor-default select-none"
+					style={{ zIndex: 9999, background: '#050505' }}
+					aria-label="Loading Portfolio"
+					role="status"
+				>
+					{/* Subtle radial vignette — pure CSS */}
+					<div
+						className="absolute inset-0 pointer-events-none"
+						style={{
+							background:
+								'radial-gradient(ellipse at center, rgba(255,255,255,0.02) 0%, transparent 60%)',
 						}}
-						className="relative group px-8 py-2.5 bg-black/50 hover:bg-emerald-950/40 border border-emerald-500/30 rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)] cursor-pointer"
-					>
-						<div className="absolute inset-0 bg-emerald-500/20 translate-x-1 animate-pulse opacity-0 group-hover:opacity-100 blur-sm" />
-						<span className="relative z-10 text-emerald-400 text-[11px] sm:text-xs font-bold tracking-[0.2em] uppercase">
-							SYSTEM OVERRIDE
-						</span>
-					</button>
+					/>
 
-					{/* Device-specific helper text */}
-					<div className="text-[10px] sm:text-[11px] text-emerald-500/40 font-mono tracking-widest uppercase text-center px-4">
-						<span className="hidden sm:block">Press [SPACE] or Click anywhere to bypass</span>
-						<span className="block sm:hidden animate-pulse">Tap anywhere to bypass</span>
+					{/* Content */}
+					<div className="relative z-10 flex flex-col items-center w-full max-w-md px-6">
+						{/* Monogram */}
+						<motion.div
+							initial={{ opacity: 0, scale: 0.8, filter: 'blur(8px)' }}
+							animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+							transition={{ delay: 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+							className="mb-8"
+						>
+							<div
+								className="text-[42px] sm:text-[52px] font-extralight tracking-[0.3em] text-white/90"
+								style={{
+									textShadow: '0 0 40px rgba(255,255,255,0.08)',
+									fontFamily: 'Inter, system-ui, sans-serif',
+								}}
+							>
+								A<span className="text-white/30 mx-1">.</span>B
+							</div>
+						</motion.div>
+
+						{/* Name */}
+						<motion.h1
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
+							className="text-sm sm:text-base font-light tracking-[0.25em] uppercase text-white/60 mb-6"
+							style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+						>
+							Anurag Basuri
+						</motion.h1>
+
+						{/* Progress Line */}
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ delay: 0.2, duration: 0.3 }}
+							className="w-full mb-6"
+						>
+							<BootProgress progress={progress} />
+						</motion.div>
+
+						{/* Subtitle */}
+						<motion.p
+							initial={{ opacity: 0, y: 8 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.45, duration: 0.35, ease: 'easeOut' }}
+							className="text-[11px] sm:text-xs font-normal tracking-[0.15em] text-white/25 uppercase"
+						>
+							Full Stack Engineer & AI Systems
+						</motion.p>
 					</div>
-				</div>
-			</div>
-		</div>
+
+					{/* Skip Hint — fades in after delay */}
+					<div className="absolute bottom-8 sm:bottom-12 w-full flex justify-center">
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: showSkipHint ? 1 : 0 }}
+							transition={{ duration: 0.5, ease: 'easeOut' }}
+							className="text-center"
+						>
+							{/* Desktop */}
+							<p className="hidden sm:block text-[11px] tracking-[0.12em] text-white/20 font-light">
+								Press any key to enter{' '}
+								<span className="text-white/30">↵</span>
+							</p>
+							{/* Mobile */}
+							<p className="block sm:hidden text-[11px] tracking-[0.12em] text-white/20 font-light">
+								Tap anywhere to enter
+							</p>
+						</motion.div>
+					</div>
+				</motion.div>
+			) : null}
+		</AnimatePresence>
 	);
 }
 
 // Backward compatibility export
 export { BootScreen as Introduction };
-

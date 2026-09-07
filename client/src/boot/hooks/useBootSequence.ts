@@ -3,38 +3,58 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAtom } from 'jotai';
 import { bootCompleteAtom } from '../atoms';
-import { BOOT_CONFIG, BOOT_PHASES } from '../constants';
+import { BOOT_CONFIG } from '../constants';
 
-const { PHASE_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
+const { BOOT_DURATION, COMPLETE_DELAY } = BOOT_CONFIG;
+
+// Session key to remember if boot has been seen this session
+const BOOT_SEEN_KEY = 'boot_seen';
 
 // ============================================================================
 // Types
 // ============================================================================
 
 interface UseBootSequenceReturn {
-	status: string;
 	progress: number;
 	isCompleting: boolean;
 	skip: () => void;
 }
 
 // ============================================================================
-// Hook — animates boot phases via requestAnimationFrame (no gsap)
+// Hook — minimal boot progress via requestAnimationFrame
 // ============================================================================
 
 export function useBootSequence(): UseBootSequenceReturn {
 	const [, setBootComplete] = useAtom(bootCompleteAtom);
-	const [status, setStatus] = useState('INITIALIZING...');
 	const [progress, setProgress] = useState(0);
 	const [isCompleting, setIsCompleting] = useState(false);
 
 	const cancelledRef = useRef(false);
 	const completionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+	// Check if boot was already seen this session — instant skip
+	useEffect(() => {
+		try {
+			if (sessionStorage.getItem(BOOT_SEEN_KEY)) {
+				setBootComplete(true);
+				return;
+			}
+		} catch {
+			// sessionStorage may be unavailable (e.g., private browsing edge cases)
+		}
+	}, [setBootComplete]);
+
 	const completeBoot = useCallback(() => {
 		if (isCompleting || cancelledRef.current) return;
 		setIsCompleting(true);
 		setProgress(100);
+
+		// Mark boot as seen for this session
+		try {
+			sessionStorage.setItem(BOOT_SEEN_KEY, '1');
+		} catch {
+			// Ignore storage errors
+		}
 
 		completionTimeoutRef.current = setTimeout(() => {
 			setBootComplete(true);
@@ -46,23 +66,30 @@ export function useBootSequence(): UseBootSequenceReturn {
 		cancelledRef.current = true;
 		setIsCompleting(true);
 		setProgress(100);
+
+		// Mark boot as seen for this session
+		try {
+			sessionStorage.setItem(BOOT_SEEN_KEY, '1');
+		} catch {
+			// Ignore storage errors
+		}
+
 		setBootComplete(true);
 	}, [isCompleting, setBootComplete]);
 
-	// Keyboard and touch skip handler
+	// Keyboard, click, and touch skip handlers
 	useEffect(() => {
 		const mountTime = Date.now();
 		const handleInteraction = (event: KeyboardEvent | MouseEvent | TouchEvent) => {
-			// Prevent phantom skipped events (e.g., the exact click that triggered the boot sequence bubbling)
+			// Prevent phantom events from the page load
 			if (Date.now() - mountTime < 400) return;
 
-			const isSkipKey = event.type === 'keydown' && (
-				[' ', 'Enter', 'Escape'].includes((event as KeyboardEvent).key) || 
-				(event as KeyboardEvent).code === 'Space'
-			);
+			const isSkipKey =
+				event.type === 'keydown' &&
+				([' ', 'Enter', 'Escape'].includes((event as KeyboardEvent).key) ||
+					(event as KeyboardEvent).code === 'Space');
 
 			if (event.type === 'mousedown' || event.type === 'touchstart' || isSkipKey) {
-				// Don't prevent default on clicks/touches, only on handled keys
 				if (event.type === 'keydown') event.preventDefault();
 				skip();
 			}
@@ -70,7 +97,7 @@ export function useBootSequence(): UseBootSequenceReturn {
 		window.addEventListener('keydown', handleInteraction as EventListener);
 		window.addEventListener('mousedown', handleInteraction as EventListener);
 		window.addEventListener('touchstart', handleInteraction as EventListener, { passive: true });
-		
+
 		return () => {
 			window.removeEventListener('keydown', handleInteraction as EventListener);
 			window.removeEventListener('mousedown', handleInteraction as EventListener);
@@ -78,9 +105,8 @@ export function useBootSequence(): UseBootSequenceReturn {
 		};
 	}, [skip]);
 
-	// Phase animation via requestAnimationFrame
+	// Progress animation via requestAnimationFrame
 	useEffect(() => {
-		const totalDuration = PHASE_DURATION * BOOT_PHASES.length * 1000; // convert s -> ms
 		let startTime: number | null = null;
 		let rafId: number;
 
@@ -89,14 +115,8 @@ export function useBootSequence(): UseBootSequenceReturn {
 			if (!startTime) startTime = timestamp;
 
 			const elapsed = timestamp - startTime;
-			const overallProgress = Math.min(1, elapsed / totalDuration);
+			const overallProgress = Math.min(1, elapsed / BOOT_DURATION);
 
-			// Determine current phase
-			const phaseIndex = Math.min(
-				BOOT_PHASES.length - 1,
-				Math.floor(overallProgress * BOOT_PHASES.length),
-			);
-			setStatus(BOOT_PHASES[phaseIndex]!.status);
 			setProgress(Math.floor(overallProgress * 100));
 
 			if (overallProgress < 1) {
@@ -122,5 +142,5 @@ export function useBootSequence(): UseBootSequenceReturn {
 		};
 	}, []);
 
-	return { status, progress, isCompleting, skip };
+	return { progress, isCompleting, skip };
 }

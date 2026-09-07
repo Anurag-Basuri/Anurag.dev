@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
 
-// Boot screen removed: default to true so it never renders
-export const bootCompleteAtom = atom(true);
+// Controls boot screen visibility. Starts as false so BootGuard shows the intro.
+export const bootCompleteAtom = atom(false);
 export const windowStateAtom = atom<'open' | 'minimized' | 'closed'>('open');

@@ -1,24 +1,14 @@
 // Boot Sequence Configuration
-// All timing, phases, and display constants in one place
+// Minimal, premium boot — timing constants only
 
 export const BOOT_CONFIG = {
-	// Timing
-	PHASE_DURATION: 0.4, // seconds per phase (snappy 2s total duration)
-	COMPLETE_DELAY: 300, // ms after 100% before transitioning
-
-	// Matrix Rain Effect
-	MATRIX_CHARS: 'संगणकदात्तयंत्रतर्कजालसंकेतविधिस्मृति01',
-	MATRIX_FONT_SIZE: 14,
-	MATRIX_INTERVAL: 50, // ms between frames
+	// Total boot animation duration in ms
+	BOOT_DURATION: 2000,
+	// Delay after progress hits 100% before transitioning out (exit animation time)
+	COMPLETE_DELAY: 350,
+	// Delay before the skip hint text fades in
+	SKIP_HINT_DELAY: 600,
 } as const;
-
-export const BOOT_PHASES = [
-	{ label: 'YANTRA', status: 'INITIALIZING YANTRA...' },
-	{ label: 'SMRITI', status: 'ALLOCATING MEMORY...' },
-	{ label: 'TARK', status: 'LOADING LOGIC MODULES...' },
-	{ label: 'JAL', status: 'CONNECTING TO NETWORK...' },
-	{ label: 'READY', status: 'SYSTEM READY' },
-] as const;
 
 export const ROLES = [
 	'Full Stack Developer',
@@ -26,7 +16,3 @@ export const ROLES = [
 	'Problem Solver',
 	'Creative Technologist',
 ] as const;
-
-// Computed
-export const BOOT_TOTAL_DURATION = BOOT_CONFIG.PHASE_DURATION * BOOT_PHASES.length;
-

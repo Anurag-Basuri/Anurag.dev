@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@/ui/ErrorBoundary';
 import { BackgroundRenderer } from '@/theme/backgrounds/BackgroundRenderer';
 import { AgentPromoBadge } from '@/layout/AgentPromoBadge';
 import { CustomCursor } from '@/ui/CustomCursor';
+import { BootGuard } from '@/boot/components/BootGuard';
 
 const jotaiStore = createStore();
 
@@ -18,7 +19,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 				<ErrorBoundary label="App Root">
 					<BackgroundRenderer />
 					<CustomCursor />
-					{children}
+					<BootGuard>
+						{children}
+					</BootGuard>
 					<AgentPromoBadge />
 
 					<Toaster
@@ -34,3 +37,4 @@ export function AppProviders({ children }: { children: ReactNode }) {
 		</Provider>
 	);
 }
+
