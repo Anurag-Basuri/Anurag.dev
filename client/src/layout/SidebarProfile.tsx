@@ -116,7 +116,7 @@ export const SidebarProfile = memo(function SidebarProfile({ isCollapsed }: { is
 								<h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight">
 									{profile?.name || 'Anurag Basuri'}
 								</h3>
-								<p className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate mt-0.5">
+								<p className="text-xs text-muted-foreground/80 font-normal truncate mt-0.5">
 									{profile?.Tagline || 'Software Engineer'}
 								</p>
 							</motion.div>

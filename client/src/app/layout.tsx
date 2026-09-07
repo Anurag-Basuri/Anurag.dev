@@ -1,10 +1,20 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { AppProviders } from '@/layout/AppProviders';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+	subsets: ['latin'],
+	variable: '--font-inter',
+	display: 'swap',
+});
+
+const geistMono = Geist_Mono({
+	subsets: ['latin'],
+	variable: '--font-geist-mono',
+	display: 'swap',
+});
 
 export const metadata: Metadata = {
 	title: {
@@ -56,7 +66,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={inter.className} style={{ background: '#020409' }}>
+			<body className={`${inter.variable} ${geistMono.variable} font-sans antialiased`} style={{ background: '#020409' }}>
 				<AppProviders>
 					{children}
 				</AppProviders>

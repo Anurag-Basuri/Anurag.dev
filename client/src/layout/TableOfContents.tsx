@@ -90,7 +90,7 @@ export function TableOfContents({ items, activeSectionId, onSelect, isCollapsed 
 						{!isCollapsed && isActive && (
 							<motion.div
 								layoutId="active-toc-line"
-								className={cn('absolute left-0 top-[20%] bottom-[20%] w-[4px] rounded-r-full', theme.activeGlow)}
+								className={cn('absolute left-0 top-[20%] bottom-[20%] w-1 rounded-r-full', theme.activeGlow)}
 							/>
 						)}
 
@@ -113,7 +113,7 @@ export function TableOfContents({ items, activeSectionId, onSelect, isCollapsed 
 									initial={{ opacity: 0, width: 0 }}
 									animate={{ opacity: 1, width: 'auto' }}
 									exit={{ opacity: 0, width: 0, overflow: 'hidden' }}
-									className={cn('truncate text-[13px] tracking-wider uppercase mt-0.5 transition-colors', isActive ? theme.activeText : 'group-hover:text-foreground')}
+									className={cn('truncate font-mono text-xs tracking-wide mt-0.5 transition-colors', isActive ? cn('font-semibold', theme.activeText) : 'text-muted-foreground/80 group-hover:text-foreground')}
 								>
 									{item.file}
 								</motion.span>

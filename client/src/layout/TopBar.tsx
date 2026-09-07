@@ -106,8 +106,8 @@ export function TopBar() {
 					{/* Title — visible only on md+ */}
 					<div className="hidden md:flex items-center gap-3 ml-1">
 						<div className="h-4 w-px bg-border shrink-0" />
-						<Link href="/portfolio" className="text-sm font-bold tracking-wider uppercase text-foreground/80 leading-none hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap">
-							Anurag<span className="text-primary">.dev</span>
+						<Link href="/portfolio" className="text-sm font-bold tracking-tight text-foreground/90 leading-none hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap">
+							Anurag<span className="text-primary font-mono">.dev</span>
 						</Link>
 					</div>
 				</div>
@@ -121,7 +121,7 @@ export function TopBar() {
 								href={AGENT_WEBSITE_URL}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="px-2.5 sm:px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/20 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_0_rgba(16,185,129,0.5)] shrink-0 whitespace-nowrap flex items-center gap-1.5 cursor-pointer"
+								className="px-2.5 sm:px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:border-emerald-500/60 hover:bg-emerald-500/20 rounded-full font-mono font-medium tracking-wide uppercase text-[11px] sm:text-xs transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)] hover:shadow-[0_0_20px_0_rgba(16,185,129,0.5)] shrink-0 whitespace-nowrap flex items-center gap-1.5 cursor-pointer"
 							>
 								<Zap className="w-3 h-3 text-emerald-400 fill-emerald-400/50" />
 								<span>Agent App</span>
@@ -168,7 +168,7 @@ export function TopBar() {
 						<TooltipTrigger asChild>
 							<button
 								onClick={goToContact}
-								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-bold tracking-widest uppercase text-[9px] sm:text-[10px] transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0 whitespace-nowrap cursor-pointer"
+								className="px-2.5 sm:px-3 py-1 bg-primary/10 text-primary border border-primary/20 hover:border-primary/50 rounded-full font-mono font-medium tracking-wide uppercase text-[11px] sm:text-xs transition-all hover:scale-105 active:scale-95 shadow-[0_0_15px_-3px_var(--theme-primary)] hover:shadow-[0_0_20px_0_var(--theme-primary)] shrink-0 whitespace-nowrap cursor-pointer"
 							>
 								Contact
 							</button>

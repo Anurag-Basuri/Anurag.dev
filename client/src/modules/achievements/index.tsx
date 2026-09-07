@@ -79,7 +79,7 @@ const AchievementCard = memo(function AchievementCard({
 						</div>
 						{achievement.featured && (
 							<div 
-								className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest"
+								className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-mono font-medium uppercase tracking-wider"
 								style={{
 									background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
 									color: 'var(--theme-primary)',
@@ -92,19 +92,19 @@ const AchievementCard = memo(function AchievementCard({
 						)}
 					</div>
 
-					<h3 className="text-sm font-black text-foreground tracking-tight mb-1 leading-tight group-hover:text-foreground/90 transition-colors line-clamp-2">
+					<h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-1.5 leading-snug group-hover:text-foreground/90 transition-colors line-clamp-2 font-sans">
 						{achievement.title}
 					</h3>
 
 					{achievement.issuer && (
-						<p className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
+						<p className="text-xs font-mono font-medium uppercase tracking-wide mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
 							<span className="w-3 h-[1.5px] rounded-full" style={{ background: 'var(--theme-primary)', opacity: 0.5 }} />
 							{achievement.issuer}
 						</p>
 					)}
 
 					{achievement.description && (
-						<p className="text-[10px] text-muted-foreground leading-snug mb-3 grow line-clamp-2 font-medium">
+						<p className="text-xs text-muted-foreground/85 leading-relaxed mb-3 grow line-clamp-2 font-normal font-sans">
 							{achievement.description}
 						</p>
 					)}
@@ -113,12 +113,12 @@ const AchievementCard = memo(function AchievementCard({
 						{(achievement.rank || achievement.event) && (
 							<div className="flex flex-wrap gap-1.5">
 								{achievement.rank && (
-									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-foreground">
+									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[11px] font-mono font-medium text-foreground">
 										{achievement.rank}
 									</span>
 								)}
 								{achievement.event && (
-									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[8px] font-black uppercase text-muted-foreground">
+									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[11px] font-mono font-medium text-muted-foreground">
 										{achievement.event}
 									</span>
 								)}
@@ -131,7 +131,7 @@ const AchievementCard = memo(function AchievementCard({
 									href={link}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
+									className="flex items-center gap-1.5 text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
 									aria-label={'View certificate for ' + achievement.title}
 								>
 									View Details

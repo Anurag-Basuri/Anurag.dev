@@ -54,16 +54,7 @@ export async function withFallback<T>(
 		return { data, source: 'api' };
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Unknown error';
-		const details =
-			error instanceof Error
-				? {
-						name: error.name,
-						message: error.message,
-						stack: error.stack,
-					}
-				: { value: error };
-		console.error(`[Fallback:${tag}] API request failed`, details);
-		console.warn(`[Fallback:${tag}] API failed, using fallback data. Reason: ${message}`);
+		console.warn(`[Fallback:${tag}] API request failed, using fallback data. Reason: ${message}`);
 		if (isBrowser) {
 			const stats = (
 				window as Window & {

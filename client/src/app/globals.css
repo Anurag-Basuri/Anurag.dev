@@ -1,6 +1,14 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
+/* ============================================================================
+   Typography System — Dual Font (Inter + Geist Mono)
+   ============================================================================ */
+@theme {
+	--font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
 /* =========================
    CSS Variables for Theming
    =========================
@@ -18,6 +26,10 @@
 	/* Panel overlays (computed from theme bg at runtime) */
 	--panel-overlay: rgba(0, 0, 0, 0.3);
 	--panel-overlay-hover: rgba(0, 0, 0, 0.4);
+
+	/* Typography tokens */
+	--font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	--font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* ================
@@ -83,7 +95,18 @@
 	body {
 		background-color: var(--background);
 		color: var(--foreground);
-		font-family: var(--font-geist-mono), monospace;
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+
+	.font-sans {
+		font-family: var(--font-sans);
+	}
+
+	.font-mono {
+		font-family: var(--font-mono);
 	}
 
 	html,
@@ -108,6 +131,15 @@
 	::selection {
 		background: var(--primary);
 		color: var(--primary-foreground);
+	}
+
+	/* Accessible, subtle focus */
+	*:where(:focus-visible) {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+	}
+	*:where(:focus) {
+		outline: none;
 	}
 }
 
@@ -135,21 +167,6 @@
 }
 ::-webkit-scrollbar-corner {
 	background: transparent;
-}
-
-/* Default element border uses our token (removes harsh white lines) */
-@layer base {
-	* {
-		border-color: var(--border);
-	}
-	/* Accessible, subtle focus */
-	*:where(:focus-visible) {
-		outline: 2px solid var(--ring);
-		outline-offset: 2px;
-	}
-	*:where(:focus) {
-		outline: none;
-	}
 }
 /* ============================================================================
    Industry-Grade Panel Collapse/Expand Transitions
