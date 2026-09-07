@@ -171,10 +171,10 @@ function StatCard({
 						<Icon className="w-5 h-5" />
 					</motion.div>
 					<div>
-						<p className="text-[10px] sm:text-xs text-muted-foreground font-bold uppercase tracking-widest mb-0.5">
+						<p className="text-[11px] sm:text-xs font-mono font-medium text-muted-foreground uppercase tracking-wide mb-1">
 							{label}
 						</p>
-						<p className="text-base sm:text-lg font-black text-foreground tracking-tight leading-none">
+						<p className="text-base sm:text-lg font-mono font-bold text-foreground tracking-tight leading-none tabular-nums">
 							{value}
 						</p>
 					</div>
@@ -363,7 +363,7 @@ export function ProfileModule() {
 						{/* Name + Tagline ONLY â€” beside the photo, vertically centered */}
 						<div className="flex-1 flex flex-col justify-center min-w-0 text-center md:text-left">
 							<motion.div variants={fadeInUp}>
-								<h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight text-foreground leading-[1.05]">
+								<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1] font-sans">
 									{profile.name}
 								</h1>
 							</motion.div>
@@ -391,7 +391,7 @@ export function ProfileModule() {
 							className="flex flex-wrap items-center justify-center md:justify-start gap-2"
 						>
 							{profile.pronouns && (
-								<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[10px] font-bold text-muted-foreground tracking-widest uppercase">
+								<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[11px] font-mono font-medium text-muted-foreground tracking-wide uppercase">
 									{profile.pronouns}
 								</span>
 							)}
@@ -415,7 +415,7 @@ export function ProfileModule() {
 							{activeWorkPrefs.map(pref => (
 								<span
 									key={pref}
-									className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[10px] font-bold text-muted-foreground capitalize tracking-wide"
+									className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[11px] font-mono font-medium text-muted-foreground capitalize tracking-normal"
 								>
 									{pref}
 								</span>
@@ -500,7 +500,7 @@ export function ProfileModule() {
 						>
 							{profile.languages && profile.languages.length > 0 && (
 								<div className="space-y-2">
-									<p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+									<p className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 										Languages I Speak
 									</p>
 									<div className="flex flex-wrap gap-2">
@@ -527,10 +527,10 @@ export function ProfileModule() {
 							className="mt-8 w-full p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-sm relative overflow-hidden"
 						>
 							<div className="absolute left-0 top-0 bottom-0 w-1.5 bg-linear-to-b from-primary to-transparent opacity-50" />
-							<h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 pl-4">
+							<h2 className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2 pl-4">
 								<User className="w-4 h-4" /> About Me
 							</h2>
-							<p className="text-sm sm:text-base text-foreground/80 leading-relaxed whitespace-pre-wrap font-medium pl-4">
+							<p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-wrap font-normal pl-4 font-sans">
 								{profile.bio}
 							</p>
 						</motion.div>
@@ -551,10 +551,10 @@ export function ProfileModule() {
 									<Layers className="w-5 h-5" />
 								</div>
 								<div>
-									<h2 className="text-lg font-black text-foreground tracking-tight">
+									<h2 className="text-lg font-bold text-foreground tracking-tight font-sans">
 										Technical Arsenal
 									</h2>
-									<p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+									<p className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 										Frameworks, Tools & Protocols
 									</p>
 								</div>
@@ -570,10 +570,10 @@ export function ProfileModule() {
 								{Object.entries(profile.skills).map(([category, items]) => (
 									<div key={category}>
 										<div className="flex items-center gap-2 mb-4 pl-1 border-l-2 border-primary/30">
-											<h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+											<h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
 												{category}
 											</h3>
-											<span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-[10px] font-black">
+											<span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-mono font-medium">
 												{items.length}
 											</span>
 										</div>
@@ -600,7 +600,7 @@ export function ProfileModule() {
 															className="w-5 h-5 mb-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
 															style={{ color }}
 														/>
-														<span className="text-[10px] sm:text-xs font-bold text-center text-foreground/80 group-hover:text-foreground transition-colors line-clamp-1 break-all px-1">
+														<span className="text-[11px] sm:text-xs font-mono font-medium text-center text-foreground/80 group-hover:text-foreground transition-colors line-clamp-1 break-all px-1">
 															{skill}
 														</span>
 													</motion.div>

@@ -107,7 +107,7 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 					<div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20">
 						<FileText className="w-8 h-8 text-rose-400/60" />
 					</div>
-					<span className="text-[9px] font-bold uppercase tracking-[0.2em] text-rose-400/50">
+					<span className="text-[11px] font-mono font-medium uppercase tracking-wider text-rose-400/60">
 						PDF Document
 					</span>
 				</div>
@@ -123,7 +123,7 @@ export const UrlThumbnail = memo(function UrlThumbnail({
 			<div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 			<FallbackIcon className="w-10 h-10 text-white/10 group-hover:text-muted-foreground transition-colors duration-500 relative" />
 			{fallbackLabel && (
-				<span className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground relative">
+				<span className="text-[11px] font-mono font-medium uppercase tracking-wider text-muted-foreground relative">
 					{fallbackLabel}
 				</span>
 			)}

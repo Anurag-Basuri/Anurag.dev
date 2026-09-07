@@ -145,12 +145,12 @@ const JobCard = memo(function JobCard({
 					<div className="relative z-10 flex flex-col h-full">
 						{/* Title row */}
 						<div className="flex items-start justify-between gap-2 mb-2">
-							<h3 className="text-base sm:text-lg font-black tracking-tight text-foreground leading-tight">
+							<h3 className="text-base sm:text-lg font-semibold tracking-tight text-foreground leading-snug font-sans">
 								{job.title}
 							</h3>
 							{job.isCurrent && (
 								<span
-									className="shrink-0 px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest"
+									className="shrink-0 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium uppercase tracking-wider"
 									style={{
 										color: 'var(--theme-primary)',
 										background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
@@ -195,7 +195,7 @@ const JobCard = memo(function JobCard({
 
 						{/* Footer */}
 						<div className="mt-3 pt-2 border-t border-border flex items-center justify-between">
-							<span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 group-hover:text-(--theme-primary) transition-colors">
+							<span className="text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground/70 group-hover:text-[var(--theme-primary)] transition-colors">
 								View Details →
 							</span>
 							{job.highlighted && (
@@ -268,7 +268,7 @@ function ExperienceDetailModal({
 			>
 				{/* Sticky Header */}
 				<div className="flex items-center justify-between px-4 sm:px-5 py-2 border-b border-border bg-card/60 backdrop-blur-xl shrink-0">
-					<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+					<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
 						<Briefcase className="w-3.5 h-3.5" style={{ color: 'var(--theme-primary)' }} />
 						<span>Experience Details</span>
 					</div>
@@ -287,13 +287,13 @@ function ExperienceDetailModal({
 						{/* Title + Badges */}
 						<div>
 							<div className="flex items-start gap-2 flex-wrap">
-								<h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight leading-tight flex-1 min-w-0">
+								<h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-snug flex-1 min-w-0 font-sans">
 									{job.title}
 								</h2>
 								<div className="flex items-center gap-2 shrink-0">
 									{job.isCurrent && (
 										<span
-											className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
+											className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium uppercase tracking-wider"
 											style={{
 												color: 'var(--theme-primary)',
 												background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
@@ -305,7 +305,7 @@ function ExperienceDetailModal({
 									)}
 									{job.highlighted && (
 										<span
-											className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest"
+											className="px-2.5 py-1 rounded-lg text-[11px] font-mono font-medium uppercase tracking-wider"
 											style={{
 												color: 'var(--theme-primary)',
 												background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
@@ -367,11 +367,11 @@ function ExperienceDetailModal({
 
 						{/* Description */}
 						<div className="space-y-2">
-							<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+							<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider" style={{ color: 'var(--theme-primary)' }}>
 								<Briefcase className="w-3.5 h-3.5" />
 								<span>About the Role</span>
 							</div>
-							<p className="text-sm sm:text-base text-muted-foreground font-medium leading-relaxed whitespace-pre-wrap">
+							<p className="text-sm sm:text-base text-foreground/85 font-normal leading-relaxed whitespace-pre-wrap font-sans">
 								{job.description}
 							</p>
 						</div>
@@ -379,13 +379,13 @@ function ExperienceDetailModal({
 						{/* Skills */}
 						{skills.length > 0 && (
 							<div className="space-y-2">
-								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+								<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider" style={{ color: 'var(--theme-primary)' }}>
 									<Star className="w-3.5 h-3.5" />
 									<span>Technologies & Skills</span>
 								</div>
 								<div className="flex flex-wrap gap-2">
 									{skills.map(skill => (
-										<span key={skill} className="px-3 py-1.5 rounded-lg bg-muted border border-border text-xs font-bold text-foreground/80 hover:bg-accent transition-colors">
+										<span key={skill} className="px-3 py-1.5 rounded-lg bg-muted border border-border text-xs font-mono font-medium text-foreground/85 hover:bg-accent transition-colors">
 											{skill}
 										</span>
 									))}
@@ -396,7 +396,7 @@ function ExperienceDetailModal({
 						{/* Achievements */}
 						{achievements.length > 0 && (
 							<div className="space-y-2">
-								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+								<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider" style={{ color: 'var(--theme-primary)' }}>
 									<Trophy className="w-3.5 h-3.5" />
 									<span>Achievements</span>
 								</div>
@@ -419,7 +419,7 @@ function ExperienceDetailModal({
 						{/* Documents */}
 						{documents.length > 0 && (
 							<div className="space-y-2">
-								<div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--theme-primary)' }}>
+								<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider" style={{ color: 'var(--theme-primary)' }}>
 									<FileText className="w-3.5 h-3.5" />
 									<span>Documents</span>
 								</div>
