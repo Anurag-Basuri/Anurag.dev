@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Linkedin, Github, Mail, Twitter, Globe, Instagram, Youtube, Facebook, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PANEL_TOKENS } from '@/theme/colors/tokens';
-import { publicService } from '@/api';
-import type { Profile } from '@/api/schema';
+import { useProfile } from '@/api';
 
 const SOCIAL_ICONS: Record<string, React.ElementType<{ className?: string }>> = {
 	GITHUB: Github,
@@ -62,11 +61,7 @@ const SocialButton = memo(function SocialButton({ href, icon: Icon, label }: Soc
 // ============================================================================
 
 export const SidebarProfile = memo(function SidebarProfile({ isCollapsed }: { isCollapsed?: boolean }) {
-	const [profile, setProfile] = useState<Profile | null>(null);
-
-	useEffect(() => {
-		publicService.getProfile().then(({ data }) => setProfile(data)).catch(console.error);
-	}, []);
+	const { profile } = useProfile();
 
 	return (
 		<div className="bg-transparent flex flex-col shrink-0">

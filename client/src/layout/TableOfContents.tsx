@@ -106,17 +106,32 @@ export function TableOfContents({ items, activeSectionId, onSelect, isCollapsed 
 							{getSectionIcon(item.id, 'w-[18px] h-[18px]', isActive)}
 						</div>
 
-						{/* File Name (Creative Label) */}
+						{/* File Name (Creative Label with Index) */}
 						<AnimatePresence>
 							{!isCollapsed && (
-								<motion.span
+								<motion.div
 									initial={{ opacity: 0, width: 0 }}
 									animate={{ opacity: 1, width: 'auto' }}
 									exit={{ opacity: 0, width: 0, overflow: 'hidden' }}
-									className={cn('truncate font-mono text-xs tracking-wide mt-0.5 transition-colors', isActive ? cn('font-semibold', theme.activeText) : 'text-muted-foreground/80 group-hover:text-foreground')}
+									className="flex items-center gap-2 truncate"
 								>
-									{item.file}
-								</motion.span>
+									<span
+										className={cn(
+											'font-mono text-[10px] tracking-wider shrink-0 transition-colors',
+											isActive ? 'text-primary font-bold' : 'text-muted-foreground/45'
+										)}
+									>
+										{item.indexStr}
+									</span>
+									<span
+										className={cn(
+											'truncate font-mono text-xs tracking-wide transition-colors',
+											isActive ? 'font-semibold text-foreground' : 'text-muted-foreground/80 group-hover:text-foreground'
+										)}
+									>
+										{item.label}
+									</span>
+								</motion.div>
 							)}
 						</AnimatePresence>
 

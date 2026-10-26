@@ -10,76 +10,99 @@ export interface SectionConfig {
 	label: string;
 	/** File name shown in sidebar */
 	file: string;
+	/** 2-digit index string matching BootScreen style */
+	indexStr: string;
+	/** Short section domain tag */
+	tag: string;
 	/** Short description for tooltips */
 	description: string;
 }
 
 /**
  * Ordered list of all portfolio sections matching the DB Schema.
+ * Projects directly follows Profile for immediate engineering demonstration.
  */
 export const SECTIONS: SectionConfig[] = [
 	{
 		id: 'profile',
 		moduleId: 'profile',
-		label: 'Profile',
-		file: 'Overview',
-		description: 'Personal info, bio, and skills',
-	},
-	{
-		id: 'experience',
-		moduleId: 'experience',
-		label: 'Experience',
-		file: 'Journey',
-		description: 'Work history and roles',
-	},
-	{
-		id: 'education',
-		moduleId: 'education',
-		label: 'Education',
-		file: 'Academics',
-		description: 'Academic background',
+		label: 'Overview',
+		file: '01_Overview',
+		indexStr: '01',
+		tag: 'DOSSIER',
+		description: 'Personal info, bio, skills, and telemetry',
 	},
 	{
 		id: 'projects',
 		moduleId: 'projects',
 		label: 'Projects',
-		file: 'Innovations',
-		description: 'Featured applications',
+		file: '02_Projects',
+		indexStr: '02',
+		tag: 'SYSTEMS',
+		description: 'Featured applications and autonomous agents',
+	},
+	{
+		id: 'experience',
+		moduleId: 'experience',
+		label: 'Journey',
+		file: '03_Journey',
+		indexStr: '03',
+		tag: 'CAREER',
+		description: 'Work history, production impact, and roles',
+	},
+	{
+		id: 'education',
+		moduleId: 'education',
+		label: 'Academics',
+		file: '04_Academics',
+		indexStr: '04',
+		tag: 'FOUNDATION',
+		description: 'Academic background and CSE fundamentals',
 	},
 	{
 		id: 'certifications',
 		moduleId: 'certifications',
-		label: 'Certifications',
-		file: 'Credentials',
-		description: 'Professional credentials',
-	},
-	{
-		id: 'blog',
-		moduleId: 'blog',
-		label: 'Blog',
-		file: 'Insights',
-		description: 'Articles and insights',
+		label: 'Credentials',
+		file: '05_Credentials',
+		indexStr: '05',
+		tag: 'LICENSES',
+		description: 'Verified credentials and cloud badges',
 	},
 	{
 		id: 'achievements',
 		moduleId: 'achievements',
-		label: 'Achievements',
-		file: 'Triumphs',
-		description: 'Awards and hackathons',
+		label: 'Honors',
+		file: '06_Honors',
+		indexStr: '06',
+		tag: 'AWARDS',
+		description: 'National hackathon finalists and awards',
 	},
 	{
 		id: 'coding_stats',
 		moduleId: 'coding_stats',
-		label: 'Coding Stats',
-		file: 'Telemetry',
-		description: 'LeetCode, GitHub, etc.',
+		label: 'Telemetry',
+		file: '07_Telemetry',
+		indexStr: '07',
+		tag: 'BENCHMARKS',
+		description: 'LeetCode, GitHub activity, and statistics',
+	},
+	{
+		id: 'blog',
+		moduleId: 'blog',
+		label: 'Insights',
+		file: '08_Insights',
+		indexStr: '08',
+		tag: 'WRITINGS',
+		description: 'Technical articles, research, and deep dives',
 	},
 	{
 		id: 'contact',
 		moduleId: 'contact',
-		label: 'Contact',
-		file: 'Connect',
-		description: 'Get in touch',
+		label: 'Connect',
+		file: '09_Connect',
+		indexStr: '09',
+		tag: 'CHANNELS',
+		description: 'Get in touch and communication endpoints',
 	},
 ];
 

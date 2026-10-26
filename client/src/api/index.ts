@@ -29,6 +29,17 @@ export type { LoginFormData } from './validations/auth';
 
 // Store
 export { accessTokenAtom, refreshTokenAtom, isAuthenticatedAtom } from './store/auth';
+export {
+	profileAtom,
+	profileLoadingAtom,
+	profileErrorAtom,
+	projectsAtom,
+	projectsLoadingAtom,
+	projectsErrorAtom,
+	activeSkillFilterAtom,
+	useProfile,
+	useProjects,
+} from './store/profileAtom';
 
 // Fallback
 export { withFallback } from './fallback/with-fallback';
