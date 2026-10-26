@@ -292,3 +292,5 @@ export function ExperienceModule() {
 		</div>
 	);
 }
+
+export default ExperienceModule;

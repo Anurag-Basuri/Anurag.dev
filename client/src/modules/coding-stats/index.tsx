@@ -229,3 +229,5 @@ export function CodingStatsModule() {
 		</div>
 	);
 }
+
+export default CodingStatsModule;

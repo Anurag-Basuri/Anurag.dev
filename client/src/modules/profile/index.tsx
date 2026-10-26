@@ -364,3 +364,5 @@ export function ProfileModule() {
 		</div>
 	);
 }
+
+export default ProfileModule;

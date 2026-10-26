@@ -273,3 +273,5 @@ export function BlogModule() {
 		</div>
 	);
 }
+
+export default BlogModule;

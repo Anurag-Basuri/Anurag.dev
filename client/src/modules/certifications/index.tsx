@@ -147,3 +147,6 @@ export function CertificationModule() {
 		</div>
 	);
 }
+
+export { CertificationModule as CertificationsModule };
+export default CertificationModule;

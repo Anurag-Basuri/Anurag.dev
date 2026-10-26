@@ -158,3 +158,5 @@ export function EducationModule() {
 		</div>
 	);
 }
+
+export default EducationModule;

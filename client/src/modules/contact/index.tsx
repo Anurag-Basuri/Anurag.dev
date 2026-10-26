@@ -300,3 +300,5 @@ export function ContactModule() {
 		</div>
 	);
 }
+
+export default ContactModule;

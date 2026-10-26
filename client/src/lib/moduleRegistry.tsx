@@ -20,10 +20,20 @@ function lazyWithRetry<T extends React.ComponentType<any>>(
 	return lazy(async () => {
 		try {
 			const mod = await importer();
-			if (exportName && mod && (mod as any)[exportName]) {
+			if (exportName && mod && typeof (mod as any)[exportName] === 'function') {
 				return { default: (mod as any)[exportName] as T };
 			}
-			return (mod as any).default ? (mod as { default: T }) : { default: mod as unknown as T };
+			if ((mod as any)?.default && typeof (mod as any).default === 'function') {
+				return { default: (mod as any).default as T };
+			}
+			if (mod && typeof mod === 'object') {
+				for (const val of Object.values(mod)) {
+					if (typeof val === 'function') {
+						return { default: val as T };
+					}
+				}
+			}
+			throw new Error(`Failed to resolve component from module (exportName: ${exportName})`);
 		} catch (error: any) {
 			if (typeof window !== 'undefined') {
 				const isChunkError =
@@ -46,7 +56,7 @@ const ProfileModule = lazyWithRetry(() => import('@/modules/profile'), 'ProfileM
 const ExperienceModule = lazyWithRetry(() => import('@/modules/experience'), 'ExperienceModule');
 const EducationModule = lazyWithRetry(() => import('@/modules/education'), 'EducationModule');
 const ProjectsModule = lazyWithRetry(() => import('@/modules/projects'), 'ProjectsModule');
-const AchievementsModule = lazyWithRetry(() => import('@/modules/achievements'), 'AchievementsModule');
+const AchievementsModule = lazyWithRetry(() => import('@/modules/achievements'), 'AchievementModule');
 const CertificationsModule = lazyWithRetry(() => import('@/modules/certifications'), 'CertificationModule');
 const BlogModule = lazyWithRetry(() => import('@/modules/blog'), 'BlogModule');
 const CodingStatsModule = lazyWithRetry(() => import('@/modules/coding-stats'), 'CodingStatsModule');

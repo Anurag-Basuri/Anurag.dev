@@ -146,3 +146,6 @@ export function AchievementModule() {
 		</div>
 	);
 }
+
+export { AchievementModule as AchievementsModule };
+export default AchievementModule;
