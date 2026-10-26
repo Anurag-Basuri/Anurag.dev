@@ -205,9 +205,10 @@ export function EducationModule() {
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={GraduationCap}
-					label="Academic Path"
-					title="Education"
-					description="Academic background, degrees, and institutions."
+					index="04"
+					tag="FOUNDATION"
+					title="Academic Foundation"
+					description="Computer Science & Engineering fundamentals, coursework, and honors."
 					sectionId="education"
 				/>
 

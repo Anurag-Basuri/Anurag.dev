@@ -586,10 +586,11 @@ export function BlogModule() {
 		<div className="h-full w-full">
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
-					label="Insights"
 					icon={BookOpen}
-					title="Engineering Log"
-					description="Thoughts, tutorials, and deep dives into software engineering, systems design, and technology."
+					index="08"
+					tag="WRITINGS"
+					title="Technical Insights"
+					description="Deep dives into software engineering, autonomous agents, and system architecture."
 					sectionId="blog"
 				/>
 

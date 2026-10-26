@@ -503,9 +503,10 @@ export function ExperienceModule() {
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Briefcase}
-					label="Work History"
-					title="Professional Experience"
-					description="My career journey, roles, and impact across companies and startups."
+					index="03"
+					tag="CAREER"
+					title="Professional Journey"
+					description="Engineering roles, production milestones, and architectural impact across teams."
 					sectionId="experience"
 				/>
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { ChangeEvent, FormEvent, ComponentType, SVGProps } from 'react';
-import { publicService } from '@/api';
+import { publicService, useProfile } from '@/api';
 import type { AboutData } from '@/api/schema';
 
 import {
@@ -72,32 +72,10 @@ export function ContactModule() {
 		message: '',
 	});
 	const [loading, setLoading] = useState(false);
-	const [initialLoading, setInitialLoading] = useState(true);
+	const { profile: about, loading: initialLoading } = useProfile();
 	const [success, setSuccess] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
-	const [about, setAbout] = useState<AboutData | null>(null);
-
-	// Fetch data
-	useEffect(() => {
-		let cancelled = false;
-		async function fetchData() {
-			try {
-				const { data: profileData } = await publicService.getProfile();
-				if (!cancelled) {
-					setAbout(profileData);
-				}
-			} catch (err) {
-				console.error(err);
-			} finally {
-				if (!cancelled) setInitialLoading(false);
-			}
-		}
-		fetchData();
-		return () => {
-			cancelled = true;
-		};
-	}, []);
 
 	const handleSubmit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -148,9 +126,10 @@ export function ContactModule() {
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-10 sm:pb-16 pt-4 md:pt-6">
 				<SectionHeader
 					icon={MessageSquare}
-					label="Connect"
+					index="09"
+					tag="CHANNELS"
 					title="Get In Touch"
-					description="I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions."
+					description="Direct communication channels, verified endpoints, and collaborative opportunities."
 					sectionId="contact"
 				/>
 

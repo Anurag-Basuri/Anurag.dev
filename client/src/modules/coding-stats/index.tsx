@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { publicService } from '@/api';
-import type { CodingStats, PlatformStats, Profile } from '@/api/schema';
+import { publicService, useProfile } from '@/api';
+import type { CodingStats, PlatformStats } from '@/api/schema';
 
 import { Terminal, Globe, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,8 +24,8 @@ import {
 // ═══════════════════════════════════════════════════════════════════
 
 export function CodingStatsModule() {
+	const { profile } = useProfile();
 	const [stats, setStats] = useState<CodingStats | null>(null);
-	const [profile, setProfile] = useState<Profile | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -33,13 +33,9 @@ export function CodingStatsModule() {
 		let cancelled = false;
 		async function fetchData() {
 			try {
-				const [statsRes, profileRes] = await Promise.all([
-					publicService.getCodingStats(),
-					publicService.getProfile(),
-				]);
+				const statsRes = await publicService.getCodingStats();
 				if (!cancelled) {
 					setStats(statsRes.data);
-					setProfile(profileRes.data);
 				}
 			} catch (err) {
 				console.error('Failed to load coding stats', err);
@@ -159,9 +155,10 @@ export function CodingStatsModule() {
 			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
 				<SectionHeader
 					icon={Terminal}
-					label="Telemetry"
-					title="Coding Profiles"
-					description="Live performance metrics and activity across competitive programming, problem solving, and open source platforms."
+					index="07"
+					tag="BENCHMARKS"
+					title="Developer Telemetry"
+					description="Live performance metrics, algorithmic benchmarks, and open source contributions."
 					sectionId="coding_stats"
 				/>
 

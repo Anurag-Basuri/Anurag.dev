@@ -1,28 +1,29 @@
 'use client';
 
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useMemo } from 'react';
 import { publicService } from '@/api';
 import type { Achievement } from '@/api/schema';
 
-import { Trophy, Award, Medal, Target, ExternalLink, Sparkles, Star } from 'lucide-react';
+import { Trophy, Award, Medal, Target, ExternalLink, Sparkles, Star, Users, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { staggerContainer, staggerItem } from '@/animations/motion';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { UrlThumbnail } from '@/ui/UrlThumbnail';
 import { SpotlightCard } from '@/ui/SpotlightCard';
+import { cn } from '@/lib/utils';
 
 // ─── Skeleton ───────────────────────────────────────────────────
-
 function AchievementsSkeleton() {
 	return (
-		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
-			<div className="space-y-3 mb-8">
+		<div className="px-3 sm:px-6 md:px-8 max-w-7xl mx-auto animate-pulse pb-12 pt-4">
+			<div className="space-y-3 mb-6">
 				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
 				<div className="h-8 w-56 bg-foreground/5 rounded-xl" />
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
-				{[1, 2, 3, 4].map(i => (
-					<div key={i} className="h-52 bg-foreground/5 rounded-xl" />
+			<div className="h-44 bg-foreground/5 rounded-2xl mb-4" />
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+				{[1, 2, 3].map(i => (
+					<div key={i} className="h-48 bg-foreground/5 rounded-xl" />
 				))}
 			</div>
 		</div>
@@ -30,22 +31,99 @@ function AchievementsSkeleton() {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────
-
 const getCategoryDetails = (category: string) => {
 	switch (category.toLowerCase()) {
 		case 'hackathon':
-			return { icon: <Target className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Target };
+			return { icon: <Target className="w-4 h-4 text-amber-400" />, fallback: Target };
 		case 'competition':
-			return { icon: <Medal className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Medal };
+			return { icon: <Medal className="w-4 h-4 text-primary" />, fallback: Medal };
 		case 'opensource':
-			return { icon: <Star className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Star };
+			return { icon: <Star className="w-4 h-4 text-cyan-400" />, fallback: Star };
 		default:
-			return { icon: <Award className="w-5 h-5" style={{ color: 'var(--theme-primary)' }} />, fallback: Award };
+			return { icon: <Award className="w-4 h-4 text-primary" />, fallback: Award };
 	}
 };
 
-// ─── Achievement Card ───────────────────────────────────────────
+// ─── Trophy Stage Card (Featured Achievement) ───────────────────
+function TrophyStageCard({ achievement }: { achievement: Achievement }) {
+	const link = achievement.url || achievement.proofUrl;
 
+	return (
+		<motion.div
+			initial={{ opacity: 0, y: 15 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.35 }}
+			className="mb-6 sm:mb-8"
+		>
+			<SpotlightCard
+				tilt={false}
+				className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-card/50 to-card/40 backdrop-blur-xl p-5 sm:p-7 md:p-8 relative overflow-hidden group shadow-md hover:border-amber-500/50 transition-all"
+			>
+				{/* Background Trophy Glow */}
+				<div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none -z-10" />
+
+				<div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+					<div className="flex items-start gap-4">
+						{/* Trophy Emblem */}
+						<div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 shrink-0 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+							<Trophy className="w-7 h-7 sm:w-8 sm:h-8" />
+						</div>
+
+						{/* Narrative */}
+						<div>
+							<div className="flex flex-wrap items-center gap-2 mb-1.5">
+								<span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-mono uppercase tracking-wider font-bold">
+									★ National Honor
+								</span>
+								{achievement.rank && (
+									<span className="px-2 py-0.5 rounded-full bg-foreground/5 border border-border text-[11px] font-mono text-foreground font-medium">
+										{achievement.rank}
+									</span>
+								)}
+								{achievement.event && (
+									<span className="text-xs font-mono text-muted-foreground">
+										{achievement.event}
+									</span>
+								)}
+							</div>
+
+							<h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground tracking-tight font-sans">
+								{achievement.title}
+							</h3>
+
+							{achievement.issuer && (
+								<p className="text-xs font-mono text-amber-400/90 font-medium mt-1">
+									Issued by: {achievement.issuer}
+								</p>
+							)}
+
+							{achievement.description && (
+								<p className="text-xs sm:text-sm text-foreground/80 font-sans leading-relaxed mt-2.5 max-w-2xl">
+									{achievement.description}
+								</p>
+							)}
+						</div>
+					</div>
+
+					{/* Action */}
+					{link && (
+						<a
+							href={link}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-semibold text-xs font-mono uppercase tracking-wider hover:bg-amber-500/25 transition-all shrink-0 shadow-xs self-stretch sm:self-auto justify-center"
+						>
+							<span>View Verification</span>
+							<ExternalLink className="w-3.5 h-3.5" />
+						</a>
+					)}
+				</div>
+			</SpotlightCard>
+		</motion.div>
+	);
+}
+
+// ─── Standard Achievement Card ──────────────────────────────────
 const AchievementCard = memo(function AchievementCard({
 	achievement,
 }: {
@@ -58,96 +136,54 @@ const AchievementCard = memo(function AchievementCard({
 		<motion.div variants={staggerItem} className="h-full flex flex-col">
 			<SpotlightCard
 				tilt={true}
-				beam={achievement.featured}
-				className="group relative flex flex-col h-full rounded-xl border border-border/80 hover:border-[var(--theme-primary)]/40 transition-all duration-300 shadow-md hover:shadow-xl overflow-hidden"
+				className="group relative flex flex-col h-full rounded-xl border border-border/60 hover:border-primary/40 bg-card/40 backdrop-blur-xl transition-all duration-300 shadow-sm hover:shadow-md p-4"
 			>
-				{/* Thumbnail — edge-to-edge */}
-				<div className="relative aspect-video overflow-hidden bg-card">
-					<UrlThumbnail
-						url={achievement.proofUrl || achievement.url}
-						title={achievement.title}
-						fallbackIcon={details.fallback}
-						fallbackLabel={achievement.issuer || undefined}
-					/>
-					<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent pointer-events-none" />
+				<div className="flex items-center justify-between gap-2 mb-3">
+					<div className="p-2 rounded-lg bg-surface-2 border border-border/50">
+						{details.icon}
+					</div>
+					{achievement.rank && (
+						<span className="px-2 py-0.5 rounded-md bg-surface-2 border border-border/40 text-[11px] font-mono text-foreground/80">
+							{achievement.rank}
+						</span>
+					)}
 				</div>
 
-				<div className="p-3.5 relative z-10 flex flex-col grow">
-					<div className="flex justify-between items-center mb-2">
-						<div className="p-1.5 rounded-lg bg-card border border-border shadow-md">
-							{details.icon}
-						</div>
-						{achievement.featured && (
-							<div 
-								className="flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-mono font-medium uppercase tracking-wider"
-								style={{
-									background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
-									color: 'var(--theme-primary)',
-									borderColor: 'color-mix(in oklch, var(--theme-primary) 20%, transparent)'
-								}}
-							>
-								<Sparkles className="w-2.5 h-2.5" />
-								Featured
-							</div>
-						)}
+				<h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-1 leading-snug group-hover:text-primary transition-colors font-sans">
+					{achievement.title}
+				</h3>
+
+				{achievement.issuer && (
+					<p className="text-xs font-mono text-muted-foreground mb-2">
+						{achievement.issuer}
+					</p>
+				)}
+
+				{achievement.description && (
+					<p className="text-xs text-muted-foreground/90 leading-relaxed mb-4 grow line-clamp-3 font-sans">
+						{achievement.description}
+					</p>
+				)}
+
+				{link && (
+					<div className="pt-2.5 border-t border-border/40 mt-auto">
+						<a
+							href={link}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:underline"
+						>
+							<span>Verify Certificate</span>
+							<ExternalLink className="w-3 h-3" />
+						</a>
 					</div>
-
-					<h3 className="text-sm sm:text-base font-semibold text-foreground tracking-tight mb-1.5 leading-snug group-hover:text-foreground/90 transition-colors line-clamp-2 font-sans">
-						{achievement.title}
-					</h3>
-
-					{achievement.issuer && (
-						<p className="text-xs font-mono font-medium uppercase tracking-wide mb-2 flex items-center gap-1.5" style={{ color: 'var(--theme-primary)' }}>
-							<span className="w-3 h-[1.5px] rounded-full" style={{ background: 'var(--theme-primary)', opacity: 0.5 }} />
-							{achievement.issuer}
-						</p>
-					)}
-
-					{achievement.description && (
-						<p className="text-xs text-muted-foreground/85 leading-relaxed mb-3 grow line-clamp-2 font-normal font-sans">
-							{achievement.description}
-						</p>
-					)}
-
-					<div className="mt-auto space-y-2.5">
-						{(achievement.rank || achievement.event) && (
-							<div className="flex flex-wrap gap-1.5">
-								{achievement.rank && (
-									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[11px] font-mono font-medium text-foreground">
-										{achievement.rank}
-									</span>
-								)}
-								{achievement.event && (
-									<span className="px-2 py-0.5 rounded-md bg-foreground/5 border border-border text-[11px] font-mono font-medium text-muted-foreground">
-										{achievement.event}
-									</span>
-								)}
-							</div>
-						)}
-
-						{link && (
-							<div className="pt-2.5 border-t border-border/60">
-								<a
-									href={link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="flex items-center gap-1.5 text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground hover:text-[var(--theme-primary)] transition-colors group/link"
-									aria-label={'View certificate for ' + achievement.title}
-								>
-									View Details
-									<ExternalLink className="w-3 h-3 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 transition-transform" />
-								</a>
-							</div>
-						)}
-					</div>
-				</div>
+				)}
 			</SpotlightCard>
 		</motion.div>
 	);
 });
 
 // ─── Main Module ────────────────────────────────────────────────
-
 export function AchievementsModule() {
 	const [achievements, setAchievements] = useState<Achievement[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -168,31 +204,40 @@ export function AchievementsModule() {
 		return () => { cancelled = true; };
 	}, []);
 
+	// Separate featured SIH hackathon from the rest
+	const { featuredAchievement, remainingAchievements } = useMemo(() => {
+		const featured = achievements.find(a => a.featured || a.category.toLowerCase() === 'hackathon');
+		const remaining = achievements.filter(a => a.id !== featured?.id);
+		return { featuredAchievement: featured, remainingAchievements: remaining };
+	}, [achievements]);
+
 	if (loading) return <AchievementsSkeleton />;
 
 	return (
-		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-2 md:pt-3">
+		<div className="h-full w-full pb-16">
+			<div className="px-3 sm:px-6 md:px-8 max-w-7xl mx-auto pt-2 sm:pt-4">
 				<SectionHeader
 					icon={Trophy}
-					title="Achievements"
-					description="Hackathon wins, open-source milestones, and competitive programming ranks."
+					index="06"
+					tag="AWARDS"
+					title="Honors & Achievements"
+					description="National hackathon honors, competitive programming milestones, and technical awards."
 					sectionId="achievements"
 				/>
 
-				{achievements.length === 0 ? (
-					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
-						No achievements found.
-					</div>
-				) : (
+				{/* Featured Trophy Card */}
+				{featuredAchievement && <TrophyStageCard achievement={featuredAchievement} />}
+
+				{/* Secondary Grid */}
+				{remainingAchievements.length > 0 && (
 					<motion.div
 						variants={staggerContainer}
 						initial="hidden"
 						whileInView="visible"
 						viewport={{ once: true, margin: '-40px' }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4.5 mt-4"
+						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4"
 					>
-						{achievements.map(achievement => (
+						{remainingAchievements.map(achievement => (
 							<AchievementCard key={achievement.id} achievement={achievement} />
 						))}
 					</motion.div>
