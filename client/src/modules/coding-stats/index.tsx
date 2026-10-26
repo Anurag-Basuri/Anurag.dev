@@ -151,8 +151,8 @@ export function CodingStatsModule() {
 	}
 
 	return (
-		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
+		<div className="w-full min-h-full pb-20 sm:pb-28">
+			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6">
 				<SectionHeader
 					icon={Terminal}
 					index="07"
