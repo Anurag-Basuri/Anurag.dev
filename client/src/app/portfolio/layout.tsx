@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Power, Maximize2 } from 'lucide-react';
 import { AgentWidget } from '@/modules/agent';
+import { MobileDock } from '@/layout/MobileDock';
 
 const ResizableSidebar = dynamic(() => import('@/layout/ResizableSidebar').then(m => m.ResizableSidebar), {
 	ssr: false,
@@ -75,6 +76,9 @@ export default function PortfolioLayout({ children }: { children: ReactNode }) {
 									</ErrorBoundary>
 								</main>
 							</div>
+
+							{/* Floating Mobile Dock (visible only on mobile screens < md) */}
+							<MobileDock />
 						</motion.div>
 					)}
 				</AnimatePresence>

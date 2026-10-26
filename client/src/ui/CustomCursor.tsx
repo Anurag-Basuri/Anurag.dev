@@ -24,6 +24,7 @@ export function CustomCursor() {
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
+		if (window.matchMedia('(pointer: coarse)').matches) return;
 
 		const canvas = canvasRef.current;
 		if (!canvas) return;
