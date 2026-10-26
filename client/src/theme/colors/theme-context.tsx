@@ -62,8 +62,16 @@ export function ThemeContextProvider({ children }: { children: ReactNode }) {
 		s.setProperty('--accent', theme.accent);
 		s.setProperty('--accent-foreground', theme.accentFg);
 		s.setProperty('--border', theme.border);
+		s.setProperty('--border-subtle', theme.borderSubtle);
+		s.setProperty('--border-hover', theme.borderHover);
 		s.setProperty('--input', theme.input);
 		s.setProperty('--ring', theme.ring);
+
+		// ── Elevation Surfaces ──
+		s.setProperty('--surface-0', theme.surface0);
+		s.setProperty('--surface-1', theme.surface1);
+		s.setProperty('--surface-2', theme.surface2);
+		s.setProperty('--surface-3', theme.surface3);
 
 		// ── Sidebar ──
 		s.setProperty('--sidebar', theme.sidebar);

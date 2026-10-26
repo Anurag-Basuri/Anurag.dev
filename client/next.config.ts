@@ -39,13 +39,24 @@ const nextConfig: NextConfig = {
 		];
 	},
 
-	// Experimental features
-	experimental: {
-		optimizePackageImports: ['lucide-react', 'framer-motion'],
-	},
+
 
 	// Headers for better caching
 	async headers() {
+		if (process.env.NODE_ENV !== 'production') {
+			return [
+				{
+					source: '/:path*',
+					headers: [
+						{
+							key: 'Cache-Control',
+							value: 'no-cache, no-store, must-revalidate',
+						},
+					],
+				},
+			];
+		}
+
 		return [
 			{
 				source: '/:all*(svg|jpg|png|webp|avif)',
