@@ -1,620 +1,665 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-	User,
 	MapPin,
-	Briefcase,
-	ChevronRight,
 	FileText,
-	CheckCircle2,
-	Globe,
-	Layers,
+	Mail,
+	Check,
+	Copy,
 	ExternalLink,
 	Zap,
+	Sparkles,
+	Code2,
+	ChevronRight,
+	Terminal,
+	Layers,
+	GitBranch,
+	Award,
+	GraduationCap,
+	Briefcase,
 } from 'lucide-react';
 import Link from 'next/link';
-import { publicService } from '@/api';
-import type { Profile } from '@/api/schema';
+import { useAtom } from 'jotai';
+import { useProfile, useProjects, activeSkillFilterAtom } from '@/api';
 import { cn } from '@/lib/utils';
 import { getSkillIcon } from '@/lib/skill-icons';
 import {
 	SiGithub,
 	SiX,
+	SiLeetcode,
 	SiYoutube,
 	SiInstagram,
-	SiFacebook,
 	SiDiscord,
-	SiMedium,
-	SiDevdotto,
-	SiHashnode,
-	SiStackoverflow,
-	SiReddit,
-	SiTwitch,
-	SiDribbble,
-	SiBehance,
 } from 'react-icons/si';
 import { FaLinkedinIn } from 'react-icons/fa6';
-import { fadeInUp, staggerContainer, staggerFast, staggerFastItem } from '@/animations/motion';
+import { fadeInUp, staggerContainer } from '@/animations/motion';
 import { SpotlightCard } from '@/ui/SpotlightCard';
+import { SectionHeader } from '@/ui/SectionHeader';
+import { useCountUp } from '@/hooks/useCountUp';
 
-// â”€â”€â”€ Social Platform Icon Map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-const SOCIAL_ICONS: Record<
-	string,
-	{ icon: React.ComponentType<{ className?: string }>; label: string; color: string }
-> = {
-	GITHUB: { icon: SiGithub, label: 'GitHub', color: '#181717' },
-	LINKEDIN: { icon: FaLinkedinIn, label: 'LinkedIn', color: '#0A66C2' },
-	X: { icon: SiX, label: 'X (Twitter)', color: '#000000' },
-	TWITTER: { icon: SiX, label: 'X (Twitter)', color: '#000000' },
-	YOUTUBE: { icon: SiYoutube, label: 'YouTube', color: '#FF0000' },
-	INSTAGRAM: { icon: SiInstagram, label: 'Instagram', color: '#E4405F' },
-	FACEBOOK: { icon: SiFacebook, label: 'Facebook', color: '#1877F2' },
-	DISCORD: { icon: SiDiscord, label: 'Discord', color: '#5865F2' },
-	MEDIUM: { icon: SiMedium, label: 'Medium', color: '#000000' },
-	DEVTO: { icon: SiDevdotto, label: 'Dev.to', color: '#0A0A0A' },
-	HASHNODE: { icon: SiHashnode, label: 'Hashnode', color: '#2962FF' },
-	STACKOVERFLOW: { icon: SiStackoverflow, label: 'Stack Overflow', color: '#F58025' },
-	REDDIT: { icon: SiReddit, label: 'Reddit', color: '#FF4500' },
-	TWITCH: { icon: SiTwitch, label: 'Twitch', color: '#9146FF' },
-	DRIBBBLE: { icon: SiDribbble, label: 'Dribbble', color: '#EA4C89' },
-	BEHANCE: { icon: SiBehance, label: 'Behance', color: '#1769FF' },
+// ─── Social Platform Helpers ──────────────────────────────────────────────────
+const SOCIAL_ICONS: Record<string, { icon: React.ComponentType<{ className?: string }>; color: string }> = {
+	GITHUB: { icon: SiGithub, color: '#f1f5f9' },
+	LINKEDIN: { icon: FaLinkedinIn, color: '#0A66C2' },
+	X: { icon: SiX, color: '#f1f5f9' },
+	TWITTER: { icon: SiX, color: '#1DA1F2' },
+	LEETCODE: { icon: SiLeetcode, color: '#FFA116' },
+	DISCORD: { icon: SiDiscord, color: '#5865F2' },
+	YOUTUBE: { icon: SiYoutube, color: '#FF0000' },
+	INSTAGRAM: { icon: SiInstagram, color: '#E4405F' },
 };
 
-function getSocialIcon(platform: string) {
-	return (
-		SOCIAL_ICONS[platform.toUpperCase()] ?? {
-			icon: ExternalLink,
-			label: platform,
-			color: '#888888',
-		}
-	);
+function getSocialInfo(platform: string) {
+	return SOCIAL_ICONS[platform.toUpperCase()] ?? { icon: ExternalLink, color: '#888888' };
 }
 
-// â”€â”€â”€ Typing Animation Hook â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-function useTypingAnimation(text: string, speed = 35, startDelay = 500) {
-	const [displayed, setDisplayed] = useState('');
-	const [isDone, setIsDone] = useState(false);
-
-	useEffect(() => {
-		if (!text) return;
-		setDisplayed('');
-		setIsDone(false);
-
-		const startTimeout = setTimeout(() => {
-			let i = 0;
-			const interval = setInterval(() => {
-				i++;
-				setDisplayed(text.slice(0, i));
-				if (i >= text.length) {
-					clearInterval(interval);
-					setIsDone(true);
-				}
-			}, speed);
-			return () => clearInterval(interval);
-		}, startDelay);
-
-		return () => clearTimeout(startTimeout);
-	}, [text, speed, startDelay]);
-
-	return { displayed, isDone };
-}
-
-// â”€â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-function ProfileSkeleton() {
-	return (
-		<div className="w-full animate-pulse px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pt-10 pb-12">
-			<div className="flex flex-col md:flex-row gap-10">
-				<div className="w-44 h-44 md:w-56 md:h-56 bg-foreground/5 rounded-3xl shrink-0" />
-				<div className="flex-1 space-y-4 pt-2">
-					<div className="h-10 w-72 bg-foreground/5 rounded-xl" />
-					<div className="h-5 w-96 bg-foreground/5 rounded-lg" />
-					<div className="h-5 w-64 bg-foreground/5 rounded-lg" />
-					<div className="flex gap-3 mt-4">
-						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
-						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
-						<div className="h-10 w-10 bg-foreground/5 rounded-full" />
-					</div>
-				</div>
-			</div>
-			<div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4">
-				{[1, 2, 3].map(i => (
-					<div key={i} className="h-24 bg-foreground/5 rounded-2xl" />
-				))}
-			</div>
-			<div className="mt-8 h-40 bg-foreground/5 rounded-3xl" />
-			<div className="mt-6 h-80 bg-foreground/5 rounded-3xl" />
-		</div>
-	);
-}
-
-// â”€â”€â”€ Helper: Stat Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-function StatCard({
-	icon: Icon,
-	label,
+// ─── Animated Telemetry Counter Component ─────────────────────────────────────
+function TelemetryNumber({
 	value,
-	colorClass,
-	children,
+	decimals = 0,
+	suffix = '',
+	prefix = '',
 }: {
-	icon: React.ComponentType<{ className?: string }>;
-	label: string;
-	value: string;
-	colorClass: string;
-	children?: React.ReactNode;
+	value: number;
+	decimals?: number;
+	suffix?: string;
+	prefix?: string;
 }) {
-	const [hovered, setHovered] = useState(false);
+	const { formatted } = useCountUp({ end: value, decimals, suffix, prefix, duration: 1200 });
+	return <span className="tabular-nums font-mono font-bold text-foreground">{formatted}</span>;
+}
 
+// ─── Bento Grid Skeleton ──────────────────────────────────────────────────────
+function ProfileBentoSkeleton() {
 	return (
-		<div
-			className="relative flex-1"
-			onMouseEnter={() => setHovered(true)}
-			onMouseLeave={() => setHovered(false)}
-		>
-			<SpotlightCard
-				tilt={true}
-				className="flex flex-col justify-center p-4 sm:p-5 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/80 hover:border-primary/40 transition-all shadow-sm hover:shadow-lg cursor-default h-full"
-			>
-				<div className="flex items-center gap-4 relative z-10">
-					<motion.div
-						animate={hovered ? { scale: 1.15, rotate: 5 } : { scale: 1, rotate: 0 }}
-						transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-						className={cn(
-							'p-3 rounded-xl border bg-background shadow-inner transition-colors',
-							colorClass.replace('bg-', 'text-'),
-						)}
-					>
-						<Icon className="w-5 h-5" />
-					</motion.div>
-					<div>
-						<p className="text-[11px] sm:text-xs font-mono font-medium text-muted-foreground uppercase tracking-wide mb-1">
-							{label}
-						</p>
-						<p className="text-base sm:text-lg font-mono font-bold text-foreground tracking-tight leading-none tabular-nums">
-							{value}
-						</p>
-					</div>
-				</div>
-			</SpotlightCard>
-
-			{/* Hover popover */}
-			<AnimatePresence>
-				{hovered && children && (
-					<motion.div
-						initial={{ opacity: 0, y: 8, scale: 0.95 }}
-						animate={{ opacity: 1, y: 0, scale: 1 }}
-						exit={{ opacity: 0, y: 8, scale: 0.95 }}
-						transition={{ duration: 0.15 }}
-						className="absolute left-0 right-0 top-full mt-2 z-50 p-4 rounded-2xl bg-card border border-border shadow-xl backdrop-blur-xl"
-					>
-						{children}
-					</motion.div>
-				)}
-			</AnimatePresence>
+		<div className="w-full max-w-7xl mx-auto px-3 sm:px-6 md:px-8 py-6 animate-pulse space-y-4">
+			<div className="h-10 w-64 rounded-xl bg-foreground/5 mb-4" />
+			<div className="h-96 rounded-2xl bg-foreground/5" />
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div className="h-48 rounded-2xl bg-foreground/5" />
+				<div className="h-48 rounded-2xl bg-foreground/5" />
+				<div className="h-48 rounded-2xl bg-foreground/5" />
+			</div>
 		</div>
 	);
 }
 
-// â”€â”€â”€ Helper: Social Button with Tooltip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-function SocialButton({
-	social,
-}: {
-	social: { id: string; platform: string; url: string; customLabel?: string | null };
-}) {
-	const { icon: SocialIcon, label } = getSocialIcon(social.platform);
-	const [showTooltip, setShowTooltip] = useState(false);
-
-	return (
-		<div
-			className="relative"
-			onMouseEnter={() => setShowTooltip(true)}
-			onMouseLeave={() => setShowTooltip(false)}
-		>
-			<a
-				href={social.url}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="w-10 h-10 rounded-full bg-foreground/5 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/10 hover:scale-110 transition-all duration-200"
-			>
-				<SocialIcon className="w-4 h-4" />
-			</a>
-			<AnimatePresence>
-				{showTooltip && (
-					<motion.div
-						initial={{ opacity: 0, y: 4 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 4 }}
-						transition={{ duration: 0.12 }}
-						className="absolute -bottom-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-foreground text-background text-[10px] font-bold whitespace-nowrap z-50 shadow-lg"
-					>
-						{social.customLabel || label}
-						<div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-foreground rotate-45" />
-					</motion.div>
-				)}
-			</AnimatePresence>
-		</div>
-	);
-}
-
-// â”€â”€â”€ Typing Tagline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-function TypingTagline({ text }: { text: string }) {
-	const { displayed, isDone } = useTypingAnimation(text, 35, 500);
-
-	return (
-		<p className="text-base sm:text-lg md:text-xl font-medium text-muted-foreground max-w-2xl tracking-tight leading-relaxed min-h-7">
-			{displayed}
-			{!isDone && (
-				<span className="inline-block w-[2px] h-5 bg-primary ml-0.5 animate-pulse align-text-bottom" />
-			)}
-		</p>
-	);
-}
-
-// â”€â”€â”€ Main Module â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
+// ─── Main Profile Module ──────────────────────────────────────────────────────
 export function ProfileModule() {
-	const [profile, setProfile] = useState<Profile | null>(null);
-	const [loading, setLoading] = useState(true);
-	const [lightboxOpen, setLightboxOpen] = useState(false);
+	const { profile, loading } = useProfile();
+	const { projects } = useProjects();
+	const [activeSkillFilter, setActiveSkillFilter] = useAtom(activeSkillFilterAtom);
 
-	useEffect(() => {
-		let cancelled = false;
-		async function fetchProfile() {
-			try {
-				const { data } = await publicService.getProfile();
-				if (!cancelled) setProfile(data);
-			} catch (err) {
-				console.error('Failed to load profile', err);
-			} finally {
-				if (!cancelled) setLoading(false);
-			}
-		}
-		fetchProfile();
-		return () => {
-			cancelled = true;
-		};
+	const [copied, setCopied] = useState(false);
+	const [lightboxOpen, setLightboxOpen] = useState(false);
+	const [expandedArsenal, setExpandedArsenal] = useState(false);
+
+	const copyEmail = useCallback((email: string) => {
+		navigator.clipboard.writeText(email);
+		setCopied(true);
+		setTimeout(() => setCopied(false), 2000);
 	}, []);
 
-	if (loading) return <ProfileSkeleton />;
-	if (!profile) return null;
+	// Group core skills for the interactive radar
+	const coreSkills = useMemo(() => {
+		if (!profile.skills) return [];
+		const list: Array<{ name: string; category: string }> = [];
+		Object.entries(profile.skills).forEach(([category, items]) => {
+			items.forEach(skill => {
+				list.push({ name: skill, category });
+			});
+		});
+		return list;
+	}, [profile.skills]);
 
-	const tagline = profile.Tagline || profile.header || 'Digital Creator & Engineer';
-	const header = profile.Tagline && profile.header ? profile.header : null;
-	const isAvailable = profile.openToWork;
-	const socialLinks = profile.socialLinks ?? [];
-	const activeWorkPrefs = profile.workPreferences
-		? Object.entries(profile.workPreferences)
-				.filter(([_, v]) => v === true)
-				.map(([k]) => k)
-		: [];
+	// Calculate which skills are utilized in actual projects
+	const skillProjectCount = useMemo(() => {
+		const map: Record<string, number> = {};
+		projects.forEach(project => {
+			project.techStack.forEach(t => {
+				const norm = t.toLowerCase();
+				map[norm] = (map[norm] || 0) + 1;
+			});
+		});
+		return map;
+	}, [projects]);
+
+	if (loading && !profile) return <ProfileBentoSkeleton />;
+
+	const email = profile.email || 'basurianurag@gmail.com';
+	const isAvailable = profile.openToWork ?? true;
 
 	return (
 		<>
-		{/* Lightbox Modal */}
-		<AnimatePresence>
-			{lightboxOpen && profile?.avatarUrl && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					transition={{ duration: 0.2 }}
-					className="fixed inset-0 z-100 flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer"
-					onClick={() => setLightboxOpen(false)}
-					onKeyDown={(e) => e.key === 'Escape' && setLightboxOpen(false)}
-					role="dialog"
-					tabIndex={0}
-				>
-					<motion.img
-						initial={{ scale: 0.8, opacity: 0 }}
-						animate={{ scale: 1, opacity: 1 }}
-						exit={{ scale: 0.8, opacity: 0 }}
-						transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-						src={profile.avatarUrl}
-						alt={profile.name}
-						className="max-h-[85vh] max-w-[90vw] object-contain rounded-3xl shadow-2xl cursor-default"
-						onClick={(e) => e.stopPropagation()}
+			{/* Lightbox for Profile Photo */}
+			<AnimatePresence>
+				{lightboxOpen && profile.avatarUrl && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 cursor-pointer"
+						onClick={() => setLightboxOpen(false)}
+					>
+						<motion.img
+							initial={{ scale: 0.9, opacity: 0 }}
+							animate={{ scale: 1, opacity: 1 }}
+							exit={{ scale: 0.9, opacity: 0 }}
+							transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+							src={profile.avatarUrl}
+							alt={profile.name}
+							className="max-h-[85vh] max-w-[90vw] object-contain rounded-3xl border border-white/10 shadow-2xl"
+							onClick={e => e.stopPropagation()}
+						/>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			<div className="w-full min-h-full pb-16 sm:pb-20">
+				{/* Soft Ambient Obsidian Glow (Quiet, less contrasty) */}
+				<div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[140px] -z-10 pointer-events-none" />
+				<div className="absolute top-1/3 left-0 w-[450px] h-[450px] bg-secondary/5 rounded-full blur-[140px] -z-10 pointer-events-none" />
+
+				<div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 pt-2 sm:pt-4">
+					{/* ══════════════════════════════════════════════════════════════════
+					    01 · SECTION HEADER (Matching BootScreen DNA)
+					    ══════════════════════════════════════════════════════════════════ */}
+					<SectionHeader
+						icon={Terminal}
+						index="01"
+						tag="SYSTEM DOSSIER"
+						title="Overview & Architecture"
+						description="Full Stack Engineer & AI Systems Architect specialized in high-performance web applications."
+						sectionId="profile"
 					/>
-				</motion.div>
-			)}
-		</AnimatePresence>
 
-		<div className="w-full relative min-h-full pb-20">
-			{/* Ambient Background Glows */}
-			<div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
-			<div className="absolute top-1/3 left-0 w-[500px] h-[500px] bg-secondary/15 rounded-full blur-[140px] -z-10 pointer-events-none mix-blend-screen" />
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						animate="visible"
+						className="space-y-4 sm:space-y-6"
+					>
+						{/* ══════════════════════════════════════════════════════════════════
+						    STAGE FEATURE CARD: Primary Engineering Dossier (Span 12)
+						    Mirrors the Stage Feature Card of Section 02 Projects!
+						    ══════════════════════════════════════════════════════════════════ */}
+						<motion.div variants={fadeInUp}>
+							<SpotlightCard
+								tilt={false}
+								className="rounded-2xl border border-border/40 hover:border-border/70 bg-card/30 backdrop-blur-xl overflow-hidden transition-all shadow-sm group"
+							>
+								{/* Blueprint Header Bar */}
+								<div className="px-4 sm:px-6 py-2.5 border-b border-border/40 bg-background/30 flex items-center justify-between text-xs font-mono text-muted-foreground select-none">
+									<div className="flex items-center gap-2">
+										<span className="text-primary font-bold">// 01</span>
+										<span className="text-muted-foreground/80 tracking-wider uppercase">SYSTEM DOSSIER</span>
+										<span className="text-border/60">·</span>
+										<span className="text-muted-foreground/60 hidden sm:inline">ANURAG BASURI</span>
+									</div>
 
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 pt-8 sm:pt-12 relative z-10">
-				<motion.div
-					variants={staggerContainer}
-					initial="hidden"
-					animate="visible"
-					className="flex flex-col"
-				>
-					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-					    HERO â€” Large Photo + Identity
-					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-					<div className="flex flex-col md:flex-row gap-8 md:gap-14 items-center md:items-center">
-						{/* Profile Photo â€” very large */}
-						<motion.div
-							variants={fadeInUp}
-							className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-4xl overflow-hidden border-2 border-border/60 bg-card shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] shrink-0 group cursor-pointer"
-							onClick={() => profile.avatarUrl && setLightboxOpen(true)}
-						>
-							{profile.avatarUrl ? (
-								<img
-									src={profile.avatarUrl}
-									alt={profile.name}
-									className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-								/>
-							) : (
-								<div className="w-full h-full flex items-center justify-center bg-muted">
-									<User className="w-28 h-28 text-muted-foreground/50" />
+									{/* Availability Status */}
+									{isAvailable ? (
+										<div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[11px] font-medium">
+											<span className="relative flex h-2 w-2">
+												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+												<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+											</span>
+											<span>Open for Roles · {profile.noticePeriod || 'Immediate'}</span>
+										</div>
+									) : (
+										<span className="text-[11px] font-mono text-muted-foreground/60">System Operational</span>
+									)}
 								</div>
-							)}
-							<div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-4xl pointer-events-none" />
+
+								{/* Dossier Body: 2 Columns */}
+								<div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+									{/* Left Column: Identity, Bio, & Quick Actions (7 cols) */}
+									<div className="lg:col-span-7 p-5 sm:p-7 md:p-8 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between space-y-6">
+										<div>
+											{/* Avatar + Main Title Row */}
+											<div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 mb-5">
+												<div
+													onClick={() => profile.avatarUrl && setLightboxOpen(true)}
+													className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-border/50 bg-surface-2 shrink-0 group cursor-pointer shadow-sm"
+												>
+													{profile.avatarUrl ? (
+														<img
+															src={profile.avatarUrl}
+															alt={profile.name}
+															className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+														/>
+													) : (
+														<div className="w-full h-full flex items-center justify-center font-mono font-bold text-lg text-primary">
+															AB
+														</div>
+													)}
+													<div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors" />
+												</div>
+
+												<div className="flex-1 min-w-0">
+													<div className="flex items-center gap-2 text-xs font-mono text-primary/80 uppercase tracking-widest mb-1">
+														<span>&lt;AB /&gt;</span>
+														<span>·</span>
+														<span>Full-Stack & AI Systems</span>
+													</div>
+
+													<h1 className="text-2xl sm:text-3xl font-light tracking-[0.06em] text-foreground/95 uppercase font-sans leading-tight">
+														{profile.name}
+													</h1>
+
+													<p className="text-xs sm:text-sm font-medium text-primary/90 mt-1 font-mono">
+														{profile.header || 'Full Stack Engineer & AI Systems Developer'}
+													</p>
+
+													<div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground/75 font-mono">
+														<MapPin className="w-3.5 h-3.5 text-muted-foreground/60" />
+														<span>{profile.Currentlocation || 'Jamshedpur, India'}</span>
+														<span className="text-border">•</span>
+														<span className="text-emerald-400/80">Remote / Hybrid</span>
+													</div>
+												</div>
+											</div>
+
+											{/* Concise Engineering Philosophy */}
+											<p className="text-xs sm:text-sm text-muted-foreground/85 leading-relaxed font-sans border-t border-border/30 pt-4">
+												Architecting high-performance, fault-tolerant web applications and autonomous AI agent workflows. Focused on clean system design, React/Next.js internals, scalable Node/Postgres backends, and tangible user delight.
+											</p>
+										</div>
+
+										{/* Quick Channels & Action Deck */}
+										<div className="pt-4 border-t border-border/30 space-y-3">
+											<div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+												<Link
+													href="/resume"
+													className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/25 hover:border-primary/50 text-foreground text-xs font-mono font-medium transition-all hover:bg-primary/15 group"
+												>
+													<span className="flex items-center gap-2">
+														<FileText className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+														<span>Interactive Resume</span>
+													</span>
+													<ChevronRight className="w-3 h-3 text-primary group-hover:translate-x-0.5 transition-transform" />
+												</Link>
+
+												<button
+													onClick={() => copyEmail(email)}
+													className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-surface-2/60 border border-border/40 hover:border-border text-foreground text-xs font-mono font-medium transition-all hover:bg-surface-2 group cursor-pointer"
+												>
+													<span className="flex items-center gap-2 truncate">
+														{copied ? (
+															<Check className="w-3.5 h-3.5 text-emerald-400" />
+														) : (
+															<Copy className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+														)}
+														<span className="truncate">{email}</span>
+													</span>
+													<span className="text-[10px] text-muted-foreground shrink-0 ml-1">
+														{copied ? 'Copied ✓' : 'Copy'}
+													</span>
+												</button>
+											</div>
+
+											{/* Social Network Strip */}
+											<div className="flex items-center gap-2">
+												{[
+													{ id: 'gh', platform: 'GITHUB', url: profile.github || 'https://github.com/Anurag-Basuri' },
+													{
+														id: 'li',
+														platform: 'LINKEDIN',
+														url:
+															profile.socialLinks?.find(s => s.platform.toUpperCase() === 'LINKEDIN')?.url ||
+															'https://linkedin.com/in/anuragbasuri',
+													},
+													{
+														id: 'tw',
+														platform: 'X',
+														url:
+															profile.socialLinks?.find(s => ['X', 'TWITTER'].includes(s.platform.toUpperCase()))?.url ||
+															'https://twitter.com/AnuragBasuri',
+													},
+													{ id: 'lc', platform: 'LEETCODE', url: profile.leetcode || 'https://leetcode.com/u/Anurag_Basuri' },
+												].map(social => {
+													const { icon: SocialIcon } = getSocialInfo(social.platform);
+													return (
+														<a
+															key={social.id}
+															href={social.url}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="flex-1 flex items-center justify-center h-8 rounded-lg bg-surface-2/40 border border-border/40 hover:border-border/70 hover:bg-surface-2 text-muted-foreground hover:text-foreground transition-all"
+															title={social.platform}
+														>
+															<SocialIcon className="w-3.5 h-3.5" />
+														</a>
+													);
+												})}
+											</div>
+										</div>
+									</div>
+
+									{/* Right Column: Interactive Tech Radar (5 cols) */}
+									<div className="lg:col-span-5 p-5 sm:p-7 md:p-8 flex flex-col justify-between space-y-4 bg-surface-1/40">
+										<div>
+											<div className="flex items-center justify-between mb-2">
+												<div className="flex items-center gap-2">
+													<Terminal className="w-3.5 h-3.5 text-primary" />
+													<h3 className="text-xs sm:text-sm font-semibold text-foreground/90 font-sans">
+														Technical Radar
+													</h3>
+												</div>
+												{activeSkillFilter && (
+													<button
+														onClick={() => setActiveSkillFilter(null)}
+														className="text-[11px] font-mono text-muted-foreground hover:text-foreground underline transition-colors"
+													>
+														Clear filter
+													</button>
+												)}
+											</div>
+											<p className="text-[11px] text-muted-foreground/75 font-mono mb-4 leading-relaxed">
+												Select or hover any skill to spotlight associated production systems:
+											</p>
+
+											{/* Interactive Skill Chips */}
+											<div className="flex flex-wrap gap-1.5 sm:gap-2">
+												{coreSkills.slice(0, 18).map(({ name, category }) => {
+													const { icon: SkillIcon, color } = getSkillIcon(name);
+													const isSelected = activeSkillFilter?.toLowerCase() === name.toLowerCase();
+													const projectCount = skillProjectCount[name.toLowerCase()] || 0;
+
+													return (
+														<button
+															key={name}
+															onClick={() =>
+																setActiveSkillFilter(isSelected ? null : name)
+															}
+															onMouseEnter={() => setActiveSkillFilter(name)}
+															onMouseLeave={() => setActiveSkillFilter(null)}
+															className={cn(
+																'group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all border cursor-pointer select-none',
+																isSelected
+																	? 'bg-primary/20 border-primary text-foreground shadow-[0_0_10px_rgba(52,211,153,0.2)] scale-105'
+																	: 'bg-surface-2/60 border-border/40 text-foreground/75 hover:text-foreground hover:border-border hover:bg-surface-2',
+															)}
+															title={`${name} (${category}) — Click to spotlight`}
+														>
+															<SkillIcon
+																className="w-3 h-3 transition-transform group-hover:scale-110"
+																style={{ color: isSelected ? 'var(--primary)' : color }}
+															/>
+															<span>{name}</span>
+															{projectCount > 0 && (
+																<span
+																	className={cn(
+																		'text-[10px] px-1 py-0.2 rounded font-mono',
+																		isSelected
+																			? 'bg-primary/30 text-primary-foreground font-semibold'
+																			: 'bg-foreground/5 text-muted-foreground group-hover:text-foreground',
+																	)}
+																>
+																	{projectCount}
+																</span>
+															)}
+														</button>
+													);
+												})}
+											</div>
+										</div>
+
+										{/* Status hint & Drawer toggle */}
+										<div className="pt-3 border-t border-border/30 flex items-center justify-between text-[11px] font-mono text-muted-foreground/70">
+											<span>Stack: Next.js · React · TS · Node</span>
+											<button
+												onClick={() => setExpandedArsenal(!expandedArsenal)}
+												className="text-primary hover:underline flex items-center gap-1 font-sans text-xs cursor-pointer"
+											>
+												{expandedArsenal ? 'Collapse arsenal' : 'View full stack'}
+												<ChevronRight
+													className={cn(
+														'w-3 h-3 transition-transform',
+														expandedArsenal ? 'rotate-90' : '',
+													)}
+												/>
+											</button>
+										</div>
+									</div>
+								</div>
+							</SpotlightCard>
 						</motion.div>
 
-						{/* Name + Tagline ONLY â€” beside the photo, vertically centered */}
-						<div className="flex-1 flex flex-col justify-center min-w-0 text-center md:text-left">
-							<motion.div variants={fadeInUp}>
-								<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.1] font-sans">
-									{profile.name}
-								</h1>
+						{/* ══════════════════════════════════════════════════════════════════
+						    SECONDARY 3-CARD ROW: Telemetry, Current Focus, Core Domains
+						    Matches the 3-column / 2-column grid layout of other sections!
+						    ══════════════════════════════════════════════════════════════════ */}
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+							{/* Card A: Engineering Telemetry */}
+							<motion.div variants={fadeInUp} className="flex flex-col">
+								<SpotlightCard
+									tilt={false}
+									className="p-5 sm:p-6 flex flex-col justify-between h-full rounded-2xl bg-card/30 border border-border/40 hover:border-border/70 transition-all"
+								>
+									<div>
+										<div className="flex items-center gap-2 mb-4">
+											<GraduationCap className="w-4 h-4 text-emerald-400" />
+											<h3 className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
+												Engineering Telemetry
+											</h3>
+										</div>
+
+										<div className="space-y-3">
+											<div className="flex items-baseline justify-between border-b border-border/20 pb-2">
+												<div>
+													<p className="text-xs font-mono text-muted-foreground/80">Academic CGPA</p>
+													<p className="text-[10px] text-muted-foreground/60 font-mono">B.Tech CSE · LPU</p>
+												</div>
+												<div className="text-lg sm:text-xl">
+													<TelemetryNumber value={9.0} decimals={1} suffix="/10" />
+												</div>
+											</div>
+
+											<div className="flex items-baseline justify-between border-b border-border/20 pb-2">
+												<div>
+													<p className="text-xs font-mono text-muted-foreground/80">Systems Shipped</p>
+													<p className="text-[10px] text-muted-foreground/60 font-mono">Web & AI Architectures</p>
+												</div>
+												<div className="text-lg sm:text-xl">
+													<TelemetryNumber value={profile.projectsCount || 15} suffix="+" />
+												</div>
+											</div>
+
+											<div className="flex items-baseline justify-between">
+												<div>
+													<p className="text-xs font-mono text-muted-foreground/80">Practical Experience</p>
+													<p className="text-[10px] text-muted-foreground/60 font-mono">Production & Open Source</p>
+												</div>
+												<div className="text-lg sm:text-xl">
+													<TelemetryNumber value={profile.experienceYears || 2} suffix=" Yrs" />
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div className="mt-4 pt-3 border-t border-border/30 flex items-center gap-2 text-xs font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1.5 rounded-lg border border-amber-500/20">
+										<Award className="w-3.5 h-3.5 shrink-0" />
+										<span className="truncate">SIH '24 National Finalist</span>
+									</div>
+								</SpotlightCard>
 							</motion.div>
-							<motion.div variants={fadeInUp} className="mt-4">
-								<TypingTagline text={tagline} />
+
+							{/* Card B: Currently Architecting */}
+							<motion.div variants={fadeInUp} className="flex flex-col">
+								<SpotlightCard
+									tilt={false}
+									className="p-5 sm:p-6 flex flex-col justify-between h-full rounded-2xl bg-card/30 border border-border/40 hover:border-border/70 transition-all"
+								>
+									<div>
+										<div className="flex items-center justify-between mb-3">
+											<div className="flex items-center gap-2 text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
+												<Zap className="w-4 h-4 text-amber-400" />
+												<span>Currently Building</span>
+											</div>
+											<span className="flex h-2 w-2 relative">
+												<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+												<span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
+											</span>
+										</div>
+
+										<div className="p-3 rounded-xl bg-surface-2/40 border border-border/30 mb-2.5">
+											<div className="flex items-center gap-2 mb-1">
+												<Code2 className="w-3.5 h-3.5 text-cyan-400" />
+												<h4 className="text-xs font-semibold text-foreground/90 font-sans">
+													JobFlow AI Platform
+												</h4>
+											</div>
+											<p className="text-[11px] text-muted-foreground/80 leading-relaxed font-sans">
+												Automated application tracker with resume tailored embeddings, Gemini pipeline, and sub-100ms sync.
+											</p>
+										</div>
+
+										<div className="p-3 rounded-xl bg-surface-2/40 border border-border/30">
+											<div className="flex items-center gap-2 mb-1">
+												<Sparkles className="w-3.5 h-3.5 text-purple-400" />
+												<h4 className="text-xs font-semibold text-foreground/90 font-sans">
+													Autonomous Agent OS
+												</h4>
+											</div>
+											<p className="text-[11px] text-muted-foreground/80 leading-relaxed font-sans">
+												SSE-streamed multi-tool execution workspace with live terminal introspection.
+											</p>
+										</div>
+									</div>
+
+									<div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between text-[11px] font-mono text-muted-foreground/70">
+										<span className="flex items-center gap-1.5">
+											<GitBranch className="w-3.5 h-3.5" />
+											Active Commits
+										</span>
+										<a
+											href="https://github.com/Anurag-Basuri"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-primary hover:underline flex items-center gap-1"
+										>
+											GitHub
+											<ExternalLink className="w-3 h-3" />
+										</a>
+									</div>
+								</SpotlightCard>
+							</motion.div>
+
+							{/* Card C: Core Architectural Domains */}
+							<motion.div variants={fadeInUp} className="flex flex-col">
+								<SpotlightCard
+									tilt={false}
+									className="p-5 sm:p-6 flex flex-col justify-between h-full rounded-2xl bg-card/30 border border-border/40 hover:border-border/70 transition-all"
+								>
+									<div>
+										<div className="flex items-center gap-2 mb-3">
+											<Layers className="w-4 h-4 text-primary" />
+											<h3 className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
+												Core Architectures
+											</h3>
+										</div>
+
+										<div className="space-y-2.5">
+											<div className="p-2.5 rounded-lg bg-surface-2/30 border border-border/25">
+												<p className="text-xs font-semibold text-foreground/90 font-mono">01. Autonomous AI Agents</p>
+												<p className="text-[11px] text-muted-foreground/75 mt-0.5">SSE streaming, function calling, tool execution pipelines.</p>
+											</div>
+
+											<div className="p-2.5 rounded-lg bg-surface-2/30 border border-border/25">
+												<p className="text-xs font-semibold text-foreground/90 font-mono">02. Modern Next.js Internals</p>
+												<p className="text-[11px] text-muted-foreground/75 mt-0.5">App router, server components, optimistic zero-flicker UI.</p>
+											</div>
+
+											<div className="p-2.5 rounded-lg bg-surface-2/30 border border-border/25">
+												<p className="text-xs font-semibold text-foreground/90 font-mono">03. Resilient Distributed Backends</p>
+												<p className="text-[11px] text-muted-foreground/75 mt-0.5">Node.js, PostgreSQL/Neon, Prisma ORM, Redis caching.</p>
+											</div>
+										</div>
+									</div>
+
+									<button
+										onClick={() =>
+											window.dispatchEvent(
+												new CustomEvent('scroll-to-section', { detail: { sectionId: 'projects' } }),
+											)
+										}
+										className="mt-4 w-full py-2 px-3 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-border/40 text-foreground font-mono text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+									>
+										<span>Explore Featured Systems</span>
+										<ChevronRight className="w-3.5 h-3.5 text-primary" />
+									</button>
+								</SpotlightCard>
 							</motion.div>
 						</div>
-					</div>
 
-					{/* â•â•â• DETAILS STRIP (below photo+name) â•â•â• */}
-					<div className="mt-8 flex flex-col items-center md:items-start gap-5">
-						{/* Header / Role */}
-						{header && (
-							<motion.p
-								variants={fadeInUp}
-								className="text-base sm:text-lg font-semibold text-primary tracking-tight"
-							>
-								{header}
-							</motion.p>
-						)}
-
-						{/* Status Badges */}
-						<motion.div
-							variants={fadeInUp}
-							className="flex flex-wrap items-center justify-center md:justify-start gap-2"
-						>
-							{profile.pronouns && (
-								<span className="px-3 py-1.5 rounded-full bg-foreground/5 border border-border text-[11px] font-mono font-medium text-muted-foreground tracking-wide uppercase">
-									{profile.pronouns}
-								</span>
-							)}
-							{isAvailable && (
-								<div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
-									<span className="relative flex h-2 w-2">
-										<span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-										<span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-									</span>
-									{profile.noticePeriod
-										? `Available Â· ${profile.noticePeriod}`
-										: 'Open to Work'}
-								</div>
-							)}
-							{profile.Freelancing && (
-								<div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full">
-									<Zap className="w-3 h-3" />
-									Freelance Ready
-								</div>
-							)}
-							{activeWorkPrefs.map(pref => (
-								<span
-									key={pref}
-									className="px-3 py-1.5 bg-foreground/5 border border-border rounded-full text-[11px] font-mono font-medium text-muted-foreground capitalize tracking-normal"
+						{/* ══════════════════════════════════════════════════════════════════
+						    EXPANDABLE ARSENAL DRAWER (Detailed category-by-category stack)
+						    ══════════════════════════════════════════════════════════════════ */}
+						<AnimatePresence>
+							{expandedArsenal && profile.skills && (
+								<motion.div
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: 'auto' }}
+									exit={{ opacity: 0, height: 0 }}
+									transition={{ duration: 0.3 }}
+									className="overflow-hidden"
 								>
-									{pref}
-								</span>
-							))}
-						</motion.div>
-
-						{/* CTAs + Social */}
-						<motion.div
-							variants={fadeInUp}
-							className="flex flex-wrap items-center justify-center md:justify-start gap-3"
-						>
-							<button
-								onClick={() =>
-									window.dispatchEvent(
-										new CustomEvent('scroll-to-section', {
-											detail: { sectionId: 'contact' },
-										}),
-									)
-								}
-								className="group flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 shadow-[0_0_30px_-8px] shadow-primary/40 hover:shadow-primary/60"
-							>
-								Let&apos;s Connect
-								<ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-							</button>
-
-							{profile.resumeUrl && (
-								<Link
-									href="/resume"
-									className="group flex items-center gap-2 bg-card hover:bg-muted text-foreground px-6 py-2.5 rounded-xl font-bold text-sm transition-all border border-border hover:border-foreground/20 hover:-translate-y-0.5"
-								>
-									Resume
-									<FileText className="w-4 h-4 text-muted-foreground group-hover:scale-110 transition-transform" />
-								</Link>
-							)}
-
-							{socialLinks.length > 0 && (
-								<div className="hidden sm:block w-px h-8 bg-border" />
-							)}
-
-							{socialLinks.length > 0 && (
-								<div className="flex items-center gap-2">
-									{socialLinks.map(social => (
-										<SocialButton key={social.id} social={social} />
-									))}
-								</div>
-							)}
-						</motion.div>
-					</div>
-
-					{/* Subtle separator */}
-					<motion.div
-						variants={fadeInUp}
-						className="mt-12 mb-2 h-px bg-linear-to-r from-transparent via-border to-transparent"
-					/>
-
-					{/* â•â•â• METRICS BAR â•â•â• */}
-					<motion.div
-						variants={fadeInUp}
-						className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
-					>
-						<StatCard
-							icon={MapPin}
-							label="Location"
-							value={profile.Currentlocation ?? 'Remote'}
-							colorClass="bg-blue-500"
-						/>
-						<StatCard
-							icon={Briefcase}
-							label="Experience"
-							value={`${profile.experienceYears}+ Years`}
-							colorClass="bg-purple-500"
-						/>
-						<StatCard
-							icon={Globe}
-							label="Languages"
-							value={
-								profile.languages?.length
-									? `${profile.languages.length} Spoken`
-									: 'Multilingual'
-							}
-							colorClass="bg-emerald-500"
-						>
-							{profile.languages && profile.languages.length > 0 && (
-								<div className="space-y-2">
-									<p className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
-										Languages I Speak
-									</p>
-									<div className="flex flex-wrap gap-2">
-										{profile.languages.map(lang => (
-											<span
-												key={lang}
-												className="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-bold text-emerald-600 dark:text-emerald-400"
-											>
-												{lang}
-											</span>
-										))}
-									</div>
-								</div>
-							)}
-						</StatCard>
-					</motion.div>
-
-					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-					    BIO SECTION
-					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-					{profile.bio && (
-						<motion.div
-							variants={fadeInUp}
-							className="mt-8 w-full p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-sm relative overflow-hidden"
-						>
-							<div className="absolute left-0 top-0 bottom-0 w-1.5 bg-linear-to-b from-primary to-transparent opacity-50" />
-							<h2 className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2 pl-4">
-								<User className="w-4 h-4" /> About Me
-							</h2>
-							<p className="text-sm sm:text-base text-foreground/85 leading-relaxed whitespace-pre-wrap font-normal pl-4 font-sans">
-								{profile.bio}
-							</p>
-						</motion.div>
-					)}
-
-					{/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-					    TECHNICAL ARSENAL
-					    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
-					{profile.skills && Object.keys(profile.skills).length > 0 && (
-						<motion.div
-							variants={fadeInUp}
-							className="mt-6 w-full p-6 sm:p-8 rounded-3xl bg-card/60 backdrop-blur-2xl border border-border shadow-md relative"
-						>
-							<div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
-
-							<div className="flex items-center gap-3 mb-8">
-								<div className="p-2 rounded-xl bg-primary/10 text-primary">
-									<Layers className="w-5 h-5" />
-								</div>
-								<div>
-									<h2 className="text-lg font-bold text-foreground tracking-tight font-sans">
-										Technical Arsenal
-									</h2>
-									<p className="text-xs font-mono font-medium uppercase tracking-wider text-muted-foreground">
-										Frameworks, Tools & Protocols
-									</p>
-								</div>
-							</div>
-
-							<motion.div
-								variants={staggerFast}
-								initial="hidden"
-								whileInView="visible"
-								viewport={{ once: true, margin: '-50px' }}
-								className="space-y-8"
-							>
-								{Object.entries(profile.skills).map(([category, items]) => (
-									<div key={category}>
-										<div className="flex items-center gap-2 mb-4 pl-1 border-l-2 border-primary/30">
-											<h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
-												{category}
-											</h3>
-											<span className="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs font-mono font-medium">
-												{items.length}
-											</span>
+									<div className="p-6 sm:p-8 rounded-2xl bg-card/30 border border-border/40 backdrop-blur-xl space-y-6">
+										<div className="flex items-center gap-3">
+											<div className="p-2 rounded-xl bg-primary/10 text-primary">
+												<Layers className="w-5 h-5" />
+											</div>
+											<div>
+												<h3 className="text-base font-semibold text-foreground/90 font-sans">
+													Full Technical Arsenal
+												</h3>
+												<p className="text-xs font-mono text-muted-foreground/75">
+													All verified languages, frameworks, databases & infrastructure tools
+												</p>
+											</div>
 										</div>
-										<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-											{items.map(skill => {
-												const { icon: SkillIcon, color } =
-													getSkillIcon(skill);
 
-												return (
-													<motion.div
-														key={skill}
-														variants={staggerFastItem}
-														className="group relative flex flex-col items-center justify-center p-3 rounded-xl bg-background border border-border hover:border-transparent transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl shadow-[inset_0_1px_rgba(255,255,255,0.02)] cursor-default"
-													>
-														<div
-															className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-xl pointer-events-none blur-md"
-															style={{ backgroundColor: color }}
-														/>
-														<div 
-															className="absolute inset-0 border border-transparent group-hover:border-current transition-colors duration-300 rounded-xl pointer-events-none opacity-20"
-															style={{ color }}
-														/>
-														<SkillIcon
-															className="w-5 h-5 mb-2 transition-transform duration-300 group-hover:scale-110 drop-shadow-sm"
-															style={{ color }}
-														/>
-														<span className="text-[11px] sm:text-xs font-mono font-medium text-center text-foreground/80 group-hover:text-foreground transition-colors line-clamp-1 break-all px-1">
-															{skill}
+										<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+											{Object.entries(profile.skills).map(([category, items]) => (
+												<div
+													key={category}
+													className="p-4 rounded-xl bg-surface-2/40 border border-border/30"
+												>
+													<div className="flex items-center justify-between mb-3">
+														<span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+															{category}
 														</span>
-													</motion.div>
-												);
-											})}
+														<span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+															{items.length}
+														</span>
+													</div>
+													<div className="flex flex-wrap gap-1.5">
+														{items.map(skill => {
+															const { icon: SkillIcon, color } = getSkillIcon(skill);
+															return (
+																<span
+																	key={skill}
+																	className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-1 border border-border/30 text-[11px] font-mono text-foreground/80"
+																>
+																	<SkillIcon className="w-3 h-3" style={{ color }} />
+																	<span>{skill}</span>
+																</span>
+															);
+														})}
+													</div>
+												</div>
+											))}
 										</div>
 									</div>
-								))}
-							</motion.div>
-						</motion.div>
-					)}
-				</motion.div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</motion.div>
+				</div>
 			</div>
-		</div>
 		</>
 	);
 }
