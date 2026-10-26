@@ -1,18 +1,14 @@
 'use client';
 
-import { memo } from 'react';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, MapPin, Calendar, Award, BookOpen, Star } from 'lucide-react';
-import { publicService } from '@/api';
+import { GraduationCap, MapPin, Calendar, BookOpen, Award } from 'lucide-react';
 import type { JourneyEntry } from '@/api/schema';
 import { SectionHeader } from '@/ui/SectionHeader';
 import { cn } from '@/lib/utils';
-import { staggerContainer, staggerItem, cardHover } from '@/animations/motion';
+import { staggerContainer, staggerItem } from '@/animations/motion';
 import { useJourney } from '@/hooks/useJourney';
 
-// ─── Skeleton ───────────────────────────────────────────────────
-
-/** Format a date range from startDate/endDate or fall back to the pre-formatted date string */
 function formatDateRange(entry: JourneyEntry): string {
 	if (entry.startDate) {
 		const start = new Date(entry.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
@@ -26,220 +22,137 @@ function formatDateRange(entry: JourneyEntry): string {
 	return entry.date;
 }
 
+function cleanSkills(skills: string[] | undefined | null): string[] {
+	return (skills ?? []).filter(s => s.trim().length > 0);
+}
+
 function EducationSkeleton() {
 	return (
-		<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto animate-pulse pb-12 pt-6">
-			<div className="space-y-3 mb-8">
-				<div className="h-5 w-28 bg-foreground/5 rounded-lg" />
-				<div className="h-8 w-48 bg-foreground/5 rounded-xl" />
-			</div>
-			<div className="max-w-4xl mx-auto space-y-6 mt-12 relative">
-				<div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-foreground/10" />
+		<div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 animate-pulse space-y-6">
+			<div className="h-6 w-32 bg-foreground/5 rounded-md" />
+			<div className="space-y-4">
 				{[1, 2, 3].map(i => (
-					<div key={i} className="flex items-start gap-8 relative z-10">
-						<div className="absolute left-8 md:left-1/2 w-4 h-4 -ml-2 rounded-full bg-foreground/10 border-4 border-card" />
-						<div className="w-full pl-20 md:pl-0 md:w-1/2 md:pr-12">
-							<div className="h-44 bg-foreground/5 rounded-xl" />
-						</div>
-					</div>
+					<div key={i} className="h-40 bg-foreground/5 rounded-2xl" />
 				))}
 			</div>
 		</div>
 	);
 }
 
-// ─── Education Card ─────────────────────────────────────────────
-
-const EducationCard = memo(function EducationCard({
-	entry,
-	isEven,
-}: {
-	entry: JourneyEntry;
-	isEven: boolean;
-}) {
-	return (
-		<motion.div
-			variants={staggerItem}
-			className={cn(
-				'relative flex flex-col md:flex-row items-start md:items-center w-full group',
-				!isEven && 'md:flex-row-reverse',
-			)}
-		>
-			{/* Timeline Node */}
-			<div className="absolute left-[31px] md:left-1/2 -translate-x-1/2 mt-8 md:mt-0 z-10">
-				<div
-					className={cn(
-						'w-4 h-4 rounded-full bg-card border-4 group-hover:scale-150 transition-all duration-500',
-						entry.isCurrent && 'animate-pulse',
-					)}
-					style={{
-						borderColor: entry.isCurrent
-							? 'var(--theme-primary)'
-							: 'color-mix(in oklch, var(--theme-primary) 50%, transparent)',
-						boxShadow: entry.isCurrent ? '0 0 12px color-mix(in oklch, var(--theme-primary) 40%, transparent)' : '0 0 0 rgba(0,0,0,0)',
-					}}
-				/>
-			</div>
-
-			{/* Content Card Wrapper */}
-			<div
-				className={cn(
-					'w-full pl-20 md:pl-0 md:w-1/2 relative',
-					isEven ? 'md:pr-16 md:text-right' : 'md:pl-16',
-				)}
-			>
-				{/* Connector Line to Node (Desktop Only) */}
-				<div
-					className={cn(
-						'hidden md:block absolute top-1/2 -translate-y-1/2 w-8 h-px bg-border group-hover:bg-(--theme-primary)/50 transition-colors duration-500',
-						isEven ? 'right-8' : 'left-8',
-					)}
-				/>
-
-				<motion.div
-					whileHover={cardHover}
-					className={cn(
-						'relative p-3 sm:p-4 rounded-xl bg-linear-to-bl from-white/5 to-transparent border border-border backdrop-blur-sm overflow-hidden text-left',
-						'hover:border-foreground/20',
-					)}
-				>
-					<div className="absolute inset-0 bg-linear-to-bl from-transparent to-transparent group-hover:from-(--theme-primary)/5 transition-colors duration-500" />
-
-					<div className="relative z-10 flex flex-col h-full">
-						{/* Header row: Title + Badge */}
-						<div className="flex items-start justify-between gap-3 mb-2">
-							<h3 className="text-base sm:text-lg font-semibold tracking-tight text-foreground line-clamp-2 font-sans">
-								{entry.title}
-							</h3>
-							<div className="flex items-center gap-2 shrink-0">
-								{entry.isCurrent && (
-									<span
-										className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-medium uppercase tracking-wider"
-										style={{
-											background: 'color-mix(in oklch, var(--theme-primary) 12%, transparent)',
-											color: 'var(--theme-primary)',
-											border: '1px solid color-mix(in oklch, var(--theme-primary) 25%, transparent)',
-										}}
-									>
-										<span className="relative flex h-1.5 w-1.5">
-											<span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--theme-primary)' }} />
-											<span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ background: 'var(--theme-primary)' }} />
-										</span>
-										Currently Enrolled
-									</span>
-								)}
-								{entry.grade && (
-									<div className="px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 font-mono font-medium text-xs shadow-inner">
-										{entry.grade}
-									</div>
-								)}
-							</div>
-						</div>
-
-						{entry.degree && entry.fieldOfStudy && (
-							<p className="text-sm sm:text-base font-medium mb-4" style={{ color: 'var(--theme-primary)' }}>
-								{entry.degree} in {entry.fieldOfStudy}
-							</p>
-						)}
-
-						<div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-mono font-medium uppercase tracking-wide text-muted-foreground mb-5">
-							{entry.organization && (
-								<span
-									className="flex items-center gap-1.5 px-2 py-1 rounded-md"
-									style={{
-										color: 'var(--theme-primary)',
-										background: 'color-mix(in oklch, var(--theme-primary) 10%, transparent)',
-									}}
-								>
-									<BookOpen className="w-3.5 h-3.5" />
-									{entry.organization}
-								</span>
-							)}
-							<span className="flex items-center gap-1.5">
-								<Calendar className="w-3.5 h-3.5" />
-								{formatDateRange(entry)}
-							</span>
-							{entry.location && (
-								<span className="flex items-center gap-1.5">
-									<MapPin className="w-3.5 h-3.5" />
-									{entry.location}
-								</span>
-							)}
-							{entry.board && (
-								<span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-foreground/5 border border-border">
-									<Award className="w-3 h-3" />
-									{entry.board}
-								</span>
-							)}
-						</div>
-
-						{/* Skills Tags */}
-						{(entry.skills ?? []).filter(s => s.trim().length > 0).length > 0 && (
-							<div className="flex flex-wrap gap-2 mt-auto pt-3 border-t border-border">
-								{(entry.skills ?? []).filter(s => s.trim().length > 0).map(skill => (
-									<span
-										key={skill}
-										className="px-2.5 py-1 text-[11px] font-mono font-medium rounded-lg bg-foreground/5 text-muted-foreground border border-border group-hover:border-(--theme-primary)/20 transition-colors"
-									>
-										{skill}
-									</span>
-								))}
-							</div>
-						)}
-					</div>
-				</motion.div>
-			</div>
-		</motion.div>
-	);
-});
-
-// ─── Main Module ────────────────────────────────────────────────
-
 export function EducationModule() {
 	const { entries: educationEntries, loading } = useJourney('EDUCATION');
 
-	if (loading) return <EducationSkeleton />;
+	if (loading && educationEntries.length === 0) return <EducationSkeleton />;
 
 	return (
-		<div className="h-full w-full">
-			<div className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto pb-8 sm:pb-12 pt-4 md:pt-6">
+		<div className="w-full min-h-full pb-20 sm:pb-28">
+			<div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-4 sm:pt-6">
+				{/* 04 · Section Header */}
 				<SectionHeader
 					icon={GraduationCap}
 					index="04"
 					tag="FOUNDATION"
-					title="Academic Foundation"
-					description="Computer Science & Engineering fundamentals, coursework, and honors."
+					title="Academic Background"
+					description="Formal education, computer science foundations, and academic honors."
 					sectionId="education"
 				/>
 
 				{educationEntries.length === 0 ? (
-					<div className="text-center py-16 mt-8 text-muted-foreground border border-dashed border-border rounded-2xl bg-card/50">
-						No education data found.
+					<div className="text-center py-20 border border-dashed border-border/40 rounded-2xl bg-card/10 mt-6">
+						<p className="text-muted-foreground text-sm font-mono">No academic records found.</p>
 					</div>
 				) : (
-					<div className="relative mt-8 md:mt-12 max-w-4xl mx-auto">
-						{/* Timeline Center Line */}
-						<div
-							className="absolute left-[31px] md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2"
-							style={{ background: `linear-gradient(to bottom, transparent, color-mix(in oklch, var(--theme-primary) 20%, transparent), transparent)` }}
-						/>
+					<motion.div
+						variants={staggerContainer}
+						initial="hidden"
+						animate="visible"
+						className="space-y-4 sm:space-y-6 mt-6"
+					>
+						{educationEntries.map((entry, idx) => {
+							const dateRange = formatDateRange(entry);
+							const skills = cleanSkills(entry.skills);
 
-						<motion.div
-							variants={staggerContainer}
-							initial="hidden"
-							whileInView="visible"
-							viewport={{ once: true, margin: '-20px' }}
-							className="space-y-8 sm:space-y-12 md:space-y-16 flex flex-col"
-						>
-							{educationEntries.map((entry, index) => (
-								<EducationCard
-									key={entry.id}
-									entry={entry}
-									isEven={index % 2 === 0}
-								/>
-							))}
-						</motion.div>
-					</div>
+							return (
+								<motion.div
+									key={entry.id || idx}
+									variants={staggerItem}
+									className="group rounded-2xl border border-border/40 bg-card/25 backdrop-blur-xl p-6 sm:p-8 hover:border-border/80 transition-all duration-300 shadow-xs hover:shadow-md"
+								>
+									<div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-4 border-b border-border/20">
+										<div>
+											<div className="flex flex-wrap items-center gap-2 mb-1.5">
+												<span className="font-mono text-xs text-primary/90 font-medium">
+													// 0{idx + 1}
+												</span>
+												{entry.board && (
+													<>
+														<span className="text-border/60">·</span>
+														<span className="px-2 py-0.5 rounded-full bg-foreground/[0.04] text-[10px] font-mono text-muted-foreground/80 uppercase">
+															{entry.board}
+														</span>
+													</>
+												)}
+												{entry.grade && (
+													<span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-medium">
+														{entry.grade}
+													</span>
+												)}
+											</div>
+
+											<h3 className="text-xl sm:text-2xl font-light tracking-tight text-foreground/95 font-sans">
+												{entry.organization}
+											</h3>
+
+											{(entry.degree || entry.fieldOfStudy) && (
+												<p className="text-sm sm:text-base font-normal text-muted-foreground/90 mt-1">
+													{[entry.degree, entry.fieldOfStudy].filter(Boolean).join(' in ')}
+												</p>
+											)}
+										</div>
+
+										<div className="flex flex-col md:items-end gap-1 shrink-0 text-xs font-mono text-muted-foreground/75">
+											<div className="flex items-center gap-1.5">
+												<Calendar className="w-3.5 h-3.5 text-muted-foreground/50" />
+												<span>{dateRange}</span>
+												{entry.isCurrent && (
+													<span className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px]">
+														Enrolled
+													</span>
+												)}
+											</div>
+											{entry.location && (
+												<div className="flex items-center gap-1.5">
+													<MapPin className="w-3.5 h-3.5 text-muted-foreground/50" />
+													<span>{entry.location}</span>
+												</div>
+											)}
+										</div>
+									</div>
+
+									{entry.description && (
+										<div className="py-4">
+											<p className="text-sm sm:text-base text-foreground/80 font-normal leading-relaxed">
+												{entry.description}
+											</p>
+										</div>
+									)}
+
+									{skills.length > 0 && (
+										<div className="flex flex-wrap items-center gap-1.5 pt-2">
+											{skills.map(skill => (
+												<span
+													key={skill}
+													className="px-2.5 py-1 rounded-lg text-xs font-mono bg-foreground/[0.03] text-muted-foreground/80 border border-border/30"
+												>
+													{skill}
+												</span>
+											))}
+										</div>
+									)}
+								</motion.div>
+							);
+						})}
+					</motion.div>
 				)}
 			</div>
 		</div>
